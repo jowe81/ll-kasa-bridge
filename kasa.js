@@ -1,5 +1,6 @@
 const { Client } = require('tplink-smarthome-api');
 const client = new Client();
+const axios = require('axios');
 
 // Import an array of objects mapping device IDs to channel numbers.
 const deviceMap = require('./deviceMap');
@@ -19,14 +20,73 @@ const getDeviceByChannel = ch => {
 
 const addDeviceToMap = device => {
   deviceObject = getDeviceById(device.id);
-  deviceObject.device = device;
-  console.log(`Added new device to map: ${device.id}, ${device.host}, ${device.alias}`);
+  if (deviceObject) {
+    deviceObject.device = device;
+    console.log(`Found device on channel ${deviceObject.ch}: ${device.id}, ${device.host}, ${device.type}, ${device.alias} / ${deviceObject.localAlias}.`); 
+
+    addListeners(deviceObject);
+    device.startPolling(10000);
+  } else {
+    console.log(`No map entry for device ${device.alias} (${device.host}, ${device.id}).`);
+  }
+}
+
+const updateLL = (event, ch) => {
+  const LL_URL = 'http://lifelog.wnet.wn/?page=kasa_event';
+  const url = `${LL_URL}&event=${event}&ch=${ch}`;
+  //console.log('calling')
+  axios.get(url)
+    .then(data => {
+      console.log('LL response: ', data.data);
+    })
+    .catch(err => {
+      console.log("Error calling LL: ", err);
+    });
+};
+
+const addListeners = deviceObject => {
+  const device = deviceObject.device;
+  const ch = deviceObject.ch;
+  const tag = `Channel ${deviceObject.ch} (${deviceObject.localAlias ?? device.alias}): `;
+  console.log(`Adding listeners to channel ${deviceObject.ch} (${device.type})`);
+
+  switch (device.type) {
+    case 'IOT.SMARTPLUGSWITCH':
+      device.on('power-on', (e) => {
+        l = tag + 'power-on';
+        console.log(l);
+        updateLL('power-on', ch);
+      });
+      
+      device.on('power-off', (e) => {
+        l = tag + 'power-off';
+
+        console.log(l);
+        updateLL('power-off', ch);
+      });
+      break;
+
+    case 'IOT.SMARTBULB':
+      device.on('lightstate-on', (e) => {
+        l = tag + 'lightstate-on';
+        console.log(l);
+        updateLL('lightstate-on', ch);
+
+      });
+      
+      device.on('lightstate-off', (e) => {
+        l = tag + 'lightstate-off';
+        console.log(l);
+        updateLL('lightstate-off', ch);
+
+      });
+      break;
+  }
 }
 
 // Look for devices and add them to the map
 client.startDiscovery().on('device-new', (device) => {
   device.getSysInfo().then(info => {
-    console.log(`Found '${device.alias}' at ${device.host}`);
     addDeviceToMap(device);
   });
 });
