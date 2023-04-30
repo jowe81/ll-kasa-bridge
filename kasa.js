@@ -2,83 +2,151 @@ const { Client } = require('tplink-smarthome-api');
 const client = new Client();
 const axios = require('axios');
 
-// Import an array of objects mapping device IDs to channel numbers.
-const deviceMap = require('./deviceMap');
-console.log("Loaded device map: ", deviceMap);
+const { getFormattedDate, pad } = require('./jUtils');
 
 // Keep live (discovered) devices here.
 const devices = [];
+
 
 const getDeviceById = id => {
   return deviceMap.find(element => element.id === id);  
 }
 
-const getDeviceByChannel = ch => {
+const getDeviceMapEntryByChannel = ch => {
   const deviceMapItem = deviceMap.find(element => element.ch == ch);
   return deviceMapItem;
 }
 
-const addDeviceToMap = device => {
+const getDeviceObjectByChannel = ch => {
+  return devices.find(deviceObject => deviceObject.ch == ch);
+};
+
+
+const log = (t, ch, err) => {
+  let prefix = ``;
+
+  if (ch) {
+    ch = pad(ch, 2, ' ');
+    prefix = `Ch ${ch}`;
+    const deviceObject = getDeviceObjectByChannel(ch);
+    if (deviceObject && deviceObject.device) {
+      prefix += ` (${deviceObject.localAlias})`;
+    } else {
+      prefix += ` (device absent!)`;
+    }
+  }
+
+  let line;
+  const colon = ch ? ': ' : '';
+
+  if (err) {
+    if (t) {
+      //If a string was sent, put it in brackets
+      line = `${getFormattedDate()} ${prefix}${colon}Error (${t}):`;
+    } else {
+      line = `${getFormattedDate()} ${prefix}${colon}Error:`;
+    }
+    console.log(line, err);
+  } else {
+    line = `${getFormattedDate()} ${prefix}${colon}${t}`;
+    console.log(line);
+  }
+}
+
+// Import an array of objects mapping device IDs to channel numbers.
+const deviceData = require('./deviceMap');
+const { deviceMap } = deviceData;
+log(null, "Loaded device map: ", deviceMap);
+
+const addDeviceToLiveMap = device => {
   deviceObject = getDeviceById(device.id);
   if (deviceObject) {
     deviceObject.device = device;
-    console.log(`Found device on channel ${deviceObject.ch}: ${device.id}, ${device.host}, ${device.type}, ${device.alias} / ${deviceObject.localAlias}.`); 
+    log(`Found device: ${device.id}, ${device.host}, ${device.type}, ${device.alias} / ${deviceObject.localAlias}.`, deviceObject.ch); 
 
     addListeners(deviceObject);
-    device.startPolling(10000);
+    startPolling(deviceObject);
+    devices.push(deviceObject);
   } else {
-    console.log(`No map entry for device ${device.alias} (${device.host}, ${device.id}).`);
+    log(`No map entry for device '${device.alias}' (${device.host}, ${device.id}).`);
   }
 }
+
 
 const updateLL = (event, ch) => {
   const LL_URL = 'http://lifelog.wnet.wn/?page=kasa_event';
   const url = `${LL_URL}&event=${event}&ch=${ch}`;
-  //console.log('calling')
+  log(`Updating LifeLog`, ch);
   axios.get(url)
-    .then(data => {
-      console.log('LL response: ', data.data);
-    })
     .catch(err => {
-      console.log("Error calling LL: ", err);
+      log("while calling LifeLog", ch, err);
     });
 };
+
+const startPolling = (deviceObject) => {
+
+  device = deviceObject.device;
+
+  if (device) {
+    let interval = deviceData.pollIntDefault;
+
+    switch (device.type) {
+      case 'IOT.SMARTPLUGSWITCH':
+        //Unfortunately both, the wall switches and the little plugs have the same type descriptor.
+        interval = (deviceObject.switchType === deviceData.switchTypePlug) ? deviceData.pollIntPlug : deviceData.pollIntSwitch;
+        break;
+      
+      case 'IOT.SMARTBULB':
+        interval = deviceData.pollIntBulb;
+        break;
+    }
+  
+    device.startPolling(interval);
+
+    log(`Polling this ${device.type} at ${interval}ms.`, deviceObject.ch);  
+  }
+}
+
+const setPowerState = (ch, state) => {
+  targetDeviceObject = getDeviceObjectByChannel(ch);
+  if (targetDeviceObject?.device) {
+    targetDeviceObject.device.setPowerState(state);
+  }
+}
 
 const addListeners = deviceObject => {
   const device = deviceObject.device;
   const ch = deviceObject.ch;
   const tag = `Channel ${deviceObject.ch} (${deviceObject.localAlias ?? device.alias}): `;
-  console.log(`Adding listeners to channel ${deviceObject.ch} (${device.type})`);
+  log(`Adding listeners.`, ch);
 
   switch (device.type) {
     case 'IOT.SMARTPLUGSWITCH':
+
       device.on('power-on', (e) => {
-        l = tag + 'power-on';
-        console.log(l);
+        log('power-on', ch);
+        deviceObject.switchTargetsA?.forEach(ch => setPowerState(ch, true));
+        deviceObject.switchTargetsB?.forEach(ch => setPowerState(ch, false));
         updateLL('power-on', ch);
       });
-      
-      device.on('power-off', (e) => {
-        l = tag + 'power-off';
 
-        console.log(l);
+      device.on('power-off', (e) => {
+        log('power-off', ch);
+        deviceObject.switchTargetsA?.forEach(ch => setPowerState(ch, false));
+        deviceObject.switchTargetsB?.forEach(ch => setPowerState(ch, true));
         updateLL('power-off', ch);
       });
       break;
 
     case 'IOT.SMARTBULB':
       device.on('lightstate-on', (e) => {
-        l = tag + 'lightstate-on';
-        console.log(l);
+        log('lightstate-on', ch);
         updateLL('lightstate-on', ch);
-
       });
       
       device.on('lightstate-off', (e) => {
-        l = tag + 'lightstate-off';
-        console.log(l);
+        log('lightstate-off', ch);
         updateLL('lightstate-off', ch);
-
       });
       break;
   }
@@ -87,7 +155,7 @@ const addListeners = deviceObject => {
 // Look for devices and add them to the map
 client.startDiscovery().on('device-new', (device) => {
   device.getSysInfo().then(info => {
-    addDeviceToMap(device);
+    addDeviceToLiveMap(device);
   });
 });
 
@@ -128,7 +196,7 @@ const processDeviceError = (err, res, device) => {
 const processRequest = (req, res, routeCommand) => {
   const { ch }  = req.query;
 
-  const deviceMapItem = getDeviceByChannel(ch);
+  const deviceMapItem = getDeviceMapEntryByChannel(ch);
   const device = deviceMapItem?.device;
 
   if (deviceMapItem && device) {
@@ -136,7 +204,7 @@ const processRequest = (req, res, routeCommand) => {
     const commandObject = buildCommandObject(req.query);
 
     let info = `Channel ${commandObject.ch} (${device.alias}@${device.host}): ${routeCommand} `;
-    console.log(info, commandObject);
+    log(`Request from ${req.socket.remoteAddress}: ${routeCommand} ${JSON.stringify(commandObject)}`, commandObject.ch);
 
     switch (routeCommand) {
       case 'setPowerState':
