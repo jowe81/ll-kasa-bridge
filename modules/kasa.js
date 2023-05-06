@@ -2,7 +2,7 @@ const { Client } = require('tplink-smarthome-api');
 const client = new Client();
 const axios = require('axios');
 
-const { getFormattedDate, pad } = require('./jUtils');
+const { getFormattedDate, pad } = require('../jUtils');
 
 // Keep live (discovered) devices here.
 const devices = [];
@@ -54,7 +54,7 @@ const log = (t, ch, err) => {
 }
 
 // Import an array of objects mapping device IDs to channel numbers.
-const deviceData = require('./deviceMap');
+const deviceData = require('../deviceMap');
 const { deviceMap } = deviceData;
 log(null, "Loaded device map: ", deviceMap);
 
@@ -110,7 +110,9 @@ const startPolling = (deviceObject) => {
 const setPowerState = (ch, state) => {
   targetDeviceObject = getDeviceObjectByChannel(ch);
   if (targetDeviceObject?.device) {
-    targetDeviceObject.device.setPowerState(state);
+    targetDeviceObject.device.setPowerState(state).catch(err => {
+      log(`setPowerState`, ch, err);
+    });
   }
 }
 
@@ -164,13 +166,7 @@ client.startDiscovery().on('device-new', (device) => {
 const express = require('express')
 const router = express.Router()
 
-const errorHandler = (err, req, res, next) => {
-  console.log('- An error occurred: ', err);
-  res.status(500).send(err);
-  next(err);
-}
 
-router.use(errorHandler);
 
 const buildCommandObject = query => {
   const intParams =  [ 'on_off', 'ch', 'brightness', 'color_temp', 'hue', 'saturation', 'ignore_default', 'transition_period'];
@@ -238,4 +234,7 @@ router.get([ '/setLightState', '/setlightstate', '/set' ], (req, res, next) => {
 })
 
 
-module.exports = router
+module.exports = {
+  getDeviceObjectByChannel,
+  log,
+}
