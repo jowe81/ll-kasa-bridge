@@ -133,7 +133,7 @@ const deviceMap = [
     ch: 34, 
     id: "800686BE89C5D37A63B4E70AB37689212066F343",
     switchType: switchTypeSwitch,
-    switchTargetsA: [ 31, 32, 33 ], //Lights above the desk and desk lamp
+    switchTargetsA: [ 31, 32, 33, 36 ], //Lights above the desk and desk lamp
   },
   {
     localAlias: 'Front Door Lamp',
@@ -145,6 +145,12 @@ const deviceMap = [
     ch: 36, 
     id: "8012FA2584FE5D30C3E2F13FC023719B1F7B385D",    
   },
+  {
+    localAlias: 'Jess Storage Shelves',
+    ch: 36, 
+    id: "80120A8622D026338547E3D7E88D70931F9E81A8",    
+  },
+  
 
   
 

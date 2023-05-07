@@ -62,6 +62,7 @@ const addDeviceToLiveMap = device => {
   deviceObject = getDeviceById(device.id);
   if (deviceObject) {
     deviceObject.device = device;
+    deviceObject.isOnline = true;
     log(`Found device: ${device.id}, ${device.host}, ${device.type}, ${device.alias} / ${deviceObject.localAlias}.`, deviceObject.ch); 
 
     addListeners(deviceObject);
@@ -70,6 +71,13 @@ const addDeviceToLiveMap = device => {
   } else {
     log(`No map entry for device '${device.alias}' (${device.host}, ${device.id}).`);
   }
+}
+
+const markDeviceOffline = (device, err) => {
+  deviceObject = getDeviceById(device.id);
+  deviceObject.isOnline = false;
+  console.log(deviceObject.device.sysInfo);
+  log("Device went offline", deviceObject.ch, err?.message);
 }
 
 
@@ -102,6 +110,9 @@ const startPolling = (deviceObject) => {
     }
   
     device.startPolling(interval);
+    device.on('polling-error', (err) => {
+      processPollingError(err, deviceObject);
+    });
 
     log(`Polling this ${device.type} at ${interval}ms.`, deviceObject.ch);  
   }
@@ -184,9 +195,9 @@ const buildCommandObject = query => {
   return commandObject;
 }
 
-const processDeviceError = (err, res, device) => {
-  res.send('A device error occurred (likely it timed out).');
-  console.log('Device error: ', err);
+// Device is probably offline
+const processPollingError = (err, deviceObject) => {
+  markDeviceOffline(deviceObject.device, err);
 }
 
 const processRequest = (req, res, routeCommand) => {
