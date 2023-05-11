@@ -1,71 +1,13 @@
-const express = require('express');
-let kasaModule; //will be passed in
-const kasaRouter = express.Router();
+/***** Router code below. */
 
-const errorHandler = (err, req, res, next) => {
+const express = require('express');
+const kasaRouter = express.Router();
+  
+kasaRouter.use((err, req, res, next) => {
   console.log('- An error occurred: ', err);
   res.status(500).send(err);
   next(err);
-}
-  
-kasaRouter.use(errorHandler);
-
-const buildCommandObject = query => {
-  const intParams =  [ 'on_off', 'ch', 'brightness', 'color_temp', 'hue', 'saturation', 'ignore_default', 'transition_period'];
-  const stringParams = [ 'mode' ];
-  const commandObject = {};
-
-  for (const [key, value] of Object.entries(query)) {
-    if (intParams.includes(key)) {
-      commandObject[key] = parseInt(value);
-    } else if (stringParams.includes(key)) {
-      commandObject[key] = value;
-    }
-  };
-  
-  return commandObject;
-}
-
-const processDeviceError = (err, res, device) => {
-  res.send('A device error occurred (likely it timed out).');
-  console.log('Device error: ', err);
-}
-
-const processRequest = (req, res, routeCommand) => {
-  const { ch }  = req.query;
-
-  const deviceObject = kasaModule.getDeviceObjectByChannel(ch);
-  const device = deviceObject?.device;
-
-  if (device) {
-
-    const commandObject = buildCommandObject(req.query);
-
-    let info = `Channel ${commandObject.ch} (${device.alias}@${device.host}): ${routeCommand} `;
-    kasaModule.log(`Request from ${req.socket.remoteAddress}: ${routeCommand} ${JSON.stringify(commandObject)}`, commandObject.ch);
-
-    switch (routeCommand) {
-      case 'setPowerState':
-        return device
-          .setPowerState(commandObject.on_off == 1 ? true : false)
-          .then(() => res.send('ok'))
-          .catch(err => processDeviceError(err, res, device));
-        break;
-
-      case 'setLightState':
-        return device.lighting
-          .setLightState(commandObject)
-          .then(() => res.send('ok'))
-          .catch(err => processDeviceError(err, res, device));
-        break;
-
-      default:
-        return Promise.reject(`Unknown device command.`);
-    }
-  } else {
-    return Promise.reject(`Device on channel ${ch} not found.`);
-  }
-}
+});
 
 kasaRouter.get([ '/setPowerState', '/setpowerstate', '/switch' ], (req, res, next) => {
   processRequest(req, res, 'setPowerState').catch(next);
@@ -74,13 +16,48 @@ kasaRouter.get([ '/setPowerState', '/setpowerstate', '/switch' ], (req, res, nex
 kasaRouter.get([ '/setLightState', '/setlightstate', '/set' ], (req, res, next) => {
   processRequest(req, res, 'setLightState').catch(next);
 });
+
+
+/***** Request processing code below. */
+
+const utils = require('../helpers/utils');
+
+// Instantiate and initialize the device pool.
+const devicePool = require('../modules/DevicePool');
+devicePool.initialize(utils.updateLL);
+
+const processRequest = (req, res, routeCommand) => {
+  const channel  = req.query.channel ?? req.query.ch;
+
+  // Find the deviceWrapper in the pool
+  const deviceWrapper = devicePool.getDeviceWrapperByChannel(parseInt(channel));
   
+  if (deviceWrapper) {
+    // Transform the query into a kasa command object
+    const commandObject = utils.buildCommandObjectFromQuery(req.query);
+    console.log(`Request from ${req.socket.remoteAddress}: ${routeCommand} ${JSON.stringify(commandObject)}`);
 
-const passInKasaModule = (module) => {
-  kasaModule = module;  
-};
+    switch (routeCommand) {
+      case 'setPowerState':
+        return deviceWrapper
+          .setPowerState(commandObject.on_off == 1 ? true : false)
+          .then(() => res.send('ok'))
+          .catch(err => {/* handled in DevicePool */});
+        break;
 
-module.exports = {
-  kasaRouter,
-  passInKasaModule
+      case 'setLightState':
+        return deviceWrapper
+          .setLightState(commandObject)
+          .then(() => res.send('ok'))
+          .catch(err => {/* handled in DevicePool */});
+        break;
+
+      default:
+        return Promise.reject(`Unknown device command.`);
+    }
+  } else {
+    return Promise.reject(`Device on channel ${channel} not found.`);
+  }
 }
+
+module.exports = kasaRouter;

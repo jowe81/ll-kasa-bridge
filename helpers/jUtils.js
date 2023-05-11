@@ -12,8 +12,8 @@ const getFormattedDate = date => {
     minutes = date.getMinutes();
     seconds = date.getSeconds();
 
-    const formattedDate = `${year}/${pad(month, 2)}/${pad(day, 2)}`;
-    const formattedTime = `${pad(hours, 2)}:${pad(minutes, 2)}:${pad(seconds, 2)}`;
+    const formattedDate = `${year}/${pad(month, 2, '0')}/${pad(day, 2, '0')}`;
+    const formattedTime = `${pad(hours, 2, '0')}:${pad(minutes, 2, '0')}:${pad(seconds, 2, '0')}`;
 
     return `${formattedDate} ${formattedTime}`;
 }
@@ -25,7 +25,7 @@ const getFormattedDate = date => {
  * @param   string    paddingCharacter 
  * @returns string
  */
-const pad = (input, targetLength, paddingCharacter) => {
+const pad = (input, targetLength, paddingCharacter = ' ') => {
 
     if (typeof(input) === 'number') {
         input = input.toString();
