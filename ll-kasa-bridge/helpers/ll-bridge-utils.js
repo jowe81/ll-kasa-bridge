@@ -1,32 +1,32 @@
-/***** Router code below. */
+const axios = require('axios');
 
-const express = require('express');
-const kasaRouter = express.Router();
+const updateLL = (event, deviceWrapper) => {
+  const LL_URL = 'http://lifelog.wnet.wn/?page=kasa_event';
+  const url = `${LL_URL}&event=${event}&ch=${deviceWrapper.channel}`;
+  console.log(`* Lifelog * ${deviceWrapper.alias} (ch ${deviceWrapper.channel}): ${event} `);
+  axios.get(url)
+    .catch(err => {
+      log("while calling LifeLog", deviceWrapper.channel, err);
+    });
+};
+
+const buildCommandObjectFromQuery = query => {
+  const intParams =  [ 'on_off', 'ch', 'brightness', 'color_temp', 'hue', 'saturation', 'ignore_default', 'transition_period'];
+  const stringParams = [ 'mode' ];
+  const commandObject = {};
+
+  for (const [key, value] of Object.entries(query)) {
+    if (intParams.includes(key)) {
+      commandObject[key] = parseInt(value);
+    } else if (stringParams.includes(key)) {
+      commandObject[key] = value;
+    }
+  };
   
-kasaRouter.use((err, req, res, next) => {
-  console.log('- An error occurred: ', err);
-  res.status(500).send(err);
-  next(err);
-});
+  return commandObject;
+}
 
-kasaRouter.get([ '/setPowerState', '/setpowerstate', '/switch' ], (req, res, next) => {
-  processRequest(req, res, 'setPowerState').catch(next);
-});
-  
-kasaRouter.get([ '/setLightState', '/setlightstate', '/set' ], (req, res, next) => {
-  processRequest(req, res, 'setLightState').catch(next);
-});
-
-
-/***** Request processing code below. */
-
-const utils = require('../helpers/utils');
-
-// Instantiate and initialize the device pool.
-const devicePool = require('../modules/DevicePool');
-devicePool.initialize(utils.updateLL);
-
-const processRequest = (req, res, routeCommand) => {
+const processRequest = (req, res, routeCommand, devicePool) => {
   const channel  = req.query.channel ?? req.query.ch;
 
   // Find the deviceWrapper in the pool
@@ -60,4 +60,8 @@ const processRequest = (req, res, routeCommand) => {
   }
 }
 
-module.exports = kasaRouter;
+module.exports = {
+  updateLL,
+  buildCommandObjectFromQuery,
+  processRequest,
+}

@@ -1,0 +1,42 @@
+version: '3.7'
+name: 'jj-auto'
+
+networks:
+  app:
+
+services:
+
+  mongodb:
+    image: mongo:5.0
+    restart: always
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: ${DB_MONGO_USERNAME}
+#      MONGO_INITDB_ROOT_PASSWORD: ${DB_MONGO_PASSWORD}
+    
+    command: --noauth
+    volumes:
+      - mongo-volume:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - app
+
+  app:
+    build:
+      context: .
+      dockerfile: node.dockerfile
+    volumes:
+      - ./:/usr/src/app
+    depends_on:
+      - mongodb
+    # Path to package.json
+    working_dir: /usr/src/app/ll-kasa-bridge
+    entrypoint: ['bash', './deploy.sh']
+    network_mode: "host"
+#    ports:
+#      - "${NODE_PORT}:3000"
+    networks:
+      - app
+
+volumes:
+  mongo-volume:
