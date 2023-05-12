@@ -191,13 +191,12 @@ const deviceMap = [
     id: "80120A8622D026338547E3D7E88D70931F9E81A8",
     subType: tStrip,
   },
-  
-
-  
-
-
-  
-  
+  {
+    alias: 'Bedroom Desk Strip Shelving',
+    ch: 37, 
+    id: "80125B9CDD55CE105CC76F0CA2F6C8CC1F5426D8",
+    subType: tStrip,
+  },
 
 //Kitchen and living room all: ***** ***** ***** *p*p* pp*p* ppppp **
 //Full on: **1** ***** ****1 11*1* 11*1* 11111 111

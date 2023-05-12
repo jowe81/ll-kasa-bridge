@@ -124,7 +124,7 @@ const DeviceWrapper = {
       }
     } else {
       if (device) {
-        log(`Found unmapped device at ${device.host}`, this);  
+        log(`Found unmapped device at ${device.host} - ID: ${device.id}`, this);  
       }
     }
   },
