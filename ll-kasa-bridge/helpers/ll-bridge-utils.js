@@ -34,7 +34,7 @@ const processRequest = (req, res, routeCommand, devicePool) => {
   
   if (deviceWrapper) {
     // Transform the query into a kasa command object
-    const commandObject = utils.buildCommandObjectFromQuery(req.query);
+    const commandObject = buildCommandObjectFromQuery(req.query);
     console.log(`Request from ${req.socket.remoteAddress}: ${routeCommand} ${JSON.stringify(commandObject)}`);
 
     switch (routeCommand) {

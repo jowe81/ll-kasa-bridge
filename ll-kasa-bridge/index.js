@@ -18,7 +18,7 @@ mongoConnect().then(db => {
 
   // Initialize the router.
   const { initRouter } = require('./routers/kasaRouter');
-  const kasaRouter = initRouter(express, utils.processRequest);
+  const kasaRouter = initRouter(express, devicePool, utils.processRequest);
   app.use('/kasa', kasaRouter);
 
   // Start the server.
