@@ -28,10 +28,8 @@ const log = (t, deviceWrapper, err) => {
 
 /**
  * A Wrapper around the device object that stores additional mapItem properties
- * and manages an inOnline flag based on device-online/device-offline events
- * emitted by the client object.
- * 
- * 
+ * and manages an isOnline flag based on device-online/device-offline events
+ * emitted by the client object.  
  */
 
 const DeviceWrapper = {
@@ -214,18 +212,29 @@ const DeviceWrapper = {
  */
 const DevicePool = {
 
-  initialize(callbackFn) {
-    this.loadDeviceMap();
-    this.devices = [];
+  initialize(db, callbackFn) {
+    this.db = db;
+    this.dbDeviceMap = db.collection('deviceMap');
+    this.dbConfig = this.db.collection('config');
 
-    const { Client } = require('tplink-smarthome-api');
-    const client = new Client();
+
+    // This will call startDiscovery once things have been loaded from Mongo
+    this.loadDeviceMap();
 
     // If a callback function has been passed in, store it.
     if (callbackFn) {
       this.deviceEventCallbackFn = callbackFn;
       log(`Registered callback function.`);
     }
+  },
+
+  startDiscovery() {
+    log(`Starting device discovery...`);
+    this.devices = [];
+
+    const { Client } = require('tplink-smarthome-api');
+    const client = new Client();
+
  
 
     const addDevice = device => {
@@ -287,11 +296,21 @@ const DevicePool = {
   },
 
   loadDeviceMap() {
-    const DeviceMap = require('../deviceMap');
-    this.globalConfig = DeviceMap.globalConfig;
-    
-    this.deviceMap = DeviceMap.deviceMap;
-    log(`Loaded device-map with ${this.deviceMap.length} items.`);
+    this.dbDeviceMap.find({}).toArray().then(deviceMap => {
+
+      log(`Loaded ${deviceMap.length} devices from the database.`);
+      this.deviceMap = deviceMap;
+
+    }).then(this.dbConfig.findOne()
+    .then(globalConfig => {
+
+      log(`Loaded global configuration from the database.`);
+      this.globalConfig = globalConfig;
+
+      this.startDiscovery();      
+    }));
+
+
   }, 
 
 }
