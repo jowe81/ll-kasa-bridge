@@ -3,6 +3,11 @@ const tStrip = 'led-strip';
 const tPlug = 'plug';
 const tSwitch = 'switch';
 
+const defaults = {
+  pollInterval: 10000,
+  offlineTolerance: 1,
+}
+
 const globalConfig = {
   subTypes: {
     tBulb,
@@ -13,17 +18,22 @@ const globalConfig = {
 
   [tBulb]: {
     pollInterval: 10000,
+    offlineTolerance: defaults.offlineTolerance
   },
   [tStrip]: {
     pollInterval: 10000,
+    offlineTolerance: defaults.offlineTolerance
   },
   [tSwitch]: {
     pollInterval: 1000,
+    offlineTolerance: defaults.offlineTolerance
   },
   [tPlug]: {
     pollInterval: 5000,
-  } 
+    offlineTolerance: defaults.offlineTolerance
+  },
 
+  defaults,
 }
 
 const deviceMap = [
