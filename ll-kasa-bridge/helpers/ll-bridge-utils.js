@@ -38,19 +38,18 @@ const processRequest = (req, res, routeCommand, devicePool) => {
   if (deviceWrapper) {
     // Transform the query into a kasa command object
     const commandObject = buildCommandObjectFromQuery(req.query);
-    console.log(`Request from ${req.socket.remoteAddress}: ${routeCommand} ${JSON.stringify(commandObject)}`);
 
     switch (routeCommand) {
       case 'setPowerState':
         return deviceWrapper
-          .setPowerState(commandObject.on_off == 1 ? true : false)
+          .setPowerState(commandObject.on_off == 1 ? true : false, { ip: req.socket.remoteAddress })
           .then(() => res.send('ok'))
           .catch(err => {/* handled in DevicePool */});
         break;
 
       case 'setLightState':
         return deviceWrapper
-          .setLightState(commandObject)
+          .setLightState(commandObject, { ip: req.socket.remoteAddress })
           .then(() => res.send('ok'))
           .catch(err => {/* handled in DevicePool */});
         break;

@@ -1,3 +1,4 @@
+import { log } from '../helpers/jUtils.js';
 
 const initRouter = (express, devicePool, processRequest) => {
   const kasaRouter = express.Router();
@@ -7,8 +8,13 @@ const initRouter = (express, devicePool, processRequest) => {
     res.status(500).send(err);
     next(err);
   });
+
+  kasaRouter.use((req, res, next) => {
+    log(req.url);
+    next();
+  })
   
-  kasaRouter.get([ '/setPowerState', '/setpowerstate', '/switch' ], (req, res, next) => {
+  kasaRouter.get([ '/setPowerState', '/setpowerstate', '/switch' ], (req, res, next) => {    
     processRequest(req, res, 'setPowerState', devicePool).catch(next);
   });
     

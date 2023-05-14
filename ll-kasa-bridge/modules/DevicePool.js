@@ -72,34 +72,59 @@ const DeviceWrapper = {
     //If no callback function is present create a dummy.
     const callback = this.deviceEventCallbackFn ? this.deviceEventCallbackFn : () => {};
 
+    // Send the meta for this device as the origin of the request (used with switches)
+    const { type, channel, id, alias } = this;
+    const origin = {
+      type,
+      channel,
+      id,
+      alias,
+    }
+    
+    const switchOnOffListener = (event) => {
+      let targetsA = event === 'power-on' ? this.switchTargets : this.switchTargetsOff;
+      let targetsB = event === 'power-on' ? this.switchTargetsOff : this.switchTargets;
+
+      if (!targetsA) {
+        targetsA = [];
+      }
+      if (!targetsB) {
+        targetsB = [];
+      }
+
+      log(`${event}, on-targets: [${targetsA.join(', ')}] off-targets: [${targetsB.join(', ')}].`, this);
+
+      targetsA.forEach(channel => {
+        const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel)
+        if (deviceWrapper) {
+          console.log('A - isonline: ', deviceWrapper.isOnline);
+          deviceWrapper
+            .setPowerState(true, origin)
+            .catch(err => {
+              console.log(err);
+            });              
+        }
+      });
+
+      targetsB.forEach(channel => {            
+        const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel)
+        if (deviceWrapper) {
+          console.log('B: ', deviceWrapper.alias);
+          deviceWrapper
+            .setPowerState(false, origin)
+            .catch(err => {
+              console.log(err);
+            });              
+        }
+      });
+
+      callback(event, this);
+    }
+
     switch (this.device.type) {
       case 'IOT.SMARTPLUGSWITCH':
-  
-        this.device.on('power-on', (e) => {
-          log('power-on', this);
-          this.switchTargets?.forEach(channel => {
-            targetDeviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel);
-            targetDeviceWrapper?.setPowerState(true);
-          });
-          this.switchTargetsOff?.forEach(channel => {
-            targetDeviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel);
-            targetDeviceWrapper?.setPowerState(false);
-          });
-          callback('power-on', this);
-        });
-  
-        this.device.on('power-off', (e) => {
-          log('power-off', this);
-          this.switchTargetsOff?.forEach(channel => {
-            targetDeviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel);
-            targetDeviceWrapper?.setPowerState(true);
-          });
-          this.switchTargets?.forEach(channel => {
-            targetDeviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel);
-            targetDeviceWrapper?.setPowerState(false);
-          });
-          callback('power-off', this);
-        });
+        this.device.on('power-on', () => switchOnOffListener('power-on'));
+        this.device.on('power-off', () => switchOnOffListener('power-off'));
         break;
   
       case 'IOT.SMARTBULB':
@@ -160,48 +185,36 @@ const DeviceWrapper = {
     }
   },
 
-  setLightState(commandObject) {
-    return new Promise((resolve, reject) => {
-      if (this.device) {
-        if (this.isOnline) {
-          this.device
-            .setLightState(commandObject)
-            .then(data => {
-              log(`${cmdPrefix} setLightState ${JSON.stringify(commandObject)}`, this, 'cyan');
-              this.PowerState = state;  
-              resolve();
-            })
-            .catch(err => {
-              log(`${cmdPrefix} ${cmdFailPrefix} setLightState returned an error`, this, null, err);
-              reject(err);
-            });
-        } else {
-          log(`${cmdPrefix} ${cmdFailPrefix} setLightState failed: device is offline.`, this, 'red');
-        }
+  async setLightState(commandObject, origin) {    
+    let originText = origin.alias ?? origin.id ?? origin.ip ?? 'unknown origin';
+    log(`Command from ${originText}`, this);
+
+    if (this.device && this.isOnline) {
+      try {
+        const data = await this.device.lighting.setLightState(commandObject);
+        log(`${cmdPrefix} setLightState ${JSON.stringify(commandObject)}`, this, 'cyan');
+      } catch(err) {
+        log(`${cmdPrefix} ${cmdFailPrefix} setLightState returned an error`, this, null, err);
       }
-    });
+    } else {
+      log(`${cmdPrefix} ${cmdFailPrefix} setLightState failed: device is offline.`, this, 'red');
+    }
   },
 
-  setPowerState(state) {
-    return new Promise((resolve, reject) => {
-      if (this.device) {
-        if (this.isOnline) {
-          this.device
-            .setPowerState(state)
-            .then(data => {
-              log(`${cmdPrefix} setPowerState ${state ? 'on' : 'off'}`, this, 'cyan');
-              this.PowerState = state;
-              resolve();  
-            })
-            .catch(err => {
-              log(`${cmdPrefix} ${cmdFailPrefix} setPowerState returned an error`, this, null, err);
-              reject(err);
-            });
-        } else {
-          log(`${cmdPrefix} ${cmdFailPrefix} setPowerState failed: device is offline.`, this, 'red');
-        }
+  async setPowerState(state, origin) {    
+    let originText = origin.alias ?? origin.id ?? origin.ip ?? 'unknown origin';
+    log(`Command from ${originText}`, this);
+
+    if (this.device && this.isOnline) {
+      try {
+        const data = await this.device.setPowerState(state);
+        log(`${cmdPrefix} setPowerState ${state ? 'on' : 'off'}`, this, 'cyan');  
+      } catch(err) {
+        log(`${cmdPrefix} ${cmdFailPrefix} setPowerState returned an error`, this, null, err);
       }
-    })
+    } else {
+      log(`${cmdPrefix} ${cmdFailPrefix} setPowerState failed: device is offline.`, this, 'red');
+    }
   },
 
 
@@ -217,6 +230,7 @@ const DeviceWrapper = {
         if (this.isOnline) {
           log("Polling error. Device probably went offline.", this, null, err?.message);
         }
+        console.log(err);
       });
   
       const pollInterval = this.config?.pollInterval ?? 10000;
@@ -277,6 +291,7 @@ const DevicePool = {
       deviceWrapper.devicePool = this;
 
       deviceWrapper.injectDevice(device, mapItem, this.globalConfig, this.deviceEventCallbackFn);
+  
       this.devices.push(deviceWrapper);      
     }
 
@@ -312,18 +327,18 @@ const DevicePool = {
     
   },
   
-  getDeviceMapItemById(id) {
-    return this.dbDeviceMap.findOne({id});
-  },
-
   getDeviceWrapperByChannel(channel) {
     return this.devices.find(deviceWrapper => deviceWrapper.channel === channel);
+  },
+
+  async getDeviceMapItemById(id) {
+    return this.dbDeviceMap.findOne({id});
   },
 
   async getDeviceWrapperById(id) {
     const mapItem = await this.getDeviceMapItemById(id);
     if (mapItem) {
-      return this.getDeviceWrapperByChannel(mapItem.ch);
+      return Promise.resolve(this.getDeviceWrapperByChannel(mapItem.ch));
     }
   },
 
