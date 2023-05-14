@@ -1,13 +1,23 @@
-require('dotenv').config();
+// Packages
+import dotenv from 'dotenv';
+import express from 'express';
 
-const express = require('express');
+// Project files
+import mongoConnect from './db/mongodb.js';
+import devicePool from './modules/DevicePool.js';
+import utils from './helpers/ll-bridge-utils.js';
+import { initRouter } from './routers/kasaRouter.js';
+import { log } from './helpers/jUtils.js';
+
+dotenv.config();
+
 const app = express();
 const port = process.env.PORT ?? 3000;
 
-const mongoConnect = require('./db/mongodb');
+log(`Welcome to JJ-Auto. Backend is starting up...`);
 
 mongoConnect().then(db => {
-  console.log('Established db connection');
+  log('Connected to database.');
 
   // Check if we need to import a device map
   if (process.argv[2] === '-import') {
@@ -20,23 +30,19 @@ mongoConnect().then(db => {
       importGlobalConfig(db, globalConfig);
     }
   }
-
-
-  // Import utilities for the ll-bridge functions.
-  const utils = require('./helpers/ll-bridge-utils');
   
   // Initialize the device pool with a callback to update the LL db on device events.
-  const devicePool = require('./modules/DevicePool');
   devicePool.initialize(db, utils.updateLL);
 
   // Initialize the router.
-  const { initRouter } = require('./routers/kasaRouter');
   const kasaRouter = initRouter(express, devicePool, utils.processRequest);
   app.use('/kasa', kasaRouter);
 
   // Start the server.
   app.listen(port, () => {
-    console.log(`LifeLog-Kasa-Bridge server listening on port ${port}.`);
+    log(`LifeLog-Kasa-Bridge server listening on port ${port}.`);
   })
-})
+}).catch(err => {
+  log(`Unable to connect to database. Exiting.`, null, err);
+});
 

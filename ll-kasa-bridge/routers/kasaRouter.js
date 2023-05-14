@@ -19,4 +19,4 @@ const initRouter = (express, devicePool, processRequest) => {
   return kasaRouter;
 }
 
-module.exports = { initRouter };
+export { initRouter };

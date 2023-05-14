@@ -1,9 +1,17 @@
-const { getFormattedDate, pad } = require('../helpers/jUtils');
+import chalk from 'chalk';
+import TplinkSmarthomeApi from 'tplink-smarthome-api';
+import fs from 'fs';
 
-const log = (t, deviceWrapper, err) => {
+
+import { getFormattedDate, pad } from '../helpers/jUtils.js';
+const cmdPrefix = '[CMD]';
+const cmdFailPrefix = '[FAIL]';
+
+const log = (t, deviceWrapper, color, err) => {
+  let date = getFormattedDate() + ' ';
   let prefix = ``;
 
-  channel = deviceWrapper?.channel ? pad(deviceWrapper?.channel, 2) : 0;
+  const channel = deviceWrapper?.channel ? pad(deviceWrapper?.channel, 2) : 0;
   if (channel) {
     prefix += `Ch ${channel}` + (deviceWrapper.device ? ` (${deviceWrapper.alias})` : ``);
   }
@@ -13,15 +21,40 @@ const log = (t, deviceWrapper, err) => {
 
   if (err) {
     if (t) {
-      //If a string was sent, put it in brackets
-      line = `${getFormattedDate()} ${prefix}${colon}Error (${t}):`;
+      //A message was sent along
+      line = `${prefix}${colon}${t}:`;
     } else {
-      line = `${getFormattedDate()} ${prefix}${colon}Error:`;
+      //No message, use err.message
+      const msg = err.message ? err.message : 'unknown error'; 
+      line = `${prefix}${colon}Error: ${msg}`;
     }
-    console.log(line, err);
+    console.log(date + chalk.red(line), typeof(err) === 'string' ? chalk.red(err) : err);
   } else {
-    line = `${getFormattedDate()} ${prefix}${colon}${t}`;
-    console.log(line);
+    // Regular message.
+    line = `${prefix}${colon}${t}`;
+    console.log(date + chalk[color ?? 'green'](line));
+  }
+
+  if (deviceWrapper) {
+    const logToFile = process.env.LOG_DEVICE_EVENTS_TO_FILE;
+    const logDirectory = process.env.LOG_DIRECTORY;
+    const logFileName = channel ?
+      `Channel ${pad(channel, 2 , '0')} - ${deviceWrapper.alias}.log` :
+      `Unmapped devices.log`;
+
+    if (logToFile) {
+      try {
+        if (!fs.existsSync(logDirectory)){
+          fs.mkdirSync(logDirectory);
+        }
+        fs.appendFileSync(
+          logDirectory + logFileName,
+          getFormattedDate(null, null) + ' ' + line + '\n'
+        );
+      } catch (err) {
+        log(`Could not write to log file at ${logDirectory + logFileName}`, null, null, err);
+      }
+    }
   }
 }
 
@@ -112,7 +145,7 @@ const DeviceWrapper = {
               log(`Updated alias from ${device.alias} to ${this.alias}.`, this);
             })
             .catch(err => {
-              log(`Updating alias failed.`, this, err);
+              log(`Updating alias failed.`, this, null, err);
             });
         }
 
@@ -122,7 +155,7 @@ const DeviceWrapper = {
       }
     } else {
       if (device) {
-        log(`Found unmapped device at ${device.host} - ID: ${device.id}`, this);  
+        log(`Found unmapped device at ${device.host} - ID ${device.id}, type ${device.type}`, this);
       }
     }
   },
@@ -134,16 +167,16 @@ const DeviceWrapper = {
           this.device
             .setLightState(commandObject)
             .then(data => {
-              log(`setLightState ${JSON.stringify(commandObject)}`, this, err);
+              log(`${cmdPrefix} setLightState ${JSON.stringify(commandObject)}`, this, 'cyan');
               this.PowerState = state;  
               resolve();
             })
             .catch(err => {
-              log(`setLightState failed`, this, err);
+              log(`${cmdPrefix} ${cmdFailPrefix} setLightState returned an error`, this, null, err);
               reject(err);
             });
         } else {
-          log(`setLightState failed because device is offline.`, this);
+          log(`${cmdPrefix} ${cmdFailPrefix} setLightState failed: device is offline.`, this, 'red');
         }
       }
     });
@@ -156,16 +189,16 @@ const DeviceWrapper = {
           this.device
             .setPowerState(state)
             .then(data => {
-              log(`setPowerState ${state ? 'on' : 'off'}`, this);
+              log(`${cmdPrefix} setPowerState ${state ? 'on' : 'off'}`, this, 'cyan');
               this.PowerState = state;
               resolve();  
             })
             .catch(err => {
-              log(`setPowerState failed`, this, err);
+              log(`${cmdPrefix} ${cmdFailPrefix} setPowerState returned an error`, this, null, err);
               reject(err);
             });
         } else {
-          log(`setPowerState failed because device is offline.`, this);
+          log(`${cmdPrefix} ${cmdFailPrefix} setPowerState failed: device is offline.`, this, 'red');
         }
       }
     })
@@ -182,7 +215,7 @@ const DeviceWrapper = {
 
       this.device.on('polling-error', (err) => {
         if (this.isOnline) {
-          log("Polling error. Device probably went offline.", this, err?.message);
+          log("Polling error. Device probably went offline.", this, null, err?.message);
         }
       });
   
@@ -212,34 +245,33 @@ const DeviceWrapper = {
  */
 const DevicePool = {
 
-  initialize(db, callbackFn) {
+  async initialize(db, callbackFn) {
     this.db = db;
     this.dbDeviceMap = db.collection('deviceMap');
     this.dbConfig = this.db.collection('config');
 
-
-    // This will call startDiscovery once things have been loaded from Mongo
-    this.loadDeviceMap();
+    log(`Initializing device pool.`, null, 'white');
 
     // If a callback function has been passed in, store it.
     if (callbackFn) {
       this.deviceEventCallbackFn = callbackFn;
-      log(`Registered callback function.`);
+      log(`Registered callback function '${callbackFn.name}' in device pool.`, null, 'white');
     }
+
+    // This will call startDiscovery once things have been loaded from Mongo
+    await this.loadGlobalConfiguration();
+    this.startDiscovery();
   },
 
   startDiscovery() {
-    log(`Starting device discovery...`);
+    log(`Starting device discovery...`, null, 'white');
     this.devices = [];
 
-    const { Client } = require('tplink-smarthome-api');
-    const client = new Client();
+    const client = new TplinkSmarthomeApi.Client();
 
- 
-
-    const addDevice = device => {
+    const addDevice = async device => {
       const deviceWrapper = Object.create(DeviceWrapper);      
-      const mapItem = this.getDeviceMapItemById(device.id);
+      const mapItem = await this.getDeviceMapItemById(device.id);
 
       // Store a backreference to the pool in each wrapper to enable event listeners to execute functinos on other devices
       deviceWrapper.devicePool = this;
@@ -260,17 +292,17 @@ const DevicePool = {
     });
 
     // Attach event listeners for device-online/device-offline    
-    client.on('device-offline', device => {
-      const deviceWrapper = this.getDeviceWrapperById(device.id);
+    client.on('device-offline', async device => {
+      const deviceWrapper = await this.getDeviceWrapperById(device.id);
       if (deviceWrapper && deviceWrapper.isOnline) {
-        log(`Device went offline.`, deviceWrapper);
+        log(`Device went offline.`, deviceWrapper, 'yellow');
         deviceWrapper.isOnline = false;
         deviceWrapper.stopPolling();
       }
     });
 
-    client.on('device-online', device => {
-      const deviceWrapper = this.getDeviceWrapperById(device.id);
+    client.on('device-online', async device => {
+      const deviceWrapper = await this.getDeviceWrapperById(device.id);
       if (deviceWrapper && !deviceWrapper.isOnline) {
         log(`Device came online.`, deviceWrapper);
         deviceWrapper.isOnline = true;
@@ -281,39 +313,28 @@ const DevicePool = {
   },
   
   getDeviceMapItemById(id) {
-    return this.deviceMap.find(item => item.id === id);  
+    return this.dbDeviceMap.findOne({id});
   },
 
   getDeviceWrapperByChannel(channel) {
     return this.devices.find(deviceWrapper => deviceWrapper.channel === channel);
   },
 
-  getDeviceWrapperById(id) {
-    mapItem = this.getDeviceMapItemById(id);
+  async getDeviceWrapperById(id) {
+    const mapItem = await this.getDeviceMapItemById(id);
     if (mapItem) {
       return this.getDeviceWrapperByChannel(mapItem.ch);
     }
   },
 
-  loadDeviceMap() {
-    this.dbDeviceMap.find({}).toArray().then(deviceMap => {
-
-      log(`Loaded ${deviceMap.length} devices from the database.`);
-      this.deviceMap = deviceMap;
-
-    }).then(this.dbConfig.findOne()
-    .then(globalConfig => {
-
-      log(`Loaded global configuration from the database.`);
-      this.globalConfig = globalConfig;
-
-      this.startDiscovery();      
-    }));
-
-
+  async loadGlobalConfiguration() {
+    const globalConfig = await this.dbConfig.findOne();
+    this.globalConfig = globalConfig;
+    const noMapItems = await this.dbDeviceMap.countDocuments();
+    log(`Loaded global configuration and found ${noMapItems} registered devices in the database.`, null, 'white');
   }, 
 
 }
 
 
-module.exports = DevicePool;
+export default DevicePool;

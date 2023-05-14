@@ -1,12 +1,15 @@
-const axios = require('axios');
+import axios from 'axios';
+import { log } from './jUtils.js';
 
 const updateLL = (event, deviceWrapper) => {
   const LL_URL = 'http://lifelog.wnet.wn/?page=kasa_event';
   const url = `${LL_URL}&event=${event}&ch=${deviceWrapper.channel}`;
-  console.log(`* Lifelog * ${deviceWrapper.alias} (ch ${deviceWrapper.channel}): ${event} `);
   axios.get(url)
+    .then(res => {
+      log(`Updated Lifelog (${deviceWrapper.alias}, channel ${deviceWrapper.channel}): ${event} `, 'gray');
+    })
     .catch(err => {
-      log("while calling LifeLog", deviceWrapper.channel, err);
+      log(`Failed to connect to LifeLog. (${deviceWrapper.alias}, channel ${deviceWrapper.channel})`, null , err.message);
     });
 };
 
@@ -60,7 +63,7 @@ const processRequest = (req, res, routeCommand, devicePool) => {
   }
 }
 
-module.exports = {
+export default {
   updateLL,
   buildCommandObjectFromQuery,
   processRequest,
