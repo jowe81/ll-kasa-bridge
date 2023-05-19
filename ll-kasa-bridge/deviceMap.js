@@ -5,7 +5,7 @@ const tSwitch = 'switch';
 
 const defaults = {
   pollInterval: 10000,
-  offlineTolerance: 1,
+  offlineTolerance: 3,
 }
 
 const globalConfig = {
@@ -18,19 +18,15 @@ const globalConfig = {
 
   [tBulb]: {
     pollInterval: 10000,
-    offlineTolerance: defaults.offlineTolerance
   },
   [tStrip]: {
     pollInterval: 10000,
-    offlineTolerance: defaults.offlineTolerance
   },
   [tSwitch]: {
     pollInterval: 1000,
-    offlineTolerance: defaults.offlineTolerance
   },
   [tPlug]: {
     pollInterval: 5000,
-    offlineTolerance: defaults.offlineTolerance
   },
 
   defaults,
@@ -207,18 +203,25 @@ const deviceMap = [
     id: "80125B9CDD55CE105CC76F0CA2F6C8CC1F5426D8",
     subType: tStrip,
   },
-
+  {
+    alias: 'Bed Shelf Strip',
+    ch: 38, 
+    id: "8012D0E9DD82CBC61A864D093BF05E911F53B1E8",
+    subType: tStrip,
+  },
+  
 //Kitchen and living room all: ***** ***** ***** *p*p* pp*p* ppppp **
 //Full on: **1** ***** ****1 11*1* 11*1* 11111 111
 //Blackout: 000** 00000 00**0 00000 00000 00000 000
 //Desk work: **p** ***** ****p p
 //Bedroom ceil: ***** pp***
+//Bedroom all: *pp** pp*** ***** p**** ***** ***** ***** *pp**
 //Bathroom: ***** ****pp pp***
 //Jess' desk: ***** ***** ***** ***** ***** ***** *ppp**
 
 ];
 
-module.exports = { 
+export { 
   deviceMap,
   globalConfig,
 //  pollIntBulb,

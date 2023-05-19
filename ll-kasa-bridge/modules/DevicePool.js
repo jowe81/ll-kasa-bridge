@@ -4,6 +4,7 @@ import fs from 'fs';
 
 
 import { getFormattedDate, pad } from '../helpers/jUtils.js';
+import { globalConfig } from '../deviceMap.js';
 const cmdPrefix = '[CMD]';
 const cmdFailPrefix = '[FAIL]';
 
@@ -174,7 +175,7 @@ const DeviceWrapper = {
             });
         }
 
-        log(`Discovered device at ${device.host}`, this);
+        log(`Discovered device at ${device.host}`, this, 'yellow');
 
         this.addListeners();
       }
@@ -222,7 +223,7 @@ const DeviceWrapper = {
 
     if (this.device && this.isOnline) {
 
-      const { tBulb, tStrip, tPlug, tSwitch } = this.globalConfig.subTypes;
+      const { tBulb, tStrip, tPlug, tSwitch } = this.globalConfig?.subTypes;
 
       this.config = this.globalConfig[this.subType];
 
@@ -236,7 +237,7 @@ const DeviceWrapper = {
       const pollInterval = this.config?.pollInterval ?? 10000;
 
       this.device.startPolling(pollInterval);
-      log(`Polling this ${this.subType ? this.subType : `unknown device`} at ${pollInterval} ms.`, this);  
+      log(`Polling this ${this.subType ? this.subType : `unknown device`} at ${pollInterval} ms.`, this, 'yellow');  
     }
 
   },
@@ -297,9 +298,10 @@ const DevicePool = {
 
     const options = {
       // Number of subsequent polling attempts before 'device-offline' is emitted.
-      offlineTolerance: 1
+      offlineTolerance: this.globalConfig.defaults.offlineTolerance
     }
-
+    console.log(this.globalConfig);
+    log(`Global offline tolerance is ${options.offlineTolerance} attempts.`);
     client.startDiscovery(options).on('device-new', (device) => {
       device.getSysInfo().then(info => {
         addDevice(device);
@@ -319,7 +321,7 @@ const DevicePool = {
     client.on('device-online', async device => {
       const deviceWrapper = await this.getDeviceWrapperById(device.id);
       if (deviceWrapper && !deviceWrapper.isOnline) {
-        log(`Device came online.`, deviceWrapper);
+        log(`Device came online.`, deviceWrapper, 'yellow');
         deviceWrapper.isOnline = true;
         deviceWrapper.startPolling();
       }

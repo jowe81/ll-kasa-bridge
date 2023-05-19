@@ -9,6 +9,9 @@ import utils from './helpers/ll-bridge-utils.js';
 import { initRouter } from './routers/kasaRouter.js';
 import { log } from './helpers/jUtils.js';
 
+import { importDeviceMap, importGlobalConfig } from './modules/ImportDeviceMap.js';
+import { deviceMap, globalConfig } from './deviceMap.js';
+
 dotenv.config();
 
 const app = express();
@@ -22,8 +25,6 @@ mongoConnect().then(db => {
   // Check if we need to import a device map
   if (process.argv[2] === '-import') {
     const options = { 'overwriteExisting' : process.argv[3] === 'overwrite' };
-    const { importDeviceMap, importGlobalConfig } = require('./modules/ImportDeviceMap');
-    const { deviceMap, globalConfig } = require('./deviceMap');
     importDeviceMap(db, deviceMap, options);
 
     if (process.argv.includes('-config')) {

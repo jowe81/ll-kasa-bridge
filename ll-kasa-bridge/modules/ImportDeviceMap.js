@@ -1,8 +1,8 @@
-const { globalConfig } = require("../deviceMap");
+import { globalConfig } from '../deviceMap.js';
 
 const importDeviceMapItem = (db, deviceMapItem, overwriteExisting) => {
   return new Promise((resolve, reject) => {
-    dbDeviceMap = db.collection('deviceMap');
+    const dbDeviceMap = db.collection('deviceMap');
     if (deviceMapItem) {
       const query = { 'id': deviceMapItem.id };
       dbDeviceMap
@@ -54,7 +54,7 @@ const importDeviceMap = (db, deviceMap, options) => {
 
 const importGlobalConfig = (db, globalConfig) => {
   return new Promise((resolve, reject) => {
-    dbConfig = db.collection('config');
+    const dbConfig = db.collection('config');
     if (globalConfig) {
       dbConfig
         .deleteMany({})
@@ -71,7 +71,7 @@ const importGlobalConfig = (db, globalConfig) => {
   });  
 }
 
-module.exports = {
+export {
   importDeviceMap,
   importGlobalConfig
 }
