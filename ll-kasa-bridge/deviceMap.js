@@ -49,13 +49,13 @@ const deviceMap = [
   { 
     alias: 'Bedroom Heater',
     ch: 4,
-    id: '8006C7225D65913606542A8806E16EFB20C3F13C',
+    id: '80065A4E60A835C49695A74DA7FAE76520436E9C01',
     subType: tPlug
   },
   {
     alias: 'Bedroom Fan',
     ch: 5, 
-    id: "80069F21DB5B0BBF07AEC07F6485B19320C3751C",
+    id: "80065A4E60A835C49695A74DA7FAE76520436E9C02",
     subType: tPlug,
   },
   {
@@ -177,7 +177,7 @@ const deviceMap = [
     ch: 34, 
     id: "800686BE89C5D37A63B4E70AB37689212066F343",
     subType: tSwitch,
-    switchTargets: [ 31, 32, 33, 36 ], //Lights above the desk and desk lamp
+    switchTargets: [ 31, 32, 33, 36, 40 ], //Lights above the desk and desk lamp
   },
   {
     alias: 'Front Door Lamp',
@@ -209,6 +209,27 @@ const deviceMap = [
     id: "8012D0E9DD82CBC61A864D093BF05E911F53B1E8",
     subType: tStrip,
   },
+  {
+    alias: 'Jess Bed Switch',
+    ch: 101, 
+    id: "8006000F366B7DD70835CBF38A51040620662083",
+    subType: tSwitch,
+    switchTargets: [ 38 ],
+  },
+  { 
+    alias: 'Bedroom Audio Amp',
+    ch: 39,
+    id: '80065A4E60A835C49695A74DA7FAE76520436E9C00',
+    subType: tPlug
+  },
+  { 
+    alias: 'Jess Desk Strip',
+    ch: 40,
+    id: '8012984E9F504FC4AEC384A012A6BEE01F54FA11',
+    subType: tStrip
+  },
+
+  
   
 //Kitchen and living room all: ***** ***** ***** *p*p* pp*p* ppppp **
 //Full on: **1** ***** ****1 11*1* 11*1* 11111 111

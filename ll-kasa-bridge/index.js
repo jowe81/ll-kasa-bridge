@@ -7,6 +7,7 @@ import mongoConnect from './db/mongodb.js';
 import devicePool from './modules/DevicePool.js';
 import utils from './helpers/ll-bridge-utils.js';
 import { initRouter } from './routers/kasaRouter.js';
+import devicesRouter from './routers/devices.js';
 import { log } from './helpers/jUtils.js';
 
 import { importDeviceMap, importGlobalConfig } from './modules/ImportDeviceMap.js';
@@ -35,9 +36,12 @@ mongoConnect().then(db => {
   // Initialize the device pool with a callback to update the LL db on device events.
   devicePool.initialize(db, utils.updateLL);
 
-  // Initialize the router.
+  // Initialize the routers.
   const kasaRouter = initRouter(express, devicePool, utils.processRequest);
   app.use('/kasa', kasaRouter);
+
+  const devices = devicesRouter(express, devicePool);
+  app.use('/auto/devices', devices);
 
   // Start the server.
   app.listen(port, () => {

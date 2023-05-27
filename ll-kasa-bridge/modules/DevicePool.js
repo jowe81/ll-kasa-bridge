@@ -5,10 +5,20 @@ import fs from 'fs';
 
 import { getFormattedDate, pad } from '../helpers/jUtils.js';
 import { globalConfig } from '../deviceMap.js';
+
+const masterLogFile = 'jj-auto.log';
 const cmdPrefix = '[CMD]';
 const cmdFailPrefix = '[FAIL]';
 
-const log = (t, deviceWrapper, color, err) => {
+/**
+ * 
+ * @param {string} t                  The text to log
+ * @param {object} deviceWrapper      The device the message is about
+ * @param {string} color              Chalk compatible color
+ * @param {object} err 
+ * @param {bool} writeToFileOverride  Do not write to file even if the env file says to.
+ */
+const log = (t, deviceWrapper, color, err, writeToFileOverride = false) => {
   let date = getFormattedDate() + ' ';
   let prefix = ``;
 
@@ -36,25 +46,39 @@ const log = (t, deviceWrapper, color, err) => {
     console.log(date + chalk[color ?? 'green'](line));
   }
 
-  if (deviceWrapper) {
-    const logToFile = process.env.LOG_DEVICE_EVENTS_TO_FILE;
-    const logDirectory = process.env.LOG_DIRECTORY;
-    const logFileName = channel ?
-      `Channel ${pad(channel, 2 , '0')} - ${deviceWrapper.alias}.log` :
-      `Unmapped devices.log`;
+  const logToFile = process.env.LOG_DEVICE_EVENTS_TO_FILE;
 
-    if (logToFile) {
-      try {
-        if (!fs.existsSync(logDirectory)){
-          fs.mkdirSync(logDirectory);
-        }
-        fs.appendFileSync(
-          logDirectory + logFileName,
-          getFormattedDate(null, null) + ' ' + line + '\n'
-        );
-      } catch (err) {
-        log(`Could not write to log file at ${logDirectory + logFileName}`, null, null, err);
+  if (logToFile && !writeToFileOverride) {
+
+    const logDirectory = process.env.LOG_DIRECTORY;
+    const logline = getFormattedDate(null, null) + ' ' + line + '\n';
+
+    try {
+
+      // Verify the directory.
+      if (!fs.existsSync(logDirectory)){
+        fs.mkdirSync(logDirectory);
       }
+
+      // Device specific logging.
+      if (deviceWrapper) {
+
+        const logFileName = channel ?
+          `Channel ${pad(channel, 2 , '0')} - ${deviceWrapper.alias}.log` :
+          `Unmapped devices.log`;
+    
+        fs.appendFileSync(
+          logDirectory + logFileName, logline
+        );
+      }
+
+      // Master log file.
+      fs.appendFileSync(
+        logDirectory + masterLogFile, logline
+      )
+
+    } catch (err) {
+      console.log(`Could not write to log file in path ${logDirectory}: ${err.message}`, null, null, err);
     }
   }
 }
@@ -98,24 +122,14 @@ const DeviceWrapper = {
       targetsA.forEach(channel => {
         const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel)
         if (deviceWrapper) {
-          console.log('A - isonline: ', deviceWrapper.isOnline);
-          deviceWrapper
-            .setPowerState(true, origin)
-            .catch(err => {
-              console.log(err);
-            });              
+          deviceWrapper.setPowerState(true, origin);
         }
       });
 
       targetsB.forEach(channel => {            
         const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel)
         if (deviceWrapper) {
-          console.log('B: ', deviceWrapper.alias);
-          deviceWrapper
-            .setPowerState(false, origin)
-            .catch(err => {
-              console.log(err);
-            });              
+          deviceWrapper.setPowerState(false, origin);
         }
       });
 
@@ -126,6 +140,7 @@ const DeviceWrapper = {
       case 'IOT.SMARTPLUGSWITCH':
         this.device.on('power-on', () => switchOnOffListener('power-on'));
         this.device.on('power-off', () => switchOnOffListener('power-off'));
+        this.device.on('power-update', (data) => this.updateLastSeen({ 'powerstate': data }));
         break;
   
       case 'IOT.SMARTBULB':
@@ -138,6 +153,10 @@ const DeviceWrapper = {
           log('lightstate-off', this);
           callback('lightstate-off', this);
         });
+
+        this.device.on('lightstate-update', (data) => {
+          this.updateLastSeen({ 'lightstate': data });
+        })
         break;
     }
   
@@ -181,7 +200,7 @@ const DeviceWrapper = {
       }
     } else {
       if (device) {
-        log(`Found unmapped device at ${device.host} - ID ${device.id}, type ${device.type}`, this);
+        log(`Found unmapped device at ${device.host} - ID ${device.id}, type ${device.type}`, this, 'magenta');
       }
     }
   },
@@ -247,6 +266,11 @@ const DeviceWrapper = {
       log(`Suspending polling.`, this);  
       this.device.stopPolling();
     }
+  },
+
+  updateLastSeen(data) {
+    this.lastSeenAt = Date.now();
+    this.state = data ;
   }
 }
 
@@ -300,13 +324,15 @@ const DevicePool = {
       // Number of subsequent polling attempts before 'device-offline' is emitted.
       offlineTolerance: this.globalConfig.defaults.offlineTolerance
     }
-    console.log(this.globalConfig);
-    log(`Global offline tolerance is ${options.offlineTolerance} attempts.`);
+
+    log(`Global offline tolerance is ${options.offlineTolerance} attempts.`, null, 'white');
     client.startDiscovery(options).on('device-new', (device) => {
       device.getSysInfo().then(info => {
         addDevice(device);
       });
     });
+
+    log(`Attaching event listeners.`, null, 'white');
 
     // Attach event listeners for device-online/device-offline    
     client.on('device-offline', async device => {
@@ -331,6 +357,33 @@ const DevicePool = {
   
   getDeviceWrapperByChannel(channel) {
     return this.devices.find(deviceWrapper => deviceWrapper.channel === channel);
+  },
+
+  getLiveDeviceMap() {
+    const map = [];
+
+    this.devices.forEach(deviceWrapper => {
+
+      const { channel, id, alias, subType, switchTargets, switchTargetsOff, type, host, isOnline, lastSeenAt, state } = deviceWrapper;
+      
+      const item = {
+        channel,
+        id,
+        alias,
+        subType,
+        switchTargets,
+        switchTargetsOff,
+        type,
+        host,
+        isOnline,
+        lastSeenAt,
+        state,
+      };
+
+      map.push(item);
+    });
+
+    return map;
   },
 
   async getDeviceMapItemById(id) {
