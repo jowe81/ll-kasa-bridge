@@ -1,6 +1,5 @@
-// Packages
 import dotenv from 'dotenv';
-import express from 'express';
+dotenv.config();
 
 // Project files
 import mongoConnect from './db/mongodb.js';
@@ -13,12 +12,29 @@ import { log } from './helpers/jUtils.js';
 import { importDeviceMap, importGlobalConfig } from './modules/ImportDeviceMap.js';
 import { deviceMap, globalConfig } from './deviceMap.js';
 
-dotenv.config();
+// Packages
+import cors from 'cors';
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
 
 const app = express();
-const port = process.env.PORT ?? 3000;
+app.use(cors());
+const server = http.createServer(app);
+const io = new Server({
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: false
+  }  
+});
 
-log(`Welcome to JJ-Auto. Backend is starting up...`);
+const appName = process.env.APP_NAME ?? "JJ-Auto";
+const port = process.env.PORT ?? 3000;
+const socketPort = process.env.SOCKET_PORT ?? 4000;
+
+log(`Welcome to ${appName}. Backend is starting up...`);
 
 mongoConnect().then(db => {
   log('Connected to database.');
@@ -32,9 +48,9 @@ mongoConnect().then(db => {
       importGlobalConfig(db, globalConfig);
     }
   }
-  
+
   // Initialize the device pool with a callback to update the LL db on device events.
-  devicePool.initialize(db, utils.updateLL);
+  devicePool.initialize(db, io, utils.updateLL);
 
   // Initialize the routers.
   const kasaRouter = initRouter(express, devicePool, utils.processRequest);
@@ -43,9 +59,34 @@ mongoConnect().then(db => {
   const devices = devicesRouter(express, devicePool);
   app.use('/auto/devices', devices);
 
-  // Start the server.
-  app.listen(port, () => {
-    log(`LifeLog-Kasa-Bridge server listening on port ${port}.`);
+  // Initialize socket server.
+  io.on('connection', (socket) => {
+
+    const address = socket.handshake.address;
+    log(`Socket connection from ${address}`, `bgBlue`);
+
+    // Clients request the full map when connecting
+    socket.on('auto/getDevices', (data) => {
+      socket.emit('auto/devices', devicePool.getLiveDeviceMap());
+    });
+
+    // Clients may execute macros
+    socket.on('auto/command/macro', ({ channel, name, commandObject }) => {
+      log(`Ch ${channel} ${address}: ${name}`, `bgBlue`);
+
+      if (name === 'toggle') {
+        devicePool.getDeviceWrapperByChannel(channel)?.toggle('ws:' + address);
+      }
+    } )
+  
+  });
+
+  io.listen(4000);
+  log(`${appName} Socket Server is listening on port ${socketPort}.`);
+
+  // Start the API server.
+  server.listen(port, () => {
+    log(`${appName} API Server is listening on port ${port}.`);
   })
 }).catch(err => {
   log(`Unable to connect to database. Exiting.`, null, err);

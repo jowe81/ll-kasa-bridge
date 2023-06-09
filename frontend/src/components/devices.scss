@@ -1,0 +1,26 @@
+.devicesContainer {
+  background-color: black;
+  color: white;
+  display:flex;
+  flex-wrap: wrap;
+  
+}
+
+.deviceContainer {
+  width: 350px;
+  height: 100px;
+  padding: 4px;
+  margin: 4px;
+  border: 1px solid gray;
+  label {
+    font-size: 120%;
+  }
+}
+
+.deviceOn {
+  background-color: green;;
+}
+
+.deviceOff {
+  background-color: rgb(145, 0, 0);
+}

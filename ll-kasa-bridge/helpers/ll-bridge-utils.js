@@ -2,8 +2,12 @@ import axios from 'axios';
 import { log } from './jUtils.js';
 
 const updateLL = (event, deviceWrapper) => {
+  if (!deviceWrapper) {
+    //Nothing to do without a device wrapper
+    return;
+  }
   const LL_URL = 'http://lifelog.wnet.wn/?page=kasa_event';
-  const url = `${LL_URL}&event=${event}&ch=${deviceWrapper.channel}`;
+  const url = `${LL_URL}&event=${event}&ch=${deviceWrapper?.channel}`;
   axios.get(url)
     .then(res => {
       log(`Updated Lifelog (${deviceWrapper.alias}, channel ${deviceWrapper.channel}): ${event} `, 'gray');

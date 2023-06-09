@@ -5,6 +5,7 @@ import fs from 'fs';
 
 import { getFormattedDate, pad } from '../helpers/jUtils.js';
 import { globalConfig } from '../deviceMap.js';
+import { timingSafeEqual } from 'crypto';
 
 const masterLogFile = 'jj-auto.log';
 const cmdPrefix = '[CMD]';
@@ -93,9 +94,13 @@ const log = (t, deviceWrapper, color, err, writeToFileOverride = false) => {
 const DeviceWrapper = {
   device: null,
 
+  addCallback(callbackFn, event) {
+    log(`Adding callback to '${event}`, this);
+  },
+
   addListeners(callbackFn) {
     //If no callback function is present create a dummy.
-    const callback = this.deviceEventCallbackFn ? this.deviceEventCallbackFn : () => {};
+    const deviceEventCallback = this.deviceEventCallback ? this.deviceEventCallback : () => {};
 
     // Send the meta for this device as the origin of the request (used with switches)
     const { type, channel, id, alias } = this;
@@ -107,33 +112,38 @@ const DeviceWrapper = {
     }
     
     const switchOnOffListener = (event) => {
-      let targetsA = event === 'power-on' ? this.switchTargets : this.switchTargetsOff;
-      let targetsB = event === 'power-on' ? this.switchTargetsOff : this.switchTargets;
+      let targetsOn;
+      let targetsOff;
 
-      if (!targetsA) {
-        targetsA = [];
+      switch (event) {
+        case 'power-on':
+          targetsOn = this.switchTargetsA?.on ? [ ...this.switchTargetsA?.on ] : [];
+          targetsOff = this.switchTargetsA?.off ? [ ...this.switchTargetsA?.off ] : []; 
+          break;
+        
+        case 'power-off':
+          targetsOn = this.switchTargetsB?.on ? [ ...this.switchTargetsB?.on ] : [];
+          targetsOff = this.switchTargetsB?.off ? [ ...this.switchTargetsB?.off ] : []; 
+          break;
       }
-      if (!targetsB) {
-        targetsB = [];
-      }
+      
+      log(`${event}, on-targets: [${targetsOn.join(', ')}] off-targets: [${targetsOff.join(', ')}].`, this);
 
-      log(`${event}, on-targets: [${targetsA.join(', ')}] off-targets: [${targetsB.join(', ')}].`, this);
-
-      targetsA.forEach(channel => {
+      targetsOn.forEach(channel => {
         const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel)
         if (deviceWrapper) {
           deviceWrapper.setPowerState(true, origin);
         }
       });
 
-      targetsB.forEach(channel => {            
+      targetsOff.forEach(channel => {            
         const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel)
         if (deviceWrapper) {
           deviceWrapper.setPowerState(false, origin);
         }
       });
 
-      callback(event, this);
+      deviceEventCallback(event, this);
     }
 
     switch (this.device.type) {
@@ -146,12 +156,12 @@ const DeviceWrapper = {
       case 'IOT.SMARTBULB':
         this.device.on('lightstate-on', (e) => {
           log('lightstate-on', this);
-          callback('lightstate-on', this);
+          deviceEventCallback('lightstate-on', this);
         });
         
         this.device.on('lightstate-off', (e) => {
           log('lightstate-off', this);
-          callback('lightstate-off', this);
+          deviceEventCallback('lightstate-off', this);
         });
 
         this.device.on('lightstate-update', (data) => {
@@ -162,9 +172,9 @@ const DeviceWrapper = {
   
   },
 
-  injectDevice(device, mapItem, globalConfig, deviceEventCallbackFn) {
+  injectDevice(device, mapItem, globalConfig, deviceEventCallback) {
     this.device = device;
-    this.deviceEventCallbackFn = deviceEventCallbackFn;
+    this.deviceEventCallback = deviceEventCallback;
 
     if (mapItem) {
       // Copy in the mapItem properties.
@@ -172,8 +182,8 @@ const DeviceWrapper = {
       this.id = mapItem.id;
       this.alias = mapItem.alias;
       this.subType = mapItem.subType;
-      this.switchTargets = mapItem.switchTargets;
-      this.switchTargetsOff = mapItem.switchTargetsOff;
+      this.switchTargetsA = mapItem.switchTargetsA;
+      this.switchTargetsB = mapItem.switchTargetsB;
 
       this.globalConfig = globalConfig;
 
@@ -206,9 +216,7 @@ const DeviceWrapper = {
   },
 
   async setLightState(commandObject, origin) {    
-    let originText = origin.alias ?? origin.id ?? origin.ip ?? 'unknown origin';
-    log(`Command from ${originText}`, this);
-
+    let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : 'unknown origin';
     if (this.device && this.isOnline) {
       try {
         const data = await this.device.lighting.setLightState(commandObject);
@@ -222,18 +230,40 @@ const DeviceWrapper = {
   },
 
   async setPowerState(state, origin) {    
-    let originText = origin.alias ?? origin.id ?? origin.ip ?? 'unknown origin';
-    log(`Command from ${originText}`, this);
+    let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
 
     if (this.device && this.isOnline) {
       try {
         const data = await this.device.setPowerState(state);
-        log(`${cmdPrefix} setPowerState ${state ? 'on' : 'off'}`, this, 'cyan');  
+        log(`${cmdPrefix} [${originText}] setPowerState ${state ? 'on' : 'off'}`, this, 'cyan');  
       } catch(err) {
-        log(`${cmdPrefix} ${cmdFailPrefix} setPowerState returned an error`, this, null, err);
+        log(`${cmdPrefix} [${originText}]${cmdFailPrefix} setPowerState returned an error`, this, null, err);
       }
     } else {
       log(`${cmdPrefix} ${cmdFailPrefix} setPowerState failed: device is offline.`, this, 'red');
+    }
+  },
+
+  async toggle(origin) {
+    console.log("Toggle", origin)    ;
+    if (this.device) {
+      if (this.isOnline) {
+        let state = null;
+        switch (this.type) {
+          case 'IOT.SMARTBULB':
+            state = this.state.lightstate.on_off;
+            break;
+          case 'IOT.SMARTPLUGSWITCH':
+            state = this.state.powerstate;            
+        }
+
+        if (state !== null) {
+          log(`${cmdPrefix} toggle`, this, 'bgBlue');
+          this.setPowerState(!state, origin);
+        }
+        console.log(this.type, !state);
+        //if (this.subType ===)
+      }
     }
   },
 
@@ -284,20 +314,36 @@ const DeviceWrapper = {
  */
 const DevicePool = {
 
-  async initialize(db, callbackFn) {
+  async initialize(db, io, deviceEventCallback) {
     this.db = db;
     this.dbDeviceMap = db.collection('deviceMap');
     this.dbConfig = this.db.collection('config');
 
-    log(`Initializing device pool.`, null, 'white');
 
-    // If a callback function has been passed in, store it.
-    if (callbackFn) {
-      this.deviceEventCallbackFn = callbackFn;
-      log(`Registered callback function '${callbackFn.name}' in device pool.`, null, 'white');
+    // This function will be injected into the device wrapper and called on device events
+    this.deviceEventCallback = (event, deviceWrapper) => {
+
+      //Push device event to sockets
+      io.emit('auto/devicestate', { 
+        event: event, 
+        data: { state: deviceWrapper.state}
+      });
+
+      // Run the callback if one was passed in
+      if (deviceEventCallback) {
+        deviceEventCallback();
+      };
+
     }
 
-    // This will call startDiscovery once things have been loaded from Mongo
+
+    // If a callback function has been passed in, store it.
+    if (deviceEventCallback) {
+      log(`Registered callback function '${deviceEventCallback.name}' in device pool.`, null, 'white');
+    }
+
+    log(`Initializing device pool.`, null, 'white');
+    
     await this.loadGlobalConfiguration();
     this.startDiscovery();
   },
@@ -315,7 +361,7 @@ const DevicePool = {
       // Store a backreference to the pool in each wrapper to enable event listeners to execute functinos on other devices
       deviceWrapper.devicePool = this;
 
-      deviceWrapper.injectDevice(device, mapItem, this.globalConfig, this.deviceEventCallbackFn);
+      deviceWrapper.injectDevice(device, mapItem, this.globalConfig, this.deviceEventCallback);
   
       this.devices.push(deviceWrapper);      
     }
@@ -364,15 +410,15 @@ const DevicePool = {
 
     this.devices.forEach(deviceWrapper => {
 
-      const { channel, id, alias, subType, switchTargets, switchTargetsOff, type, host, isOnline, lastSeenAt, state } = deviceWrapper;
+      const { channel, id, alias, subType, switchTargetsA, switchTargetsB, type, host, isOnline, lastSeenAt, state } = deviceWrapper;
       
       const item = {
         channel,
         id,
         alias,
         subType,
-        switchTargets,
-        switchTargetsOff,
+        switchTargetsA,
+        switchTargetsB,
         type,
         host,
         isOnline,

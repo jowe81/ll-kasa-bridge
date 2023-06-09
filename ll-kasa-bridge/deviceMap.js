@@ -118,8 +118,14 @@ const deviceMap = [
     ch: 14,
     id: "8006E7EB4A66E3687708A7ABF93FB237200DCDA4",
     subType: tSwitch,
-    switchTargets: [ 5 ], //Turn on Fan on position A (and Heater off)
-    switchTargetsOff: [ 4 ], //Turn on Heater on position B (and Fan off)
+    switchTargetsA: {
+      'on' : [ 5, 2, 3, 16, 37, 39 ], // Turn fan and lights on
+      'off': [ 4 ], // Turn heater off
+    },
+    switchTargetsB: {
+      'on' : [ 4, 2, 3, 16, 37, 39 ], // Turn heater and lights on
+      'off': [ 5 ], // Turn fan off
+    }
   },
   {
     alias: 'Bathroom Heater',
@@ -177,7 +183,8 @@ const deviceMap = [
     ch: 34, 
     id: "800686BE89C5D37A63B4E70AB37689212066F343",
     subType: tSwitch,
-    switchTargets: [ 31, 32, 33, 36, 40 ], //Lights above the desk and desk lamp
+    switchTargetsA: { 'on': [ 31, 32, 33, 36, 40 ] }, //Lights above the desk and desk lamp
+    switchTargetsB: { 'off': [ 31, 32, 33, 36, 40 ] }, //Lights above the desk and desk lamp
   },
   {
     alias: 'Front Door Lamp',
@@ -214,7 +221,8 @@ const deviceMap = [
     ch: 101, 
     id: "8006000F366B7DD70835CBF38A51040620662083",
     subType: tSwitch,
-    switchTargets: [ 38 ],
+    switchTargetsA: { 'on': [ 38 ] },
+    switchTargetsB: { 'off': [ 38 ] },
   },
   { 
     alias: 'Bedroom Audio Amp',
