@@ -1,4 +1,5 @@
-import { isDaytime } from "../helpers/jDateTimeUtils.js";
+import { isDaytime, getNighttimePercent } from "../helpers/jDateTimeUtils.js";
+import { scale } from "../helpers/jUtils.js";
 
 const getCommandObjectFromTargetData = (targetData) => {
   console.log("GetCommandObjectFromTargetData", targetData);
@@ -40,6 +41,40 @@ const getCommandObjectFromTargetData = (targetData) => {
   return commandObject;
 };
 
+
+const filters = {
+
+  'sunEvents': function sunEvents(commandObject, filter, triggerSwitchPosition) {
+    const { stateData, settings, switchPosition } = filter;
+
+    if (!stateData) {
+      return commandObject;
+    }
+
+    if (!(triggerSwitchPosition !== null && triggerSwitchPosition === switchPosition)) {
+      // Wrong trigger switch position; filter does not apply
+      return commandObject;
+    }
+
+    const stateKeys = Object.keys(stateData);
+    stateKeys.forEach(stateKey => {
+      // If no value is set in device config, use the one passed in with the command
+      const value = stateData[stateKey].value ?? commandObject[stateKey];
+            
+      commandObject[stateKey] = scale(
+        value, 
+        stateData[stateKey].altValue, 
+        getNighttimePercent(settings.transitionTime, new Date(), settings.offset),
+      );
+            
+    })
+
+    return commandObject;
+  }
+
+};
+
 export {
   getCommandObjectFromTargetData,
+  filters,
 }

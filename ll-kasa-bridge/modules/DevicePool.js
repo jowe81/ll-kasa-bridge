@@ -4,7 +4,8 @@ import fs from 'fs';
 
 
 import { getFormattedDate, pad } from '../helpers/jUtils.js';
-import { getCommandObjectFromTargetData } from './TargetDataProcessor.js';
+import { filters, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
+
 
 const masterLogFile = 'jj-auto.log';
 const cmdPrefix = '[CMD]';
@@ -124,18 +125,25 @@ const DeviceWrapper = {
       };
       
       // Was the switch turned on or off?
-      let targets;
+      let triggerSwitchPosition = null;
 
       switch (event) {
         case 'power-on':
-          targets = targetsForOnPosition;
+          triggerSwitchPosition = true;
           break;
         
         case 'power-off':
-          targets = targetsForOffPosition;
+          triggerSwitchPosition = false;
           break;
       }
-      
+
+      let targets = null;
+
+      if (triggerSwitchPosition !== null) {
+        targets = triggerSwitchPosition ? targetsForOnPosition : targetsForOffPosition;
+      }
+
+
       // Are there any targets?
       if (targets) {
 
@@ -172,7 +180,11 @@ const DeviceWrapper = {
 
                 console.log('CommandObject: ', commandObject);
 
-                setTimeout(() => deviceWrapper.setLightState(commandObject, origin), delay);
+                if (this.channel === 14) {
+                  console.log("Switch Position: ", this.alias, triggerSwitchPosition);
+                }
+        
+                setTimeout(() => deviceWrapper.setLightState(commandObject, triggerSwitchPosition, origin), delay);
 
               } else {
                 log(`Ignoring empty target object`, this);
@@ -219,11 +231,9 @@ const DeviceWrapper = {
 
     if (mapItem) {
       // Copy in the mapItem properties.
-      this.channel = mapItem.ch;
-      this.id = mapItem.id;
-      this.alias = mapItem.alias;
-      this.subType = mapItem.subType;
-      this.targets = mapItem.targets;
+      Object.keys(mapItem).forEach(key => { 
+        this[key] = mapItem[key];
+      });
 
       this.globalConfig = globalConfig;
 
@@ -255,8 +265,21 @@ const DeviceWrapper = {
     }
   },
 
-  async setLightState(commandObject, origin) {    
+  async setLightState(commandObject, triggerSwitchPosition, origin) {    
     let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : 'unknown origin';
+
+    // Apply filters
+    if (this.filters) {
+      this.filters.forEach(filter => {
+        if (Object.keys(filters).includes(filter.name)) {
+          // Filter exists
+          console.log(filter);
+          commandObject = filters[filter.name](commandObject, filter, triggerSwitchPosition);
+          console.log("Filtered commandOBject", commandObject);
+        }        
+      });
+    }
+
     if (this.device && this.isOnline) {
       try {
         const data = await this.device.lighting.setLightState(commandObject);
@@ -478,7 +501,7 @@ const DevicePool = {
   async getDeviceWrapperById(id) {
     const mapItem = await this.getDeviceMapItemById(id);
     if (mapItem) {
-      return Promise.resolve(this.getDeviceWrapperByChannel(mapItem.ch));
+      return Promise.resolve(this.getDeviceWrapperByChannel(mapItem.channel));
     }
   },
 
