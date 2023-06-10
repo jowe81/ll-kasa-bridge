@@ -118,14 +118,78 @@ const deviceMap = [
     ch: 14,
     id: "8006E7EB4A66E3687708A7ABF93FB237200DCDA4",
     subType: tSwitch,
-    switchTargetsA: {
-      'on' : [ 5, 2, 3, 16, 37, 39 ], // Turn fan and lights on
-      'off': [ 4 ], // Turn heater off
-    },
-    switchTargetsB: {
-      'on' : [ 4, 2, 3, 16, 37, 39 ], // Turn heater and lights on
-      'off': [ 5 ], // Turn fan off
-    }
+    targets: {
+      'on': {
+        'powerState': [           
+          { channel: 5, data: true },  // Turn fan on
+          { channel: 4, data: false }, // Turn heater off
+
+          { channel: 2, data: true },  // Turn lights on both ways
+          { channel: 3, data: true }, 
+          
+          { channel: 39, data: true }, // Turn audio amp on both ways
+        ],
+        'lightState': [
+          { 
+            channel: 3,
+            data: {
+              on_off: 1,
+              saturation: 0,
+              brightness: 95,
+            }
+          },
+          { 
+            channel: 16,
+            data: {
+              on_off: 1,
+              hue: 240,
+            }
+          },
+          { 
+            channel: 37,
+            data: {
+              on_off: 1,
+              hue: 240,
+            }
+          },
+        ],
+      },
+      'off': {
+        'powerState': [
+          { channel: 5, data: false }, // Turn fan off
+          { channel: 4, data: true },  // Turn heater on
+
+          { channel: 2, data: true },  // Turn lights on both ways
+          { channel: 3, data: true }, 
+
+          { channel: 39, data: true }, // Turn audio amp on both ways
+        ],
+        'lightState': [
+          { 
+            channel: 3,
+            data: {
+              on_off: 1,
+              saturation: 0,
+              brightness: 95,
+            }
+          },          
+          { 
+            channel: 16,
+            data: {
+              on_off: 1,
+              hue: 277,
+            }
+          },
+          { 
+            channel: 37,
+            data: {
+              on_off: 1,
+              hue: 277,
+            }
+          },
+        ],
+      }
+    }   
   },
   {
     alias: 'Bathroom Heater',
@@ -183,8 +247,26 @@ const deviceMap = [
     ch: 34, 
     id: "800686BE89C5D37A63B4E70AB37689212066F343",
     subType: tSwitch,
-    switchTargetsA: { 'on': [ 31, 32, 33, 36, 40 ] }, //Lights above the desk and desk lamp
-    switchTargetsB: { 'off': [ 31, 32, 33, 36, 40 ] }, //Lights above the desk and desk lamp
+    targets: {
+      'on': {
+        'powerState': [ //Lights above the desk and desk lamp
+          { channel: 31, data: true, delay: 1000 }, 
+          { channel: 32, data: true, delay: 1000 }, 
+          { channel: 33, data: true, delay: 1000 }, 
+          { channel: 36, data: true }, 
+          { channel: 40, data: true }, 
+        ],
+      },
+      'off': {
+        'powerState': [
+          { channel: 31, data: false }, 
+          { channel: 32, data: false }, 
+          { channel: 33, data: false }, 
+          { channel: 36, data: false }, 
+          { channel: 40, data: false, delay: 1000 }, 
+        ],
+      }
+    }   
   },
   {
     alias: 'Front Door Lamp',
@@ -220,9 +302,32 @@ const deviceMap = [
     alias: 'Jess Bed Switch',
     ch: 101, 
     id: "8006000F366B7DD70835CBF38A51040620662083",
-    subType: tSwitch,
-    switchTargetsA: { 'on': [ 38 ] },
-    switchTargetsB: { 'off': [ 38 ] },
+    subType: tSwitch, 
+    targets: {
+      'on': {
+        'lightState': [
+          { 
+            channel: 38, 
+            data: {
+              'brightness': {
+                'value': 80,
+                'macro': 'sleep_wake'
+              }, 
+            }
+          },
+        ]
+      },
+      'off': {
+        'lightState': [
+          { 
+            channel: 38, 
+            data: {
+              'brightness': 0, 
+            }
+          },
+        ]
+      }
+    }   
   },
   { 
     alias: 'Bedroom Audio Amp',

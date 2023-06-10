@@ -110,38 +110,100 @@ const DeviceWrapper = {
       id,
       alias,
     }
-    
+
     const switchOnOffListener = (event) => {
-      let targetsOn;
-      let targetsOff;
+
+      // Get targets and data from device configuration
+      const targetsForOnPosition = {
+        'powerState': this.targets?.on?.powerState,
+        'lightState': this.targets?.on?.lightState,
+      };
+
+      const targetsForOffPosition = {
+        'powerState': this.targets?.off?.powerState,
+        'lightState': this.targets?.off?.lightState,
+      };
+      
+      // Was the switch turned on or off?
+      let targets;
 
       switch (event) {
         case 'power-on':
-          targetsOn = this.switchTargetsA?.on ? [ ...this.switchTargetsA?.on ] : [];
-          targetsOff = this.switchTargetsA?.off ? [ ...this.switchTargetsA?.off ] : []; 
+          targets = targetsForOnPosition;
           break;
         
         case 'power-off':
-          targetsOn = this.switchTargetsB?.on ? [ ...this.switchTargetsB?.on ] : [];
-          targetsOff = this.switchTargetsB?.off ? [ ...this.switchTargetsB?.off ] : []; 
+          targets = targetsForOffPosition;
           break;
       }
       
-      log(`${event}, on-targets: [${targetsOn.join(', ')}] off-targets: [${targetsOff.join(', ')}].`, this);
+      // Are there any targets?
+      if (targets) {
 
-      targetsOn.forEach(channel => {
-        const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel)
-        if (deviceWrapper) {
-          deviceWrapper.setPowerState(true, origin);
-        }
-      });
+        // Have targets to switch powerState on?
+        if (targets.powerState) {
+          const list = targets.powerState.map(target => JSON.stringify(target));
 
-      targetsOff.forEach(channel => {            
-        const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel)
-        if (deviceWrapper) {
-          deviceWrapper.setPowerState(false, origin);
+          log(`${event}, targets: [${list.join(', ')}]`, this);
+
+          targets.powerState.forEach(target => {
+            const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(target.channel)
+            if (deviceWrapper) {
+              const delay = target.delay ?? 0;
+              setTimeout(() => deviceWrapper.setPowerState(target.data, origin), delay);
+            }
+          });    
         }
-      });
+
+        // Have targets to switch powerState on?
+        if (targets.lightState) {
+          const list = targets.lightState.map(target => JSON.stringify(target));
+
+          log(`${event}, targets: [${list.join(', ')}]`, this);
+
+          targets.lightState.forEach(target => {
+            const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(target.channel)
+            if (deviceWrapper) {
+              
+              // Is there data in this target object?
+              if (target.data) {
+                const delay = target.delay ?? 0;
+
+                const commandObject = {};
+
+                const keys = Object.keys(target.data)
+                keys.forEach(key => {
+
+                  const paramValue = target.data[key];
+
+                  if (typeof(paramValue === 'object')) {
+
+                    // Macro?
+                    if (paramValue.macro) {
+                      console.log('Have Macro', paramValue.macro);
+                      commandObject[key] = paramValue.value;
+                    }
+
+                  } else {
+                    // Plain value
+                    commandObject[key] = paramValue;
+                    
+                  }
+                  console.log('CommandObject: ', commandObject);
+
+                  setTimeout(() => deviceWrapper.setLightState(target.data, origin), delay);
+
+                });
+
+              } else {
+                log(`Ignoring empty target object`, this);
+              }
+
+            }
+          });    
+        }
+
+      }
 
       deviceEventCallback(event, this);
     }
@@ -182,8 +244,7 @@ const DeviceWrapper = {
       this.id = mapItem.id;
       this.alias = mapItem.alias;
       this.subType = mapItem.subType;
-      this.switchTargetsA = mapItem.switchTargetsA;
-      this.switchTargetsB = mapItem.switchTargetsB;
+      this.targets = mapItem.targets;
 
       this.globalConfig = globalConfig;
 
@@ -410,15 +471,14 @@ const DevicePool = {
 
     this.devices.forEach(deviceWrapper => {
 
-      const { channel, id, alias, subType, switchTargetsA, switchTargetsB, type, host, isOnline, lastSeenAt, state } = deviceWrapper;
+      const { channel, id, alias, subType, targets, type, host, isOnline, lastSeenAt, state } = deviceWrapper;
       
       const item = {
         channel,
         id,
         alias,
         subType,
-        switchTargetsA,
-        switchTargetsB,
+        targets,
         type,
         host,
         isOnline,

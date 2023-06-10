@@ -20,6 +20,7 @@ const importDeviceMapItem = (db, deviceMapItem, overwriteExisting) => {
                 .replaceOne(query, deviceMapItem)
                 .then(resolve);
             } else {
+              console.log('not overwriting');
               resolve(data);
             }
           }
@@ -39,10 +40,12 @@ const importDeviceMap = (db, deviceMap, options) => {
         promises.push(importDeviceMapItem(db, mapItem, options.overwriteExisting));
       });
 
+      console.log(`Importing device map ...`);
+
       Promise
         .all(promises)
         .then(data => {
-          console.log(`Import complete. Got ${data.length} items.`);
+          console.log(`Device map import complete. Got ${data.length} items.`);
           return resolve(data);
         })
         .catch(reject);
@@ -56,11 +59,14 @@ const importGlobalConfig = (db, globalConfig) => {
   return new Promise((resolve, reject) => {
     const dbConfig = db.collection('config');
     if (globalConfig) {
+
+      console.log(`Importing configuration ...`);
+
       dbConfig
         .deleteMany({})
         .then(() => dbConfig.insertOne(globalConfig))
         .then(data => { 
-          console.log(`Config imported: `, data);
+          console.log(`Config import complete. `);
           resolve(data);
         })
         .catch(err => {

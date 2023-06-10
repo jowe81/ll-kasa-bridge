@@ -39,55 +39,66 @@ log(`Welcome to ${appName}. Backend is starting up...`);
 mongoConnect().then(db => {
   log('Connected to database.');
 
-  // Check if we need to import a device map
-  if (process.argv[2] === '-import') {
-    const options = { 'overwriteExisting' : process.argv[3] === 'overwrite' };
-    importDeviceMap(db, deviceMap, options);
 
-    if (process.argv.includes('-config')) {
-      importGlobalConfig(db, globalConfig);
-    }
+  const promises = [];
+
+  // Check if we need to import a device map
+  if (process.argv.includes('-import-map')) {
+    const options = { 'overwriteExisting' : true };
+    promises.push(importDeviceMap(db, deviceMap, options));
   }
 
-  // Initialize the device pool with a callback to update the LL db on device events.
-  devicePool.initialize(db, io, utils.updateLL);
+  // Check if need to import the configuration
+  if (process.argv.includes('-import-config')) {
+    promises.push(importGlobalConfig(db, globalConfig));
+  }
 
-  // Initialize the routers.
-  const kasaRouter = initRouter(express, devicePool, utils.processRequest);
-  app.use('/kasa', kasaRouter);
+  Promise
+    .allSettled(promises)
+    .then(() => {
+      // Initialize the device pool with a callback to update the LL db on device events.
+      devicePool.initialize(db, io, utils.updateLL);
 
-  const devices = devicesRouter(express, devicePool);
-  app.use('/auto/devices', devices);
+      // Initialize the routers.
+      const kasaRouter = initRouter(express, devicePool, utils.processRequest);
+      app.use('/kasa', kasaRouter);
 
-  // Initialize socket server.
-  io.on('connection', (socket) => {
+      const devices = devicesRouter(express, devicePool);
+      app.use('/auto/devices', devices);
 
-    const address = socket.handshake.address;
-    log(`Socket connection from ${address}`, `bgBlue`);
+      // Initialize socket server.
+      io.on('connection', (socket) => {
 
-    // Clients request the full map when connecting
-    socket.on('auto/getDevices', (data) => {
-      socket.emit('auto/devices', devicePool.getLiveDeviceMap());
+        const address = socket.handshake.address;
+        log(`Socket connection from ${address}`, `bgBlue`);
+
+        // Clients request the full map when connecting
+        socket.on('auto/getDevices', (data) => {
+          socket.emit('auto/devices', devicePool.getLiveDeviceMap());
+        });
+
+        // Clients may execute macros
+        socket.on('auto/command/macro', ({ channel, name, commandObject }) => {
+          log(`Ch ${channel} ${address}: ${name}`, `bgBlue`);
+
+          if (name === 'toggle') {
+            devicePool.getDeviceWrapperByChannel(channel)?.toggle('ws:' + address);
+          }
+        } )
+      
+      });
+
+      io.listen(4000);
+      log(`${appName} Socket Server is listening on port ${socketPort}.`);
+
+      // Start the API server.
+      server.listen(port, () => {
+        log(`${appName} API Server is listening on port ${port}.`);
+      })
+
     });
 
-    // Clients may execute macros
-    socket.on('auto/command/macro', ({ channel, name, commandObject }) => {
-      log(`Ch ${channel} ${address}: ${name}`, `bgBlue`);
-
-      if (name === 'toggle') {
-        devicePool.getDeviceWrapperByChannel(channel)?.toggle('ws:' + address);
-      }
-    } )
   
-  });
-
-  io.listen(4000);
-  log(`${appName} Socket Server is listening on port ${socketPort}.`);
-
-  // Start the API server.
-  server.listen(port, () => {
-    log(`${appName} API Server is listening on port ${port}.`);
-  })
 }).catch(err => {
   log(`Unable to connect to database. Exiting.`, null, err);
 });
