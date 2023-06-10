@@ -57,14 +57,16 @@ const isDaytime = (date = null, coords = null) => {
  
 
  /**
-  * Return a percentage with indicates fully day (1), fully night (0), or dusk/dawn (0 < result < 1)
+  * Return a percentage with indicates fully day (1), fully night (0), or dusk/dawn (0 < result < 1).
+  * Without offset, transitionTime will be a twilight window with the sunrise/sunset at its centre.
   * 
-  * @param {*} transitionTime 
-  * @param {*} date 
+  * @param {*} transitionTime ms
+  * @param {*} date           Date
+  * @param {*} offset         ms
   * @param {*} latitude 
   * @param {*} longitude 
   */
-const getDaytimePercent = (transitionTime = null, date = null, coords = null) => {
+const getDaytimePercent = (transitionTime, date, offset, coords) => {
   const { lat, long } = _getCoords(coords);
 
   if (!transitionTime) {
@@ -75,7 +77,9 @@ const getDaytimePercent = (transitionTime = null, date = null, coords = null) =>
     date = new Date();
   }
 
-  // Get start and end of transition period, with the center beeing the current time (or date passed in)
+  date.setTime(date.getTime() + (offset ?? 0));
+
+  // Get start and end of transition period, with the center beeing the current time (or date passed in), with offset
   const transitionStart = new Date();
   transitionStart.setTime(date.getTime() - (transitionTime / 2));
 
@@ -91,7 +95,7 @@ const getDaytimePercent = (transitionTime = null, date = null, coords = null) =>
     return 0;
 
   } else {
-    // Twilight
+    // Twilight: dawn or dusk
     const isDawn = isDaytime(transitionEnd);
 
     const twilightStart = new Date();
@@ -109,9 +113,9 @@ const getDaytimePercent = (transitionTime = null, date = null, coords = null) =>
   }
 }
 
-const getNighttimePercent = (transitionTime = null, date = null, coords = null) => 1 - getDaytimePercent(transitionTime, date, coords);
+const getNighttimePercent = (transitionTime, date, offset, coords) => 1 - getDaytimePercent(transitionTime, date, offset, coords);
 
-const isFullyDaytime = (transitionTime = null, date = null) => getDaytimePercent(transitionTime, date) === 1;
+const isFullyDaytime = (transitionTime = null, date = null) => getDaytimePercent(transitionTime, null, date) === 1;
 
 
 export {
