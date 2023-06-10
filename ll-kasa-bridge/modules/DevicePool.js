@@ -272,10 +272,17 @@ const DeviceWrapper = {
     if (this.filters) {
       this.filters.forEach(filter => {
         if (Object.keys(filters).includes(filter.name)) {
+
           // Filter exists
           console.log(filter);
-          commandObject = filters[filter.name](commandObject, filter, triggerSwitchPosition);
-          console.log("Filtered commandOBject", commandObject);
+
+          if (triggerSwitchPosition !== null && filter.switchPosition === triggerSwitchPosition) {
+            commandObject = filters[filter.name](commandObject, filter);
+            console.log("Filtered commandOBject", commandObject);  
+          } else {
+            console.log("Filter doesn't apply");
+          }
+
         }        
       });
     }

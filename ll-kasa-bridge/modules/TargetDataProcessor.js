@@ -44,25 +44,18 @@ const getCommandObjectFromTargetData = (targetData) => {
 
 const filters = {
 
-  'sunEvents': function sunEvents(commandObject, filter, triggerSwitchPosition) {
-    const { stateData, settings, switchPosition } = filter;
+  'sunEvents': function sunEvents(commandObject, filter) {
+    const { stateData, settings } = filter;
 
     if (!stateData) {
       return commandObject;
     }
 
-    if (!(triggerSwitchPosition !== null && triggerSwitchPosition === switchPosition)) {
-      // Wrong trigger switch position; filter does not apply
-      return commandObject;
-    }
-
-    const stateKeys = Object.keys(stateData);
-    stateKeys.forEach(stateKey => {
-      // If no value is set in device config, use the one passed in with the command
-      const value = stateData[stateKey].value ?? commandObject[stateKey];
-            
+    Object.keys(stateData).forEach(stateKey => {
+                  
       commandObject[stateKey] = scale(
-        value, 
+        // If no value is set in device config, use the one passed in with the command
+        stateData[stateKey].value ?? commandObject[stateKey], 
         stateData[stateKey].altValue, 
         getNighttimePercent(settings.transitionTime, new Date(), settings.offset),
       );
