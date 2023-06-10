@@ -4,8 +4,6 @@ import fs from 'fs';
 
 
 import { getFormattedDate, pad } from '../helpers/jUtils.js';
-import { globalConfig } from '../deviceMap.js';
-import { timingSafeEqual } from 'crypto';
 
 const masterLogFile = 'jj-auto.log';
 const cmdPrefix = '[CMD]';
