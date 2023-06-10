@@ -4,6 +4,7 @@ import fs from 'fs';
 
 
 import { getFormattedDate, pad } from '../helpers/jUtils.js';
+import { getCommandObjectFromTargetData } from './TargetDataProcessor.js';
 
 const masterLogFile = 'jj-auto.log';
 const cmdPrefix = '[CMD]';
@@ -167,31 +168,11 @@ const DeviceWrapper = {
               if (target.data) {
                 const delay = target.delay ?? 0;
 
-                const commandObject = {};
+                const commandObject = getCommandObjectFromTargetData(target.data);
 
-                const keys = Object.keys(target.data)
-                keys.forEach(key => {
+                console.log('CommandObject: ', commandObject);
 
-                  const paramValue = target.data[key];
-
-                  if (typeof(paramValue === 'object')) {
-
-                    // Macro?
-                    if (paramValue.macro) {
-                      console.log('Have Macro', paramValue.macro);
-                      commandObject[key] = paramValue.value;
-                    }
-
-                  } else {
-                    // Plain value
-                    commandObject[key] = paramValue;
-                    
-                  }
-                  console.log('CommandObject: ', commandObject);
-
-                  setTimeout(() => deviceWrapper.setLightState(target.data, origin), delay);
-
-                });
+                setTimeout(() => deviceWrapper.setLightState(commandObject, origin), delay);
 
               } else {
                 log(`Ignoring empty target object`, this);

@@ -311,7 +311,8 @@ const deviceMap = [
             data: {
               'brightness': {
                 'value': 80,
-                'macro': 'sleep_wake'
+                'modValue': 5,
+                'macro': 'sleep_wake',
               }, 
             }
           },
