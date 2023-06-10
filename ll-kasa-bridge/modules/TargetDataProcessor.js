@@ -1,5 +1,5 @@
-import { isDaytime, getNighttimePercent } from "../helpers/jDateTimeUtils.js";
-import { scale } from "../helpers/jUtils.js";
+import { isDaytime } from "../helpers/jDateTimeUtils.js";
+import filterFunctions from "./Filters.js";
 
 const getCommandObjectFromTargetData = (targetData) => {
   console.log("GetCommandObjectFromTargetData", targetData);
@@ -41,33 +41,37 @@ const getCommandObjectFromTargetData = (targetData) => {
   return commandObject;
 };
 
+const filter = (filterObject, commandObject) => {
+  const { name, stateData } = filterObject;
 
-const filters = {
-
-  'sunEvents': function sunEvents(commandObject, filter) {
-    const { stateData, settings } = filter;
-
-    if (!stateData) {
-      return commandObject;
-    }
-
-    Object.keys(stateData).forEach(stateKey => {
-                  
-      commandObject[stateKey] = scale(
-        // If no value is set in device config, use the one passed in with the command
-        stateData[stateKey].value ?? commandObject[stateKey], 
-        stateData[stateKey].altValue, 
-        getNighttimePercent(settings.transitionTime, new Date(), settings.offset),
-      );
-            
-    })
-
+  if (!name || !stateData) {
     return commandObject;
   }
 
-};
+  console.log("Unfiltered commandObject", commandObject);
+
+  // Loop over the stateData items and apply the filter to each in turn.
+  if (filterFunctions[name]) {
+    console.log(`Found filter ${name}`);
+
+    Object.keys(stateData).forEach(stateKey => {
+      console.log(`Processing ${stateKey}`);
+      commandObject[stateKey] = filterFunctions[name](
+        filterObject, 
+        stateKey, 
+        commandObject[stateKey] // Default value to use if none is provided in filter configuration
+      );  
+    });
+  } else {
+    console.log(`Filter ${name} doesn't exist`);
+  }
+
+  console.log("Filtered commandObject", commandObject);
+
+  return commandObject;
+}
 
 export {
   getCommandObjectFromTargetData,
-  filters,
+  filter,
 }

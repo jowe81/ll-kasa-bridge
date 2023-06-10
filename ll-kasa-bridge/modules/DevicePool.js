@@ -4,7 +4,7 @@ import fs from 'fs';
 
 
 import { getFormattedDate, pad } from '../helpers/jUtils.js';
-import { filters, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
+import { filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
 
 
 const masterLogFile = 'jj-auto.log';
@@ -270,20 +270,12 @@ const DeviceWrapper = {
 
     // Apply filters
     if (this.filters) {
-      this.filters.forEach(filter => {
-        if (Object.keys(filters).includes(filter.name)) {
-
-          // Filter exists
-          console.log(filter);
-
-          if (triggerSwitchPosition !== null && filter.switchPosition === triggerSwitchPosition) {
-            commandObject = filters[filter.name](commandObject, filter);
-            console.log("Filtered commandOBject", commandObject);  
-          } else {
-            console.log("Filter doesn't apply");
-          }
-
-        }        
+      this.filters.forEach(filterObject => {
+        if (filterObject.switchPosition !== null && filterObject.switchPosition === triggerSwitchPosition) {
+          commandObject = filter(filterObject, commandObject);
+        } else {
+          console.log("Filter doesn't apply");
+        }
       });
     }
 
