@@ -21,6 +21,18 @@ const getFormattedDate = (date, color = 'gray') => {
 }
 
 /**
+ * Return the value that lies the specified percentage between value and altValue.
+ * 
+ * @param {*} value 
+ * @param {*} altValue 
+ * @param {*} percentage 
+ */
+const scale = (value, altValue, percentage) => {
+  const range = altValue - value;  
+  return value + (percentage * range);
+}
+
+/**
  * Pad the front of a string.
  * @param   string    input 
  * @param   integer   targetLength 
@@ -61,5 +73,6 @@ export {
     getFormattedDate,
     pad,
     log,
+    scale,
 }
 
