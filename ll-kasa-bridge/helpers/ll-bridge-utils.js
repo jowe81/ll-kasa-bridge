@@ -18,7 +18,7 @@ const updateLL = (event, deviceWrapper) => {
 };
 
 const buildCommandObjectFromQuery = query => {
-  const intParams =  [ 'on_off', 'ch', 'brightness', 'color_temp', 'hue', 'saturation', 'ignore_default', 'transition_period'];
+  const intParams =  [ 'on_off', 'ch', 'brightness', 'color_temp', 'hue', 'saturation', 'ignore_default', 'transition'];
   const stringParams = [ 'mode' ];
   const commandObject = {};
 

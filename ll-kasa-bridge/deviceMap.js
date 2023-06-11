@@ -315,7 +315,19 @@ const deviceMap = [
         // Should this filter be invoked when a switch is turned on or off?
         switchPosition: true,
       }
-    ]
+    ],
+    targets: {
+      'on': {
+        powerState: [
+          { channel: 101, data: true },
+        ]
+      },
+      'off': {
+        powerState: [
+          { channel: 101, data: false },
+        ]
+      }
+    }
   },
   {
     alias: 'Jess Bed Switch',
@@ -330,6 +342,7 @@ const deviceMap = [
             data: {
               brightness: 80, 
               on_off: 1,
+              saturation: 0,
             }
           },
         ]
@@ -340,6 +353,7 @@ const deviceMap = [
             channel: 38, 
             data: {
               on_off: 0, 
+              transition: 20000
             }
           },
         ]

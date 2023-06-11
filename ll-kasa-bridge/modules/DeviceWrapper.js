@@ -1,3 +1,8 @@
+import util from 'util';
+
+import e from 'cors';
+import _ from 'lodash';
+
 import { log } from './Log.js';
 import { filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
 
@@ -31,89 +36,13 @@ const cmdFailPrefix = '[FAIL]';
     }
 
     const switchOnOffListener = (event) => {
-
-      // Get targets and data from device configuration
-      const targetsForOnPosition = {
-        'powerState': this.targets?.on?.powerState,
-        'lightState': this.targets?.on?.lightState,
-      };
-
-      const targetsForOffPosition = {
-        'powerState': this.targets?.off?.powerState,
-        'lightState': this.targets?.off?.lightState,
-      };
-      
-      // Was the switch turned on or off?
-      let triggerSwitchPosition = null;
-
-      switch (event) {
-        case 'power-on':
-          triggerSwitchPosition = true;
-          break;
-        
-        case 'power-off':
-          triggerSwitchPosition = false;
-          break;
+      console.log('This is a ' , this.subType);
+      if (![this.globalConfig.subTypes.tSwitch, this.globalConfig.subTypes.tStrip].includes(this.subType)) {
+        // The trigger did not come from a switch (as opposed to a plug or bulb)
+        return;
       }
 
-      let targets = null;
-
-      if (triggerSwitchPosition !== null) {
-        targets = triggerSwitchPosition ? targetsForOnPosition : targetsForOffPosition;
-      }
-
-
-      // Are there any targets?
-      if (targets) {
-
-        // Have targets to switch powerState on?
-        if (targets.powerState) {
-          const list = targets.powerState.map(target => JSON.stringify(target));
-
-          log(`${event}, targets: [${list.join(', ')}]`, this);
-
-          targets.powerState.forEach(target => {
-            const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(target.channel)
-            if (deviceWrapper) {
-              const delay = target.delay ?? 0;
-              setTimeout(() => deviceWrapper.setPowerState(target.data, origin), delay);
-            }
-          });    
-        }
-
-        // Have targets to switch powerState on?
-        if (targets.lightState) {
-          const list = targets.lightState.map(target => JSON.stringify(target));
-
-          log(`${event}, targets: [${list.join(', ')}]`, this);
-
-          targets.lightState.forEach(target => {
-            const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(target.channel)
-            if (deviceWrapper) {
-              
-              // Is there data in this target object?
-              if (target.data) {
-                const delay = target.delay ?? 0;
-
-                const commandObject = getCommandObjectFromTargetData(target.data);
-
-                console.log('CommandObject: ', commandObject);
-
-                if (this.channel === 14) {
-                  console.log("Switch Position: ", this.alias, triggerSwitchPosition);
-                }
-        
-                setTimeout(() => deviceWrapper.setLightState(commandObject, triggerSwitchPosition, origin), delay);
-
-              } else {
-                log(`Ignoring empty target object`, this);
-              }
-
-            }
-          });    
-        }
-
-      }
+      this.executeCommands(event, this);
 
       deviceEventCallback(event, this);
     }
@@ -122,7 +51,7 @@ const cmdFailPrefix = '[FAIL]';
       case 'IOT.SMARTPLUGSWITCH':
         this.device.on('power-on', () => switchOnOffListener('power-on'));
         this.device.on('power-off', () => switchOnOffListener('power-off'));
-        this.device.on('power-update', (data) => this.updateLastSeen({ 'powerstate': data }));
+        this.device.on('power-update', (state) => this.updateState(state));
         break;
   
       case 'IOT.SMARTBULB':
@@ -136,12 +65,195 @@ const cmdFailPrefix = '[FAIL]';
           deviceEventCallback('lightstate-off', this);
         });
 
-        this.device.on('lightstate-update', (data) => {
-          this.updateLastSeen({ 'lightstate': data });
+        this.device.on('lightstate-update', (state) => {
+
+          const changeInfo = this.analyzeStateChange(state)
+
+          const l = ([38].includes(this.channel));
+          if (l) {
+            if (changeInfo?.changed) {
+              console.log("previous state:", this.state);
+              console.log("new state:", state);  
+            }
+
+            util.inspect.defaultOptions.depth = 4;
+            console.log("ChangeInfo:", changeInfo);
+          }
+
+          this.updateState(state);
         })
-        break;
     }
   
+  },
+
+
+  /**
+   * Compare newState against the current state of the device.
+   * 
+   * @param   {} newState 
+   * @returns {} Infomation about the change or undefined if current state doesn't exist.
+   */
+  analyzeStateChange(newState) {
+    if (this.state === undefined) {
+      // Have no current state. Just received the first update.
+      return undefined;
+    } 
+
+    /*
+        Gleaned from observation:
+
+        ## Lightstate-on:
+
+        [dft_on_state] present ?
+          it was turned on by the backend :
+          it was turned on on the device or via the kasa app
+
+        ## Lightstate-off:
+
+        [mode, groups] present ?
+          it was turned on by the backend :
+          it was turned on on the device or via the kasa app
+     */
+
+    const changeInfo = {};
+    changeInfo.changed = !_.isEqual(this.state, newState);
+
+    if (changeInfo.changed) {
+
+      let backendChange;
+
+      changeInfo.on_off = this.state.on_off !== newState.on_off;
+      changeInfo.transition = this.state.transition !== newState.transition;
+
+      if (changeInfo.on_off) {
+        if (newState.on_off === 1) {
+          // Was turned on
+          backendChange = newState.dft_on_state ? true : false;
+
+          if (backendChange) {
+            changeInfo.settings = !_.isEqual(this.state.dft_on_state.groups, newState.dft_on_state.groups);
+          } else {
+            changeInfo.settings = !_.isEqual(this.state.dft_on_state.groups, newState.groups);
+          }
+        } else {
+          // Was turned off
+          backendChange = newState.mode && newState.groups;
+
+          if (backendChange) {            
+            changeInfo.settings = !_.isEqual(this.state.groups, newState.groups);
+          } else {
+            changeInfo.settings = !_.isEqual(this.state.groups, newState.dft_on_state.groups);
+          }
+        }
+      } else {
+        // Was not an on_off change
+        if (this.state.on_off === 1) {
+          changeInfo.settings = !_.isEqual(this.state.groups, newState.groups);
+        } else {
+          changeInfo.settings = !_.isEqual(this.state.dft_on_state.groups, newState.dft_on_state.groups);
+        }
+        
+      }
+            
+      if (changeInfo.on_off || changeInfo.settings) {
+        // Either on_off or the settings changed; we have the origin for this case.
+        changeInfo.origin = backendChange ? 'backend' : 'other';
+      } else {
+        // Only the transition changed; not sure of the origin but most likely a backend change.
+        changeInfo.origin = 'backend';
+      }
+
+    }
+
+    if (changeInfo.changed && !(changeInfo.on_off || changeInfo.settings || changeInfo.transition)) {
+      // The state objects weren't equal but nothing actually changed in the state.
+      return { changed: false };
+    }
+
+    return changeInfo;
+  },
+
+  executeCommands(event, originDeviceWrapper) {
+
+      // Get targets and data from device configuration
+      const targetsForOnPosition = {
+        'powerState': this.targets?.on?.powerState,
+        'lightState': this.targets?.on?.lightState,
+      };
+
+      const targetsForOffPosition = {
+        'powerState': this.targets?.off?.powerState,
+        'lightState': this.targets?.off?.lightState,
+      };
+      
+      let targets = null;
+      let triggerSwitchPosition = null;
+
+      switch (event) {
+        case 'power-on':
+          triggerSwitchPosition = true;
+          break;
+        
+        case 'power-off':
+          triggerSwitchPosition = false;
+          break;
+      }
+
+      if (triggerSwitchPosition !== null) {
+        targets = triggerSwitchPosition ? targetsForOnPosition : targetsForOffPosition;
+      }
+
+
+    if (!targets) {
+      return;
+    }    
+
+    // Have targets to switch powerState on?
+    if (targets.powerState) {
+      const list = targets.powerState.map(target => JSON.stringify(target));
+
+      log(`${event}, targets: [${list.join(', ')}]`, this);
+
+      targets.powerState.forEach(target => {
+        const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(target.channel)
+        if (deviceWrapper) {
+          const delay = target.delay ?? 0;
+          setTimeout(() => deviceWrapper.setPowerState(target.data, originDeviceWrapper), delay);
+        }
+      });    
+    }
+
+    // Have targets to switch powerState on?
+    if (targets.lightState) {
+      const list = targets.lightState.map(target => JSON.stringify(target));
+
+      log(`${event}, targets: [${list.join(', ')}]`, this);
+
+      targets.lightState.forEach(target => {
+        const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(target.channel)
+        if (deviceWrapper) {
+          
+          // Is there data in this target object?
+          if (target.data) {
+            const delay = target.delay ?? 0;
+
+            const commandObject = getCommandObjectFromTargetData(target.data);
+
+            console.log('CommandObject: ', commandObject);
+
+            if (this.channel === 14) {
+              console.log("Switch Position: ", this.alias, triggerSwitchPosition);
+            }
+    
+            setTimeout(() => deviceWrapper.setLightState(commandObject, triggerSwitchPosition, originDeviceWrapper), delay);
+
+          } else {
+            log(`Ignoring empty target object`, this);
+          }
+
+        }
+      });    
+    }
   },
 
   injectDevice(device, mapItem, globalConfig, deviceEventCallback) {
@@ -279,9 +391,9 @@ const cmdFailPrefix = '[FAIL]';
     }
   },
 
-  updateLastSeen(data) {
+  updateState(data) {
     this.lastSeenAt = Date.now();
-    this.state = data ;
+    this.state = _.cloneDeep(data);
   }
 }
 
