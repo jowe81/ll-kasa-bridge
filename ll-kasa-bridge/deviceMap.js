@@ -328,7 +328,8 @@ const deviceMap = [
           { 
             channel: 38, 
             data: {
-              'brightness': 80, 
+              brightness: 80, 
+              on_off: 1,
             }
           },
         ]
@@ -338,7 +339,7 @@ const deviceMap = [
           { 
             channel: 38, 
             data: {
-              'brightness': 0, 
+              on_off: 0, 
             }
           },
         ]
