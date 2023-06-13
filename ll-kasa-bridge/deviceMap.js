@@ -328,9 +328,10 @@ const deviceMap = [
         onPosition: true, 
         // Sync/toggle when this device is set to the off position
         offPosition: true,
-        // Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
+        // NOT YET IMPLEMENTED: Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
         onlyWhenSameStateAs: []
-      }    
+      },
+      { channel: 2, sync: true, onPosition: false, offPosition: true },
     ],
     targets: {
       'on': {
