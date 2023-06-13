@@ -309,12 +309,28 @@ const deviceMap = [
           },
         },
         settings: {
+          // Settings specific to the sunEvents filter
           transitionTime: 1 * HOUR,
           offset: 0 * HOUR,
         },
         // Should this filter be invoked when a switch is turned on or off?
         switchPosition: true,
       }
+    ],
+    linkedDevices: [
+      { 
+        channel: 101,
+        // Sync the switch to the powerstate of this device or just toggle it?
+        sync: true,
+        // Only has effect if sync === true: should the device be inversely synced
+        inverse: false,
+        // Sync/toggle when this device is set to the on position
+        onPosition: true, 
+        // Sync/toggle when this device is set to the off position
+        offPosition: true,
+        // Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
+        onlyWhenSameStateAs: []
+      }    
     ],
     targets: {
       'on': {

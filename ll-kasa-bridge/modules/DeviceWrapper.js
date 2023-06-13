@@ -1,10 +1,8 @@
-import util from 'util';
-
-import e from 'cors';
 import _ from 'lodash';
 
 import { log } from './Log.js';
 import { filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
+import { allAreBoolean } from '../helpers/jUtils.js';
 
 const cmdPrefix = '[CMD]';
 const cmdFailPrefix = '[FAIL]';
@@ -36,11 +34,25 @@ const cmdFailPrefix = '[FAIL]';
     }
 
     const switchOnOffListener = (event) => {
-      console.log('This is a ' , this.subType);
+      console.log(`${event} event on ${this.alias}.`);
+      console.log(`Flag type/value: `, typeof this.__ignoreNextChangeByBackend, this.__ignoreNextChangeByBackend);
+
       if (![this.globalConfig.subTypes.tSwitch, this.globalConfig.subTypes.tStrip].includes(this.subType)) {
         // The trigger did not come from a switch (as opposed to a plug or bulb)
         return;
       }
+
+      // See if we should ignore this event
+      if (['power-on', 'power-off'].includes(event)) {
+        if (this.__ignoreNextChangeByBackend) {
+          console.log('Returning without executing device commands that this switch normally executes.');
+          // Ignore this change and remove the flag.
+          this.__ignoreNextChangeByBackend = undefined;
+          return;
+        }
+      }
+
+
 
       this.executeCommands(event, this);
 
@@ -65,22 +77,66 @@ const cmdFailPrefix = '[FAIL]';
           deviceEventCallback('lightstate-off', this);
         });
 
-        this.device.on('lightstate-update', (state) => {
+        this.device.on('lightstate-update', (newState) => {
 
-          const changeInfo = this.analyzeStateChange(state)
+          const changeInfo = this.analyzeStateChange(newState)
 
           const l = ([38].includes(this.channel));
           if (l) {
-            if (changeInfo?.changed) {
-              console.log("previous state:", this.state);
-              console.log("new state:", state);  
-            }
 
-            util.inspect.defaultOptions.depth = 4;
-            console.log("ChangeInfo:", changeInfo);
-          }
+            if (changeInfo && changeInfo.changed && changeInfo.origin !== 'backend') {
+              // Change did not originate from the backend
 
-          this.updateState(state);
+              if (changeInfo.on_off && this.linkedDevices) {
+                // This was an on-off change. See if there are linked devices to process.
+                this.linkedDevices.forEach(linkInfo => {
+                  const linkedWrapper = this.devicePool.getDeviceWrapperByChannel(linkInfo.channel);
+
+                  if (linkedWrapper && typeof linkedWrapper.state === 'boolean') {
+                    console.log('Found connected device: ', linkedWrapper.alias);
+                    let flipPowerstate = false;
+
+                    
+                    const newStateBool = newState.on_off === 1;
+                    const linkedWrapperStateBool = linkedWrapper.state;
+
+                    // See if we need to flip this device
+                    if (linkInfo.sync) {
+                      // Keep the target device in sync                      
+
+                      console.log('newState.on_off / linkedWrapper.state', newState.on_off, linkedWrapper.state, "both as bools:", newStateBool, linkedWrapperStateBool );
+                      if (linkInfo.inverse) {
+                        // Inverse sync
+                        console.log('Checking for inverse sync');
+                        flipPowerstate = newStateBool === linkedWrapperStateBool;
+                      } else {
+                        console.log('Checking for Same direction sync');
+                        // Same direction sync
+                        flipPowerstate = newStateBool !== linkedWrapperStateBool;
+                      }
+
+                      console.log(flipPowerstate ? "SWITCHING" : "NOT SWITCHING");
+                    } else {
+                      // Toggle the target device, regardless of its current position
+                      flipPowerstate = true;
+                    }
+
+                    // Flip the device if needed
+                    if (flipPowerstate) {
+                      // Set a flag on it to ignore the next power state change originating from the backend
+                      linkedWrapper.__ignoreNextChangeByBackend = true;
+                      console.log('Flipping the switch! - have device: ', typeof linkedWrapper.device === 'object');
+                      linkedWrapper.setPowerState(!linkedWrapperStateBool);
+                    }
+  
+                  }
+
+                });
+              }
+            }  
+          }          
+
+          this.updateState(newState);
         })
     }
   

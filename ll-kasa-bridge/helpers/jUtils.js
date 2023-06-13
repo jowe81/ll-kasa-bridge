@@ -1,5 +1,18 @@
 import chalk from 'chalk';
 
+const allAreBoolean = testVariables => {
+  let foundNonBoolean = false;
+
+  testVariables.every(testVariable => {
+    if (typeof testVariable !== typeof true) {
+      foundNonBoolean = true;
+      return false; // Break the loop    
+    }
+  })
+
+  return !foundNonBoolean;
+}
+
 const getFormattedDate = (date, color = 'gray') => {
     if (!date) {
         date = new Date();
@@ -70,6 +83,7 @@ const log = (text, color = null, err) => {
 }
 
 export {
+    allAreBoolean,
     getFormattedDate,
     pad,
     log,
