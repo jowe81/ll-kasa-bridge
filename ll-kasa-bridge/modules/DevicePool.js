@@ -180,7 +180,7 @@ const DevicePool = {
     if (filtersProcessed) {
       log(`${tag}Processed ${filtersProcessed} filters.`);
     } else {
-      log(`${tag}Periodic Filter Service: Nothing to do.`);
+      log(`${tag}Nothing to do.`);
     }
     }
   }
