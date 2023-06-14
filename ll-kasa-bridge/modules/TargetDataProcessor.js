@@ -2,11 +2,14 @@ import { isDaytime } from "../helpers/jDateTimeUtils.js";
 import filterFunctions from "./Filters.js";
 
 const getCommandObjectFromTargetData = (targetData) => {
-  console.log("GetCommandObjectFromTargetData", targetData);
-  
   const commandObject = {};
 
-  const keys = Object.keys(targetData)
+  const keys = Object.keys(targetData);
+
+  if (!keys.length) {
+    // There's no data to put in command object.
+    return null;
+  }
 
   keys.forEach(key => {
 

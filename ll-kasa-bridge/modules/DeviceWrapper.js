@@ -2,7 +2,6 @@ import _ from 'lodash';
 
 import { log } from './Log.js';
 import { filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
-import { allAreBoolean } from '../helpers/jUtils.js';
 
 const cmdPrefix = '[CMD]';
 const cmdFailPrefix = '[FAIL]';
@@ -21,149 +20,78 @@ const cmdFailPrefix = '[FAIL]';
   },
 
   addListeners(callbackFn) {
-    //If no callback function is present create a dummy.
-    const deviceEventCallback = this.deviceEventCallback ? this.deviceEventCallback : () => {};
 
-    // Send the meta for this device as the origin of the request (used with switches)
-    const { type, channel, id, alias } = this;
-    const origin = {
-      type,
-      channel,
-      id,
-      alias,
-    }
+    // Handles actions after power-update events on IOT.SMARTPLUGSWITCH
+    const onOffListener = (newState) => {
 
-    const switchOnOffListener = (event) => {
-      if (![this.globalConfig.subTypes.tSwitch, this.globalConfig.subTypes.tStrip].includes(this.subType)) {
-        // The trigger did not come from a switch (as opposed to a plug or bulb)
+      // This call must come before updateState (it needs the old state).
+      const changeInfo = this.analyzeStateChange(newState);
+      this.updateState(newState);
+
+      // There was no change.
+      if (!(changeInfo && changeInfo.changed)) {
         return;
       }
 
-      // See if we should ignore this event
-      if (['power-on', 'power-off'].includes(event)) {
-        if (this.__ignoreNextChangeByBackend) {
-          // Ignore this change and remove the flag.
-          this.__ignoreNextChangeByBackend = undefined;
-          return;
-        }
+      const event = this.getPowerState() ? 'power-on' : 'power-off';
+      log(event, this);
+
+      // See if we should ignore this event.
+      if (this.__ignoreNextChangeByBackend) {
+        // Ignore this change and remove the flag.
+        this.__ignoreNextChangeByBackend = undefined;
+        return;
       }
 
-
-
+      if (!this.type === 'IOT.SMARTPLUGSWITCH' && this.subType === this.globalConfig.subTypes.tSwitch) {
+        // This isn't an actual switch (does it matter?)
+        return;
+      }
+      
+      // Process target devices
       this.executeCommands(event, this);
 
       deviceEventCallback(event, this);
     }
 
+    // Handles actions after lightstate-update events on IOT.SMARTBULB
+    const lightStateListener = (newState) => {
+
+      // This call must come before updateState (it needs the old state).
+      const changeInfo = this.analyzeStateChange(newState);
+      this.updateState(newState);
+
+      // Was this a change at all?
+      if (!(changeInfo && changeInfo.changed)) {
+        return;
+      }
+
+      // Was it an on/off change?
+      if (!changeInfo.on_off) {
+        return;
+      }
+
+      // This was an on-off change; which way?
+      const event = this.getPowerState() ? 'lightstate-on' : 'lightstate-off';
+      log(event, this);
+
+      // Process linked devices
+      this.processLinkedDevices(changeInfo);
+
+      deviceEventCallback(event, this);
+    }
+
+    //If no callback function is present create a dummy.
+    const deviceEventCallback = this.deviceEventCallback ? this.deviceEventCallback : () => {};
+
     switch (this.device.type) {
       case 'IOT.SMARTPLUGSWITCH':
-        this.device.on('power-on', () => switchOnOffListener('power-on'));
-        this.device.on('power-off', () => switchOnOffListener('power-off'));
-        this.device.on('power-update', (state) => {          
-          this.updateState(state);
-        });
+        this.device.on('power-update', onOffListener);
         break;
   
       case 'IOT.SMARTBULB':
-        this.device.on('lightstate-on', (e) => {
-          log('lightstate-on', this);
-          deviceEventCallback('lightstate-on', this);
-        });
-        
-        this.device.on('lightstate-off', (e) => {
-          log('lightstate-off', this);
-          deviceEventCallback('lightstate-off', this);
-        });
-
-        this.device.on('lightstate-update', (newState) => {
-
-          const changeInfo = this.analyzeStateChange(newState);
-          this.updateState(newState);
-
-          // Remove this eventually
-          const l = ([38].includes(this.channel));
-          if (l) {
-
-            if (changeInfo && changeInfo.changed && changeInfo.origin !== 'backend') {
-              // Change did not originate from the backend
-
-              if (!changeInfo.on_off && !this.linkedDevices) {
-                // Either it wasn't an on/off change or there are no linked devices
-                return;
-              }
-
-              // This was an on-off change. See if there are linked devices to process.
-
-              // Do we have state data for this device?
-              const newStateBool = this.getPowerState();
-
-              if (!typeof newStateBool === 'boolean') {
-                log(`Connected devices check failed (no state data for this device)`, this, 'red');
-                return;
-              }
-
-              this.linkedDevices.forEach(linkInfo => {                    
-                const linkedWrapper = this.devicePool.getDeviceWrapperByChannel(linkInfo.channel);
-
-                // Do we care about this change?
-                if (newStateBool && linkInfo.onPosition === false) {
-                  return;
-                }                
-
-                if (!newStateBool && linkInfo.offPosition === false) {
-                  return;
-                }                
-
-                // Has the connected device been discovered?
-                if (!linkedWrapper) {
-                  log(`Connected device check failed for channel ${linkInfo.channel} (device not discovered)`, this, 'red');
-                }
-
-                // Is the connected device live?
-                if (!linkedWrapper.isOnline) {
-                  log(`Connected device check failed for channel ${linkInfo.channel} (device went offline)`, this, 'red');
-                }
-                
-                // Do we have power state for this device?
-                const linkedWrapperStateBool = linkedWrapper.getPowerState();
-                
-                if (typeof linkedWrapperStateBool !== 'boolean') {
-                  log(`Connected device check failed for channel ${linkedWrapper.channel} (no state data)`, this, 'red');
-                  return;
-                }
-
-                let flipPowerstate = false;
-              
-                // See if we need to flip this device
-                if (linkInfo.sync) {
-                  // Keep the target device in sync                      
-                  if (linkInfo.inverse) {
-                    // Inverse sync
-                    flipPowerstate = newStateBool === linkedWrapperStateBool;
-                  } else {
-                    // Same direction sync
-                    flipPowerstate = newStateBool !== linkedWrapperStateBool;
-                  }
-                } else {
-                  // Toggle the target device, regardless of its current position
-                  flipPowerstate = true;
-                }
-
-                // Flip the device if needed
-                if (flipPowerstate) {
-                  // Set a flag on it to ignore the next power state change originating from the backend
-                  linkedWrapper.__ignoreNextChangeByBackend = true;
-
-                  log(`Flipping connected device: ${linkedWrapper.alias}`, this);
-                  linkedWrapper.setPowerState(!linkedWrapperStateBool);
-                }
-            
-              });
-            }  
-          }          
-
-          
-        })
+        this.device.on('lightstate-update', lightStateListener);
+        break;
     }
   
   },
@@ -201,6 +129,11 @@ const cmdFailPrefix = '[FAIL]';
     changeInfo.changed = !_.isEqual(this.state, newState);
 
     if (changeInfo.changed) {
+
+      // If this is a power-state change then there's nothing to analyse
+      if (this.type === 'IOT.SMARTPLUGSWITCH') {
+        return changeInfo;
+      }
 
       let backendChange;
 
@@ -294,7 +227,7 @@ const cmdFailPrefix = '[FAIL]';
     if (targets.powerState) {
       const list = targets.powerState.map(target => JSON.stringify(target));
 
-      log(`${event}, targets: [${list.join(', ')}]`, this);
+      log(`Targets: [${list.join(', ')}]`, this);
 
       targets.powerState.forEach(target => {
         const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(target.channel)
@@ -305,7 +238,7 @@ const cmdFailPrefix = '[FAIL]';
       });    
     }
 
-    // Have targets to switch powerState on?
+    // Have targets to change lightState on?
     if (targets.lightState) {
       const list = targets.lightState.map(target => JSON.stringify(target));
 
@@ -317,16 +250,13 @@ const cmdFailPrefix = '[FAIL]';
           
           // Is there data in this target object?
           if (target.data) {
-            const delay = target.delay ?? 0;
-
             const commandObject = getCommandObjectFromTargetData(target.data);
 
-            console.log('CommandObject: ', commandObject);
-
-            if (this.channel === 14) {
-              console.log("Switch Position: ", this.alias, triggerSwitchPosition);
+            if (!commandObject) {
+              return;
             }
-    
+
+            const delay = target.delay ?? 0;                
             setTimeout(() => deviceWrapper.setLightState(commandObject, triggerSwitchPosition, originDeviceWrapper), delay);
 
           } else {
@@ -398,6 +328,90 @@ const cmdFailPrefix = '[FAIL]';
         log(`Found unmapped device at ${device.host} - ID ${device.id}, type ${device.type}`, this, 'magenta');
       }
     }
+  },
+
+  // After a change, see if linked devices need to be adjusted
+  processLinkedDevices(changeInfo) {
+
+    if (!this.linkedDevices || !this.linkedDevices.length) {
+      return;
+    }
+
+    // Do we have state data for this device?
+    const newStateBool = this.getPowerState();
+
+    if (!typeof newStateBool === 'boolean') {
+      log(`Connected devices check failed (no state data for this device)`, this, 'red');
+      return;
+    }
+    
+    this.linkedDevices.forEach(linkInfo => {                    
+      const linkedWrapper = this.devicePool.getDeviceWrapperByChannel(linkInfo.channel);
+
+      if (this.type !== 'IOT.SMARTBULB' && changeInfo.origin === 'backend' && linkedWrapper.type === 'IOT.SMARTPLUGSWITCH') {
+        /**
+         * Ignoring change for the linked device, because this is not a smart bulb,  
+         * the change was backend originated, and the linked device is a smartplugswitch.
+         * Not catching this case will result in an unstable switch (infinite flips).
+         */
+        return;
+      }
+
+      // Do we care about this change?
+      if (newStateBool && linkInfo.onPosition === false) {
+        return;
+      }                
+
+      if (!newStateBool && linkInfo.offPosition === false) {
+        return;
+      }                
+
+      // Has the connected device been discovered?
+      if (!linkedWrapper) {
+        log(`Connected device check failed for channel ${linkInfo.channel} (device not discovered)`, this, 'red');
+      }
+
+      // Is the connected device live?
+      if (!linkedWrapper.isOnline) {
+        log(`Connected device check failed for channel ${linkInfo.channel} (device went offline)`, this, 'red');
+      }
+      
+      // Do we have power state for this device?
+      const linkedWrapperStateBool = linkedWrapper.getPowerState();
+      
+      if (typeof linkedWrapperStateBool !== 'boolean') {
+        log(`Connected device check failed for channel ${linkedWrapper.channel} (no state data)`, this, 'red');
+        return;
+      }
+
+      let flipPowerstate = false;
+    
+      // See if we need to flip this device
+      if (linkInfo.sync) {
+        // Keep the target device in sync                      
+        if (linkInfo.inverse) {
+          // Inverse sync
+          flipPowerstate = newStateBool === linkedWrapperStateBool;
+        } else {
+          // Same direction sync
+          flipPowerstate = newStateBool !== linkedWrapperStateBool;
+        }
+      } else {
+        // Toggle the target device, regardless of its current position
+        flipPowerstate = true;
+      }
+
+      // Flip the device if needed
+      if (flipPowerstate) {
+        // Set a flag on it to ignore the next power state change originating from the backend
+        linkedWrapper.__ignoreNextChangeByBackend = true;
+
+        log(`Flipping connected device: ${linkedWrapper.alias}`, this);
+        linkedWrapper.setPowerState(!linkedWrapperStateBool, 'backend');
+      }
+  
+    });
+
   },
 
   async setLightState(commandObject, triggerSwitchPosition, origin) {    

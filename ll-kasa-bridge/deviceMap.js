@@ -331,20 +331,9 @@ const deviceMap = [
         // NOT YET IMPLEMENTED: Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
         onlyWhenSameStateAs: []
       },
+      // When this light goes off, take channel 2 with.
       { channel: 2, sync: true, onPosition: false, offPosition: true },
     ],
-    targets: {
-      'on': {
-        powerState: [
-          { channel: 101, data: true },
-        ]
-      },
-      'off': {
-        powerState: [
-          { channel: 101, data: false },
-        ]
-      }
-    }
   },
   {
     alias: 'Jess Bed Switch',
