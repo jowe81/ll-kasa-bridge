@@ -160,15 +160,28 @@ const DevicePool = {
 
   // Any filter configured on a device that has an interval property > 0 set, will be applied by this function.
   _runPeriodicFilters() {
-    log(`Checking filters...`, null, 'bgGray');
-      if (Array.isArray(this.devices)) {
-        this.devices.forEach(deviceWrapper => {
-          const filters = deviceWrapper.getPeriodicFilters();
+    const serviceName = 'Periodic Filter Service';
+    const tag = `${serviceName}: `;
+    log(`${tag}Run filters...`, null);
 
-          if (filters) {
-            deviceWrapper.setLightState({}, null, 'periodic filter service', filters);
-          }          
-      });
+    let filtersProcessed = 0;
+
+    if (Array.isArray(this.devices)) {
+      this.devices.forEach(deviceWrapper => {
+        const filters = deviceWrapper.getPeriodicFilters();
+
+        if (Array.isArray(filters) && filters.length) {
+          filtersProcessed++;
+
+          deviceWrapper.setLightState({}, null, serviceName, filters);
+        }          
+    });
+
+    if (filtersProcessed) {
+      log(`${tag}Processed ${filtersProcessed} filters.`);
+    } else {
+      log(`${tag}Periodic Filter Service: Nothing to do.`);
+    }
     }
   }
 
