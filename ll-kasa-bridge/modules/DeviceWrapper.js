@@ -268,6 +268,16 @@ const cmdFailPrefix = '[FAIL]';
     }
   },
 
+  // Return those filters that have an interval property set
+  getPeriodicFilters() {
+
+    if (Array.isArray(this.filters)) {
+      return this.filters.filter(filter => filter.interval > 0)      
+    }
+
+    return null;    
+  },
+
   // Return power state as a boolean, regardless of the type of device
   getPowerState() {
     let powerState = undefined;
@@ -414,11 +424,18 @@ const cmdFailPrefix = '[FAIL]';
 
   },
 
-  async setLightState(commandObject, triggerSwitchPosition, origin) {    
-    let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : 'unknown origin';
+  async setLightState(commandObject, triggerSwitchPosition, origin, filters = null) {    
+    let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin;
+    if (originText) {
+      originText = `[${originText}]`;
+    }
 
-    // Apply filters
-    if (this.filters) {
+    // Apply filters    
+    if (Array.isArray(filters)) {
+      // Specific filters were passed in; use these instead of the filters configured on this device.
+      filters.forEach(filterObject => commandObject = filter(filterObject, commandObject));
+    } else if (this.filters) {
+      // No filters were passed in; use those configured on this device.
       this.filters.forEach(filterObject => {
         if (filterObject.switchPosition !== null && filterObject.switchPosition === triggerSwitchPosition) {
           commandObject = filter(filterObject, commandObject);
@@ -431,9 +448,9 @@ const cmdFailPrefix = '[FAIL]';
     if (this.device && this.isOnline) {
       try {
         const data = await this.device.lighting.setLightState(commandObject);
-        log(`${cmdPrefix} setLightState ${JSON.stringify(commandObject)}`, this, 'cyan');
+        log(`${cmdPrefix} ${originText} setLightState ${JSON.stringify(commandObject)}`, this, 'cyan');
       } catch(err) {
-        log(`${cmdPrefix} ${cmdFailPrefix} setLightState returned an error`, this, null, err);
+        log(`${cmdPrefix} ${originText} ${cmdFailPrefix} setLightState returned an error`, this, null, err);
       }
     } else {
       log(`${cmdPrefix} ${cmdFailPrefix} setLightState failed: device is offline.`, this, 'red');

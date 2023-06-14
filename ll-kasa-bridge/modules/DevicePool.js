@@ -2,6 +2,7 @@ import TplinkSmarthomeApi from 'tplink-smarthome-api';
 
 import DeviceWrapper from './DeviceWrapper.js';
 import { log } from './Log.js';
+import { filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
 
 /**
  * The DevicePool encapsulates all automation device functionality.
@@ -16,7 +17,7 @@ const DevicePool = {
     this.db = db;
     this.dbDeviceMap = db.collection('deviceMap');
     this.dbConfig = this.db.collection('config');
-
+    this.devices = [];
 
     // This function will be injected into the device wrapper and called on device events
     this.deviceEventCallback = (event, deviceWrapper) => {
@@ -41,14 +42,22 @@ const DevicePool = {
     }
 
     log(`Initializing device pool.`, null, 'white');
-    
+
     await this.loadGlobalConfiguration();
+
+    this.startPeriodicFilterService();
     this.startDiscovery();
+  },
+
+  startPeriodicFilterService() {    
+    const interval = this.globalConfig?.defaults?.periodicFilterServiceCheckInterval ?? 60 * 1000;
+
+    log(`Starting periodic filter service at check interval (ms): ${interval}`, null, 'white');
+    setInterval(() => this._runPeriodicFilters(this), interval);
   },
 
   startDiscovery() {
     log(`Starting device discovery...`, null, 'white');
-    this.devices = [];
 
     const client = new TplinkSmarthomeApi.Client();
 
@@ -146,6 +155,22 @@ const DevicePool = {
     const noMapItems = await this.dbDeviceMap.countDocuments();
     log(`Loaded global configuration and found ${noMapItems} registered devices in the database.`, null, 'white');
   }, 
+
+  // Internal
+
+  // Any filter configured on a device that has an interval property > 0 set, will be applied by this function.
+  _runPeriodicFilters() {
+    log(`Checking filters...`, null, 'bgGray');
+      if (Array.isArray(this.devices)) {
+        this.devices.forEach(deviceWrapper => {
+          const filters = deviceWrapper.getPeriodicFilters();
+
+          if (filters) {
+            deviceWrapper.setLightState({}, null, 'periodic filter service', filters);
+          }          
+      });
+    }
+  }
 
 }
 

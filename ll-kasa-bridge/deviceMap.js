@@ -1,4 +1,6 @@
-const HOUR = 60 * 60 * 1000;
+const SECOND = 1000;
+const MINUTE = 60 * SECOND;
+const HOUR = 60 * MINUTE;
 
 const tBulb = 'bulb';
 const tStrip = 'led-strip';
@@ -8,6 +10,7 @@ const tSwitch = 'switch';
 const defaults = {
   pollInterval: 10000,
   offlineTolerance: 3,
+  periodicFilterServiceCheckInterval: 10 * SECOND,
 }
 
 const globalConfig = {
@@ -315,6 +318,8 @@ const deviceMap = [
         },
         // Should this filter be invoked when a switch is turned on or off?
         switchPosition: true,
+        // This filter should be run against this device at this interval
+        interval: 1 * MINUTE,
       }
     ],
     linkedDevices: [
