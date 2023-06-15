@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { isDaytime } from "../helpers/jDateTimeUtils.js";
-import filterFunctions from "./Filters.js";
+import { getFilterFunctions } from "./Filters.js";
 
 /**
  * Reverse-generate a command object from a device's current state
@@ -81,6 +81,12 @@ const commandMatchesCurrentState = (deviceWrapper, commandObject) => {
   return result;
 }
 
+/**
+ * Perform filtering of a commandObject
+ * @param {*} filterObject 
+ * @param {*} commandObject 
+ * @returns the filtered commandObject
+ */
 const filter = (filterObject, commandObject) => {
   const { name, stateData } = filterObject;
 
@@ -89,14 +95,16 @@ const filter = (filterObject, commandObject) => {
   }
 
   console.log("Unfiltered commandObject", commandObject);
-
+  
+  const filterFunction = getFilterFunctions()[name];
+  
   // Loop over the stateData items and apply the filter to each in turn.
-  if (filterFunctions[name]) {
+  if (filterFunction) {
     console.log(`Found filter ${name}`);
 
     Object.keys(stateData).forEach(stateKey => {
       console.log(`Processing ${stateKey}`);
-      commandObject[stateKey] = filterFunctions[name](
+      commandObject[stateKey] = filterFunction(
         filterObject, 
         stateKey, 
         commandObject[stateKey] // Default value to use if none is provided in filter configuration

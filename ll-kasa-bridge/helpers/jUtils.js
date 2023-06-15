@@ -1,4 +1,7 @@
 import chalk from 'chalk';
+import path from 'path';
+import fs from 'fs';
+import * as url from 'url';
 
 const allAreBoolean = testVariables => {
   let foundNonBoolean = false;
@@ -11,6 +14,18 @@ const allAreBoolean = testVariables => {
   })
 
   return !foundNonBoolean;
+}
+
+/**
+ * Return an array of filenames in the targetPath
+ * 
+ * @param {*} targetPath 
+ * @param {*} callingScriptPath 
+ * @returns 
+ */
+const getFileNames = (targetPath, callingScriptPath) => {
+  const directoryPath = path.join(getSystemConstants(callingScriptPath).__dirname, targetPath);
+  return fs.readdirSync(directoryPath);
 }
 
 const getFormattedDate = (date, color = 'gray') => {
@@ -31,6 +46,24 @@ const getFormattedDate = (date, color = 'gray') => {
 
     const text = `${formattedDate} ${formattedTime}`
     return color ? chalk[color](text) : text;
+}
+
+/**
+ * Return the constants for the urlPath passed in
+ * 
+ * @param string urlPath 
+ * @returns 
+ */
+const getSystemConstants = (urlPath) => {
+  if (!urlPath) {
+    return null;
+  }
+
+  // From https://blog.logrocket.com/alternatives-dirname-node-js-es-modules/
+  return {
+    __filename: url.fileURLToPath(urlPath),
+    __dirname: url.fileURLToPath(new URL('.', urlPath)),  
+  }
 }
 
 /**
@@ -84,9 +117,11 @@ const log = (text, color = null, err) => {
 
 export {
     allAreBoolean,
+    getFileNames,
     getFormattedDate,
+    getSystemConstants,
     pad,
     log,
-    scale,
+    scale,    
 }
 

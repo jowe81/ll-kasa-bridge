@@ -5,7 +5,7 @@ import DeviceWrapper from './DeviceWrapper.js';
 import { log } from './Log.js';
 import { filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
 
-
+import { loadFilterFunctions } from './Filters.js';
 
 /**
  * The DevicePool encapsulates all automation device functionality.
@@ -22,6 +22,8 @@ const devicePool = {
     this.dbDeviceMap = db.collection('deviceMap');
     this.dbConfig = this.db.collection('config');
     this.devices = [];
+
+    loadFilterFunctions();
 
     // This function will be injected into the device wrapper and called on device events
     this.deviceEventCallback = (event, deviceWrapper) => {

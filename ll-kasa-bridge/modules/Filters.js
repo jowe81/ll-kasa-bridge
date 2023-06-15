@@ -1,49 +1,54 @@
-import { getNighttimePercent, getSunrise, getSunset, isDaytime } from "../helpers/jDateTimeUtils.js";
-import { scale } from "../helpers/jUtils.js";
-import constants from '../constants.js';
+import Path from 'path';
+import { getFileNames } from "../helpers/jUtils.js";
+import { log } from "../helpers/jUtils.js";
 
-const filterFunctions = {
+const promises = [];
 
-  /**
-   * Adjust values linked to sunrise/sunset
-   */
-  'sunEvents': function (filterObject, stateKey, defaultValue) {  
-    // Add padding on both sides of the window
-    const { stateData, settings } = filterObject;
+const filterFiles = getFileNames('./filters', import.meta.url);
 
-    const valueToProcess = stateData[stateKey].value ?? defaultValue;
+let cachedFilterFunctions = {};
 
-    const sunEvent = isDaytime() ? getSunset() : getSunrise();
+const getFilterFunctions = () => cachedFilterFunctions;
 
-    const sunEventMs = sunEvent.getTime();
-    const halfTransitionTime = (settings.transitionTime ?? 0) / 2;
-    const padding = settings.padding ?? 0;
-    const offset = settings.offset ?? 0;
+const loadFilterFunctions = async () => {
 
-    const windowOpensMs = sunEventMs - halfTransitionTime - padding + offset;
-    const windowClosesMs = sunEventMs + halfTransitionTime + padding + offset;
+  // Have we loaded the functions already?
+  if (Object.keys(cachedFilterFunctions).length) {
+    return Promise.resolve(cachedFilterFunctions);
+  }
 
-    const windowOpens = new Date(windowOpensMs);
-    const windowCloses = new Date(windowClosesMs);
+  log(`Looking for filter plugins...`);
 
-    const now = new Date();
-
-    let resultValue = valueToProcess;
-
-    if (windowOpens < now && windowCloses > now) {
-      resultValue = scale(
-        // If no value is set in device config, use the one passed in with the command
-        valueToProcess,
-        stateData[stateKey].altValue, 
-        getNighttimePercent(settings.transitionTime, new Date(), offset),
-      );  
-    } else {
-      console.log('Not within window - returning default');
+  Array.isArray(filterFiles) && filterFiles.forEach(fileName => {
+    const filterName = Path.parse(fileName).name;
+    
+    log(`-> Loaded filter plugin '${filterName}'`);
+    if (fileName) {
+      promises.push(import(`./filters/${fileName}`));
     }
+  
+  });
+    
+  return Promise.all(promises).then(fns => {
+    const filterFunctions = {};
+  
+    fns.forEach(fn => {
+      const functionName = fn.default?.name;
+      if (fn.default) {
+        filterFunctions[functionName] = fn.default;
+      }    
+    })
+  
+    log(`Loaded ${Object.keys(filterFunctions).length} filter(s).`);
 
-    return resultValue;
-  },
+    // Cache them so next time we don't have to do the fs operations
+    cachedFilterFunctions = filterFunctions;
 
+    return filterFunctions;
+  });
 }
 
-export default filterFunctions;
+export { 
+  loadFilterFunctions,
+  getFilterFunctions,
+};
