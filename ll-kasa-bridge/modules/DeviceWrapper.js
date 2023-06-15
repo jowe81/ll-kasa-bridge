@@ -173,10 +173,10 @@ const cmdFailPrefix = '[FAIL]';
             
       if (changeInfo.on_off || changeInfo.settings) {
         // Either on_off or the settings changed; we have the origin for this case.
-        changeInfo.origin = backendChange ? 'backend' : 'other';
+        changeInfo.origin = backendChange ? constants.SERVICE_BACKEND : 'other';
       } else {
         // Only the transition changed; not sure of the origin but most likely a backend change.
-        changeInfo.origin = 'backend';
+        changeInfo.origin = constants.SERVICE_BACKEND;
       }
 
     }
@@ -359,7 +359,7 @@ const cmdFailPrefix = '[FAIL]';
     this.linkedDevices.forEach(linkInfo => {                    
       const linkedWrapper = this.devicePool.getDeviceWrapperByChannel(linkInfo.channel);
 
-      if (this.type !== 'IOT.SMARTBULB' && changeInfo.origin === 'backend' && linkedWrapper.type === 'IOT.SMARTPLUGSWITCH') {
+      if (this.type !== 'IOT.SMARTBULB' && changeInfo.origin === constants.SERVICE_BACKEND && linkedWrapper.type === 'IOT.SMARTPLUGSWITCH') {
         /**
          * Ignoring change for the linked device, because this is not a smart bulb,  
          * the change was backend originated, and the linked device is a smartplugswitch.
@@ -418,7 +418,7 @@ const cmdFailPrefix = '[FAIL]';
         linkedWrapper.__ignoreNextChangeByBackend = true;
 
         log(`Flipping connected device: ${linkedWrapper.alias}`, this);
-        linkedWrapper.setPowerState(!linkedWrapperStateBool, 'backend');
+        linkedWrapper.setPowerState(!linkedWrapperStateBool, constants.SERVICE_BACKEND);
       }
   
     });

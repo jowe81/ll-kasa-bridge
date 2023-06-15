@@ -69,14 +69,16 @@ const commandMatchesCurrentState = (deviceWrapper, commandObject) => {
   const currentStateAsCommandObject = buildCommandObjectFromCurrentState(deviceWrapper);
 
   let result = true;
-
-  Object.keys(commandObject).every(paramName => {
-    if (commandObject[paramName] !== currentStateAsCommandObject[paramName]) {
-      result = false;
-      console.log(`${paramName} differs: ${commandObject[paramName]} != ${currentStateAsCommandObject[paramName]}` );
-      return false;
-    }
-  });
+  
+  if (currentStateAsCommandObject) {
+    Object.keys(commandObject).every(paramName => {
+      if (commandObject[paramName] !== currentStateAsCommandObject[paramName]) {
+        result = false;
+        console.log(`${paramName} differs: ${commandObject[paramName]} != ${currentStateAsCommandObject[paramName]}` );
+        return false;
+      }
+    });  
+  }
 
   return result;
 }
@@ -97,7 +99,7 @@ const filter = (filterObject, commandObject) => {
   console.log("Unfiltered commandObject", commandObject);
   
   const filterFunction = getFilterFunctions()[name];
-  
+
   // Loop over the stateData items and apply the filter to each in turn.
   if (filterFunction) {
     console.log(`Found filter ${name}`);
