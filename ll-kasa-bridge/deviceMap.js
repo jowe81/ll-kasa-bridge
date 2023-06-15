@@ -304,8 +304,31 @@ const deviceMap = [
         },
         settings: {
           // Settings specific to the sunEvents filter
+          /**
+           * Specify across what time window the transition should occur.
+           * If not set or 0, it will be instant.
+           */
           transitionTime: 1 * HOUR,
+
+          /**
+           * Specify an optional offset at which the transition should occur.
+           * The offset shifts the transition to before or after the sun event.
+           */
           offset: 0 * HOUR,
+
+          /**
+           * Only apply this filter from before until after dusk and before until after dawn?
+           * 
+           * If set to true, filtered parameters get changed at other times they won't be overwritten 
+           * until the next dusk/dawn period
+           */
+          atDawnAndDuskOnly: true,
+
+          /**
+           * If atDawnAndDuskOnly is set, apply optional padding on both sides of the time window
+           * resulting from the above parameters.
+           */
+          padding: 5 * MINUTE,
         },
         // Should this filter be invoked when a switch is turned on or off?
         switchPosition: true,

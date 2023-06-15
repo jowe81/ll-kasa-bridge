@@ -77,7 +77,7 @@ const getDaytimePercent = (transitionTime, date, offset, coords) => {
     date = new Date();
   }
 
-  date.setTime(date.getTime() + (offset ?? 0));
+  date.setTime(date.getTime() - (offset ?? 0));
 
   // Get start and end of transition period, with the center beeing the current time (or date passed in), with offset
   const transitionStart = new Date();
