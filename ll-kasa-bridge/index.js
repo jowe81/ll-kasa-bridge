@@ -3,7 +3,7 @@ dotenv.config();
 
 // Project files
 import mongoConnect from './db/mongodb.js';
-import devicePool from './modules/DevicePool.js';
+import { devicePool } from './modules/DevicePool.js';
 import utils from './helpers/ll-bridge-utils.js';
 import { initRouter } from './routers/kasaRouter.js';
 import devicesRouter from './routers/devices.js';

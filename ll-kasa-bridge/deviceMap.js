@@ -1,36 +1,25 @@
-const SECOND = 1000;
-const MINUTE = 60 * SECOND;
-const HOUR = 60 * MINUTE;
-
-const tBulb = 'bulb';
-const tStrip = 'led-strip';
-const tPlug = 'plug';
-const tSwitch = 'switch';
+import constants from './constants.js';
+const { SECOND, MINUTE, HOUR } = constants;
+const { SUBTYPE_BULB, SUBTYPE_LED_STRIP, SUBTYPE_PLUG, SUBTYPE_SWITCH } = constants;
 
 const defaults = {
   pollInterval: 10000,
   offlineTolerance: 3,
-  periodicFilterServiceCheckInterval: 10 * SECOND,
+  periodicFilterServiceCheckInterval: 20 * SECOND,
 }
 
 const globalConfig = {
-  subTypes: {
-    tBulb,
-    tStrip,
-    tPlug,
-    tSwitch,
-  },
 
-  [tBulb]: {
+  [SUBTYPE_BULB]: {
     pollInterval: 10000,
   },
-  [tStrip]: {
+  [SUBTYPE_LED_STRIP]: {
     pollInterval: 10000,
   },
-  [tSwitch]: {
+  [SUBTYPE_SWITCH]: {
     pollInterval: 1000,
   },
-  [tPlug]: {
+  [SUBTYPE_PLUG]: {
     pollInterval: 5000,
   },
 
@@ -43,38 +32,38 @@ const deviceMap = [
     alias: 'Bedroom IKEA lamp',
     channel: 2,
     id: "8012E7EA0A70974D997DE95E898FBA261F980E1A",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
   {
     alias: 'Bedroom Desk Strip top',
     channel: 3,
     id: "80121CF5373D56F7C62278B4C0FE88A01F53DD26",
-    subType: tStrip,
+    subType: SUBTYPE_LED_STRIP,
   },
   { 
     alias: 'Bedroom Heater',
     channel: 4,
     id: '80065A4E60A835C49695A74DA7FAE76520436E9C01',
-    subType: tPlug
+    subType: SUBTYPE_PLUG
   },
   {
     alias: 'Bedroom Fan',
     channel: 5, 
     id: "80065A4E60A835C49695A74DA7FAE76520436E9C02",
-    subType: tPlug,
+    subType: SUBTYPE_PLUG,
   },
   {
     alias: 'Bedroom Ceiling 1',
     channel: 6, 
     id: "8012C3A3B58B58E8081EDBCF694C8CBC1F790A02",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
 
   },
   {
     alias: 'Bedroom Ceiling 2',
     channel: 7, 
     id: "8012511ABF75C811DB47A833DD2EDAED1F791417",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
 
   //Hallway
@@ -82,13 +71,13 @@ const deviceMap = [
     alias: 'Hallway Ceiling 1', //Hallway ceiling 2?
     channel: 8,
     id: "80121D6F58ADDCAC185363C01347F5EA1F752B55",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
   {
     alias: 'Hallway Ceiling 2',
     channel: 9, 
     id: "8012DA57516B98CCFFE6467D8F4F01691F73C975",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
 
 
@@ -98,31 +87,31 @@ const deviceMap = [
     alias: 'Bathroom 1',
     channel: 10, 
     id: "8012D32B889FD9CE23C825CEB1C2EFD41F73D8E2",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
   {
     alias: 'Bathroom 2',
     channel: 11, 
     id: "8012F65B8543DA7FFFC8A3F756D1EBE61F742CDF",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
   {
     alias: 'Bathroom 3',
     channel: 12, 
     id: "80128096836910A62F80A6B532C1461E1F79D295",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
   {
     alias: 'Bathroom 4',
     channel: 13, 
     id: "8012EE37548E3F0F48405DECC13D0B801F779B2B",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
   {
     alias: 'Bedroom Desk Switch',
     channel: 14,
     id: "8006E7EB4A66E3687708A7ABF93FB237200DCDA4",
-    subType: tSwitch,
+    subType: SUBTYPE_SWITCH,
     targets: {
       'on': {
         'powerState': [           
@@ -148,6 +137,7 @@ const deviceMap = [
             data: {
               on_off: 1,
               hue: 240,
+              transition:5000,
             }
           },
           { 
@@ -183,6 +173,7 @@ const deviceMap = [
             data: {
               on_off: 1,
               hue: 277,
+              transition:5000,
             }
           },
           { 
@@ -200,13 +191,13 @@ const deviceMap = [
     alias: 'Bathroom Heater',
     channel: 15,
     id: "80061465B741F3D278857FD2F8E09CD020C3200A",
-    subType: tPlug
+    subType: SUBTYPE_PLUG
   },
   {
     alias: 'Bedroom Desk Strip bottom',
     channel: 16,
     id: "8012ACE65E9CFF19DBAB8CAF5A2BBD942014A9B1",
-    subType: tStrip,
+    subType: SUBTYPE_LED_STRIP,
   },
 
   //Living Room
@@ -215,43 +206,43 @@ const deviceMap = [
     alias: 'Living Room Ikea 1',
     channel: 28, 
     id: "801264A4EC3F66CAC02D4FF78712E6D11F992564",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
   {
     alias: 'Living Room Ikea 2',
     channel: 29, 
     id: "8012F095B949B648B1BE7C8A050FA39E1F78FAE8",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
   {
     alias: 'Living Room Ikea 3',
     channel: 30, 
     id: "8012AE4AF3CF80CD50EC66E4F87F3E291F99397C",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
   {
     alias: 'Living Room Ikea 4',
     channel: 31, 
     id: "8012DEFBED48C05561BF6C2F5D8A490D1F77A75D",
-    subType: tBulb,    
+    subType: SUBTYPE_BULB,    
   },
   {
     alias: 'Living Room Ikea 5',
     channel: 32, 
     id: "8012D9195E6D17B426B7F74DE432D6A21F9BD8BE",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
   {
     alias: 'Jess\' Desk Lamp',
     channel: 33, 
     id: "8012D2D5067A0F9AE37075A3FA816E341F9D35A9",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
   {
     alias: 'Switch in Jess\' desk',
     channel: 34, 
     id: "800686BE89C5D37A63B4E70AB37689212066F343",
-    subType: tSwitch,
+    subType: SUBTYPE_SWITCH,
     targets: {
       'on': {
         'powerState': [ //Lights above the desk and desk lamp
@@ -277,31 +268,31 @@ const deviceMap = [
     alias: 'Front Door Lamp',
     channel: 35, 
     id: "801277C3769ADD0BA769504AAB6B233E1F77F11C",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
   {
     alias: 'Ikea Hallway',
     channel: 36, 
     id: "8012FA2584FE5D30C3E2F13FC023719B1F7B385D",
-    subType: tBulb,
+    subType: SUBTYPE_BULB,
   },
   {
     alias: 'Jess Storage Shelves',
     channel: 36, 
     id: "80120A8622D026338547E3D7E88D70931F9E81A8",
-    subType: tStrip,
+    subType: SUBTYPE_LED_STRIP,
   },
   {
     alias: 'Bedroom Desk Strip Shelving',
     channel: 37, 
     id: "80125B9CDD55CE105CC76F0CA2F6C8CC1F5426D8",
-    subType: tStrip,
+    subType: SUBTYPE_LED_STRIP,
   },
   {
     alias: 'Bed Shelf Strip',
     channel: 38, 
     id: "8012D0E9DD82CBC61A864D093BF05E911F53B1E8",
-    subType: tStrip,
+    subType: SUBTYPE_LED_STRIP,
     filters: [      
       { 
         name: 'sunEvents', 
@@ -344,7 +335,7 @@ const deviceMap = [
     alias: 'Jess Bed Switch',
     channel: 101, 
     id: "8006000F366B7DD70835CBF38A51040620662083",
-    subType: tSwitch, 
+    subType: SUBTYPE_SWITCH, 
     targets: {
       'on': {
         'lightState': [
@@ -375,13 +366,13 @@ const deviceMap = [
     alias: 'Bedroom Audio Amp',
     channel: 39,
     id: '80065A4E60A835C49695A74DA7FAE76520436E9C00',
-    subType: tPlug
+    subType: SUBTYPE_PLUG
   },
   { 
     alias: 'Jess Desk Strip',
     channel: 40,
     id: '8012984E9F504FC4AEC384A012A6BEE01F54FA11',
-    subType: tStrip,
+    subType: SUBTYPE_LED_STRIP,
   },
 
   
@@ -404,6 +395,6 @@ export {
 //  pollIntSwitch,
 //  pollIntPlug,
 
-//  tPlug,
+//  SUBTYPE_PLUG,
 //  switch,
 }

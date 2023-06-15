@@ -1,7 +1,8 @@
 import _ from 'lodash';
 
+import constants from '../constants.js';
 import { log } from './Log.js';
-import { filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
+import { commandMatchesCurrentState, filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
 
 const cmdPrefix = '[CMD]';
 const cmdFailPrefix = '[FAIL]';
@@ -43,7 +44,7 @@ const cmdFailPrefix = '[FAIL]';
         return;
       }
 
-      if (!this.type === 'IOT.SMARTPLUGSWITCH' && this.subType === this.globalConfig.subTypes.tSwitch) {
+      if (!this.type === 'IOT.SMARTPLUGSWITCH' && this.subType === constants.SUBTYPE_SWITCH) {
         // This isn't an actual switch (does it matter?)
         return;
       }
@@ -430,6 +431,11 @@ const cmdFailPrefix = '[FAIL]';
       originText = `[${originText}]`;
     }
 
+    if (!(this.device && this.isOnline)) {
+      log(`${cmdPrefix} ${cmdFailPrefix} setLightState failed: device is offline.`, this, 'red');
+      return;
+    }
+
     // Apply filters    
     if (Array.isArray(filters)) {
       // Specific filters were passed in; use these instead of the filters configured on this device.
@@ -444,16 +450,17 @@ const cmdFailPrefix = '[FAIL]';
         }
       });
     }
-
-    if (this.device && this.isOnline) {
-      try {
-        const data = await this.device.lighting.setLightState(commandObject);
-        log(`${cmdPrefix} ${originText} setLightState ${JSON.stringify(commandObject)}`, this, 'cyan');
-      } catch(err) {
-        log(`${cmdPrefix} ${originText} ${cmdFailPrefix} setLightState returned an error`, this, null, err);
-      }
-    } else {
-      log(`${cmdPrefix} ${cmdFailPrefix} setLightState failed: device is offline.`, this, 'red');
+    
+    if (commandMatchesCurrentState(this, commandObject) && origin === constants.SERVICE_PERIODIC_FILTER) {
+      console.log('Periodic filter command is matching, ignoring');
+      return;
+    }
+    
+    try {
+      const data = await this.device.lighting.setLightState(commandObject);
+      log(`${cmdPrefix} ${originText} setLightState ${JSON.stringify(commandObject)}`, this, 'cyan');
+    } catch(err) {
+      log(`${cmdPrefix} ${originText} ${cmdFailPrefix} setLightState returned an error`, this, null, err);
     }
   },
 
@@ -499,8 +506,6 @@ const cmdFailPrefix = '[FAIL]';
   startPolling() {
 
     if (this.device && this.isOnline) {
-
-      const { tBulb, tStrip, tPlug, tSwitch } = this.globalConfig?.subTypes;
 
       this.config = this.globalConfig[this.subType];
 

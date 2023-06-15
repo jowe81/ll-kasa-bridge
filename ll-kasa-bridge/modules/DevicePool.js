@@ -1,8 +1,11 @@
 import TplinkSmarthomeApi from 'tplink-smarthome-api';
 
+import constants from '../constants.js';
 import DeviceWrapper from './DeviceWrapper.js';
 import { log } from './Log.js';
 import { filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
+
+
 
 /**
  * The DevicePool encapsulates all automation device functionality.
@@ -11,7 +14,8 @@ import { filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js
  * A callback function can be passed into intialize() that will be called 
  * on device events (powerstate/lightstate changes).
  */
-const DevicePool = {
+
+const devicePool = {
 
   async initialize(db, io, deviceEventCallback) {
     this.db = db;
@@ -188,4 +192,7 @@ const DevicePool = {
 }
 
 
-export default DevicePool;
+export { 
+  devicePool, 
+  constants 
+};
