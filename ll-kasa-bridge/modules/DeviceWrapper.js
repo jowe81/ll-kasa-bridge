@@ -426,10 +426,7 @@ const cmdFailPrefix = '[FAIL]';
   },
 
   async setLightState(commandObject, triggerSwitchPosition, origin, filters = null) {    
-    let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin;
-    if (originText) {
-      originText = `[${originText}]`;
-    }
+    let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
 
     if (!(this.device && this.isOnline)) {
       log(`${cmdPrefix} ${cmdFailPrefix} setLightState failed: device is offline.`, this, 'red');
@@ -455,12 +452,12 @@ const cmdFailPrefix = '[FAIL]';
       console.log('Periodic filter command is matching, ignoring');
       return;
     }
-    
+
     try {
       const data = await this.device.lighting.setLightState(commandObject);
-      log(`${cmdPrefix} ${originText} setLightState ${JSON.stringify(commandObject)}`, this, 'cyan');
+      log(`${cmdPrefix} [${originText}] setLightState ${JSON.stringify(commandObject)}`, this, 'cyan');
     } catch(err) {
-      log(`${cmdPrefix} ${originText} ${cmdFailPrefix} setLightState returned an error`, this, null, err);
+      log(`${cmdPrefix} [${originText}] ${cmdFailPrefix} setLightState returned an error`, this, null, err);
     }
   },
 

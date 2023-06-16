@@ -73,9 +73,11 @@ const getSystemConstants = (urlPath) => {
  * @param {*} altValue 
  * @param {*} percentage 
  */
-const scale = (value, altValue, percentage) => {
+const scale = (value, altValue, percentage, decimals = 0) => {
   const range = altValue - value;  
-  return value + (percentage * range);
+  const fullResult = value + (percentage * range);
+
+  return parseFloat(fullResult.toFixed(decimals));
 }
 
 /**

@@ -19,10 +19,11 @@ const _getCoords = (coords) => {
 }
 
 // Get today's sunset from library
-const getSunset = (coords) => {
+const getSunset = (date, coords) => {
   const { lat, long } = _getCoords(coords);
 
-  const now = new Date();
+  const now = date ? date : new Date();
+
   // Need to pass this into getSunset, or it gets yesterday's sunset time (?)
   const plus1Day = new Date(now.getTime() + 24 * 60 * 60 * 1000);  
 
@@ -30,23 +31,36 @@ const getSunset = (coords) => {
 }
 
 // Get today's sunrise from library
-const getSunrise = (coords) => {
+const getSunrise = (date, coords) => {
   const { lat, long } = _getCoords(coords);
-  return sunriseSunsetJs.getSunrise(lat, long);
+  return sunriseSunsetJs.getSunrise(lat, long, date);
 }
 
 /**
  * Are we between today's sunrise and sunset?
  * @returns bool
  */
-const isDaytime = (date = null, coords = null) => {
+const isDaytime = (date = null, coords = null, offset = 0) => {
   const { lat, long } = _getCoords(coords);
 
+  if (date && offset) {
+    date.setTime(date.getTime() + offset);
+  }
+
   const now = date ? date : new Date();
-  const sunset = getSunset({lat, long});
-  const sunrise = getSunrise({lat, long});
+
+  const sunset = getSunset(now, {lat, long});
+  const sunrise = getSunrise(now, {lat, long});
 
   return sunrise < now && sunset > now;  
+}
+
+/**
+ * Get the date/time of the upcoming sunrise or sunset.
+ * @returns Date
+ */
+const getNextSunEvent = (date = null, coords = null) => {  
+  return isDaytime(date, coords) ? getSunset(date, coords) : getSunrise(date, coords)
 }
 
 /**
@@ -117,13 +131,24 @@ const getNighttimePercent = (transitionTime, date, offset, coords) => 1 - getDay
 
 const isFullyDaytime = (transitionTime = null, date = null) => getDaytimePercent(transitionTime, null, date) === 1;
 
+const logDates = (dates, label) => {
+  if (!Array.isArray(dates)) {
+    dates = [ dates ];
+  }
+
+  dates.forEach(date => {
+    console.log(" - " + (label ?? ''), date?.toLocaleString(), date?.getTime());  
+  })
+}
 
 export {
   getSunrise,
   getSunset,
   getDaytimePercent,
   getNighttimePercent,
+  getNextSunEvent,
   isDaytime,  
   isFullyDaytime,
   isNighttime,
+  logDates,
 }
