@@ -3,9 +3,23 @@ const { SECOND, MINUTE, HOUR } = constants;
 const { SUBTYPE_BULB, SUBTYPE_LED_STRIP, SUBTYPE_PLUG, SUBTYPE_SWITCH } = constants;
 
 const defaults = {
+  /**
+   * Devices
+   */
   pollInterval: 10000,
   offlineTolerance: 3,
-  periodicFilterServiceCheckInterval: 20 * SECOND,
+
+  periodicFilters: {
+    /**
+     * How often should the service check for filters to be run?
+     */
+    checkInterval: 20 * SECOND,    
+    /**
+     * How long before and after sunrise/sunset should the filter be executed when it has the
+     * periodicallyActive flag set?
+     */
+    paddingFromSunEvent: 2 * HOUR,
+  }
 }
 
 const globalConfig = {

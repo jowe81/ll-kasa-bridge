@@ -57,8 +57,9 @@ const devicePool = {
   },
 
   startPeriodicFilterService() {    
-    const interval = this.globalConfig?.defaults?.periodicFilterServiceCheckInterval ?? constants.MINUTE;
-
+    const settings = this.globalConfig?.defaults?.periodicFilters;
+    const interval = settings?.checkInterval ?? constants.MINUTE;
+  
     log(`Starting periodic filter service at check interval (ms): ${interval}`, null, 'white');
     setInterval(() => this._runPeriodicFilters(this), interval);
   },
@@ -201,15 +202,15 @@ const devicePool = {
     if (Array.isArray(allFilters) && allFilters.length) {
       allFilters.forEach(filterObject => {
         if (filterObject.periodicallyActive) {
+          const paddingFromSunEvent = this.globalConfig?.defaults?.periodicFilters?.paddingFromSunEvent ?? constants.HOUR * 2;
+
           let runThisFilter = false;
 
           switch (filterObject.periodicallyActive) {
             case 'always':
               runThisFilter = true;    
             case 'duskToDawn':
-              const paddingFromSunEvent = filterObject.settings.transitionTime / 2;
-              runThisFilter = isBetweenDuskAndDawn(null, null, paddingFromSunEvent * 3);
-              console.log('Running dusk to dawn filter? ' + (runThisFilter ? "yes" : "no"));
+              runThisFilter = isBetweenDuskAndDawn(null, null, paddingFromSunEvent);
               break;
 
 
