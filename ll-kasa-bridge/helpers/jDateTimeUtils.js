@@ -1,4 +1,5 @@
 import sunriseSunsetJs from 'sunrise-sunset-js';
+import constants from '../constants.js';
 
 // Vancouver
 const DEFAULT_LAT = 49.28;
@@ -34,6 +35,26 @@ const getSunset = (date, coords) => {
 const getSunrise = (date, coords) => {
   const { lat, long } = _getCoords(coords);
   return sunriseSunsetJs.getSunrise(lat, long, date);
+}
+
+/**
+ * Are we between dusk and dawn? 
+ * Adds/subtracts paddingFromSunEvent to sunset/sunrise to determine this.
+ *  
+ * @returns bool
+ */
+const isBetweenDuskAndDawn = (date, coords, paddingFromSunEvent = 0) => {
+  const now = date ? date : new Date();
+  
+  const tomorrow = new Date(now.getTime() + constants.DAY);
+
+  const sunset = getSunset(now, coords);
+  const sunrise = getSunrise(tomorrow, coords);
+
+  const windowOpens = new Date(sunset.getTime() - paddingFromSunEvent);
+  const windowCloses = new Date(sunrise.getTime() + paddingFromSunEvent);
+
+  return windowOpens < now && windowCloses > now;
 }
 
 /**
@@ -147,6 +168,7 @@ export {
   getDaytimePercent,
   getNighttimePercent,
   getNextSunEvent,
+  isBetweenDuskAndDawn,
   isDaytime,  
   isFullyDaytime,
   isNighttime,

@@ -4,7 +4,7 @@ import constants from '../constants.js';
 import DeviceWrapper from './DeviceWrapper.js';
 import { log } from './Log.js';
 import { filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
-
+import { isBetweenDuskAndDawn } from '../helpers/jDateTimeUtils.js';
 import { loadFilterFunctions } from './Filters.js';
 
 /**
@@ -22,8 +22,6 @@ const devicePool = {
     this.dbDeviceMap = db.collection('deviceMap');
     this.dbConfig = this.db.collection('config');
     this.devices = [];
-
-    loadFilterFunctions();
 
     // This function will be injected into the device wrapper and called on device events
     this.deviceEventCallback = (event, deviceWrapper) => {
@@ -51,12 +49,15 @@ const devicePool = {
 
     await this.loadGlobalConfiguration();
 
+    // Load the filter plugins
+    loadFilterFunctions();
+
     this.startPeriodicFilterService();
     this.startDiscovery();
   },
 
   startPeriodicFilterService() {    
-    const interval = this.globalConfig?.defaults?.periodicFilterServiceCheckInterval ?? 60 * 1000;
+    const interval = this.globalConfig?.defaults?.periodicFilterServiceCheckInterval ?? constants.MINUTE;
 
     log(`Starting periodic filter service at check interval (ms): ${interval}`, null, 'white');
     setInterval(() => this._runPeriodicFilters(this), interval);
@@ -174,12 +175,14 @@ const devicePool = {
 
     if (Array.isArray(this.devices)) {
       this.devices.forEach(deviceWrapper => {
-        const filters = deviceWrapper.getPeriodicFilters();
+        const allFilters = deviceWrapper.getPeriodicFilters();
 
-        if (Array.isArray(filters) && filters.length) {
+        const filtersToRun = this._getCurrentlyActivePeriodicFilters(allFilters);
+        
+        if (Array.isArray(filtersToRun) && filtersToRun.length) {
           filtersProcessed++;
 
-          deviceWrapper.setLightState({}, null, serviceName, filters);
+          deviceWrapper.setLightState({}, null, serviceName, filtersToRun);
         }          
     });
 
@@ -189,7 +192,40 @@ const devicePool = {
       log(`${tag}Nothing to do.`);
     }
     }
+  },
+
+  // Filter out filters that shouldn't run
+  _getCurrentlyActivePeriodicFilters(allFilters) {
+    const filtersToRun = [];
+
+    if (Array.isArray(allFilters) && allFilters.length) {
+      allFilters.forEach(filterObject => {
+        if (filterObject.periodicallyActive) {
+          let runThisFilter = false;
+
+          switch (filterObject.periodicallyActive) {
+            case 'always':
+              runThisFilter = true;    
+            case 'duskToDawn':
+              const paddingFromSunEvent = filterObject.settings.transitionTime / 2;
+              runThisFilter = isBetweenDuskAndDawn(null, null, paddingFromSunEvent * 3);
+              console.log('Running dusk to dawn filter? ' + (runThisFilter ? "yes" : "no"));
+              break;
+
+
+          }
+          if (runThisFilter) {
+            filtersToRun.push(filterObject);
+          }
+          
+        }
+      });
+    }
+
+    return filtersToRun;
   }
+
+
 
 }
 

@@ -295,13 +295,24 @@ const deviceMap = [
     subType: SUBTYPE_LED_STRIP,
     filters: [      
       { 
+        /**
+         * Name of the filter (maps to 'filters/name.js' )
+         */
         name: 'sunEvents', 
+
         stateData: { 
           brightness: { 
             value: 80,
             altValue: 1,
           },
         },
+        
+        /**
+         * Populate this to add the filter to the period filter service runs.
+         * 
+         */
+        periodicallyActive: 'duskToDawn',
+
         settings: {
           // Settings specific to the sunEvents filter
           /**
