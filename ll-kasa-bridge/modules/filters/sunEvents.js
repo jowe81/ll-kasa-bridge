@@ -8,16 +8,16 @@ import { scale } from "../../helpers/jUtils.js";
 const sunEvents = (filterObject, stateKey, defaultValue) => {  
   const { stateData, settings } = filterObject;
 
-  const valueToProcess = stateData[stateKey].value ?? defaultValue;
+  // If no value is set in device config, use the one passed in with the command
+  const valueToProcess = stateData[stateKey].value ?? defaultValue ?? 100; //The last default 100 should be properly resolved to the max value of the property stateKey
 
+  // Default the altValue and the offset to 0
+  const altValue = stateData[stateKey].altValue ?? 0;
   const offset = settings.offset ?? 0;
 
-  let resultValue = valueToProcess;
-
-  resultValue = scale(
-    // If no value is set in device config, use the one passed in with the command
+  const resultValue = scale(
     valueToProcess,
-    stateData[stateKey].altValue, 
+    altValue,
     getNighttimePercent(settings.transitionTime, new Date(), offset)
   );  
 

@@ -269,16 +269,6 @@ const cmdFailPrefix = '[FAIL]';
     }
   },
 
-  // Return those filters that have an interval property set
-  getPeriodicFilters() {
-
-    if (Array.isArray(this.filters)) {
-      return this.filters.filter(filter => filter.interval > 0)      
-    }
-
-    return null;    
-  },
-
   // Return power state as a boolean, regardless of the type of device
   getPowerState() {
     let powerState = undefined;

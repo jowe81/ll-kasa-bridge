@@ -90,19 +90,19 @@ const commandMatchesCurrentState = (deviceWrapper, commandObject) => {
  * @returns the filtered commandObject
  */
 const filter = (filterObject, commandObject) => {
-  const { name, stateData } = filterObject;
+  const { pluginName, stateData } = filterObject;
 
-  if (!name || !stateData) {
+  if (!pluginName || !stateData) {
     return commandObject;
   }
 
   console.log("Unfiltered commandObject", commandObject);
   
-  const filterFunction = getFilterFunctions()[name];
+  const filterFunction = getFilterFunctions()[pluginName];
 
   // Loop over the stateData items and apply the filter to each in turn.
   if (filterFunction) {
-    console.log(`Found filter ${name}`);
+    console.log(`Found filter ${pluginName}`);
 
     Object.keys(stateData).forEach(stateKey => {
       console.log(`Processing ${stateKey}`);
@@ -113,7 +113,7 @@ const filter = (filterObject, commandObject) => {
       );  
     });
   } else {
-    console.log(`Filter ${name} doesn't exist`);
+    console.log(`Filter ${pluginName} doesn't exist`);
   }
 
   console.log("Filtered commandObject", commandObject);

@@ -1,9 +1,10 @@
 import TplinkSmarthomeApi from 'tplink-smarthome-api';
+import _ from 'lodash';
 
 import constants from '../constants.js';
 import DeviceWrapper from './DeviceWrapper.js';
 import { log } from './Log.js';
-import { filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
+
 import { isBetweenDuskAndDawn } from '../helpers/jDateTimeUtils.js';
 import { loadFilterFunctions } from './Filters.js';
 
@@ -164,6 +165,60 @@ const devicePool = {
     log(`Loaded global configuration and found ${noMapItems} registered devices in the database.`, null, 'white');
   }, 
 
+  /**
+   * Take a filter definition from a device and, if it references a globally defined filter,
+   * resolve the reference and return the full definition.
+   */
+  resolveDeviceFilterObject(deviceFilterObject, deviceWrapper) {
+
+    // If there is no refId, return the object as is.
+    if (!deviceFilterObject.refId) {
+      return deviceFilterObject;
+    }
+
+    // Resolve the reference
+    const referencedFilter = this.globalConfig.filters.find(filter => filter.id === deviceFilterObject.refId);
+
+    // Did it resolve?
+    if (!referencedFilter) {
+      log(`Failed to resolve global filter definition: ${JSON.stringify(deviceFilterObject)}`, deviceWrapper, 'red');
+      return null;
+    }
+
+    // Apply any overwrites from the device definition.
+    const resolvedFilter = _.cloneDeep(referencedFilter);
+
+    const mergedResolvedFilter = _.mergeWith(
+      resolvedFilter, 
+      deviceFilterObject,
+  
+      // Do not overwrite with null.
+      (resolvedFilterValue, deviceFilterValue, key) => {
+        
+        if (typeof deviceFilterValue === 'null') {
+          return resolvedFilterValue;
+        }
+
+        return deviceFilterValue;
+      }
+    );
+
+    if (!mergedResolvedFilter.pluginName) {
+      log(`Filter configuration is incomplete: ${JSON.stringify(deviceFilterObject)}. Must specify a valid pluginName.`, deviceWrapper, 'red');
+      return null;
+    }
+
+    if (!mergedResolvedFilter.globalLabel) {
+      mergedResolvedFilter.globalLabel = mergedResolvedFilter.pluginName;
+    }
+
+    if (!resolvedFilter.label) {
+      mergedResolvedFilter.label = mergedResolvedFilter.globalLabel;
+    }
+    
+    return mergedResolvedFilter;
+  },
+
   // Internal
 
   // Any filter configured on a device that has an interval property > 0 set, will be applied by this function.
@@ -176,15 +231,26 @@ const devicePool = {
 
     if (Array.isArray(this.devices)) {
       this.devices.forEach(deviceWrapper => {
-        const allFilters = deviceWrapper.getPeriodicFilters();
+        const allFilters = deviceWrapper.filters;
 
-        const filtersToRun = this._getCurrentlyActivePeriodicFilters(allFilters);
+        if (Array.isArray(allFilters) && allFilters.length) {
+          let periodicFilters = allFilters.map(deviceFilterObject => {
+            return this.resolveDeviceFilterObject(deviceFilterObject, deviceWrapper);
+          });
+
+          // Remove any filters that did not resolve
+          periodicFilters = periodicFilters.filter(filter => filter ? true : false);
+
+          const filtersToRun = this._getCurrentlyActivePeriodicFilters(periodicFilters);
         
-        if (Array.isArray(filtersToRun) && filtersToRun.length) {
-          filtersProcessed++;
+          if (Array.isArray(filtersToRun) && filtersToRun.length) {
+            filtersProcessed++;
+  
+            deviceWrapper.setLightState({}, null, serviceName, filtersToRun);
+          }          
+  
+        }
 
-          deviceWrapper.setLightState({}, null, serviceName, filtersToRun);
-        }          
     });
 
     if (filtersProcessed) {
@@ -200,13 +266,14 @@ const devicePool = {
     const filtersToRun = [];
 
     if (Array.isArray(allFilters) && allFilters.length) {
+      const paddingFromSunEvent = this.globalConfig?.defaults?.periodicFilters?.paddingFromSunEvent ?? constants.HOUR * 2;
+
       allFilters.forEach(filterObject => {
-        if (filterObject.periodicallyActive) {
-          const paddingFromSunEvent = this.globalConfig?.defaults?.periodicFilters?.paddingFromSunEvent ?? constants.HOUR * 2;
+        if (filterObject && filterObject.periodicallyActive?.restriction) {
 
           let runThisFilter = false;
 
-          switch (filterObject.periodicallyActive) {
+          switch (filterObject.periodicallyActive?.restriction) {
             case 'always':
               runThisFilter = true;    
             case 'duskToDawn':

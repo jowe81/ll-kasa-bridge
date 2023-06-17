@@ -13,7 +13,7 @@ const defaults = {
     /**
      * How often should the service check for filters to be run?
      */
-    checkInterval: 20 * SECOND,    
+    checkInterval: 10 * SECOND,    
     /**
      * How long before and after sunrise/sunset should the filter be executed when it has the
      * periodicallyActive flag set?
@@ -21,6 +21,93 @@ const defaults = {
     paddingFromSunEvent: 2 * HOUR,
   }
 }
+
+const filters = [
+  {
+    /**
+     * Id that filter properties on devices can reference to use this filter
+     */
+    id: 'sunEvents-nightlights',
+
+    /**
+     * Label for the filter (defaults to pluginName if missing)
+     */
+    globalLabel: 'Brightness and color control for nightlights',
+
+    /**
+      * Name of the filter plugin (maps to 'filters/name.js' )
+      * 
+      * pluginName:
+      */
+    pluginName: 'sunEvents',
+
+    /**
+     * State data for the filter. Properties must be valid IOT.SMARTBULB parameters.
+     * 
+     * Example for sunEvents:
+     * 
+     * stateData: {
+     *  brightness: {
+     *    value: 90,
+     *    altValue: 10,
+     *  }
+     * }
+     *
+     */
+    
+    // Should this filter be invoked when a switch is turned on or off?
+    switchPosition: true,
+
+    /**
+     * Populate this to add the filter to the periodic filter service runs.
+     *  
+     * Example: 
+     * 
+     * periodicallyActive: {
+     *  interval: 1 * MINUTE,
+     *  restriction: 'duskToDawn'
+     * }
+     */
+    periodicallyActive: {
+      /**
+       * Set the interval at which the filter should be run against this device.
+       * 
+       * interval:
+       */
+      interval: 1 * MINUTE,
+
+      /**
+       * Restrict the operation of the filter to certain times of the day.
+       * 
+       * Must be one of the following: duskToDawn
+       * 
+       * restriction:
+       */
+      restriction: 'duskToDawn',
+    },
+
+    settings: {
+      // Settings specific to the sunEvents filter
+      /**
+       * Specify across what time window the transition should occur.
+       * If not set or 0, it will be instant.
+       */
+      transitionTime: 2 * HOUR,
+
+      /**
+       * Specify an optional offset at which the transition should occur.
+       * The offset shifts the transition to before or after the sun event.
+       */
+      offset: 0 * HOUR,
+
+      /**
+       * If atDawnAndDuskOnly is set, apply optional padding on both sides of the time window
+       * resulting from the above parameters.
+       */
+      padding: 5 * MINUTE,
+    },
+  }
+];
 
 const globalConfig = {
 
@@ -38,6 +125,7 @@ const globalConfig = {
   },
 
   defaults,
+  filters,
 }
 
 const deviceMap = [
@@ -310,22 +398,70 @@ const deviceMap = [
     filters: [      
       { 
         /**
-         * Name of the filter (maps to 'filters/name.js' )
+         * Optionally reference a globally defined filter by its id.
+         * 
+         * If set, additional parameters may be defined which will override the
+         * defaults of the global filter.
+         * 
+         * refId:
          */
-        name: 'sunEvents', 
+        refId: 'sunEvents-nightlights',
 
+        /**
+         * Label for the filter. If not provided it will:
+         * - default to the referenced global filters label if one is specified
+         * - default to pluginName if no global filter is referenced
+         * 
+         * label:
+         */
+        label: 'Led-strip bed',
+
+        /**
+          * Name of the filter plugin (maps to 'filters/name.js' )
+          * 
+          * pluginName:
+          */
+ 
+        /**
+         * State data for the filter. Properties must be valid IOT.SMARTBULB parameters.
+         * 
+         * Example for sunEvents:
+         * 
+         * stateDate: {
+         *  brightness: {
+         *    value: 90,
+         *    altValue: 10,
+         *  }
+         * }
+         *
+         */
         stateData: { 
           brightness: { 
-            value: 80,
-            altValue: 1,
+            value: 85,
           },
+          saturation: {
+            value: 0,
+            altValue: 100, 
+          },
+          hue: {
+            value: 20,
+            altValue: 240,
+          }
         },
         
+        // Should this filter be invoked when a switch is turned on or off?
+        switchPosition: true,
+
         /**
-         * Populate this to add the filter to the period filter service runs.
+         * Populate this to add the filter to the periodic filter service runs.
+         *  
+         * Example: 
          * 
+         * periodicallyActive: {
+         *  interval: 1 * MINUTE,
+         *  restriction: 'duskToDawn'
+         * }
          */
-        periodicallyActive: 'duskToDawn',
 
         settings: {
           // Settings specific to the sunEvents filter
@@ -333,7 +469,7 @@ const deviceMap = [
            * Specify across what time window the transition should occur.
            * If not set or 0, it will be instant.
            */
-          transitionTime: 1 * HOUR,
+          transitionTime: 2 * HOUR,
 
           /**
            * Specify an optional offset at which the transition should occur.
@@ -342,23 +478,11 @@ const deviceMap = [
           offset: 0 * HOUR,
 
           /**
-           * Only apply this filter from before until after dusk and before until after dawn?
-           * 
-           * If set to true, filtered parameters get changed at other times they won't be overwritten 
-           * until the next dusk/dawn period
-           */
-          atDawnAndDuskOnly: true,
-
-          /**
            * If atDawnAndDuskOnly is set, apply optional padding on both sides of the time window
            * resulting from the above parameters.
            */
           padding: 5 * MINUTE,
         },
-        // Should this filter be invoked when a switch is turned on or off?
-        switchPosition: true,
-        // This filter should be run against this device at this interval
-        interval: 1 * MINUTE,
       }
     ],
     linkedDevices: [
@@ -439,10 +563,4 @@ const deviceMap = [
 export { 
   deviceMap,
   globalConfig,
-//  pollIntBulb,
-//  pollIntSwitch,
-//  pollIntPlug,
-
-//  SUBTYPE_PLUG,
-//  switch,
 }
