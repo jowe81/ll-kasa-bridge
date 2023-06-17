@@ -1,4 +1,4 @@
-import { globalConfig } from '../deviceMap.js';
+import { globalConfig } from '../configuration.js';
 
 const importDeviceMapItem = (db, deviceMapItem, overwriteExisting) => {
   return new Promise((resolve, reject) => {

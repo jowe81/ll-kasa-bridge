@@ -10,7 +10,7 @@ import devicesRouter from './routers/devices.js';
 import { log } from './helpers/jUtils.js';
 
 import { importDeviceMap, importGlobalConfig } from './modules/ImportDeviceMap.js';
-import { deviceMap, globalConfig } from './deviceMap.js';
+import { deviceMap, globalConfig } from './configuration.js';
 
 // Packages
 import cors from 'cors';
