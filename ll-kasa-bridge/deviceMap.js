@@ -31,7 +31,16 @@ const filters = [
     pluginName: 'naturalLight',
     settings: {
       transitionTime: 1 * HOUR,
-      offset: -1 * HOUR,
+      offset: {
+        /**
+         * Offset the shift from sunrise?
+         */
+        sunrise: +1 * HOUR,
+        /**
+         * Offset the shift from sunset?
+         */
+        sunset: -1 * HOUR,
+      }
     },
     periodicallyActive: true,
   },

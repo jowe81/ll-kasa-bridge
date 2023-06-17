@@ -48,7 +48,7 @@ const isBetweenDuskAndDawn = (date, coords, paddingFromSunEvent = 0) => {
   
   let sunset, sunrise;
 
-  if (now.getHours() > 12) {
+  if (isPm(now)) {
     // It is evening; need today's sunset and tomorrow's sunrise
     const tomorrow = new Date(now.getTime() + constants.DAY);
 
@@ -67,6 +67,14 @@ const isBetweenDuskAndDawn = (date, coords, paddingFromSunEvent = 0) => {
 
   return windowOpens < now && windowCloses > now;
 }
+
+const isAm = (date) => {
+  const now = date ? date : new Date();
+
+  return now.getHours() <= 12;
+}
+
+const isPm = (date) => !isAm(date);
 
 /**
  * Are we between today's sunrise and sunset?
@@ -180,6 +188,8 @@ export {
   getNighttimePercent,
   getNextSunEvent,
   isBetweenDuskAndDawn,
+  isAm,
+  isPm,
   isDaytime,  
   isFullyDaytime,
   isNighttime,
