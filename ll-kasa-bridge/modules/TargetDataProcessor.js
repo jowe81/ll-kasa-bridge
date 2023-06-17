@@ -1,5 +1,6 @@
 import _ from "lodash";
-import { isDaytime } from "../helpers/jDateTimeUtils.js";
+
+import constants from "../constants.js";
 import { getFilterFunctions } from "./Filters.js";
 
 /**
@@ -7,21 +8,60 @@ import { getFilterFunctions } from "./Filters.js";
  * @param {} deviceWrapper
  */
 const buildCommandObjectFromCurrentState = (deviceWrapper) => {
-  if (!(deviceWrapper && deviceWrapper.device)) {
-    // Have no device
+
+  const state = deviceWrapper?.state;
+
+  if (!state) {
+    // Have no state info
     return null;
   }
 
-  if (!(Array.isArray(deviceWrapper.state?.groups) && deviceWrapper.state.groups.length)) {
-    // Invalid or missing state info
+  switch (deviceWrapper.subType) {
+    case constants.SUBTYPE_BULB:
+      return buildCommandObjectFromBulbState(deviceWrapper);
+
+    case constants.SUBTYPE_LED_STRIP:
+      return buildCommandObjectFromLedStripState(deviceWrapper); 
+  }
+
+}
+
+const buildCommandObjectFromBulbState = (deviceWrapper) => {
+  if (deviceWrapper.subType !== constants.SUBTYPE_BULB || !deviceWrapper.state) {
+    // Wrong type or no state
+    return {}
+  }
+
+  const directState = deviceWrapper.state.dftOnState ?
+  _.cloneDeep(deviceWrapper.state.dftOnState) :
+  _.cloneDeep(deviceWrapper.state);
+
+  if (!directState) {
+    // Invalid or corrupt state data.
     return {};
   }
 
-  const groups0 = deviceWrapper.state.groups[0];
-  if (!Array.isArray(groups0) && groups0.length) {
-    // Invalid or corrupt state info
-    return {};
+  // Found something
+  delete directState.mode;
+  delete directState.err_code;
+
+  return directState;
+}
+
+const buildCommandObjectFromLedStripState = (deviceWrapper) => {
+  if (deviceWrapper.subType !== constants.SUBTYPE_LED_STRIP || !deviceWrapper.state) {
+    // Wrong type or no state
+    return {}
   }
+
+  const groups = deviceWrapper.state.groups;
+
+  if (!Array.isArray(groups) || !groups.length) {
+    // Bad state data
+    return {}
+  }
+
+  const groups0 = groups[0];
 
   const commandObject = {};
 
@@ -78,11 +118,20 @@ const commandMatchesCurrentState = (deviceWrapper, commandObject) => {
   
   if (currentStateAsCommandObject) {
     Object.keys(commandObject).every(paramName => {
-      if (!currentStateAsCommandObject[paramName] || commandObject[paramName] !== currentStateAsCommandObject[paramName]) {
-        // The parameter either doesn't exist in current state or differs.
+
+      if (typeof currentStateAsCommandObject[paramName] !== 'number') {
+        //Parameter does not exist in current state.
         result = false;
         return false;
       }
+
+      if (commandObject[paramName] !== currentStateAsCommandObject[paramName]) {
+        // The parameter exists in the current state but is different.
+        result = false;
+        return false;
+      }
+
+      return true;
     });  
   }
 
@@ -95,31 +144,29 @@ const commandMatchesCurrentState = (deviceWrapper, commandObject) => {
  * @param {*} commandObject 
  * @returns the filtered commandObject
  */
-const filter = (filterObject, commandObject) => {
+const filter = (filterObject, commandObject, deviceWrapper) => {
   const { pluginName } = filterObject;
 
   if (!pluginName) {
     return commandObject;
   }
 
-  console.log("Unfiltered commandObject", commandObject);
-  
+  const before = _.cloneDeep(commandObject);
+
   const filterFunction = getFilterFunctions()[pluginName];
 
   if (filterFunction) {
-    console.log(`Found filter ${pluginName}`);
 
     // Execute the filter plugin.
     commandObject = filterFunction(
       filterObject,
       commandObject,
+      deviceWrapper,
     );
 
-  } else {
-    console.log(`Filter ${pluginName} doesn't exist`);
   }
 
-  console.log("Filtered commandObject", commandObject);
+  console.log(pluginName + " | before: ", before, " after: ", commandObject);
 
   return commandObject;
 }

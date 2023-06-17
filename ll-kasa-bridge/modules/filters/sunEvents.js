@@ -8,6 +8,10 @@ import { scale } from "../../helpers/jUtils.js";
 const sunEvents = (filterObject, commandObject) => {  
   const { stateData } = filterObject;
   
+  if (!stateData) {
+    return commandObject;
+  }
+
   Object.keys(stateData).forEach(stateKey => {
     commandObject[stateKey] = filterParameter(
       filterObject, 

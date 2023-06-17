@@ -13,7 +13,7 @@ const defaults = {
     /**
      * How often should the service check for filters to be run?
      */
-    checkInterval: 30 * SECOND,    
+    checkInterval: 10 * SECOND,    
     /**
      * How long before and after sunrise/sunset should the filter be executed when it has the
      * periodicallyActive flag set?
@@ -22,6 +22,9 @@ const defaults = {
   }
 }
 
+/**
+ * Global filter definitions
+ */
 const filters = [
   {
     id: 'naturalLight',
@@ -153,6 +156,9 @@ const deviceMap = [
     channel: 3,
     id: "80121CF5373D56F7C62278B4C0FE88A01F53DD26",
     subType: SUBTYPE_LED_STRIP,
+    filters: [
+      { refId: 'naturalLight' }
+    ],    
   },
   { 
     alias: 'Bedroom Heater',
@@ -338,19 +344,22 @@ const deviceMap = [
     alias: 'Living Room Ikea 4',
     channel: 31, 
     id: "8012DEFBED48C05561BF6C2F5D8A490D1F77A75D",
-    subType: SUBTYPE_BULB,    
+    subType: SUBTYPE_BULB,
+    filters: [ { refId: 'naturalLight'} ],
   },
   {
     alias: 'Living Room Ikea 5',
     channel: 32, 
     id: "8012D9195E6D17B426B7F74DE432D6A21F9BD8BE",
     subType: SUBTYPE_BULB,
+    filters: [ { refId: 'naturalLight'} ],
   },
   {
     alias: 'Jess\' Desk Lamp',
     channel: 33, 
     id: "8012D2D5067A0F9AE37075A3FA816E341F9D35A9",
     subType: SUBTYPE_BULB,
+    filters: [ { refId: 'naturalLight'} ],
   },
   {
     alias: 'Switch in Jess\' desk',
@@ -385,12 +394,6 @@ const deviceMap = [
     subType: SUBTYPE_BULB,
   },
   {
-    alias: 'Ikea Hallway',
-    channel: 36, 
-    id: "8012FA2584FE5D30C3E2F13FC023719B1F7B385D",
-    subType: SUBTYPE_BULB,
-  },
-  {
     alias: 'Jess Storage Shelves',
     channel: 36, 
     id: "80120A8622D026338547E3D7E88D70931F9E81A8",
@@ -400,7 +403,7 @@ const deviceMap = [
     alias: 'Bedroom Desk Strip Shelving',
     channel: 37, 
     id: "80125B9CDD55CE105CC76F0CA2F6C8CC1F5426D8",
-    subType: SUBTYPE_LED_STRIP,
+    subType: SUBTYPE_LED_STRIP,    
   },
   {
     alias: 'Bed Shelf Strip',
@@ -558,6 +561,13 @@ const deviceMap = [
     channel: 40,
     id: '8012984E9F504FC4AEC384A012A6BEE01F54FA11',
     subType: SUBTYPE_LED_STRIP,
+    filters: [ { refId: 'naturalLight'} ],
+  },
+  {
+    alias: 'Ikea Hallway',
+    channel: 41, 
+    id: "8012FA2584FE5D30C3E2F13FC023719B1F7B385D",
+    subType: SUBTYPE_BULB,
   },
 
   

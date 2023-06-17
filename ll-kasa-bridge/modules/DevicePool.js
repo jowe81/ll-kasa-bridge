@@ -165,60 +165,6 @@ const devicePool = {
     log(`Loaded global configuration and found ${noMapItems} registered devices in the database.`, null, 'white');
   }, 
 
-  /**
-   * Take a filter definition from a device and, if it references a globally defined filter,
-   * resolve the reference and return the full definition.
-   */
-  resolveDeviceFilterObject(deviceFilterObject, deviceWrapper) {
-
-    // If there is no refId, return the object as is.
-    if (!deviceFilterObject.refId) {
-      return deviceFilterObject;
-    }
-
-    // Resolve the reference
-    const referencedFilter = this.globalConfig.filters.find(filter => filter.id === deviceFilterObject.refId);
-
-    // Did it resolve?
-    if (!referencedFilter) {
-      log(`Failed to resolve global filter definition: ${JSON.stringify(deviceFilterObject)}`, deviceWrapper, 'red');
-      return null;
-    }
-
-    // Apply any overwrites from the device definition.
-    const resolvedFilter = _.cloneDeep(referencedFilter);
-
-    const mergedResolvedFilter = _.mergeWith(
-      resolvedFilter, 
-      deviceFilterObject,
-  
-      // Do not overwrite with null.
-      (resolvedFilterValue, deviceFilterValue, key) => {
-        
-        if (typeof deviceFilterValue === 'null') {
-          return resolvedFilterValue;
-        }
-
-        return deviceFilterValue;
-      }
-    );
-
-    if (!mergedResolvedFilter.pluginName) {
-      log(`Filter configuration is incomplete: ${JSON.stringify(deviceFilterObject)}. Must specify a valid pluginName.`, deviceWrapper, 'red');
-      return null;
-    }
-
-    if (!mergedResolvedFilter.globalLabel) {
-      mergedResolvedFilter.globalLabel = mergedResolvedFilter.pluginName;
-    }
-
-    if (!resolvedFilter.label) {
-      mergedResolvedFilter.label = mergedResolvedFilter.globalLabel;
-    }
-    
-    return mergedResolvedFilter;
-  },
-
   // Internal
 
   // Any filter configured on a device that has an interval property > 0 set, will be applied by this function.
@@ -235,7 +181,7 @@ const devicePool = {
 
         if (Array.isArray(allFilters) && allFilters.length) {
           let periodicFilters = allFilters.map(deviceFilterObject => {
-            return this.resolveDeviceFilterObject(deviceFilterObject, deviceWrapper);
+            return deviceWrapper.resolveDeviceFilterObject(deviceFilterObject);
           });
 
           // Remove any filters that did not resolve

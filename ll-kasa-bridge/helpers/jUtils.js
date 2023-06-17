@@ -11,6 +11,8 @@ const allAreBoolean = testVariables => {
       foundNonBoolean = true;
       return false; // Break the loop    
     }
+
+    return true;
   })
 
   return !foundNonBoolean;
