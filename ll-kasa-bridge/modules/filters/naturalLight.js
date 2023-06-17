@@ -21,11 +21,10 @@ const naturalLight = (filterObject, commandObject, deviceWrapper) => {
           altValue: 20,
         }    
       }
+
       // Values do not matter here but property must exist
-      commandObject = {
-        hue: 1,
-        saturation: 1
-      }
+      commandObject.hue = 1;
+      commandObject.saturation = 1;
       break;
 
     case 'bulb':
@@ -37,9 +36,7 @@ const naturalLight = (filterObject, commandObject, deviceWrapper) => {
         },    
       }
       // Values do not matter here but property must exist
-      commandObject = {
-        color_temp: 1,
-      }
+      commandObject.color_temp = 1;
       break;
   }
   filterObject = { stateData, settings };

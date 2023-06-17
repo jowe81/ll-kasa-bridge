@@ -28,6 +28,7 @@ const defaults = {
 const filters = [
   {
     id: 'naturalLight',
+    globalLabel: 'Automatic color temperature control',
     pluginName: 'naturalLight',
     settings: {
       transitionTime: 1 * HOUR,
@@ -52,6 +53,27 @@ const filters = [
         sunset: 1.5 * HOUR,
       }
     },
+  },
+  {
+    id: 'sunEvents-outdoorLights',
+    globalLabel: 'Control for outdoor illumination',
+    pluginName: 'sunEvents',
+    settings: {
+      transitionTime: 1 * HOUR,      
+    },
+    periodicallyActive: {
+      restriction: 'duskToDawn'
+    },
+    stateData: {
+      brightness: {
+        value: 0,
+        altValue: 30,
+      },
+      on_off: {
+        value: 0,
+        altValue: 1,
+      }
+    }
   },
   {
     /**
@@ -414,6 +436,10 @@ const deviceMap = [
     channel: 35, 
     id: "801277C3769ADD0BA769504AAB6B233E1F77F11C",
     subType: SUBTYPE_BULB,
+    filters: [
+      { refId: 'sunEvents-outdoorLights' },
+      { refId: 'naturalLight' },
+    ],
   },
   {
     alias: 'Jess Storage Shelves',

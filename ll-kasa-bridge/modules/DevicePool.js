@@ -233,7 +233,9 @@ const devicePool = {
 
             switch (filterObject.periodicallyActive?.restriction) {
               case 'always':
-                runThisFilter = true;    
+                runThisFilter = true;
+                break;
+
               case 'duskToDawn':
                 runThisFilter = isBetweenDuskAndDawn(null, null, paddingFromSunEvent);
                 break;

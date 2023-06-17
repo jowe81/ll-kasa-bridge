@@ -1,4 +1,4 @@
-import { getNighttimePercent, isAm, getFromSettingsForNextSunEvent } from "../../helpers/jDateTimeUtils.js";
+import { getNighttimePercent, getFromSettingsForNextSunEvent } from "../../helpers/jDateTimeUtils.js";
 import { scale } from "../../helpers/jUtils.js";
 
 /**
@@ -37,11 +37,24 @@ const sunEvents = (filterObject, commandObject) => {
   const offset = getFromSettingsForNextSunEvent('offset', settings);
   const transitionTime = getFromSettingsForNextSunEvent('transitionTime', settings);
 
-  const resultValue = scale(
-    valueToProcess,
-    altValue,
-    getNighttimePercent(transitionTime, new Date(), offset)
-  );  
+  const nightTimePercent = getNighttimePercent(transitionTime, new Date(), offset);
+  
+  let resultValue;
+
+  switch (stateKey) {
+    case 'on_off':
+      // on_off is a special case: set to 1 as soon as scaling begins.
+      resultValue = nightTimePercent > 0 ? 1 : 0
+      break;
+    
+    default:
+      resultValue = scale(
+        valueToProcess,
+        altValue,
+        nightTimePercent
+      );      
+      break;
+  }
 
   return resultValue;
 }
