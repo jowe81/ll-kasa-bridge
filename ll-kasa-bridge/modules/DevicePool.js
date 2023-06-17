@@ -269,23 +269,33 @@ const devicePool = {
       const paddingFromSunEvent = this.globalConfig?.defaults?.periodicFilters?.paddingFromSunEvent ?? constants.HOUR * 2;
 
       allFilters.forEach(filterObject => {
-        if (filterObject && filterObject.periodicallyActive?.restriction) {
 
-          let runThisFilter = false;
+        // Has periodicallyActive set?
+        if (filterObject && filterObject.periodicallyActive) {
 
-          switch (filterObject.periodicallyActive?.restriction) {
-            case 'always':
-              runThisFilter = true;    
-            case 'duskToDawn':
-              runThisFilter = isBetweenDuskAndDawn(null, null, paddingFromSunEvent);
-              break;
+          // Has a restriction set?
+          if (filterObject && filterObject.periodicallyActive?.restriction) {
+            // Is restricted - evaluate.
+            let runThisFilter = false;
+
+            switch (filterObject.periodicallyActive?.restriction) {
+              case 'always':
+                runThisFilter = true;    
+              case 'duskToDawn':
+                runThisFilter = isBetweenDuskAndDawn(null, null, paddingFromSunEvent);
+                break;
 
 
-          }
-          if (runThisFilter) {
+            }
+            if (runThisFilter) {
+              filtersToRun.push(filterObject);
+            }
+            
+          } else {
+            // No restriction - run around the clock.
             filtersToRun.push(filterObject);
           }
-          
+
         }
       });
     }

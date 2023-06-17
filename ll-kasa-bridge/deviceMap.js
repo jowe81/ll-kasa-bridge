@@ -13,7 +13,7 @@ const defaults = {
     /**
      * How often should the service check for filters to be run?
      */
-    checkInterval: 10 * SECOND,    
+    checkInterval: 30 * SECOND,    
     /**
      * How long before and after sunrise/sunset should the filter be executed when it has the
      * periodicallyActive flag set?
@@ -23,6 +23,15 @@ const defaults = {
 }
 
 const filters = [
+  {
+    id: 'naturalLight',
+    pluginName: 'naturalLight',
+    settings: {
+      transitionTime: 1 * HOUR,
+      offset: -1 * HOUR,
+    },
+    periodicallyActive: true,
+  },
   {
     /**
      * Id that filter properties on devices can reference to use this filter
@@ -135,6 +144,9 @@ const deviceMap = [
     channel: 2,
     id: "8012E7EA0A70974D997DE95E898FBA261F980E1A",
     subType: SUBTYPE_BULB,
+    filters: [
+      { refId: 'naturalLight' }
+    ],    
   },
   {
     alias: 'Bedroom Desk Strip top',
@@ -438,14 +450,15 @@ const deviceMap = [
         stateData: { 
           brightness: { 
             value: 85,
+            altValue: 1,
           },
           saturation: {
-            value: 0,
+            value: 15,
             altValue: 100, 
           },
           hue: {
-            value: 20,
-            altValue: 240,
+            value: 24,
+            altValue: 24,
           }
         },
         
@@ -469,7 +482,7 @@ const deviceMap = [
            * Specify across what time window the transition should occur.
            * If not set or 0, it will be instant.
            */
-          transitionTime: 2 * HOUR,
+          transitionTime: 1 * HOUR,
 
           /**
            * Specify an optional offset at which the transition should occur.

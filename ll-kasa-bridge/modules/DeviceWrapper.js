@@ -438,9 +438,14 @@ const cmdFailPrefix = '[FAIL]';
       });
     }
     
-    if (commandMatchesCurrentState(this, commandObject) && origin === constants.SERVICE_PERIODIC_FILTER) {
-      console.log('Periodic filter command is matching, ignoring');
-      return;
+    if (origin === constants.SERVICE_PERIODIC_FILTER) {
+      const stateCheck = commandMatchesCurrentState(this, commandObject);
+
+      if (stateCheck) {
+        // No point in issuing a command that would change nothing.
+        return;
+      }
+  
     }
 
     try {

@@ -14,13 +14,13 @@ const buildCommandObjectFromCurrentState = (deviceWrapper) => {
 
   if (!(Array.isArray(deviceWrapper.state?.groups) && deviceWrapper.state.groups.length)) {
     // Invalid or missing state info
-    return null;
+    return {};
   }
 
   const groups0 = deviceWrapper.state.groups[0];
   if (!Array.isArray(groups0) && groups0.length) {
     // Invalid or corrupt state info
-    return null;
+    return {};
   }
 
   const commandObject = {};
@@ -64,17 +64,23 @@ const commandMatchesCurrentState = (deviceWrapper, commandObject) => {
   if (!(typeof commandObject === 'object' && Object.keys(commandObject).length)) {
     return null
   }
+
   // This is a lightstate command
 
   const currentStateAsCommandObject = buildCommandObjectFromCurrentState(deviceWrapper);
+
+  if (currentStateAsCommandObject === null) {
+    // Have no live device.
+    return null;
+  }
 
   let result = true;
   
   if (currentStateAsCommandObject) {
     Object.keys(commandObject).every(paramName => {
-      if (commandObject[paramName] !== currentStateAsCommandObject[paramName]) {
+      if (!currentStateAsCommandObject[paramName] || commandObject[paramName] !== currentStateAsCommandObject[paramName]) {
+        // The parameter either doesn't exist in current state or differs.
         result = false;
-        console.log(`${paramName} differs: ${commandObject[paramName]} != ${currentStateAsCommandObject[paramName]}` );
         return false;
       }
     });  
@@ -90,9 +96,9 @@ const commandMatchesCurrentState = (deviceWrapper, commandObject) => {
  * @returns the filtered commandObject
  */
 const filter = (filterObject, commandObject) => {
-  const { pluginName, stateData } = filterObject;
+  const { pluginName } = filterObject;
 
-  if (!pluginName || !stateData) {
+  if (!pluginName) {
     return commandObject;
   }
 
@@ -100,18 +106,15 @@ const filter = (filterObject, commandObject) => {
   
   const filterFunction = getFilterFunctions()[pluginName];
 
-  // Loop over the stateData items and apply the filter to each in turn.
   if (filterFunction) {
     console.log(`Found filter ${pluginName}`);
 
-    Object.keys(stateData).forEach(stateKey => {
-      console.log(`Processing ${stateKey}`);
-      commandObject[stateKey] = filterFunction(
-        filterObject, 
-        stateKey, 
-        commandObject[stateKey] // Default value to use if none is provided in filter configuration
-      );  
-    });
+    // Execute the filter plugin.
+    commandObject = filterFunction(
+      filterObject,
+      commandObject,
+    );
+
   } else {
     console.log(`Filter ${pluginName} doesn't exist`);
   }
