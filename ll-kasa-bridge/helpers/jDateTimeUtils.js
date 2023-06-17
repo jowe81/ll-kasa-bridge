@@ -7,7 +7,9 @@ const DEFAULT_LONG = -123.12;
 
 const DEFAULT_DAWN_DUSK_LENGTH = 60 * 60 * 1000;
 
-// Internal use: get lat/long when none are provided
+/**
+ * Internal use: get lat/long when none are provided
+ */
 const _getCoords = (coords) => {
   if (coords) {
     return coords;
@@ -19,8 +21,10 @@ const _getCoords = (coords) => {
   }
 }
 
-// Get today's sunset from library
-const getSunset = (date, coords) => {
+/**
+ * Get today's sunset from the library
+ */
+ const getSunset = (date, coords) => {
   const { lat, long } = _getCoords(coords);
 
   const now = date ? date : new Date();
@@ -31,7 +35,9 @@ const getSunset = (date, coords) => {
   return sunriseSunsetJs.getSunset(lat, long, plus1Day);
 }
 
-// Get today's sunrise from library
+/**
+ * Get today's sunrise from the library
+ */
 const getSunrise = (date, coords) => {
   const { lat, long } = _getCoords(coords);
   return sunriseSunsetJs.getSunrise(lat, long, date);
@@ -68,13 +74,82 @@ const isBetweenDuskAndDawn = (date, coords, paddingFromSunEvent = 0) => {
   return windowOpens < now && windowCloses > now;
 }
 
+/**
+ * Are we in dusk or dawn? 
+ * Adds/subtracts paddingFromSunEvent to sunset/sunrise to determine this.
+ *  
+ * @returns bool
+ */
+const isDawnOrDusk = (date, coords, paddingFromSunEvent = 0) => {
+  return isDusk(date, coords, paddingFromSunEvent) || isDawn(date, coords, paddingFromSunEvent);
+}
+
+const isDawn = (date, coords, paddingFromSunEvent = 0) => {
+  const now = date ? date : new Date();
+
+  if (isPm(now)) {
+    // It's past noon, can't be dawn.
+    return false;
+  }
+
+  return isWithinWindow(
+    now, 
+    getSunrise(now, coords), 
+    paddingFromSunEvent
+  );
+}
+
+const isDusk = (date, coords, paddingFromSunEvent = 0) => {
+  const now = date ? date : new Date();
+
+  if (isAm(now)) {
+    // It's before noon, can't be dusk.
+    return false;
+  }
+
+  return isWithinWindow(
+    now, 
+    getSunset(now, coords), 
+    paddingFromSunEvent
+  );
+}
+
+/**
+ * Is the given date within the window that's spanned by
+ * centerOfWindow +- padding?
+ * 
+ * @param Date    date            (defaults to current) 
+ * @param Date    centerOfWindow
+ * @param number  padding         (in ms)
+ * 
+ * @returns bool
+ */
+const isWithinWindow = (date, centerOfWindow, padding) => {
+  if (!centerOfWindow) {
+    return null;
+  }
+
+  const now = date ? date : new Date();
+
+  const windowOpens = centerOfWindow.getTime() - padding;
+  const windowCloses = centerOfWindow.getTime() + padding;
+
+  return windowOpens < now && windowCloses > now;
+}
+
+/**
+ * Is it before noon?
+ */
 const isAm = (date) => {
   const now = date ? date : new Date();
 
-  return now.getHours() <= 12;
+  return now.getHours() < 12;
 }
 
-const isPm = (date) => !isAm(date);
+/**
+ * Is it after noon?
+ */
+ const isPm = (date) => !isAm(date);
 
 /**
  * Are we between today's sunrise and sunset?
@@ -109,7 +184,6 @@ const getNextSunEvent = (date = null, coords = null) => {
  */
  const isNighttime = (date = null, coords = null) => !isDaytime(date, coords);
  
-
  /**
   * Return a percentage with indicates fully day (1), fully night (0), or dusk/dawn (0 < result < 1).
   * Without offset, transitionTime will be a twilight window with the sunrise/sunset at its centre.
@@ -171,6 +245,40 @@ const getNighttimePercent = (transitionTime, date, offset, coords) => 1 - getDay
 
 const isFullyDaytime = (transitionTime = null, date = null) => getDaytimePercent(transitionTime, null, date) === 1;
 
+/**
+ * Determine the value of paramName for the next sunEvent.
+ * The value may have been provided as a number or as an object
+ * with a sunrise/sunset property, or not at all.
+ */
+ const getFromSettingsForNextSunEvent = (paramName, settings) => {
+
+  if (!(settings && settings[paramName])) {
+    // paramName not set at all - default to 0
+    return 0;
+  }
+
+  let paramValue;
+
+  switch (typeof settings[paramName]) {
+    case 'number':
+      // It's a number, use it for both sunrise and sunset
+      paramValue = settings[paramName];
+      break;
+
+    case 'object':
+      // It's an object, use sunrise/sunset properties
+      paramValue = isAm() ? settings[paramName].sunrise : settings[paramName].sunset;
+      break;
+  }
+  
+  if (typeof paramValue !== 'number') {
+    // Couldn't determine a value - default to 0
+    paramValue = 0;
+  }
+
+  return paramValue;
+};
+
 const logDates = (dates, label) => {
   if (!Array.isArray(dates)) {
     dates = [ dates ];
@@ -188,10 +296,12 @@ export {
   getNighttimePercent,
   getNextSunEvent,
   isBetweenDuskAndDawn,
+  isDawnOrDusk,
   isAm,
   isPm,
   isDaytime,  
   isFullyDaytime,
   isNighttime,
+  getFromSettingsForNextSunEvent,
   logDates,
 }

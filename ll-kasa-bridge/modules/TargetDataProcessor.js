@@ -166,7 +166,7 @@ const filter = (filterObject, commandObject, deviceWrapper) => {
 
   }
 
-  console.log(pluginName + " | before: ", before, " after: ", commandObject);
+  console.log(`${pluginName} / ${deviceWrapper.alias}: cmd before: `, before, ` after: `, commandObject);
 
   return commandObject;
 }

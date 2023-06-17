@@ -42,7 +42,16 @@ const filters = [
         sunset: -1 * HOUR,
       }
     },
-    periodicallyActive: true,
+    periodicallyActive: {
+      restriction: 'dawnAndDusk',
+      /**
+       * Can override any of the periodicFilters defaults configured above.
+       */     
+      paddingFromSunEvent: {
+        sunrise: 1.5 * HOUR,
+        sunset: 1.5 * HOUR,
+      }
+    },
   },
   {
     /**

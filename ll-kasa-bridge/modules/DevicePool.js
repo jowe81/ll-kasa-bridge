@@ -5,7 +5,7 @@ import constants from '../constants.js';
 import DeviceWrapper from './DeviceWrapper.js';
 import { log } from './Log.js';
 
-import { isBetweenDuskAndDawn } from '../helpers/jDateTimeUtils.js';
+import { isBetweenDuskAndDawn, isDawnOrDusk, getFromSettingsForNextSunEvent } from '../helpers/jDateTimeUtils.js';
 import { loadFilterFunctions } from './Filters.js';
 
 /**
@@ -212,16 +212,23 @@ const devicePool = {
     const filtersToRun = [];
 
     if (Array.isArray(allFilters) && allFilters.length) {
-      const paddingFromSunEvent = this.globalConfig?.defaults?.periodicFilters?.paddingFromSunEvent ?? constants.HOUR * 2;
+      // Get the default for all periodic filters
+      const defaultPaddingFromSunEvent = this.globalConfig?.defaults?.periodicFilters?.paddingFromSunEvent ?? constants.HOUR * 2;
 
       allFilters.forEach(filterObject => {
 
         // Has periodicallyActive set?
         if (filterObject && filterObject.periodicallyActive) {
 
+          const periodicallyActive = filterObject.periodicallyActive;
+
           // Has a restriction set?
-          if (filterObject && filterObject.periodicallyActive?.restriction) {
+          if (periodicallyActive.restriction) {
             // Is restricted - evaluate.
+
+            // See if this filter has custom padding, otherwise use the default
+            const paddingFromSunEvent = getFromSettingsForNextSunEvent('paddingFromSunEvent', periodicallyActive) ?? defaultPaddingFromSunEvent;
+
             let runThisFilter = false;
 
             switch (filterObject.periodicallyActive?.restriction) {
@@ -231,8 +238,18 @@ const devicePool = {
                 runThisFilter = isBetweenDuskAndDawn(null, null, paddingFromSunEvent);
                 break;
 
+              case 'dawnAndDusk':
+              case 'duskAndDawn':
+                runThisFilter = isDawnOrDusk(null, null, paddingFromSunEvent);
+                break;
 
+              case 'dusk':
+                runThisFilter = isDusk(null, null, paddingFromSunEvent);
+
+              case 'dawn':
+                runThisFilter = isDawn(null, null, paddingFromSunEvent);
             }
+  
             if (runThisFilter) {
               filtersToRun.push(filterObject);
             }
