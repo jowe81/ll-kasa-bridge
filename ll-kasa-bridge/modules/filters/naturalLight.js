@@ -13,11 +13,11 @@ const naturalLight = (filterObject, commandObject, deviceWrapper) => {
       // Values describe daylight, altValues describe 'warm' light on led strip
       stateData = {
         hue: {
-          value: 20,
+          value: 227,
           altValue: 20,
         },
         saturation: {
-          value: 0,
+          value: 23,
           altValue: 20,
         }    
       }
@@ -32,7 +32,7 @@ const naturalLight = (filterObject, commandObject, deviceWrapper) => {
       // Values describe daylight, altValues describe 'warm' light on bulb
       stateData = {
         color_temp: { 
-          value: 5000,
+          value: 6000,
           altValue: 2700,
         },    
       }

@@ -248,7 +248,6 @@ const deviceMap = [
             channel: 3,
             data: {
               on_off: 1,
-              saturation: 0,
               brightness: 95,
             }
           },
@@ -256,15 +255,18 @@ const deviceMap = [
             channel: 16,
             data: {
               on_off: 1,
+              brightness: 20,
               hue: 240,
-              transition:5000,
+              saturation: 100,
             }
           },
           { 
             channel: 37,
             data: {
               on_off: 1,
+              brightness: 20,
               hue: 240,
+              saturation: 100,
             }
           },
         ],
@@ -284,7 +286,6 @@ const deviceMap = [
             channel: 3,
             data: {
               on_off: 1,
-              saturation: 0,
               brightness: 95,
             }
           },          
@@ -292,15 +293,18 @@ const deviceMap = [
             channel: 16,
             data: {
               on_off: 1,
+              brightness: 20,
               hue: 277,
-              transition:5000,
+              saturation: 100,
             }
           },
           { 
             channel: 37,
             data: {
               on_off: 1,
+              brightness: 20,
               hue: 277,
+              saturation: 100,
             }
           },
         ],

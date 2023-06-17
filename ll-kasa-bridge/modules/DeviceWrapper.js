@@ -503,7 +503,7 @@ const cmdFailPrefix = '[FAIL]';
     
     if (origin === constants.SERVICE_PERIODIC_FILTER) {
       const stateCheck = commandMatchesCurrentState(this, commandObject);
-      console.log('stateCheck', stateCheck);
+
       if (stateCheck) {
         // No point in issuing a command that would change nothing.
         return;
