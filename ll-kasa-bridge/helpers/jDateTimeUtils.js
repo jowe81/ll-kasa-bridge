@@ -46,10 +46,21 @@ const getSunrise = (date, coords) => {
 const isBetweenDuskAndDawn = (date, coords, paddingFromSunEvent = 0) => {
   const now = date ? date : new Date();
   
-  const tomorrow = new Date(now.getTime() + constants.DAY);
+  let sunset, sunrise;
 
-  const sunset = getSunset(now, coords);
-  const sunrise = getSunrise(tomorrow, coords);
+  if (now.getHours() > 12) {
+    // It is evening; need today's sunset and tomorrow's sunrise
+    const tomorrow = new Date(now.getTime() + constants.DAY);
+
+    sunset = getSunset(now, coords);
+    sunrise = getSunrise(tomorrow, coords);
+  } else {
+    // It is morning; need yesterday's sunset and today's sunrise
+    const yesterday = new Date(now.getTime() - constants.DAY);
+
+    sunset = getSunset(yesterday, coords);
+    sunrise = getSunrise(now, coords);  
+  }
 
   const windowOpens = new Date(sunset.getTime() - paddingFromSunEvent);
   const windowCloses = new Date(sunrise.getTime() + paddingFromSunEvent);
