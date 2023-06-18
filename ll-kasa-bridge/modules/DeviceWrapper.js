@@ -431,28 +431,30 @@ const cmdFailPrefix = '[FAIL]';
       filters = this.filters;
     }
 
-    filters.forEach(filterObject => {
-      const resolvedFilter = resolveDeviceFilterObject(filterObject, this);
-
-      if (!resolvedFilter) {
-        log(`Filter ${filterObject.refId} did not resolve. Make sure that a global filter with that id exists.`, deviceWrapper, 'red');
-        return;
-      }
-      const switchPositionSetting = resolvedFilter.switchPosition;
-
-      // Execute the filter if:
-      if (
-        // the origin of the request the periodic filter service, or
-        (origin === constants.SERVICE_PERIODIC_FILTER) ||
-        // a switchPosition setting has not been defined for the filter, or
-        (typeof switchPositionSetting !== 'boolean') || 
-        // the trigger switch position matches the switchPosition setting.
-        (switchPositionSetting !== null && switchPositionSetting === triggerSwitchPosition)
-      ) {
-        // switchPosition either is not set on the filter, or it matches the trigger switch position.
-        commandObject = filter(resolvedFilter, commandObject, this);
-      }
-    });
+    if (Array.isArray(filters) && filters.length) {
+      filters.forEach(filterObject => {
+        const resolvedFilter = resolveDeviceFilterObject(filterObject, this);
+  
+        if (!resolvedFilter) {
+          log(`Filter ${filterObject.refId} did not resolve. Make sure that a global filter with that id exists.`, deviceWrapper, 'red');
+          return;
+        }
+        const switchPositionSetting = resolvedFilter.switchPosition;
+  
+        // Execute the filter if:
+        if (
+          // the origin of the request the periodic filter service, or
+          (origin === constants.SERVICE_PERIODIC_FILTER) ||
+          // a switchPosition setting has not been defined for the filter, or
+          (typeof switchPositionSetting !== 'boolean') || 
+          // the trigger switch position matches the switchPosition setting.
+          (switchPositionSetting !== null && switchPositionSetting === triggerSwitchPosition)
+        ) {
+          // switchPosition either is not set on the filter, or it matches the trigger switch position.
+          commandObject = filter(resolvedFilter, commandObject, this);
+        }
+      });  
+    }
     
     if (!Object.keys(commandObject).length) {
       // No point in sending an empty command object.
