@@ -482,7 +482,7 @@ const cmdFailPrefix = '[FAIL]';
         const switchPositionSetting = resolvedFilter.switchPosition;
 
         if (
-          (switchPositionSetting === null) || 
+          (typeof switchPositionSetting !== 'boolean') || 
           (switchPositionSetting !== null && switchPositionSetting === triggerSwitchPosition)
         ) {
           // switchPosition either is not set on the filter, or it matches the trigger switch position.

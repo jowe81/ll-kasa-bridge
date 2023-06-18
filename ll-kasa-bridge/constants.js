@@ -7,6 +7,8 @@ const WEEK = 7 * DAY;
 
 const constants = {
 
+  DEBUG: true,
+
   // Time
   SECOND, 
   MINUTE, 

@@ -16,6 +16,9 @@ const masterLogFile = 'jj-auto.log';
  const log = (t, deviceWrapper, color, err, writeToFileOverride = false) => {
   let date = getFormattedDate() + ' ';
   let prefix = ``;
+  if (color === 'debug') {
+    color = 'bgRed'
+  }
 
   const channel = deviceWrapper?.channel ? pad(deviceWrapper?.channel, 2) : 0;
   if (channel) {

@@ -27,11 +27,19 @@ const defaults = {
  */
 const filters = [
   {
-    id: 'lifelogFlags',
+    id: 'externalFlags',
     globalLabel: 'Action based on flags in LifeLog',
-    pluginName: 'lifelogFlags',
+    pluginName: 'externalFlags',
     settings: {
-      lifelogUrl: 'http://lifelog.wnet.wn/ajax.php?action=getFlags',
+      /**
+       * Specify an URL that will respond with JSON data (boolean flags).
+       */
+      url: 'http://lifelog.wnet.wn/ajax.php?action=getFlags',
+
+      /**
+       * The path to the flags properties in the JSON response. Defaults to 'flags'.
+       */
+      //jsonPath: 'flags'
     },
     periodicallyActive: true,
   },
@@ -201,7 +209,18 @@ const deviceMap = [
     id: "8012E7EA0A70974D997DE95E898FBA261F980E1A",
     subType: SUBTYPE_BULB,
     filters: [
-      { refId: 'naturalLight' }
+      { refId: 'naturalLight' },
+      { refId: 'externalFlags',
+        stateData: {
+          on_off: {
+            value: 0,
+            altValue: 1,
+          }
+        },
+        settings: {
+          flag: 'busy_available',
+        }
+      },
     ],    
   },
   {
@@ -289,14 +308,17 @@ const deviceMap = [
       'on': {
         'powerState': [           
           { channel: 5, data: true },  // Turn fan on
-          { channel: 4, data: false }, // Turn heater off
-
-          { channel: 2, data: true },  // Turn lights on both ways
-          { channel: 3, data: true }, 
-          
+          { channel: 4, data: false }, // Turn heater off          
           { channel: 39, data: true }, // Turn audio amp on both ways
         ],
         'lightState': [
+          { 
+            channel: 2, 
+            data: {
+              on_off: 1,
+              brightness: 95,
+            }
+          },
           { 
             channel: 3,
             data: {
@@ -328,13 +350,16 @@ const deviceMap = [
         'powerState': [
           { channel: 5, data: false }, // Turn fan off
           { channel: 4, data: true },  // Turn heater on
-
-          { channel: 2, data: true },  // Turn lights on both ways
-          { channel: 3, data: true }, 
-
           { channel: 39, data: true }, // Turn audio amp on both ways
         ],
         'lightState': [
+          { 
+            channel: 2, 
+            data: {
+              on_off: 1,
+              brightness: 95,
+            }
+          },
           { 
             channel: 3,
             data: {
@@ -625,7 +650,7 @@ const deviceMap = [
     filters: [ 
       { refId: 'naturalLight'},
       {
-        refId: 'lifelogFlags',
+        refId: 'externalFlags',
         stateData: {
           on_off: {
             value: 0,
