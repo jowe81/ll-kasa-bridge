@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import constants from '../constants.js';
 import { log } from './Log.js';
-import { commandMatchesCurrentState, filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
+import { commandMatchesCurrentState, filter, getCommandObjectFromTargetData, resolveDeviceFilterObject } from './TargetDataProcessor.js';
 
 const cmdPrefix = '[CMD]';
 const cmdFailPrefix = '[FAIL]';
@@ -257,15 +257,8 @@ const cmdFailPrefix = '[FAIL]';
               return;
             }
             
-            // Are there any filters to run?
-            let filters = null;
-
-            if (Array.isArray(target.filters)) {
-              filters = target.filters.map(filter => this.resolveDeviceFilterObject(filter));
-            }
-
             const delay = target.delay ?? 0;                
-            setTimeout(() => deviceWrapper.setLightState(commandObject, triggerSwitchPosition, originDeviceWrapper, filters), delay);
+            setTimeout(() => deviceWrapper.setLightState(commandObject, triggerSwitchPosition, originDeviceWrapper, target.filters), delay);
 
           } else {
             log(`Ignoring empty target object`, this);
@@ -424,51 +417,6 @@ const cmdFailPrefix = '[FAIL]';
 
   },
 
-  /**
-   * Take a filter definition from a device and, if it references a globally defined filter,
-   * resolve the reference and return the full definition.
-   */
-  resolveDeviceFilterObject(deviceFilterObject) {
-
-    // If there is no refId, return the object as is.
-    if (!deviceFilterObject.refId) {
-      return deviceFilterObject;
-    }
-
-    // Resolve the reference
-    const referencedFilter = this.globalConfig.filters.find(filter => filter.id === deviceFilterObject.refId);
-
-    // Did it resolve?
-    if (!referencedFilter) {
-      log(`Failed to resolve global filter definition: ${JSON.stringify(deviceFilterObject)}`, this, 'red');
-      return null;
-    }
-
-    // Apply any overwrites from the device definition.
-    const resolvedFilter = _.cloneDeep(referencedFilter);
-
-    const mergedResolvedFilter = _.merge(
-      resolvedFilter, 
-      deviceFilterObject,
-    );
-
-    if (!mergedResolvedFilter.pluginName) {
-      log(`Filter configuration is incomplete: ${JSON.stringify(deviceFilterObject)}. Must specify a valid pluginName.`, this, 'red');
-      return null;
-    }
-
-    if (!mergedResolvedFilter.globalLabel) {
-      mergedResolvedFilter.globalLabel = mergedResolvedFilter.pluginName;
-    }
-
-    if (!resolvedFilter.label) {
-      mergedResolvedFilter.label = mergedResolvedFilter.globalLabel;
-    }
-    
-    return mergedResolvedFilter;
-  },
-  
-
   async setLightState(commandObject, triggerSwitchPosition, origin, filters = null) {    
     let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
 
@@ -478,25 +426,33 @@ const cmdFailPrefix = '[FAIL]';
     }
 
     // Apply filters    
-    if (Array.isArray(filters)) {
-      // Specific filters were passed in; use these instead of the filters configured on this device.
-      filters.forEach(filterObject => commandObject = filter(filterObject, commandObject, this));
-    } else if (this.filters) {
-      // No filters were passed in; use those configured on this device.
-      this.filters.forEach(filterObject => {
-        const resolvedFilter = this.resolveDeviceFilterObject(filterObject);
-
-        const switchPositionSetting = resolvedFilter.switchPosition;
-
-        if (
-          (typeof switchPositionSetting !== 'boolean') || 
-          (switchPositionSetting !== null && switchPositionSetting === triggerSwitchPosition)
-        ) {
-          // switchPosition either is not set on the filter, or it matches the trigger switch position.
-          commandObject = filter(resolvedFilter, commandObject, this);
-        }
-      });
+    if (filters === null) {
+      // No filters were passed in; use filters configured on this device.
+      filters = this.filters;
     }
+
+    filters.forEach(filterObject => {
+      const resolvedFilter = resolveDeviceFilterObject(filterObject, this);
+
+      if (!resolvedFilter) {
+        log(`Filter ${filterObject.refId} did not resolve. Make sure that a global filter with that id exists.`, deviceWrapper, 'red');
+        return;
+      }
+      const switchPositionSetting = resolvedFilter.switchPosition;
+
+      // Execute the filter if:
+      if (
+        // the origin of the request the periodic filter service, or
+        (origin === constants.SERVICE_PERIODIC_FILTER) ||
+        // a switchPosition setting has not been defined for the filter, or
+        (typeof switchPositionSetting !== 'boolean') || 
+        // the trigger switch position matches the switchPosition setting.
+        (switchPositionSetting !== null && switchPositionSetting === triggerSwitchPosition)
+      ) {
+        // switchPosition either is not set on the filter, or it matches the trigger switch position.
+        commandObject = filter(resolvedFilter, commandObject, this);
+      }
+    });
     
     if (!Object.keys(commandObject).length) {
       // No point in sending an empty command object.
