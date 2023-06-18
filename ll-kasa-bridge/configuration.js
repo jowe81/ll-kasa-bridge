@@ -80,7 +80,7 @@ const filters = [
     stateData: {
       brightness: {
         value: 0,
-        altValue: 20,
+        altValue: 6,
       },
       on_off: {
         value: 0,
@@ -561,7 +561,6 @@ const deviceMap = [
           padding: 5 * MINUTE,
         },
       },
-      { refId: 'lifelogFlags' },
     ],
     linkedDevices: [
       { 
@@ -623,7 +622,33 @@ const deviceMap = [
     channel: 40,
     id: '8012984E9F504FC4AEC384A012A6BEE01F54FA11',
     subType: SUBTYPE_LED_STRIP,
-    filters: [ { refId: 'naturalLight'} ],
+    filters: [ 
+      { refId: 'naturalLight'},
+      {
+        refId: 'lifelogFlags',
+        stateData: {
+          on_off: {
+            value: 0,
+            altValue: 1,
+          },
+          brightness: {
+            value: 0,
+            altValue: 2,
+          },
+          hue: { 
+            value: 240,
+            altValue: 240,
+          },
+          saturation: {
+            value: 0,
+            altValue: 100,
+          },
+        },
+        settings: {
+          flag: 'sleep_wake',
+        }
+      }
+    ],
   },
   {
     alias: 'Ikea Hallway',

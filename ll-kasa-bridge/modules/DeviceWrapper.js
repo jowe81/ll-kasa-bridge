@@ -440,19 +440,9 @@ const cmdFailPrefix = '[FAIL]';
     // Apply any overwrites from the device definition.
     const resolvedFilter = _.cloneDeep(referencedFilter);
 
-    const mergedResolvedFilter = _.mergeWith(
+    const mergedResolvedFilter = _.merge(
       resolvedFilter, 
       deviceFilterObject,
-  
-      // Do not overwrite with null.
-      (resolvedFilterValue, deviceFilterValue, key) => {
-        
-        if (typeof deviceFilterValue === 'null') {
-          return resolvedFilterValue;
-        }
-
-        return deviceFilterValue;
-      }
     );
 
     if (!mergedResolvedFilter.pluginName) {
@@ -501,6 +491,11 @@ const cmdFailPrefix = '[FAIL]';
       });
     }
     
+    if (!Object.keys(commandObject).length) {
+      // No point in sending an empty command object.
+      return;
+    }
+
     if (origin === constants.SERVICE_PERIODIC_FILTER) {
       const stateCheck = commandMatchesCurrentState(this, commandObject);
 
