@@ -182,6 +182,45 @@ const filters = [
   }
 ];
 
+/**
+ * Define schedules to execute with the schedules filter.
+ */
+const schedules = [
+  {
+    'id': 'outdoorLights',
+    'label': 'Schedule to control the front door light',
+
+    'schedule': [
+      /**
+       * This schedule item gets triggered by sunset and sunrise.
+       * It runs a filter instead of defining data here.
+       */
+      {
+        trigger: {
+          sunset: true,
+          sunrise: true,          
+        },
+        filters: [
+          { refId: 'sunEvents-outdoorLights' },
+        ]
+      },
+      /**
+       * Plain schedule item - specify a time and stateData.
+       */
+      {
+        trigger: {
+          hours: 23,
+          minutes: 30,  
+        },
+        stateData: {
+          brightness: 1,
+        }
+      },
+    ]
+  }
+]
+
+
 const globalConfig = {
 
   [SUBTYPE_BULB]: {
