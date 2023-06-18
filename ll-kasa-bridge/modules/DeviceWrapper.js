@@ -256,9 +256,16 @@ const cmdFailPrefix = '[FAIL]';
             if (!commandObject) {
               return;
             }
+            
+            // Are there any filters to run?
+            let filters = null;
+
+            if (Array.isArray(target.filters)) {
+              filters = target.filters.map(filter => this.resolveDeviceFilterObject(filter));
+            }
 
             const delay = target.delay ?? 0;                
-            setTimeout(() => deviceWrapper.setLightState(commandObject, triggerSwitchPosition, originDeviceWrapper), delay);
+            setTimeout(() => deviceWrapper.setLightState(commandObject, triggerSwitchPosition, originDeviceWrapper, filters), delay);
 
           } else {
             log(`Ignoring empty target object`, this);

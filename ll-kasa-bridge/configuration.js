@@ -451,12 +451,42 @@ const deviceMap = [
     targets: {
       'on': {
         'powerState': [ //Lights above the desk and desk lamp
-          { channel: 31, data: true, delay: 1000 }, 
-          { channel: 32, data: true, delay: 1000 }, 
-          { channel: 33, data: true, delay: 1000 }, 
           { channel: 36, data: true }, 
-          { channel: 40, data: true }, 
         ],
+        'lightState': [
+          {
+            channel: 31,
+            data: {
+              on_off: 1,
+            },
+            filters: [ { refId: 'naturalLight' }],
+            delay: 2000,
+          },
+          {
+            channel: 32,
+            data: {
+              on_off: 1,
+            },
+            filters: [ { refId: 'naturalLight' }],
+            delay: 2000,
+          },
+          {
+            channel: 33,
+            data: {
+              on_off: 1,
+            },
+            filters: [ { refId: 'naturalLight' }],
+            delay: 1000,
+          },
+          {
+            channel: 40,
+            data: {
+              brightness: 95,
+              on_off: 1,
+            },
+            filters: [ { refId: 'naturalLight' }],
+          }
+        ]
       },
       'off': {
         'powerState': [
