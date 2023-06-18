@@ -27,6 +27,15 @@ const defaults = {
  */
 const filters = [
   {
+    id: 'lifelogFlags',
+    globalLabel: 'Action based on flags in LifeLog',
+    pluginName: 'lifelogFlags',
+    settings: {
+      lifelogUrl: 'http://lifelog.wnet.wn/ajax.php?action=getFlags',
+    },
+    periodicallyActive: true,
+  },
+  {
     id: 'naturalLight',
     globalLabel: 'Automatic color temperature control',
     pluginName: 'naturalLight',
@@ -59,7 +68,11 @@ const filters = [
     globalLabel: 'Control for outdoor illumination',
     pluginName: 'sunEvents',
     settings: {
-      transitionTime: 1 * HOUR,      
+      transitionTime: 1 * HOUR,
+      offset: {
+        sunset: 30 * MINUTE,
+        sunrise: -30 * MINUTE,
+      }
     },
     periodicallyActive: {
       restriction: 'duskToDawn'
@@ -67,7 +80,7 @@ const filters = [
     stateData: {
       brightness: {
         value: 0,
-        altValue: 30,
+        altValue: 20,
       },
       on_off: {
         value: 0,
@@ -547,7 +560,8 @@ const deviceMap = [
            */
           padding: 5 * MINUTE,
         },
-      }
+      },
+      { refId: 'lifelogFlags' },
     ],
     linkedDevices: [
       { 

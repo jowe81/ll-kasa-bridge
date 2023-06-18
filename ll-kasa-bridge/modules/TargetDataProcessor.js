@@ -2,6 +2,7 @@ import _ from "lodash";
 
 import constants from "../constants.js";
 import { getFilterFunctions } from "./Filters.js";
+import { log } from './Log.js';
 
 /**
  * Reverse-generate a command object from a device's current state
@@ -32,8 +33,8 @@ const buildCommandObjectFromBulbState = (deviceWrapper) => {
     return {}
   }
 
-  const directState = deviceWrapper.state.dftOnState ?
-  _.cloneDeep(deviceWrapper.state.dftOnState) :
+  const directState = deviceWrapper.state.dft_on_state ?
+  _.cloneDeep(deviceWrapper.state.dft_on_state) :
   _.cloneDeep(deviceWrapper.state);
 
   if (!directState) {
@@ -90,7 +91,6 @@ const buildCommandObjectFromLedStripState = (deviceWrapper) => {
  * @return boolean
  */
 const commandMatchesCurrentState = (deviceWrapper, commandObject) => {
-
   if (!(deviceWrapper && deviceWrapper.device)) {
     // Don't have a live device
     return null;
@@ -108,7 +108,7 @@ const commandMatchesCurrentState = (deviceWrapper, commandObject) => {
   // This is a lightstate command
 
   const currentStateAsCommandObject = buildCommandObjectFromCurrentState(deviceWrapper);
-
+  
   if (currentStateAsCommandObject === null) {
     // Have no live device.
     return null;
@@ -153,20 +153,21 @@ const filter = (filterObject, commandObject, deviceWrapper) => {
 
   const before = _.cloneDeep(commandObject);
 
-  const filterFunction = getFilterFunctions()[pluginName];
+  const filterFunctions = getFilterFunctions();
 
-  if (filterFunction) {
-
+  const filterFunction = filterFunctions[pluginName];
+  
+  if (filterFunction) {    
     // Execute the filter plugin.
     commandObject = filterFunction(
       filterObject,
       commandObject,
       deviceWrapper,
+      filterFunctions, // Pass in the array of filter functions so filters can cross-reference.
     );
-
+  } else {
+    log(`Filter plugin '${pluginName}' not found.`, deviceWrapper, 'red');
   }
-
-  console.log(`${pluginName} / ${deviceWrapper.alias}: cmd before: `, before, ` after: `, commandObject);
 
   return commandObject;
 }

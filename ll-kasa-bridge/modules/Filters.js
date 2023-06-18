@@ -30,16 +30,33 @@ const loadFilterFunctions = async () => {
   });
     
   return Promise.all(promises).then(fns => {
-    const filterFunctions = {};
+    const filterFunctionWrappers = {};
   
     fns.forEach(fn => {
       const functionName = fn.default?.name;
       if (fn.default) {
-        filterFunctions[functionName] = fn.default;
+        filterFunctionWrappers[functionName] = fn.default;
       }    
     })
   
-    log(`Loaded ${Object.keys(filterFunctions).length} filter(s).`);
+    log(`Loaded ${Object.keys(filterFunctionWrappers).length} filter(s).`);
+
+    const filterFunctions = []
+    
+    Object.keys(filterFunctionWrappers).forEach(functionName => {
+
+      const filterFunctionWrapper = filterFunctionWrappers[functionName];
+
+      // The filter function wrapper must return an execute function.
+      const { execute } = filterFunctionWrapper();
+            
+      if (!execute) {
+        log(`Failed to initialize filter plugin '${functionName}. Make sure it returns a function 'execute'.`, 'red');        
+      }
+
+      filterFunctions[functionName] = execute;
+      log(`Initialized filter plugin '${functionName}'`);
+    });
 
     // Cache them so next time we don't have to do the fs operations
     cachedFilterFunctions = filterFunctions;

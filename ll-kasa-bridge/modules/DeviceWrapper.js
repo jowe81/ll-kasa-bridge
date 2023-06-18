@@ -475,8 +475,8 @@ const cmdFailPrefix = '[FAIL]';
   async setLightState(commandObject, triggerSwitchPosition, origin, filters = null) {    
     let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
 
-    if (!(this.device && this.isOnline)) {
-      log(`${cmdPrefix} ${cmdFailPrefix} setLightState failed: device is offline.`, this, 'red');
+    if (!this.device) {
+      log(`${cmdPrefix} ${cmdFailPrefix} setLightState failed: device not found.`, this, 'red');
       return;
     }
 
@@ -509,6 +509,11 @@ const cmdFailPrefix = '[FAIL]';
         return;
       }
   
+    }
+
+    if (!this.isOnline) {
+      log(`${cmdPrefix} ${cmdFailPrefix} setLightState failed: device is offline.`, this, 'red');
+      return;
     }
 
     try {
