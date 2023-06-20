@@ -165,7 +165,7 @@ const filter = (filterObject, commandObject, deviceWrapper) => {
       filterFunctions, // Pass in the array of filter functions so filters can cross-reference.
     );
 
-    if (constants.DEBUG && [28, 29, 30, 31].includes(deviceWrapper.channel)) {
+    if (constants.DEBUG) {
       log(`Executed ${pluginName}/${filterObject.label}. Returned: ${JSON.stringify(commandObject)}`, deviceWrapper, 'debug');
     }
   } else {

@@ -31,12 +31,15 @@ const naturalLight = () => {
           saturation: {
             value: daytimeState.ledStrip.saturation ?? 23,
             altValue: nighttimeState.ledStrip.saturation ?? 20,
-          }    
+          }
         }
 
         // Values do not matter here but property must exist
         commandObject.hue = 1;
         commandObject.saturation = 1;
+
+        // This MUST be set to 0; otherwise the strips disregard hue and saturation.
+        commandObject.color_temp = 0;
         break;
 
       case constants.SUBTYPE_BULB:

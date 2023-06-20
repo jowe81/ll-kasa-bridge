@@ -83,9 +83,8 @@ const filters = [
     },
     periodicallyActive: {
       /**
-       * This MUST be set to 'always' when using partial filtering,
-       * that is, when applyPartially is set on any definitions for this filter.
-       * Otherwise partial filtering will not work properly.
+       * This MUST either be set here (restriction: 'always' or periodicallyActive: true)
+       * or on an override for partial filtering to work properly.
        */
       restriction: 'always',
       /**
@@ -476,6 +475,7 @@ const deviceMap = [
     subType: SUBTYPE_BULB,
     filters: [{
       refId: 'naturalLight',
+      restriction: 'always',
       applyPartially: 0.25,
     }]
   },
@@ -486,6 +486,7 @@ const deviceMap = [
     subType: SUBTYPE_BULB,
     filters: [{
       refId: 'naturalLight',
+      restriction: 'always',
       applyPartially: 0.5,
     }]
   },
@@ -496,6 +497,7 @@ const deviceMap = [
     subType: SUBTYPE_BULB,
     filters: [{
       refId: 'naturalLight',
+      restriction: 'always',
       applyPartially: 0.75,
     }]
   },
@@ -504,10 +506,7 @@ const deviceMap = [
     channel: 31, 
     id: "8012DEFBED48C05561BF6C2F5D8A490D1F77A75D",
     subType: SUBTYPE_BULB,
-    filters: [{
-      refId: 'naturalLight',
-      applyPartially: 1
-    }]
+    filters: [ { refId: 'naturalLight' }],
   },
   {
     alias: 'Living Room Ikea 5',
