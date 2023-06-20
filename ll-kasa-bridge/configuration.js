@@ -13,7 +13,7 @@ const defaults = {
     /**
      * How often should the service check for filters to be run?
      */
-    checkInterval: 10 * SECOND,    
+    checkInterval: 30 * SECOND,    
     /**
      * How long before and after sunrise/sunset should the filter be executed when it has the
      * periodicallyActive flag set?
@@ -82,8 +82,12 @@ const filters = [
       },
     },
     periodicallyActive: {
+      /**
+       * This MUST be set to 'always' when using partial filtering,
+       * that is, when applyPartially is set on any definitions for this filter.
+       * Otherwise partial filtering will not work properly.
+       */
       restriction: 'always',
-      //restriction: 'dawnAndDusk',
       /**
        * Can override any of the periodicFilters defaults configured above.
        */     
