@@ -7,7 +7,6 @@ import { log } from './Log.js';
 
 import { isBetweenDuskAndDawn, isDawnOrDusk, getFromSettingsForNextSunEvent } from '../helpers/jDateTimeUtils.js';
 import { loadFilterFunctions } from './Filters.js';
-import { resolveDeviceFilterObject } from './TargetDataProcessor.js';
 
 /**
  * The DevicePool encapsulates all automation device functionality.
@@ -178,17 +177,14 @@ const devicePool = {
 
     if (Array.isArray(this.devices)) {
       this.devices.forEach(deviceWrapper => {
-        const allFilters = deviceWrapper.filters;
 
-        if (Array.isArray(allFilters) && allFilters.length) {
-          const filtersToRun = this._getCurrentlyActivePeriodicFilters(allFilters);
-        
-          if (Array.isArray(filtersToRun) && filtersToRun.length) {
-            deviceWrapper.setLightState({}, null, serviceName, filtersToRun);
-            filtersProcessed++;
-          }          
+      const filtersToRun = this._getCurrentlyActivePeriodicFilters(deviceWrapper.getFilters());
+
+      if (Array.isArray(filtersToRun) && filtersToRun.length) {        
+        deviceWrapper.setLightState({}, null, serviceName, filtersToRun);
+        filtersProcessed++;
+      }          
   
-        }
     });
 
     if (filtersProcessed) {
@@ -208,7 +204,7 @@ const devicePool = {
       const defaultPaddingFromSunEvent = this.globalConfig?.defaults?.periodicFilters?.paddingFromSunEvent ?? constants.HOUR * 2;
 
       allFilters.forEach(filterObject => {
-        filterObject = resolveDeviceFilterObject(filterObject, null, this);
+
         // Has periodicallyActive set?
         if (filterObject && filterObject.periodicallyActive) {
 

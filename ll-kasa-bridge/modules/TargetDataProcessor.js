@@ -1,6 +1,7 @@
 import _ from "lodash";
 
 import constants from "../constants.js";
+import { devicePool } from "./DevicePool.js";
 import { getFilterFunctions } from "./Filters.js";
 import { log } from './Log.js';
 
@@ -151,13 +152,11 @@ const filter = (filterObject, commandObject, deviceWrapper) => {
     return commandObject;
   }
 
-  const before = _.cloneDeep(commandObject);
-
   const filterFunctions = getFilterFunctions();
 
   const filterFunction = filterFunctions[pluginName];
   
-  if (filterFunction) {    
+  if (filterFunction) {  
     // Execute the filter plugin.
     commandObject = filterFunction(
       filterObject,
@@ -166,7 +165,7 @@ const filter = (filterObject, commandObject, deviceWrapper) => {
       filterFunctions, // Pass in the array of filter functions so filters can cross-reference.
     );
 
-    if (constants.DEBUG) {
+    if (constants.DEBUG && [28, 29, 30, 31].includes(deviceWrapper.channel)) {
       log(`Executed ${pluginName}/${filterObject.label}. Returned: ${JSON.stringify(commandObject)}`, deviceWrapper, 'debug');
     }
   } else {
@@ -194,56 +193,8 @@ const getCommandObjectFromTargetData = (targetData) => {
   return commandObject;
 };
 
-/**
-* Take a filter definition from a device and, if it references a globally defined filter,
-* resolve the reference and return the full definition.
-*/
-const resolveDeviceFilterObject = (deviceFilterObject, deviceWrapper, devicePool) => {
-
-  const globalConfig = deviceWrapper ? deviceWrapper.globalConfig : devicePool?.globalConfig;
-
-  // If there is no refId, return the object as is.
-  if (!deviceFilterObject.refId) {
-    return deviceFilterObject;
-  }
-
-  // Resolve the reference
-  const referencedFilter = globalConfig.filters.find(filter => filter.id === deviceFilterObject.refId);
-
-  // Did it resolve?
-  if (!referencedFilter) {
-    log(`Failed to resolve global filter definition: ${JSON.stringify(deviceFilterObject)}`, deviceWrapper, 'red');
-    return null;
-  }
-
-  // Apply any overwrites from the device definition.
-  const resolvedFilter = _.cloneDeep(referencedFilter);
-
-  const mergedResolvedFilter = _.merge(
-    resolvedFilter, 
-    deviceFilterObject,
-  );
-
-  if (!mergedResolvedFilter.pluginName) {
-    log(`Filter configuration is incomplete: ${JSON.stringify(deviceFilterObject)}. Must specify a valid pluginName.`, deviceWrapper, 'red');
-    return null;
-  }
-
-  if (!mergedResolvedFilter.globalLabel) {
-    mergedResolvedFilter.globalLabel = mergedResolvedFilter.pluginName;
-  }
-
-  if (!resolvedFilter.label) {
-    mergedResolvedFilter.label = mergedResolvedFilter.globalLabel;
-  }
-  
-  return mergedResolvedFilter;
-}
-
-
 export {
   commandMatchesCurrentState,
   filter,
   getCommandObjectFromTargetData,
-  resolveDeviceFilterObject,
 }

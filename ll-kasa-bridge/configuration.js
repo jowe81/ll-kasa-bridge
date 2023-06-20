@@ -58,10 +58,32 @@ const filters = [
          * Offset the shift from sunset?
          */
         sunset: -1 * HOUR,
-      }
+      },
+      /**
+       * Define daytime and nighttime defaults for each light type
+       */
+      daytimeState: {
+        ledStrip: {
+          hue: 227,
+          saturation: 23,
+        },
+        bulb: {
+          color_temp: 6000,
+        }
+      },
+      nighttimeState: {
+        ledStrip: {
+          hue: 20,
+          saturation: 20,
+        },
+        bulb: {
+          color_temp: 2700,
+        }
+      },
     },
     periodicallyActive: {
-      restriction: 'dawnAndDusk',
+      restriction: 'always',
+      //restriction: 'dawnAndDusk',
       /**
        * Can override any of the periodicFilters defaults configured above.
        */     
@@ -448,25 +470,40 @@ const deviceMap = [
     channel: 28, 
     id: "801264A4EC3F66CAC02D4FF78712E6D11F992564",
     subType: SUBTYPE_BULB,
+    filters: [{
+      refId: 'naturalLight',
+      applyPartially: 0.25,
+    }]
   },
   {
     alias: 'Living Room Ikea 2',
     channel: 29, 
     id: "8012F095B949B648B1BE7C8A050FA39E1F78FAE8",
     subType: SUBTYPE_BULB,
+    filters: [{
+      refId: 'naturalLight',
+      applyPartially: 0.5,
+    }]
   },
   {
     alias: 'Living Room Ikea 3',
     channel: 30, 
     id: "8012AE4AF3CF80CD50EC66E4F87F3E291F99397C",
     subType: SUBTYPE_BULB,
+    filters: [{
+      refId: 'naturalLight',
+      applyPartially: 0.75,
+    }]
   },
   {
     alias: 'Living Room Ikea 4',
     channel: 31, 
     id: "8012DEFBED48C05561BF6C2F5D8A490D1F77A75D",
     subType: SUBTYPE_BULB,
-    filters: [ { refId: 'naturalLight'} ],
+    filters: [{
+      refId: 'naturalLight',
+      applyPartially: 1
+    }]
   },
   {
     alias: 'Living Room Ikea 5',
