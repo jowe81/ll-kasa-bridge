@@ -13,7 +13,7 @@ const defaults = {
     /**
      * How often should the service check for filters to be run?
      */
-    checkInterval: 30 * SECOND,    
+    checkInterval: 10 * SECOND,    
     /**
      * How long before and after sunrise/sunset should the filter be executed when it has the
      * periodicallyActive flag set?
@@ -86,9 +86,9 @@ const filters = [
        * This MUST either be set here (restriction: 'always' or periodicallyActive: true)
        * or on an override for partial filtering to work properly.
        */
-      restriction: 'always',
+      restriction: 'dawnAndDusk',
       /**
-       * Can override any of the periodicFilters defaults configured above.
+       * Can override any of the periodicFilters defaults configured in defaults.periodicFilters above.
        */     
       paddingFromSunEvent: {
         sunrise: 1.5 * HOUR,
@@ -475,8 +475,8 @@ const deviceMap = [
     subType: SUBTYPE_BULB,
     filters: [{
       refId: 'naturalLight',
-      restriction: 'always',
-      applyPartially: 0.25,
+      periodicallyActive: true,
+      applyPartially: 0.15,
     }]
   },
   {
@@ -486,8 +486,8 @@ const deviceMap = [
     subType: SUBTYPE_BULB,
     filters: [{
       refId: 'naturalLight',
-      restriction: 'always',
-      applyPartially: 0.5,
+      periodicallyActive: true,
+      applyPartially: 0.3,
     }]
   },
   {
@@ -497,8 +497,8 @@ const deviceMap = [
     subType: SUBTYPE_BULB,
     filters: [{
       refId: 'naturalLight',
-      restriction: 'always',
-      applyPartially: 0.75,
+      periodicallyActive: true,
+      applyPartially: 0.5,
     }]
   },
   {
