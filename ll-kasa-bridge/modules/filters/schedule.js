@@ -1,23 +1,16 @@
 import _ from "lodash";
 
-import { getNighttimePercent, getFromSettingsForNextSunEvent } from "../../helpers/jDateTimeUtils.js";
-import { scale } from "../../helpers/jUtils.js";
+import { getSunrise, getSunset } from "../../helpers/jDateTimeUtils.js";
+import { log } from "../Log.js";
 
 const schedule = () => {
-
-  /**
-   * 
-   */
-  const cache = {
-
-  }
 
   /**
    * Adjust values following a defined schedule
    */
   const execute = (filterObject, commandObject, deviceWrapper) => {  
 
-    const currentItem = getCurrentScheduleItem(filterObject);
+    const currentItem = getCurrentScheduleItem(filterObject, deviceWrapper);
 
     if (!currentItem) {
       // Nothing to do.
@@ -30,7 +23,7 @@ const schedule = () => {
   /**
    * Return the schedule item that is currently active.
    */
-  const getCurrentScheduleItem = (filterObject) => {
+  const getCurrentScheduleItem = (filterObject, deviceWrapper) => {
     const { schedule } = filterObject;
 
     if (!Array.isArray(schedule) && schedule.length) {
@@ -45,12 +38,12 @@ const schedule = () => {
        *  2. Items that have only minutes specified: 
        *     -> these will be expanded to 24 items, one per hour
        */
-      ...getPlainItems(schedule), 
+      ...getPlainItems(schedule, deviceWrapper), 
       /**
        * Get those items that reference a time such as sunset or sunrise
        * -> these will be resolved to a specific time
        */
-      ...resolveReferencingItems(schedule)       
+      ...resolveReferencingItems(schedule, deviceWrapper)       
     ].sort((itemA, itemB) => 
       /**
        * Sort all items chronologically
@@ -105,15 +98,49 @@ const schedule = () => {
     return date;
   }
 
-  const resolveReferencingItems = (schedule) => {
-    return schedule
-      .map(item => resolveReferencingItem(item))
+  const resolveReferencingItems = (schedule, deviceWrapper) => {
+    const referencingItems = getReferencingItems(schedule);
+    const resolvedReferencingItems = referencingItems
+      .map(item => resolveReferencingItem(item, deviceWrapper))
       .filter(item => item);
+    
+    return resolvedReferencingItems;
   }
 
-  const resolveReferencingItem = (item) => {
-    // Todo: implement
-    return null;
+  const getReferencingItems = (schedule) => {
+    return schedule.filter(item => typeof item.trigger.event !== 'undefined')
+  }
+
+  const resolveReferencingItem = (item, deviceWrapper) => {
+
+    const { trigger } = item;
+
+    let resolvedTime;
+
+    switch (trigger.event) {
+      case 'sunset':
+        resolvedTime = getSunset();
+        break;
+
+      case 'sunrise':
+        resolvedTime = getSunrise();
+        break;
+    }
+
+    if (!resolvedTime) {
+      // Event did not resolve
+      log(`schedule filter error: trigger event ${trigger.event} did not resolve. Please pecify a valid event.`, deviceWrapper, 'red');
+      return null;
+    }
+
+    // Apply configured offset
+    const offset = typeof trigger.offset === 'number' ? trigger.offset : 0;
+    resolvedTime.setTime(resolvedTime.getTime() + offset);
+    
+    trigger.hours = resolvedTime.getHours();
+    trigger.minutes = resolvedTime.getMinutes();
+
+    return item;
   }
 
   const getPlainItems = (schedule) => {

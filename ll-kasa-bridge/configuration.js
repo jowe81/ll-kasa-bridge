@@ -211,13 +211,22 @@ const filters = [
     periodicallyActive: true,
     schedule: [
       /**
+       * The pair of items below turns the lamp on 45 minutes before sunset by overwriting
+       * the on_off and brightness properties for the stateData passed in 
+       * (possibly the output from another filter).
+       * 
+       * A minute later, the override is disabled and the stateData will just pass through,
+       * (it may be empty or come from naturalLight and/or sunEvents).
+      */
+      
+      /* 
        * This schedule item gets triggered by sunset, with an offset.
        * It runs a filter instead of defining data here.
        */
       {
         trigger: {
           event: 'sunset',
-          offset: -1 * HOUR,
+          offset: -45 * MINUTE,
         },
         stateData: {
           onOff: 1,
@@ -230,13 +239,15 @@ const filters = [
       {
         trigger: {
           event: 'sunset',
-          offset: -59 * MINUTE,
+          offset: -44 * MINUTE,
         },
         stateData: {
         },
       },
+
+
       /**
-       * Plain schedule item - specify a time and stateData.
+       * This is a plain schedule item - specify a time and stateData.
        */
       {
         trigger: {
@@ -247,17 +258,50 @@ const filters = [
           brightness: 1,
         }
       },      
+
+      /**
+       * This item, with an empty stateData object, will
+       * clear whatever adjustments the preceding item made,
+       * letting the input stateData pass through.
+       */
       {
         trigger: {
           hours: 5,
         },
-        /**
-         * An item with an empty stateData object will
-         * clear whatever stateData was set by the preceding item(s)
-         */
         stateData: {
         }
       },
+
+      /**
+       * The following pair of items turns the lamp off at sunrise by overwriting
+       * the on_off property for the stateData passed in (possibly output from another filter)
+       * A minute later, the override is disabled and the output from the previous filter
+       * can pass through.
+       */
+      
+      /**
+       * This schedule item gets triggered by sunrise, with an offset.
+       * It runs a filter instead of defining data here.
+       */
+       {
+        trigger: {
+          event: 'sunrise',          
+        },
+        stateData: {
+          onOff: 0,
+        },
+      },
+      /**
+       * This item rescinds the previous one a minute later
+       */
+      {
+        trigger: {
+          event: 'sunrise',
+          offset: 1 * MINUTE,
+        },
+        stateData: {
+        },
+      },      
     ],
   }
 ];
