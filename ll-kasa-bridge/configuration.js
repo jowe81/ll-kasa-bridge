@@ -97,31 +97,6 @@ const filters = [
     },
   },
   {
-    id: 'sunEvents-outdoorLights',
-    globalLabel: 'Control for outdoor illumination',
-    pluginName: 'sunEvents',
-    settings: {
-      transitionTime: 1 * HOUR,
-      offset: {
-        sunset: 30 * MINUTE,
-        sunrise: -30 * MINUTE,
-      }
-    },
-    periodicallyActive: {
-      restriction: 'duskToDawn'
-    },
-    stateData: {
-      brightness: {
-        value: 0,
-        altValue: 6,
-      },
-      on_off: {
-        value: 0,
-        altValue: 1,
-      }
-    }
-  },
-  {
     /**
      * Id that filter properties on devices can reference to use this filter
      */
@@ -204,30 +179,61 @@ const filters = [
        */
       padding: 5 * MINUTE,
     },
-  }
-];
-
-/**
- * Define schedules to execute with the schedules filter.
- */
-const schedules = [
+  },
   {
-    'id': 'outdoorLights',
-    'label': 'Schedule to control the front door light',
-
-    'schedule': [
+    id: 'sunEvents-outdoorLights',
+    globalLabel: 'Control for outdoor illumination',
+    pluginName: 'sunEvents',
+    settings: {
+      transitionTime: 1 * HOUR,
+      offset: {
+        sunset: 30 * MINUTE,
+        sunrise: -30 * MINUTE,
+      }
+    },
+    periodicallyActive: {
+      restriction: 'duskToDawn'
+    },
+    stateData: {
+      brightness: {
+        value: 0,
+        altValue: 6,
+      },
+      on_off: {
+        value: 0,
+        altValue: 1,
+      }
+    }
+  },
+  {
+    id: 'schedule-outdoorLights',
+    pluginName: 'schedule',
+    periodicallyActive: true,
+    schedule: [
       /**
-       * This schedule item gets triggered by sunset and sunrise.
+       * This schedule item gets triggered by sunset, with an offset.
        * It runs a filter instead of defining data here.
        */
       {
         trigger: {
-          sunset: true,
-          sunrise: true,          
+          event: 'sunset',
+          offset: -1 * HOUR,
         },
-        filters: [
-          { refId: 'sunEvents-outdoorLights' },
-        ]
+        stateData: {
+          onOff: 1,
+          brightness: 1,
+        },
+      },
+      /**
+       * This item rescinds the previous one a minute later
+       */
+      {
+        trigger: {
+          event: 'sunset',
+          offset: -59 * MINUTE,
+        },
+        stateData: {
+        },
       },
       /**
        * Plain schedule item - specify a time and stateData.
@@ -240,11 +246,21 @@ const schedules = [
         stateData: {
           brightness: 1,
         }
+      },      
+      {
+        trigger: {
+          hours: 5,
+        },
+        /**
+         * An item with an empty stateData object will
+         * clear whatever stateData was set by the preceding item(s)
+         */
+        stateData: {
+        }
       },
-    ]
+    ],
   }
-]
-
+];
 
 const globalConfig = {
 
@@ -586,6 +602,7 @@ const deviceMap = [
     filters: [
       { refId: 'sunEvents-outdoorLights' },
       { refId: 'naturalLight' },
+      { refId: 'schedule-outdoorLights'},
     ],
   },
   {
