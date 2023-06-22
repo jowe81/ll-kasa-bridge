@@ -74,6 +74,8 @@ const devicePool = {
       const deviceWrapper = Object.create(DeviceWrapper);      
       const mapItem = await this.getDeviceMapItemById(device.id);
 
+      mapItem.groups = this.getGroupsForChannel(mapItem.channel);
+
       // Store a backreference to the pool in each wrapper to enable event listeners to execute functinos on other devices
       deviceWrapper.devicePool = this;
 
@@ -119,6 +121,28 @@ const devicePool = {
   
   getDeviceWrapperByChannel(channel) {
     return this.devices.find(deviceWrapper => deviceWrapper.channel === channel);
+  },
+
+  /**
+   * Return an array of group ids that this channel belongs to
+   */
+  getGroupsForChannel(channel) {
+    if (!Array.isArray(this.globalConfig.groups)) {
+      return [];
+    }
+
+    const groups = this.globalConfig.groups
+      .map(groupDefinition => {
+        if (Array.isArray(groupDefinition.channels)) {
+          if (groupDefinition.channels.includes(channel)) {
+            return groupDefinition.id;
+          };
+        }
+
+        return null;
+      }).filter(item => item);
+    if (channel === 38) console.log('returning gorups for ch', channel, groups)
+    return groups;
   },
 
   getLiveDeviceMap() {

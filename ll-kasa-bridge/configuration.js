@@ -2,348 +2,6 @@ import constants from './constants.js';
 const { SECOND, MINUTE, HOUR } = constants;
 const { SUBTYPE_BULB, SUBTYPE_LED_STRIP, SUBTYPE_PLUG, SUBTYPE_SWITCH } = constants;
 
-const defaults = {
-  /**
-   * Devices
-   */
-  pollInterval: 10000,
-  offlineTolerance: 3,
-
-  periodicFilters: {
-    /**
-     * How often should the service check for filters to be run?
-     */
-    checkInterval: 10 * SECOND,    
-    /**
-     * How long before and after sunrise/sunset should the filter be executed when it has the
-     * periodicallyActive flag set?
-     */
-    paddingFromSunEvent: 2 * HOUR,
-  }
-}
-
-/**
- * Global filter definitions
- */
-const filters = [
-  {
-    id: 'externalFlags',
-    globalLabel: 'Action based on flags in LifeLog',
-    pluginName: 'externalFlags',
-    settings: {
-      /**
-       * Specify an URL that will respond with JSON data (boolean flags).
-       */
-      url: 'http://lifelog.wnet.wn/ajax.php?action=getFlags',
-
-      /**
-       * The path to the flags properties in the JSON response. Defaults to 'flags'.
-       */
-      //jsonPath: 'flags'
-    },
-    periodicallyActive: true,
-  },
-  {
-    id: 'nighttimeGlim',
-    pluginName: 'externalFlags',
-    settings: {
-      /**
-       * Specify an URL that will respond with JSON data (boolean flags).
-       */
-      url: 'http://lifelog.wnet.wn/ajax.php?action=getFlags',
-
-
-      flag: 'sleep_wake',
-
-      /**
-       * The path to the flags properties in the JSON response. Defaults to 'flags'.
-       */
-      //jsonPath: 'flags'
-    },
-    stateData: {
-      on_off: {
-        value: 0,
-        altValue: 1,
-      },
-      brightness: {
-        value: 0,
-        altValue: 2,
-      },
-      hue: { 
-        value: 240,
-        altValue: 240,
-      },
-      saturation: {
-        value: 0,
-        altValue: 100,
-      },
-    },
-
-    periodicallyActive: true,
-  },
-  {
-    id: 'naturalLight',
-    globalLabel: 'Automatic color temperature control',
-    pluginName: 'naturalLight',
-    settings: {
-      transitionTime: 1 * HOUR,
-      offset: {
-        /**
-         * Offset the shift from sunrise?
-         */
-        sunrise: +1 * HOUR,
-        /**
-         * Offset the shift from sunset?
-         */
-        sunset: -1 * HOUR,
-      },
-      /**
-       * Define daytime and nighttime defaults for each light type
-       */
-      daytimeState: {
-        ledStrip: {
-          hue: 227,
-          saturation: 23,
-        },
-        bulb: {
-          color_temp: 6000,
-        }
-      },
-      nighttimeState: {
-        ledStrip: {
-          hue: 20,
-          saturation: 20,
-        },
-        bulb: {
-          color_temp: 2700,
-        }
-      },
-    },
-    periodicallyActive: {
-      /**
-       * This MUST either be set here (restriction: 'always' or periodicallyActive: true)
-       * or on an override for partial filtering to work properly.
-       */
-      restriction: 'dawnAndDusk',
-      /**
-       * Can override any of the periodicFilters defaults configured in defaults.periodicFilters above.
-       */     
-      paddingFromSunEvent: {
-        sunrise: 1.5 * HOUR,
-        sunset: 1.5 * HOUR,
-      }
-    },
-  },
-  {
-    /**
-     * Id that filter properties on devices can reference to use this filter
-     */
-    id: 'sunEvents-nightlights',
-
-    /**
-     * Label for the filter (defaults to pluginName if missing)
-     */
-    globalLabel: 'Brightness and color control for nightlights',
-
-    /**
-      * Name of the filter plugin (maps to 'filters/name.js' )
-      * 
-      * pluginName:
-      */
-    pluginName: 'sunEvents',
-
-    /**
-     * State data for the filter. Properties must be valid IOT.SMARTBULB parameters.
-     * 
-     * Example for sunEvents:
-     * 
-     * stateData: {
-     *  brightness: {
-     *    value: 90,
-     *    altValue: 10,
-     *  }
-     * }
-     *
-     */
-    
-    // Should this filter be invoked when a switch is turned on or off?
-    switchPosition: true,
-
-    /**
-     * Populate this to add the filter to the periodic filter service runs.
-     *  
-     * Example: 
-     * 
-     * periodicallyActive: {
-     *  interval: 1 * MINUTE,
-     *  restriction: 'duskToDawn'
-     * }
-     */
-    periodicallyActive: {
-      /**
-       * Set the interval at which the filter should be run against this device.
-       * 
-       * interval:
-       */
-      interval: 1 * MINUTE,
-
-      /**
-       * Restrict the operation of the filter to certain times of the day.
-       * 
-       * Must be one of the following: duskToDawn
-       * 
-       * restriction:
-       */
-      restriction: 'duskToDawn',
-    },
-
-    settings: {
-      // Settings specific to the sunEvents filter
-      /**
-       * Specify across what time window the transition should occur.
-       * If not set or 0, it will be instant.
-       */
-      transitionTime: 2 * HOUR,
-
-      /**
-       * Specify an optional offset at which the transition should occur.
-       * The offset shifts the transition to before or after the sun event.
-       */
-      offset: 0 * HOUR,
-
-      /**
-       * If atDawnAndDuskOnly is set, apply optional padding on both sides of the time window
-       * resulting from the above parameters.
-       */
-      padding: 5 * MINUTE,
-    },
-  },
-  {
-    id: 'sunEvents-outdoorLights',
-    globalLabel: 'Control for outdoor illumination',
-    pluginName: 'sunEvents',
-    settings: {
-      transitionTime: 1 * HOUR,
-      offset: {
-        sunset: 30 * MINUTE,
-        sunrise: -30 * MINUTE,
-      }
-    },
-    periodicallyActive: {
-      restriction: 'dusk',
-    },
-    stateData: {
-      brightness: {
-        value: 0,
-        altValue: 5,
-      },
-      on_off: {
-        value: 0,
-        altValue: 1,
-      }
-    }
-  },
-  {
-    id: 'schedule-outdoorLights',
-    pluginName: 'schedule',
-    periodicallyActive: true,
-    schedule: [
-      /**
-       * The pair of items below turns the lamp on 45 minutes before sunset by overwriting
-       * the on_off and brightness properties for the stateData passed in 
-       * (possibly the output from another filter).
-       * 
-       * A minute later, the override is disabled and the stateData will just pass through,
-       * (it may be empty or come from naturalLight and/or sunEvents).
-      */
-      
-      /* 
-       * This schedule item gets triggered by sunset, with an offset.
-       * It runs a filter instead of defining data here.
-       */
-      {
-        trigger: {
-          event: 'sunset',
-          offset: -45 * MINUTE,
-        },
-        stateData: {
-          onOff: 1,
-          brightness: 1,
-        },
-      },
-      /**
-       * This item rescinds the previous one a minute later
-       */
-      {
-        trigger: {
-          event: 'sunset',
-          offset: -44 * MINUTE,
-        },
-        stateData: {
-        },
-      },
-
-
-      /**
-       * This is a plain schedule item - specify a time and stateData.
-       */
-      {
-        trigger: {
-          hours: 23,
-          minutes: 0,  
-        },
-        stateData: {
-          brightness: 1,
-        }
-      },      
-
-      /**
-       * This item, with an empty stateData object, will
-       * clear whatever adjustments the preceding item made,
-       * letting the input stateData pass through.
-       */
-      {
-        trigger: {
-          hours: 5,
-        },
-        stateData: {
-        }
-      },
-
-      /**
-       * The following pair of items turns the lamp off at sunrise by overwriting
-       * the on_off property for the stateData passed in (possibly output from another filter)
-       * A minute later, the override is disabled and the output from the previous filter
-       * can pass through.
-       */
-      
-      /**
-       * This schedule item gets triggered by sunrise, with an offset.
-       * It runs a filter instead of defining data here.
-       */
-       {
-        trigger: {
-          event: 'sunrise',          
-        },
-        stateData: {
-          onOff: 0,
-        },
-      },
-      /**
-       * This item rescinds the previous one a minute later
-       */
-      {
-        trigger: {
-          event: 'sunrise',
-          offset: 1 * MINUTE,
-        },
-        stateData: {
-        },
-      },      
-    ],
-  }
-];
-
 const globalConfig = {
 
   [SUBTYPE_BULB]: {
@@ -359,8 +17,393 @@ const globalConfig = {
     pollInterval: 5000,
   },
 
-  defaults,
-  filters,
+  defaults: {
+    /**
+     * Devices
+     */
+    pollInterval: 10000,
+    offlineTolerance: 3,
+  
+    periodicFilters: {
+      /**
+       * How often should the service check for filters to be run?
+       */
+      checkInterval: 10 * SECOND,    
+      /**
+       * How long before and after sunrise/sunset should the filter be executed when it has the
+       * periodicallyActive flag set?
+       */
+      paddingFromSunEvent: 2 * HOUR,
+    }
+  },
+  
+  /**
+   * Global filter definitions
+   */
+  filters: [
+    {
+      id: 'externalFlags',
+      globalLabel: 'Action based on flags in LifeLog',
+      pluginName: 'externalFlags',
+      settings: {
+        /**
+         * Specify an URL that will respond with JSON data (boolean flags).
+         */
+        url: 'http://lifelog.wnet.wn/ajax.php?action=getFlags',
+
+        /**
+         * The path to the flags properties in the JSON response. Defaults to 'flags'.
+         */
+        //jsonPath: 'flags'
+      },
+      periodicallyActive: true,
+    },
+    {
+      id: 'nighttimeGlim',
+      pluginName: 'externalFlags',
+      settings: {
+        /**
+         * Specify an URL that will respond with JSON data (boolean flags).
+         */
+        url: 'http://lifelog.wnet.wn/ajax.php?action=getFlags',
+
+
+        flag: 'sleep_wake',
+
+        /**
+         * The path to the flags properties in the JSON response. Defaults to 'flags'.
+         */
+        //jsonPath: 'flags'
+      },
+      stateData: {
+        on_off: {
+          value: 0,
+          altValue: 1,
+        },
+        brightness: {
+          value: 0,
+          altValue: 2,
+        },
+        hue: { 
+          value: 240,
+          altValue: 240,
+        },
+        saturation: {
+          value: 0,
+          altValue: 100,
+        },
+      },
+
+      periodicallyActive: true,
+    },
+    {
+      id: 'naturalLight',
+      globalLabel: 'Automatic color temperature control',
+      pluginName: 'naturalLight',
+      settings: {
+        transitionTime: 1 * HOUR,
+        offset: {
+          /**
+           * Offset the shift from sunrise?
+           */
+          sunrise: +1 * HOUR,
+          /**
+           * Offset the shift from sunset?
+           */
+          sunset: -1 * HOUR,
+        },
+        /**
+         * Define daytime and nighttime defaults for each light type
+         */
+        daytimeState: {
+          ledStrip: {
+            hue: 227,
+            saturation: 23,
+          },
+          bulb: {
+            color_temp: 6000,
+          }
+        },
+        nighttimeState: {
+          ledStrip: {
+            hue: 20,
+            saturation: 20,
+          },
+          bulb: {
+            color_temp: 2700,
+          }
+        },
+      },
+      periodicallyActive: {
+        /**
+         * This MUST either be set here (restriction: 'always' or periodicallyActive: true)
+         * or on an override for partial filtering to work properly.
+         */
+        restriction: 'dawnAndDusk',
+        /**
+         * Can override any of the periodicFilters defaults configured in defaults.periodicFilters above.
+         */     
+        paddingFromSunEvent: {
+          sunrise: 1.5 * HOUR,
+          sunset: 1.5 * HOUR,
+        }
+      },
+    },
+    {
+      /**
+       * Id that filter properties on devices can reference to use this filter
+       */
+      id: 'sunEvents-nightlights',
+
+      /**
+       * Label for the filter (defaults to pluginName if missing)
+       */
+      globalLabel: 'Brightness and color control for nightlights',
+
+      /**
+        * Name of the filter plugin (maps to 'filters/name.js' )
+        * 
+        * pluginName:
+        */
+      pluginName: 'sunEvents',
+
+      /**
+       * State data for the filter. Properties must be valid IOT.SMARTBULB parameters.
+       * 
+       * Example for sunEvents:
+       * 
+       * stateData: {
+       *  brightness: {
+       *    value: 90,
+       *    altValue: 10,
+       *  }
+       * }
+       *
+       */
+      
+      // Should this filter be invoked when a switch is turned on or off?
+      switchPosition: true,
+
+      /**
+       * Populate this to add the filter to the periodic filter service runs.
+       *  
+       * Example: 
+       * 
+       * periodicallyActive: {
+       *  interval: 1 * MINUTE,
+       *  restriction: 'duskToDawn'
+       * }
+       */
+      periodicallyActive: {
+        /**
+         * Set the interval at which the filter should be run against this device.
+         * 
+         * interval:
+         */
+        interval: 1 * MINUTE,
+
+        /**
+         * Restrict the operation of the filter to certain times of the day.
+         * 
+         * Must be one of the following: duskToDawn
+         * 
+         * restriction:
+         */
+        restriction: 'duskToDawn',
+      },
+
+      settings: {
+        // Settings specific to the sunEvents filter
+        /**
+         * Specify across what time window the transition should occur.
+         * If not set or 0, it will be instant.
+         */
+        transitionTime: 2 * HOUR,
+
+        /**
+         * Specify an optional offset at which the transition should occur.
+         * The offset shifts the transition to before or after the sun event.
+         */
+        offset: 0 * HOUR,
+
+        /**
+         * If atDawnAndDuskOnly is set, apply optional padding on both sides of the time window
+         * resulting from the above parameters.
+         */
+        padding: 5 * MINUTE,
+      },
+    },
+    {
+      id: 'sunEvents-outdoorLights',
+      globalLabel: 'Control for outdoor illumination',
+      pluginName: 'sunEvents',
+      settings: {
+        transitionTime: 1 * HOUR,
+        offset: {
+          sunset: 30 * MINUTE,
+          sunrise: -30 * MINUTE,
+        }
+      },
+      periodicallyActive: {
+        restriction: 'dusk',
+      },
+      stateData: {
+        brightness: {
+          value: 0,
+          altValue: 5,
+        },
+        on_off: {
+          value: 0,
+          altValue: 1,
+        }
+      }
+    },
+    {
+      id: 'schedule-outdoorLights',
+      pluginName: 'schedule',
+      periodicallyActive: true,
+      schedule: [
+        /**
+         * The pair of items below turns the lamp on 45 minutes before sunset by overwriting
+         * the on_off and brightness properties for the stateData passed in 
+         * (possibly the output from another filter).
+         * 
+         * A minute later, the override is disabled and the stateData will just pass through,
+         * (it may be empty or come from naturalLight and/or sunEvents).
+        */
+        
+        /* 
+        * This schedule item gets triggered by sunset, with an offset.
+        * It runs a filter instead of defining data here.
+        */
+        {
+          trigger: {
+            event: 'sunset',
+            offset: -45 * MINUTE,
+          },
+          stateData: {
+            onOff: 1,
+            brightness: 1,
+          },
+        },
+        /**
+         * This item rescinds the previous one a minute later
+         */
+        {
+          trigger: {
+            event: 'sunset',
+            offset: -44 * MINUTE,
+          },
+          stateData: {
+          },
+        },
+
+
+        /**
+         * This is a plain schedule item - specify a time and stateData.
+         */
+        {
+          trigger: {
+            hours: 23,
+            minutes: 0,  
+          },
+          stateData: {
+            brightness: 1,
+          }
+        },      
+
+        /**
+         * This item, with an empty stateData object, will
+         * clear whatever adjustments the preceding item made,
+         * letting the input stateData pass through.
+         */
+        {
+          trigger: {
+            hours: 5,
+          },
+          stateData: {
+          }
+        },
+
+        /**
+         * The following pair of items turns the lamp off at sunrise by overwriting
+         * the on_off property for the stateData passed in (possibly output from another filter)
+         * A minute later, the override is disabled and the output from the previous filter
+         * can pass through.
+         */
+        
+        /**
+         * This schedule item gets triggered by sunrise, with an offset.
+         * It runs a filter instead of defining data here.
+         */
+        {
+          trigger: {
+            event: 'sunrise',          
+          },
+          stateData: {
+            onOff: 0,
+          },
+        },
+        /**
+         * This item rescinds the previous one a minute later
+         */
+        {
+          trigger: {
+            event: 'sunrise',
+            offset: 1 * MINUTE,
+          },
+          stateData: {
+          },
+        },      
+      ],
+    }
+  ],
+
+  /**
+   * Device Group Definitions
+   */
+  groups: [
+    {
+      id: "Bed Shelf Lights",
+      channels: [ 38 ],
+      linkedDevices: [
+        { 
+          channel: 101,
+          // Sync the switch to the powerstate of this device or just toggle it?
+          sync: true,
+          // Only has effect if sync === true: should the device be inversely synced
+          inverse: false,
+          // Sync/toggle when this device is set to the on position
+          onPosition: true, 
+          // Sync/toggle when this device is set to the off position
+          offPosition: true,
+          // NOT YET IMPLEMENTED: Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
+          onlyWhenSameStateAs: []
+        },
+        // When this light goes off, take channel 2 with.
+        { channel: 2, sync: true, onPosition: false, offPosition: true },
+      ],  
+    },
+    {
+      id: "Jess Desk Lights",
+      channels: [ 31, 32, 33, 36, 40 ],
+      linkedDevices: [
+        { 
+          channel: 34,
+          // Sync the switch to the powerstate of this device or just toggle it?
+          sync: true,
+          // Only has effect if sync === true: should the device be inversely synced
+          inverse: false,
+          // Sync/toggle when this device is set to the on position
+          onPosition: true, 
+          // Sync/toggle when this device is set to the off position
+          offPosition: true,
+          // NOT YET IMPLEMENTED: Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
+          onlyWhenSameStateAs: []
+        },
+      ],  
+    }
+  ],
 }
 
 const deviceMap = [
@@ -789,23 +832,23 @@ const deviceMap = [
         },
       },
     ],
-    linkedDevices: [
-      { 
-        channel: 101,
-        // Sync the switch to the powerstate of this device or just toggle it?
-        sync: true,
-        // Only has effect if sync === true: should the device be inversely synced
-        inverse: false,
-        // Sync/toggle when this device is set to the on position
-        onPosition: true, 
-        // Sync/toggle when this device is set to the off position
-        offPosition: true,
-        // NOT YET IMPLEMENTED: Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
-        onlyWhenSameStateAs: []
-      },
-      // When this light goes off, take channel 2 with.
-      { channel: 2, sync: true, onPosition: false, offPosition: true },
-    ],
+  //   linkedDevices: [
+  //     { 
+  //       channel: 101,
+  //       // Sync the switch to the powerstate of this device or just toggle it?
+  //       sync: true,
+  //       // Only has effect if sync === true: should the device be inversely synced
+  //       inverse: false,
+  //       // Sync/toggle when this device is set to the on position
+  //       onPosition: true, 
+  //       // Sync/toggle when this device is set to the off position
+  //       offPosition: true,
+  //       // NOT YET IMPLEMENTED: Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
+  //       onlyWhenSameStateAs: []
+  //     },
+  //     // When this light goes off, take channel 2 with.
+  //     { channel: 2, sync: true, onPosition: false, offPosition: true },
+  //   ],
   },
   {
     alias: 'Jess Bed Switch',

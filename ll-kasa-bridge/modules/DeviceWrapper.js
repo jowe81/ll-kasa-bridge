@@ -363,6 +363,39 @@ const cmdFailPrefix = '[FAIL]';
           
     return resolvedFilters;
   },
+
+  /**
+   * Return linked devices that are defined on linked groups
+   */
+  getLinkedDevicesFromGroups() {
+
+    const linkedDevices = [];
+
+    const haveLinkedDeviceDefinitionAlready = (linkedDeviceDefinition) => {
+      return linkedDevices.find(existingDefinition => existingDefinition.channel === linkedDeviceDefinition.channel)
+    }
+
+    if (Array.isArray(this.groups)) {
+      
+      // Go through each group
+      this.groups.forEach(groupId => {
+        const group = this.globalConfig.groups?.find(group => group.id === groupId);
+
+        if (group && Array.isArray(group.linkedDevices)) {
+          // Go through each linked device definition on this group
+          group.linkedDevices.forEach(groupLinkedDeviceDefinition => {
+
+            // Add this definition only if a definition for this channel hasn't been collected yet.
+            if (!haveLinkedDeviceDefinitionAlready(groupLinkedDeviceDefinition)) {
+              linkedDevices.push(groupLinkedDeviceDefinition);
+            }
+          });          
+        }        
+      });
+    }
+
+    return linkedDevices;    
+  },
  
   injectDevice(device, mapItem, globalConfig, deviceEventCallback) {
     this.device = device;
@@ -407,10 +440,6 @@ const cmdFailPrefix = '[FAIL]';
   // After a change, see if linked devices need to be adjusted
   processLinkedDevices(changeInfo) {
 
-    if (!this.linkedDevices || !this.linkedDevices.length) {
-      return;
-    }
-
     // Do we have state data for this device?
     const newStateBool = this.getPowerState();
 
@@ -418,8 +447,22 @@ const cmdFailPrefix = '[FAIL]';
       log(`Connected devices check failed (no state data for this device)`, this, 'red');
       return;
     }
+
+    // If this device is a member of a group with a linkedDevices property, use those instead of a possibly existing local linkedDevices array    
+    let linkedDevices = this.getLinkedDevicesFromGroups();
+
+    if (!linkedDevices.length) {
+      // Not a member of groups with linked devices. Use the local definition.
+      if (Array.isArray(this.linkedDevices)) {
+        linkedDevices = this.linkedDevices;
+      }
+    }
+
+    if (!(linkedDevices && linkedDevices.length)) {
+      return;
+    }
     
-    this.linkedDevices.forEach(linkInfo => {                    
+    linkedDevices.forEach(linkInfo => {      
       const linkedWrapper = this.devicePool.getDeviceWrapperByChannel(linkInfo.channel);
 
       if (this.type !== 'IOT.SMARTBULB' && changeInfo.origin === constants.SERVICE_BACKEND && linkedWrapper.type === 'IOT.SMARTPLUGSWITCH') {
