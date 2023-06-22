@@ -236,7 +236,7 @@ const cmdFailPrefix = '[FAIL]';
         const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(target.channel)
         if (deviceWrapper) {
           const delay = target.delay ?? 0;
-          setTimeout(() => deviceWrapper.setPowerState(target.data, originDeviceWrapper), delay);
+          setTimeout(() => deviceWrapper.setPowerState(target.stateData, originDeviceWrapper), delay);
         }
       });    
     }
@@ -252,8 +252,8 @@ const cmdFailPrefix = '[FAIL]';
         if (deviceWrapper) {
           
           // Is there data in this target object?
-          if (target.data) {
-            const commandObject = getCommandObjectFromTargetData(target.data);          
+          if (target.stateData) {
+            const commandObject = getCommandObjectFromTargetData(target.stateData);          
 
             if (!commandObject) {
               return;

@@ -469,28 +469,28 @@ const deviceMap = [
     targets: {
       'on': {
         'powerState': [           
-          { channel: 5, data: true },  // Turn fan on
-          { channel: 4, data: false }, // Turn heater off          
-          { channel: 39, data: true }, // Turn audio amp on both ways
+          { channel: 5, stateData: true },  // Turn fan on
+          { channel: 4, stateData: false }, // Turn heater off          
+          { channel: 39, stateData: true }, // Turn audio amp on both ways
         ],
         'lightState': [
           { 
             channel: 2, 
-            data: {
+            stateData: {
               on_off: 1,
               brightness: 95,
             }
           },
           { 
             channel: 3,
-            data: {
+            stateData: {
               on_off: 1,
               brightness: 95,
             }
           },
           { 
             channel: 16,
-            data: {
+            stateData: {
               on_off: 1,
               brightness: 20,
               hue: 240,
@@ -499,7 +499,7 @@ const deviceMap = [
           },
           { 
             channel: 37,
-            data: {
+            stateData: {
               on_off: 1,
               brightness: 20,
               hue: 240,
@@ -510,28 +510,28 @@ const deviceMap = [
       },
       'off': {
         'powerState': [
-          { channel: 5, data: false }, // Turn fan off
-          { channel: 4, data: true },  // Turn heater on
-          { channel: 39, data: true }, // Turn audio amp on both ways
+          { channel: 5, stateData: false }, // Turn fan off
+          { channel: 4, stateData: true },  // Turn heater on
+          { channel: 39, stateData: true }, // Turn audio amp on both ways
         ],
         'lightState': [
           { 
             channel: 2, 
-            data: {
+            stateData: {
               on_off: 1,
               brightness: 95,
             }
           },
           { 
             channel: 3,
-            data: {
+            stateData: {
               on_off: 1,
               brightness: 95,
             }
           },          
           { 
             channel: 16,
-            data: {
+            stateData: {
               on_off: 1,
               brightness: 20,
               hue: 277,
@@ -540,7 +540,7 @@ const deviceMap = [
           },
           { 
             channel: 37,
-            data: {
+            stateData: {
               on_off: 1,
               brightness: 20,
               hue: 277,
@@ -628,12 +628,12 @@ const deviceMap = [
     targets: {
       'on': {
         'powerState': [ //Lights above the desk and desk lamp
-          { channel: 36, data: true }, 
+          { channel: 36, stateData: true }, 
         ],
         'lightState': [
           {
             channel: 31,
-            data: {
+            stateData: {
               on_off: 1,
             },
             filters: [ { refId: 'naturalLight' }],
@@ -641,7 +641,7 @@ const deviceMap = [
           },
           {
             channel: 32,
-            data: {
+            stateData: {
               on_off: 1,
             },
             filters: [ { refId: 'naturalLight' }],
@@ -649,7 +649,7 @@ const deviceMap = [
           },
           {
             channel: 33,
-            data: {
+            stateData: {
               on_off: 1,
             },
             filters: [ { refId: 'naturalLight' }],
@@ -657,7 +657,7 @@ const deviceMap = [
           },
           {
             channel: 40,
-            data: {
+            stateData: {
               brightness: 95,
               on_off: 1,
             },
@@ -667,11 +667,11 @@ const deviceMap = [
       },
       'off': {
         'powerState': [
-          { channel: 31, data: false }, 
-          { channel: 32, data: false }, 
-          { channel: 33, data: false }, 
-          { channel: 36, data: false },
-          { channel: 40, data: false, delay: 1000 }, 
+          { channel: 31, stateData: false }, 
+          { channel: 32, stateData: false }, 
+          { channel: 33, stateData: false }, 
+          { channel: 36, stateData: false },
+          { channel: 40, stateData: false, delay: 1000 }, 
         ],
       }
     }   
@@ -831,7 +831,7 @@ const deviceMap = [
         'lightState': [
           { 
             channel: 38, 
-            data: {
+            stateData: {
               brightness: 80, 
               on_off: 1,
               saturation: 0,
@@ -843,7 +843,7 @@ const deviceMap = [
         'lightState': [
           { 
             channel: 38, 
-            data: {
+            stateData: {
               on_off: 0, 
               transition: 20000
             }
