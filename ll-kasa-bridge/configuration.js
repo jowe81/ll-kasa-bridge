@@ -467,88 +467,80 @@ const deviceMap = [
     id: "8006E7EB4A66E3687708A7ABF93FB237200DCDA4",
     subType: SUBTYPE_SWITCH,
     targets: {
-      'on': {
-        'powerState': [           
-          { channel: 5, stateData: true },  // Turn fan on
-          { channel: 4, stateData: false }, // Turn heater off          
-          { channel: 39, stateData: true }, // Turn audio amp on both ways
-        ],
-        'lightState': [
-          { 
-            channel: 2, 
-            stateData: {
-              on_off: 1,
-              brightness: 95,
-            }
-          },
-          { 
-            channel: 3,
-            stateData: {
-              on_off: 1,
-              brightness: 95,
-            }
-          },
-          { 
-            channel: 16,
-            stateData: {
-              on_off: 1,
-              brightness: 20,
-              hue: 240,
-              saturation: 100,
-            }
-          },
-          { 
-            channel: 37,
-            stateData: {
-              on_off: 1,
-              brightness: 20,
-              hue: 240,
-              saturation: 100,
-            }
-          },
-        ],
-      },
-      'off': {
-        'powerState': [
-          { channel: 5, stateData: false }, // Turn fan off
-          { channel: 4, stateData: true },  // Turn heater on
-          { channel: 39, stateData: true }, // Turn audio amp on both ways
-        ],
-        'lightState': [
-          { 
-            channel: 2, 
-            stateData: {
-              on_off: 1,
-              brightness: 95,
-            }
-          },
-          { 
-            channel: 3,
-            stateData: {
-              on_off: 1,
-              brightness: 95,
-            }
-          },          
-          { 
-            channel: 16,
-            stateData: {
-              on_off: 1,
-              brightness: 20,
-              hue: 277,
-              saturation: 100,
-            }
-          },
-          { 
-            channel: 37,
-            stateData: {
-              on_off: 1,
-              brightness: 20,
-              hue: 277,
-              saturation: 100,
-            }
-          },
-        ],
-      }
+      on: [
+        { channel: 5, stateData: true },  // Turn fan on
+        { channel: 4, stateData: false }, // Turn heater off          
+        { channel: 39, stateData: true }, // Turn audio amp on both ways
+        { 
+          channel: 2, 
+          stateData: {
+            on_off: 1,
+            brightness: 95,
+          }
+        },
+        { 
+          channel: 3,
+          stateData: {
+            on_off: 1,
+            brightness: 95,
+          }
+        },
+        { 
+          channel: 16,
+          stateData: {
+            on_off: 1,
+            brightness: 20,
+            hue: 240,
+            saturation: 100,
+          }
+        },
+        { 
+          channel: 37,
+          stateData: {
+            on_off: 1,
+            brightness: 20,
+            hue: 240,
+            saturation: 100,
+          }
+        },
+      ],
+      off: [
+        { channel: 5, stateData: false }, // Turn fan off
+        { channel: 4, stateData: true },  // Turn heater on
+        { channel: 39, stateData: true }, // Turn audio amp on both ways
+        { 
+          channel: 2, 
+          stateData: {
+            on_off: 1,
+            brightness: 95,
+          }
+        },
+        { 
+          channel: 3,
+          stateData: {
+            on_off: 1,
+            brightness: 95,
+          }
+        },          
+        { 
+          channel: 16,
+          stateData: {
+            on_off: 1,
+            brightness: 20,
+            hue: 277,
+            saturation: 100,
+          }
+        },
+        { 
+          channel: 37,
+          stateData: {
+            on_off: 1,
+            brightness: 20,
+            hue: 277,
+            saturation: 100,
+          }
+        },
+      ],
     }   
   },
   {
@@ -626,54 +618,48 @@ const deviceMap = [
     id: "800686BE89C5D37A63B4E70AB37689212066F343",
     subType: SUBTYPE_SWITCH,
     targets: {
-      'on': {
-        'powerState': [ //Lights above the desk and desk lamp
-          { channel: 36, stateData: true }, 
-        ],
-        'lightState': [
-          {
-            channel: 31,
-            stateData: {
-              on_off: 1,
-            },
-            filters: [ { refId: 'naturalLight' }],
-            delay: 2000,
+      on: [
+        {
+          channel: 31,
+          stateData: {
+            on_off: 1,
           },
-          {
-            channel: 32,
-            stateData: {
-              on_off: 1,
-            },
-            filters: [ { refId: 'naturalLight' }],
-            delay: 2000,
+          filters: [ { refId: 'naturalLight' }],
+          delay: 2000,
+        },
+        {
+          channel: 32,
+          stateData: {
+            on_off: 1,
           },
-          {
-            channel: 33,
-            stateData: {
-              on_off: 1,
-            },
-            filters: [ { refId: 'naturalLight' }],
-            delay: 1000,
+          filters: [ { refId: 'naturalLight' }],
+          delay: 2000,
+        },
+        {
+          channel: 33,
+          stateData: {
+            on_off: 1,
           },
-          {
-            channel: 40,
-            stateData: {
-              brightness: 95,
-              on_off: 1,
-            },
-            filters: [ { refId: 'naturalLight' }],
-          }
-        ]
-      },
-      'off': {
-        'powerState': [
-          { channel: 31, stateData: false }, 
-          { channel: 32, stateData: false }, 
-          { channel: 33, stateData: false }, 
-          { channel: 36, stateData: false },
-          { channel: 40, stateData: false, delay: 1000 }, 
-        ],
-      }
+          filters: [ { refId: 'naturalLight' }],
+          delay: 1000,
+        },
+        { channel: 36, stateData: true }, 
+        {
+          channel: 40,
+          stateData: {
+            brightness: 95,
+            on_off: 1,
+          },
+          filters: [ { refId: 'naturalLight' }],
+        }
+      ],
+      off: [
+        { channel: 31, stateData: false }, 
+        { channel: 32, stateData: false }, 
+        { channel: 33, stateData: false }, 
+        { channel: 36, stateData: false },
+        { channel: 40, stateData: false, delay: 5000 }, 
+      ],
     }   
   },
   {
@@ -827,29 +813,25 @@ const deviceMap = [
     id: "8006000F366B7DD70835CBF38A51040620662083",
     subType: SUBTYPE_SWITCH, 
     targets: {
-      'on': {
-        'lightState': [
-          { 
-            channel: 38, 
-            stateData: {
-              brightness: 80, 
-              on_off: 1,
-              saturation: 0,
-            }
-          },
-        ]
-      },
-      'off': {
-        'lightState': [
-          { 
-            channel: 38, 
-            stateData: {
-              on_off: 0, 
-              transition: 20000
-            }
-          },
-        ]
-      }
+      on: [
+        { 
+          channel: 38, 
+          stateData: {
+            brightness: 80, 
+            on_off: 1,
+            saturation: 0,
+          }
+        },
+      ],
+      off: [
+        { 
+          channel: 38, 
+          stateData: {
+            on_off: 0, 
+            transition: 20000
+          }
+        },
+      ]
     }   
   },
   { 

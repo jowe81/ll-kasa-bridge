@@ -193,33 +193,44 @@ const cmdFailPrefix = '[FAIL]';
 
   executeCommands(event, originDeviceWrapper) {
 
-      // Get targets and data from device configuration
-      const targetsForOnPosition = {
-        'powerState': this.targets?.on?.powerState,
-        'lightState': this.targets?.on?.lightState,
-      };
+    // Get targets and data from device configuration
+    const targetsForOnPosition = {
+      'powerState': this.targets?.on?.powerState,
+      'lightState': this.targets?.on?.lightState,
+    };
 
-      const targetsForOffPosition = {
-        'powerState': this.targets?.off?.powerState,
-        'lightState': this.targets?.off?.lightState,
-      };
+    const targetsForOffPosition = {
+      'powerState': this.targets?.off?.powerState,
+      'lightState': this.targets?.off?.lightState,
+    };
+    
+    // Also support definitions with no separation between powerState and lightState
+    if (Array.isArray(this.targets?.on)) {
+      targetsForOnPosition.powerState = this.targets.on.filter(target => typeof target.stateData === 'boolean');
+      targetsForOnPosition.lightState = this.targets.on.filter(target => typeof target.stateData === 'object');
+    }
+
+    if (Array.isArray(this.targets?.off)) {
+      targetsForOffPosition.powerState = this.targets.off.filter(target => typeof target.stateData === 'boolean');
+      targetsForOffPosition.lightState = this.targets.off.filter(target => typeof target.stateData === 'object');
+    }
+    
+    let targets = null;
+    let triggerSwitchPosition = null;
+
+    switch (event) {
+      case 'power-on':
+        triggerSwitchPosition = true;
+        break;
       
-      let targets = null;
-      let triggerSwitchPosition = null;
+      case 'power-off':
+        triggerSwitchPosition = false;
+        break;
+    }
 
-      switch (event) {
-        case 'power-on':
-          triggerSwitchPosition = true;
-          break;
-        
-        case 'power-off':
-          triggerSwitchPosition = false;
-          break;
-      }
-
-      if (triggerSwitchPosition !== null) {
-        targets = triggerSwitchPosition ? targetsForOnPosition : targetsForOffPosition;
-      }
+    if (triggerSwitchPosition !== null) {
+      targets = triggerSwitchPosition ? targetsForOnPosition : targetsForOffPosition;
+    }
 
 
     if (!targets) {
@@ -230,7 +241,7 @@ const cmdFailPrefix = '[FAIL]';
     if (targets.powerState) {
       const list = targets.powerState.map(target => JSON.stringify(target));
 
-      log(`Targets: [${list.join(', ')}]`, this);
+      log(`${event}, targets: [${list.join(', ')}]`, this);
 
       targets.powerState.forEach(target => {
         const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(target.channel)
