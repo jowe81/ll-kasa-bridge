@@ -5,7 +5,7 @@ import constants from '../constants.js';
 import DeviceWrapper from './DeviceWrapper.js';
 import { log } from './Log.js';
 
-import { isBetweenDuskAndDawn, isDawnOrDusk, getFromSettingsForNextSunEvent } from '../helpers/jDateTimeUtils.js';
+import { isBetweenDuskAndDawn, isDawnOrDusk, isDawn, isDusk, getFromSettingsForNextSunEvent } from '../helpers/jDateTimeUtils.js';
 import { loadFilterFunctions } from './Filters.js';
 
 /**

@@ -297,6 +297,8 @@ export {
   getNextSunEvent,
   isBetweenDuskAndDawn,
   isDawnOrDusk,
+  isDawn,
+  isDusk,
   isAm,
   isPm,
   isDaytime,  

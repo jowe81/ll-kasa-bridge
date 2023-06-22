@@ -230,12 +230,12 @@ const filters = [
       }
     },
     periodicallyActive: {
-      restriction: 'duskToDawn'
+      restriction: 'dusk',
     },
     stateData: {
       brightness: {
         value: 0,
-        altValue: 6,
+        altValue: 5,
       },
       on_off: {
         value: 0,
@@ -290,7 +290,7 @@ const filters = [
       {
         trigger: {
           hours: 23,
-          minutes: 30,  
+          minutes: 0,  
         },
         stateData: {
           brightness: 1,
