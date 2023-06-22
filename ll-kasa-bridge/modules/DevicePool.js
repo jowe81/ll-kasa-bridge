@@ -20,8 +20,8 @@ const devicePool = {
 
   async initialize(db, io, deviceEventCallback) {
     this.db = db;
-    this.dbDeviceMap = db.collection('deviceMap');
-    this.dbConfig = this.db.collection('config');
+    this.dbDeviceMap = db.collection('DeviceMap');
+    this.dbConfig = this.db.collection('Config');
     this.devices = [];
 
     // This function will be injected into the device wrapper and called on device events

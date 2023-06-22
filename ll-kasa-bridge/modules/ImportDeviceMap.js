@@ -1,26 +1,26 @@
-import { globalConfig } from '../configuration.js';
+import { log } from "../helpers/jUtils.js";
 
 const importDeviceMapItem = (db, deviceMapItem, overwriteExisting) => {
   return new Promise((resolve, reject) => {
-    const dbDeviceMap = db.collection('deviceMap');
+    const dbDeviceMap = db.collection('DeviceMap');
     if (deviceMapItem) {
       const query = { 'id': deviceMapItem.id };
       dbDeviceMap
         .findOne(query)
         .then(data => {
           if (data === null) {
-            console.log(`Inserting ${deviceMapItem.id} (${deviceMapItem.alias})`); 
+            log(`Inserting ${deviceMapItem.id} (${deviceMapItem.alias})`); 
             dbDeviceMap
               .insertOne(deviceMapItem)
               .then(resolve);
           } else {
             if (overwriteExisting) {
-              console.log(`Overwriting ${deviceMapItem.id} (${deviceMapItem.alias})`); 
+              log(`Overwriting ${deviceMapItem.id} (${deviceMapItem.alias})`); 
               dbDeviceMap
                 .replaceOne(query, deviceMapItem)
                 .then(resolve);
             } else {
-              console.log('not overwriting');
+              log('not overwriting');
               resolve(data);
             }
           }
@@ -40,12 +40,12 @@ const importDeviceMap = (db, deviceMap, options) => {
         promises.push(importDeviceMapItem(db, mapItem, options.overwriteExisting));
       });
 
-      console.log(`Importing device map ...`);
+      log(`Importing device map ...`);
 
       Promise
         .all(promises)
         .then(data => {
-          console.log(`Device map import complete. Got ${data.length} items.`);
+          log(`Device map import complete. Got ${data.length} items.`);
           return resolve(data);
         })
         .catch(reject);
@@ -55,29 +55,37 @@ const importDeviceMap = (db, deviceMap, options) => {
   });
 }
 
-const importGlobalConfig = (db, globalConfig) => {
+const importArray = (db, array, name) => {
   return new Promise((resolve, reject) => {
-    const dbConfig = db.collection('config');
-    if (globalConfig) {
+    if (!array) {
+      reject(`${name} import failed. Nothing to import.`);
+    }
+    if (array) {
 
-      console.log(`Importing configuration ...`);
+      log(`Importing ${name} ...`);
 
-      dbConfig
+      const collection = db.collection(name);
+
+      collection
         .deleteMany({})
-        .then(() => dbConfig.insertOne(globalConfig))
+        .then(() => collection.insertOne(array))
         .then(data => { 
-          console.log(`Config import complete. `);
+          log(`${name} import complete. `);
           resolve(data);
         })
         .catch(err => {
-          console.log(`Config import failed. `, err);
+          log(`${name} import failed. `, err);
           reject(err);
         });
     }
   });  
+};
+
+const importGlobalConfig = (db, globalConfig) => {
+  return importArray(db, globalConfig, 'Config');
 }
 
 export {
   importDeviceMap,
-  importGlobalConfig
+  importGlobalConfig,
 }
