@@ -2,7 +2,9 @@ import _ from 'lodash';
 
 import constants from '../constants.js';
 import { log } from './Log.js';
-import { commandMatchesCurrentState, filter, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
+import { commandMatchesCurrentState, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
+import { getFilterFunctions } from "./Filters.js";
+
 
 const cmdPrefix = '[CMD]';
 const cmdFailPrefix = '[FAIL]';
@@ -251,14 +253,16 @@ const cmdFailPrefix = '[FAIL]';
           
           // Is there data in this target object?
           if (target.data) {
-            const commandObject = getCommandObjectFromTargetData(target.data);
+            const commandObject = getCommandObjectFromTargetData(target.data);          
 
             if (!commandObject) {
               return;
             }
+
+            const filtersToRun = this.getFilters(target.filters);
             
             const delay = target.delay ?? 0;                
-            setTimeout(() => deviceWrapper.setLightState(commandObject, triggerSwitchPosition, originDeviceWrapper, target.filters), delay);
+            setTimeout(() => deviceWrapper.setLightState(commandObject, triggerSwitchPosition, originDeviceWrapper, filtersToRun), delay);
 
           } else {
             log(`Ignoring empty target object`, this);
@@ -268,6 +272,43 @@ const cmdFailPrefix = '[FAIL]';
       });    
     }
   },
+
+  /**
+   * Perform filtering of a commandObject
+   * @param {*} filterObject 
+   * @param {*} commandObject 
+   * @returns the filtered commandObject
+   */
+  filter(filterObject, commandObject) {
+    const { pluginName } = filterObject;
+
+    if (!pluginName) {
+      return commandObject;
+    }
+
+    const filterFunctions = getFilterFunctions();
+
+    const filterFunction = filterFunctions[pluginName];
+    
+    if (filterFunction) {  
+      // Execute the filter plugin.
+      commandObject = filterFunction(
+        filterObject,
+        commandObject,
+        this,
+        filterFunctions, // Pass in the array of filter functions so filters can cross-reference.
+      );
+
+      if (constants.DEBUG) {
+        log(`Executed ${pluginName}/${filterObject.label}. Returned: ${JSON.stringify(commandObject)}`, this, 'debug');
+      }
+    } else {
+      log(`Filter plugin '${pluginName}' not found.`, this, 'red');
+    }
+
+    return commandObject;
+  },
+
 
   // Return power state as a boolean, regardless of the type of device
   getPowerState() {
@@ -291,9 +332,16 @@ const cmdFailPrefix = '[FAIL]';
     return powerState;
   },
 
-  getFilters() {
-    const rawFilters = this.filters;
-
+  /**
+   * Get an array of resolved filters.
+   * If nothing is passed in, get the filters defined on this device.
+   * If a rawFilters array is passed, resolve the filters passed in.
+   */
+  getFilters(rawFilters) {
+    if (!rawFilters) {
+      rawFilters = this.filters;
+    }
+    
     if (!(Array.isArray(rawFilters) && rawFilters.length)) {
       return [];
     };
@@ -447,7 +495,7 @@ const cmdFailPrefix = '[FAIL]';
 
     // Did it resolve?
     if (!referencedFilter) {
-      log(`Failed to resolve global filter definition: ${JSON.stringify(deviceFilterObject)}`, this, 'red');
+      log(`Failed to resolve filter reference: ${JSON.stringify(deviceFilterObject)}`, this, 'red');
       return null;
     }
 
@@ -503,7 +551,7 @@ const cmdFailPrefix = '[FAIL]';
           (switchPositionSetting !== null && switchPositionSetting === triggerSwitchPosition)
         ) {
           // switchPosition either is not set on the filter, or it matches the trigger switch position.
-          commandObject = filter(filterObject, commandObject, this);
+          commandObject = this.filter(filterObject, commandObject, true);
         }
       });  
     }

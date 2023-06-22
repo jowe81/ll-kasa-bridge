@@ -44,6 +44,44 @@ const filters = [
     periodicallyActive: true,
   },
   {
+    id: 'nighttimeGlim',
+    pluginName: 'externalFlags',
+    settings: {
+      /**
+       * Specify an URL that will respond with JSON data (boolean flags).
+       */
+      url: 'http://lifelog.wnet.wn/ajax.php?action=getFlags',
+
+
+      flag: 'sleep_wake',
+
+      /**
+       * The path to the flags properties in the JSON response. Defaults to 'flags'.
+       */
+      //jsonPath: 'flags'
+    },
+    stateData: {
+      on_off: {
+        value: 0,
+        altValue: 1,
+      },
+      brightness: {
+        value: 0,
+        altValue: 2,
+      },
+      hue: { 
+        value: 240,
+        altValue: 240,
+      },
+      saturation: {
+        value: 0,
+        altValue: 100,
+      },
+    },
+
+    periodicallyActive: true,
+  },
+  {
     id: 'naturalLight',
     globalLabel: 'Automatic color temperature control',
     pluginName: 'naturalLight',
@@ -632,7 +670,7 @@ const deviceMap = [
           { channel: 31, data: false }, 
           { channel: 32, data: false }, 
           { channel: 33, data: false }, 
-          { channel: 36, data: false }, 
+          { channel: 36, data: false },
           { channel: 40, data: false, delay: 1000 }, 
         ],
       }
@@ -645,7 +683,15 @@ const deviceMap = [
     subType: SUBTYPE_BULB,
     filters: [
       { refId: 'sunEvents-outdoorLights' },
-      { refId: 'naturalLight' },
+      { 
+        refId: 'naturalLight',
+        settings: {
+          offset: {
+            sunset: 0,
+            sunrise: 0,
+          }
+        }
+      },
       { refId: 'schedule-outdoorLights'},
     ],
   },
@@ -820,28 +866,7 @@ const deviceMap = [
     filters: [ 
       { refId: 'naturalLight'},
       {
-        refId: 'externalFlags',
-        stateData: {
-          on_off: {
-            value: 0,
-            altValue: 1,
-          },
-          brightness: {
-            value: 0,
-            altValue: 2,
-          },
-          hue: { 
-            value: 240,
-            altValue: 240,
-          },
-          saturation: {
-            value: 0,
-            altValue: 100,
-          },
-        },
-        settings: {
-          flag: 'sleep_wake',
-        }
+        refId: 'nighttimeGlim',
       }
     ],
   },

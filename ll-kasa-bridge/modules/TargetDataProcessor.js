@@ -1,9 +1,6 @@
 import _ from "lodash";
 
 import constants from "../constants.js";
-import { devicePool } from "./DevicePool.js";
-import { getFilterFunctions } from "./Filters.js";
-import { log } from './Log.js';
 
 /**
  * Reverse-generate a command object from a device's current state
@@ -139,42 +136,6 @@ const commandMatchesCurrentState = (deviceWrapper, commandObject) => {
   return result;
 }
 
-/**
- * Perform filtering of a commandObject
- * @param {*} filterObject 
- * @param {*} commandObject 
- * @returns the filtered commandObject
- */
-const filter = (filterObject, commandObject, deviceWrapper) => {
-  const { pluginName } = filterObject;
-
-  if (!pluginName) {
-    return commandObject;
-  }
-
-  const filterFunctions = getFilterFunctions();
-
-  const filterFunction = filterFunctions[pluginName];
-  
-  if (filterFunction) {  
-    // Execute the filter plugin.
-    commandObject = filterFunction(
-      filterObject,
-      commandObject,
-      deviceWrapper,
-      filterFunctions, // Pass in the array of filter functions so filters can cross-reference.
-    );
-
-    if (constants.DEBUG) {
-      log(`Executed ${pluginName}/${filterObject.label}. Returned: ${JSON.stringify(commandObject)}`, deviceWrapper, 'debug');
-    }
-  } else {
-    log(`Filter plugin '${pluginName}' not found.`, deviceWrapper, 'red');
-  }
-
-  return commandObject;
-}
-
 const getCommandObjectFromTargetData = (targetData) => {
   const commandObject = {};
 
@@ -195,6 +156,5 @@ const getCommandObjectFromTargetData = (targetData) => {
 
 export {
   commandMatchesCurrentState,
-  filter,
   getCommandObjectFromTargetData,
 }
