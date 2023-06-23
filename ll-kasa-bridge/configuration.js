@@ -139,7 +139,7 @@ const globalConfig = {
          * This MUST either be set here (restriction: 'always' or periodicallyActive: true)
          * or on an override for partial filtering to work properly.
          */
-        restriction: 'dawnAndDusk',
+        restriction: 'always',
         /**
          * Can override any of the periodicFilters defaults configured in defaults.periodicFilters above.
          */     
@@ -889,7 +889,22 @@ const deviceMap = [
     id: '8012984E9F504FC4AEC384A012A6BEE01F54FA11',
     subType: SUBTYPE_LED_STRIP,
     filters: [ 
-      { refId: 'naturalLight'},
+      { 
+        refId: 'naturalLight',
+        settings: {
+          periodicallyActive: {
+            restriction: {
+              event: 'externalFlag',
+              flag: 'sleep_wake',
+              state: true,
+            }
+          }
+        },
+        stateData: {
+          color_temp: 0
+        }
+
+      },
       {
         refId: 'nighttimeGlim',
       }

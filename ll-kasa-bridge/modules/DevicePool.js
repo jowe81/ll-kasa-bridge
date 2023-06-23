@@ -80,7 +80,7 @@ const devicePool = {
       deviceWrapper.devicePool = this;
 
       deviceWrapper.injectDevice(device, mapItem, this.globalConfig, this.deviceEventCallback);
-  
+      
       this.devices.push(deviceWrapper);      
     }
 
@@ -141,8 +141,8 @@ const devicePool = {
 
         return null;
       }).filter(item => item);
-    if (channel === 38) console.log('returning gorups for ch', channel, groups)
-    return groups;
+
+      return groups;
   },
 
   getLiveDeviceMap() {
@@ -202,7 +202,7 @@ const devicePool = {
     if (Array.isArray(this.devices)) {
       this.devices.forEach(deviceWrapper => {
 
-      const filtersToRun = this._getCurrentlyActivePeriodicFilters(deviceWrapper.getFilters());
+      const filtersToRun = this._getCurrentlyActivePeriodicFilters(deviceWrapper.filters);
 
       if (Array.isArray(filtersToRun) && filtersToRun.length) {        
         deviceWrapper.setLightState({}, null, serviceName, filtersToRun);
