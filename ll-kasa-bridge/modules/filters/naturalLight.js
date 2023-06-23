@@ -8,7 +8,12 @@ const naturalLight = () => {
   /**
    * Adjust values linked to sunrise/sunset
    */
-  const execute = (filterObject, commandObject, deviceWrapper, filterFunctions) => {  
+  const execute = (filterObject, commandObject, deviceWrapper, filterPlugins) => {  
+
+    if (!checkRestrictions(filterObject, deviceWrapper, filterPlugins)) {
+      log(`naturalLight filter: blocked by externalFlags restriction`, this);
+      return commandObject;
+    }
 
     let stateData;
 
@@ -58,7 +63,7 @@ const naturalLight = () => {
     filterObject.stateData = stateData;
 
     // Need the sunEvents filter
-    const sunEvents = filterFunctions?.sunEvents;
+    const sunEvents = filterPlugins?.sunEvents.execute;
 
     if (!sunEvents) {
       // Don't have the sunEvents filter - do nothing
@@ -75,6 +80,50 @@ const naturalLight = () => {
     }
     
     return applyPartialFiltering(filterObject, commandObject, deviceWrapper);
+  }
+
+  const checkRestrictions = (filterObject, deviceWrapper, filterPlugins) => {
+
+    if (!filterPlugins.externalFlags) {
+      log(`naturalLight filter error:`, deviceWrapper, null `externalFlags filter is missing`);
+      // Without being able to check restrictions, run the filter.
+      return true;
+    }
+
+    const checkFlagStateOnUrl = filterPlugins.externalFlags.functions?.checkFlagStateOnUrl;
+    if (!checkFlagStateOnUrl) {
+      log(`naturalLight filter error:`, deviceWrapper, null `externalFlags filter did not return expected function 'checkFlagStateOnUrl'`);
+      // Again, run the filter if the function is missing.
+      return true;
+    }
+
+    const { restrictions }  = filterObject.settings;
+
+    if (!Array.isArray(restrictions)) {
+      // No restrictions defined
+      return true;            
+    }
+
+    restrictions.forEach(restriction => {
+
+      switch (restriction.type) {
+        case 'externalFlags':
+          const { url, flagName, flagState } = restriction;
+          
+          const currentflagState = checkFlagStateOnUrl(url, flagName);
+
+          if (currentflagState !== null && currentflagState === flagState) {
+            // The restriction is currently active. Do not execute the filter.
+            return false;
+          }          
+          break;
+
+      }
+
+      // No restriction returned early, so none apply and we can run the filter.
+      return true;
+    })
+
   }
 
   const applyPartialFiltering = (filterObject, commandObject, deviceWrapper) => {

@@ -8,7 +8,7 @@ const schedule = () => {
   /**
    * Adjust values following a defined schedule
    */
-  const execute = (filterObject, commandObject, deviceWrapper) => {  
+  const execute = (filterObject, commandObject, deviceWrapper, filterPlugins) => {  
 
     const currentItem = getCurrentScheduleItem(filterObject, deviceWrapper);
 

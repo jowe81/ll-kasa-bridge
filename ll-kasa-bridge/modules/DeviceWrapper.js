@@ -3,7 +3,7 @@ import _ from 'lodash';
 import constants from '../constants.js';
 import { log } from './Log.js';
 import { commandMatchesCurrentState, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
-import { getFilterFunctions } from "./Filters.js";
+import { getFilterPlugins } from "./Filters.js";
 import { resolveDeviceDependencies } from './DependencyResolver.js';
 
 
@@ -298,24 +298,24 @@ const cmdFailPrefix = '[FAIL]';
       return commandObject;
     }
 
-    const filterFunctions = getFilterFunctions();
-
-    const filterFunction = filterFunctions[pluginName];
+    const filterPlugins = getFilterPlugins();
+    const { execute, data } = filterPlugins[pluginName];
     
-    if (filterFunction) {  
-      // Execute the filter plugin.
-      commandObject = filterFunction(
-        filterObject,
-        commandObject,
-        this,
-        filterFunctions, // Pass in the array of filter functions so filters can cross-reference.
-      );
-
-      if (constants.DEBUG) {
-        log(`Executed ${pluginName}/${filterObject.label}. Returned: ${JSON.stringify(commandObject)}`, this, 'debug');
-      }
-    } else {
+    if (!execute) {
       log(`Filter plugin '${pluginName}' not found.`, this, 'red');
+      return commandObject;
+    }
+
+    // Execute the filter plugin.
+    commandObject = execute(
+      filterObject,
+      commandObject,
+      this,
+      filterPlugins, // Pass in the array of plugins so filters can cross-reference.
+    );
+
+    if (constants.DEBUG) {
+      log(`Executed ${pluginName}/${filterObject.label}. Returned: ${JSON.stringify(commandObject)}`, this, 'debug');
     }
 
     return commandObject;

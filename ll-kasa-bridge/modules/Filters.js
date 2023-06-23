@@ -6,15 +6,15 @@ const promises = [];
 
 const filterFiles = getFileNames('./filters', import.meta.url);
 
-let cachedFilterFunctions = {};
+let cachedFilterPlugins = {};
 
-const getFilterFunctions = () => cachedFilterFunctions;
+const getFilterPlugins = () => cachedFilterPlugins;
 
-const loadFilterFunctions = async () => {
+const loadFilterPlugins = async () => {
 
-  // Have we loaded the functions already?
-  if (Object.keys(cachedFilterFunctions).length) {
-    return Promise.resolve(cachedFilterFunctions);
+  // Have we loaded the plugins already?
+  if (Object.keys(cachedFilterPlugins).length) {
+    return Promise.resolve(cachedFilterPlugins);
   }
 
   log(`Looking for filter plugins...`);
@@ -29,43 +29,41 @@ const loadFilterFunctions = async () => {
   
   });
     
-  return Promise.all(promises).then(fns => {
-    const filterFunctionWrappers = {};
+  return Promise.all(promises).then(filterPluginsArray => {
+    const filterPlugins = {};
   
-    fns.forEach(fn => {
-      const functionName = fn.default?.name;
-      if (fn.default) {
-        filterFunctionWrappers[functionName] = fn.default;
-      }    
+    filterPluginsArray.forEach(plugin => {
+      const pluginName = plugin.default?.name;
+      filterPlugins[pluginName] = plugin;
     })
   
-    log(`Loaded ${Object.keys(filterFunctionWrappers).length} filter(s).`);
-
-    const filterFunctions = []
+    log(`Loaded ${Object.keys(filterPlugins).length} filter(s).`);
     
-    Object.keys(filterFunctionWrappers).forEach(functionName => {
+    Object.keys(filterPlugins).forEach(pluginName => {
+      const filterPlugin = filterPlugins[pluginName];
 
-      const filterFunctionWrapper = filterFunctionWrappers[functionName];
-
-      // The filter function wrapper must return an execute function.
-      const { execute } = filterFunctionWrapper();
-            
+      /**
+       * Initialize this plugin. The wrapper MUST return an execute function 
+       * and may return additional functions and data.
+       */
+      const { execute, functions, data } = filterPlugin.default();
+      
       if (!execute) {
-        log(`Failed to initialize filter plugin '${functionName}. Make sure it returns a function 'execute'.`, 'red');        
+        log(`Failed to initialize filter plugin '${pluginName}. Make sure it returns a function 'execute'.`, 'red');        
       }
 
-      filterFunctions[functionName] = execute;
-      log(`Initialized filter plugin '${functionName}'`);
+      log(`Initialized filter plugin '${pluginName}'`);
+      filterPlugins[pluginName] = { execute, functions, data };
     });
 
     // Cache them so next time we don't have to do the fs operations
-    cachedFilterFunctions = filterFunctions;
+    cachedFilterPlugins = filterPlugins;
 
-    return filterFunctions;
+    return filterPlugins;
   });
 }
 
 export { 
-  loadFilterFunctions,
-  getFilterFunctions,
+  loadFilterPlugins,
+  getFilterPlugins,
 };

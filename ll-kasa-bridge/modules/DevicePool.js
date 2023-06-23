@@ -6,7 +6,7 @@ import DeviceWrapper from './DeviceWrapper.js';
 import { log } from './Log.js';
 
 import { isBetweenDuskAndDawn, isDawnOrDusk, isDawn, isDusk, getFromSettingsForNextSunEvent } from '../helpers/jDateTimeUtils.js';
-import { loadFilterFunctions } from './Filters.js';
+import { loadFilterPlugins } from './Filters.js';
 
 /**
  * The DevicePool encapsulates all automation device functionality.
@@ -51,7 +51,7 @@ const devicePool = {
     await this.loadGlobalConfiguration();
 
     // Load the filter plugins
-    loadFilterFunctions();
+    loadFilterPlugins();
 
     this.startPeriodicFilterService();
     this.startDiscovery();

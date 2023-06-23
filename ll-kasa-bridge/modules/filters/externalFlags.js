@@ -69,7 +69,7 @@ const externalFlags = () => {
   /**
    * Apply filtering based on external flags
    */
-  const execute = (filterObject, commandObject, deviceWrapper, filterFunctions) => {
+  const execute = (filterObject, commandObject, deviceWrapper, filterPlugins) => {
 
     const { channel } = deviceWrapper;
     const { settings, stateData } = filterObject;
@@ -241,11 +241,38 @@ const externalFlags = () => {
     });
   }
 
+  const checkFlagStateOnUrl = (url, flagName) => {
+    const data = cache.responseData[url];
+
+    if (!(data && data.cachedFlags)) {
+      // Have no data from this url
+      return null;
+    }
+
+    const state = data.cachedFlags[flagName];
+
+    if (typeof state !== 'boolean') {
+      // Have no data for this flag
+      return null;
+    }
+  
+    return state;
+  }
+  
   // On initialization, prepare to spin up a polling loop for the url.
   const pollingLoop = setInterval(retrieveData, DEFAULT_POLLING_INTERVAL);
   log(`${LOG_TAG} Started the polling loop. Interval is ${DEFAULT_POLLING_INTERVAL} ms.`);
 
-  return { execute };  
+  return { 
+    execute,
+
+    // Return the cache reference so that other filters an make decisions based on flagstate
+    data: cache,
+
+    functions: {
+      checkFlagStateOnUrl
+    }
+  };  
 }
 
 export default externalFlags;

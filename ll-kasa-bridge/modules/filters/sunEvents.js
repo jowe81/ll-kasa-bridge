@@ -6,7 +6,7 @@ const sunEvents = () => {
   /**
    * Adjust values linked to sunrise/sunset
    */
-  const execute = (filterObject, commandObject, deviceWrapper) => {  
+  const execute = (filterObject, commandObject, deviceWrapper, filterPlugins) => {  
     const { stateData } = filterObject;
     
     if (!stateData) {

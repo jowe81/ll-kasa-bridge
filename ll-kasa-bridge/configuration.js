@@ -892,18 +892,22 @@ const deviceMap = [
       { 
         refId: 'naturalLight',
         settings: {
-          periodicallyActive: {
-            restriction: {
-              event: 'externalFlag',
-              flag: 'sleep_wake',
-              state: true,
-            }
-          }
+          /**
+           * This is a filter specific setting.
+           * naturalLight taps into externalFlags to execute conditionally.
+           */
+          restrictions: [
+            {
+              type: 'externalFlags',
+              url: 'http://lifelog.wnet.wn/ajax.php?action=getFlags',
+              flagName: 'sleep_wake',
+              flagState: true,  // Block the filter when flag is set to true
+            },
+          ],
         },
         stateData: {
           color_temp: 0
         }
-
       },
       {
         refId: 'nighttimeGlim',
