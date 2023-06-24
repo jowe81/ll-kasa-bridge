@@ -1,7 +1,7 @@
 import axios from "axios";
 import _ from "lodash";
 
-import { log } from '../Log.js';
+import { log, debug } from '../Log.js';
 import constants from "../../constants.js";
 
 const externalFlags = () => {  
@@ -119,11 +119,9 @@ const externalFlags = () => {
     // Did the flag change?
     if (deviceCache.currentChanges[flag] === true) {        
       const newFlagValue = responseData.cachedFlags[flag];
-
-      if (constants.DEBUG) {
-        log(`External flag ${flag} changed to ${newFlagValue}.`, deviceWrapper, 'debug');
-      }
-
+    
+      debug(`External flag ${flag} changed to ${newFlagValue}.`, deviceWrapper);
+      
       Object.keys(stateData).forEach(stateKey => {
         const paramData = stateData[stateKey];
         const paramValue = newFlagValue ? paramData?.altValue : paramData?.value;

@@ -7,7 +7,10 @@ const WEEK = 7 * DAY;
 
 const constants = {
 
-  DEBUG: true,
+  DEBUG: {
+    debug: true,
+    channels: [40],
+  },
 
   // Time
   SECOND, 

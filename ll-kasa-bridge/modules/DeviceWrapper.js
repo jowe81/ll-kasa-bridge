@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import constants from '../constants.js';
-import { log } from './Log.js';
+import { log, debug } from './Log.js';
 import { commandMatchesCurrentState, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
 import { getFilterPlugins } from "./Filters.js";
 import { resolveDeviceDependencies } from './DependencyResolver.js';
@@ -271,7 +271,18 @@ const cmdFailPrefix = '[FAIL]';
               return;
             }
 
-            const filtersToRun = target.filters;
+            const filtersToRun = [];
+
+            // Get the filter chain from the target device
+            const targetDeviceFilters = deviceWrapper.filters;
+            if (Array.isArray(targetDeviceFilters)) {
+              targetDeviceFilters.forEach(filter => filtersToRun.push(filter));
+            }
+
+            const filtersDefinedInTriggerCommmand = target.filters;
+            if (Array.isArray(filtersDefinedInTriggerCommmand)) {
+              filtersDefinedInTriggerCommmand.forEach(filter => filtersToRun.push(filter));
+            }
             
             const delay = target.delay ?? 0;                
             setTimeout(() => deviceWrapper.setLightState(commandObject, triggerSwitchPosition, originDeviceWrapper, filtersToRun), delay);
@@ -314,10 +325,8 @@ const cmdFailPrefix = '[FAIL]';
       filterPlugins, // Pass in the array of plugins so filters can cross-reference.
     );
 
-    if (constants.DEBUG) {
-      log(`Executed ${pluginName}/${filterObject.label}. Returned: ${JSON.stringify(commandObject)}`, this, 'debug');
-    }
-
+    debug(`Executed ${pluginName}/${filterObject.label}. Returned: ${JSON.stringify(commandObject)}`, this);
+    
     return commandObject;
   },
 

@@ -667,7 +667,6 @@ const deviceMap = [
           stateData: {
             on_off: 1,
           },
-          filters: [ { refId: 'naturalLight' }],
           delay: 2000,
         },
         {
@@ -675,7 +674,6 @@ const deviceMap = [
           stateData: {
             on_off: 1,
           },
-          filters: [ { refId: 'naturalLight' }],
           delay: 2000,
         },
         {
@@ -683,7 +681,6 @@ const deviceMap = [
           stateData: {
             on_off: 1,
           },
-          filters: [ { refId: 'naturalLight' }],
           delay: 1000,
         },
         { channel: 36, stateData: true }, 
@@ -693,7 +690,6 @@ const deviceMap = [
             brightness: 95,
             on_off: 1,
           },
-          filters: [ { refId: 'naturalLight' }],
         }
       ],
       off: [
@@ -701,7 +697,7 @@ const deviceMap = [
         { channel: 32, stateData: false }, 
         { channel: 33, stateData: false }, 
         { channel: 36, stateData: false },
-        { channel: 40, stateData: false, delay: 5000 }, 
+        { channel: 40, stateData: false }, 
       ],
     }   
   },
@@ -889,6 +885,9 @@ const deviceMap = [
     id: '8012984E9F504FC4AEC384A012A6BEE01F54FA11',
     subType: SUBTYPE_LED_STRIP,
     filters: [ 
+      {
+        refId: 'nighttimeGlim',
+      },
       { 
         refId: 'naturalLight',
         settings: {
@@ -909,9 +908,6 @@ const deviceMap = [
           color_temp: 0
         }
       },
-      {
-        refId: 'nighttimeGlim',
-      }
     ],
   },
   {

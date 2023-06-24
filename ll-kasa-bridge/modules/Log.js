@@ -1,3 +1,4 @@
+import constants from '../constants.js';
 import chalk from 'chalk';
 import fs from 'fs';
 
@@ -81,6 +82,20 @@ const masterLogFile = 'jj-auto.log';
   }
 }
 
+/**
+ * Log out the text if DEBUG is set, and either the deviceWrapper matches the debug channel,
+ * or no wrapper was passed.
+ */
+
+const debug = (text, deviceWrapper) => {
+  const debug = constants.DEBUG?.debug;
+  const channels = constants.DEBUG?.channels;
+  if (debug && (deviceWrapper === null || channels.includes(deviceWrapper.channel))) {
+    log(text, deviceWrapper, 'bgRed');
+  }
+}
+
 export { 
   log,
+  debug,
 };
