@@ -32,10 +32,10 @@ const devicePool = {
         event: event, 
         data: { state: deviceWrapper.state}
       });
-
+      
       // Run the callback if one was passed in
       if (deviceEventCallback) {
-        deviceEventCallback();
+        deviceEventCallback(event, deviceWrapper);
       };
 
     }
@@ -80,7 +80,6 @@ const devicePool = {
 
       // Store a backreference to the pool in each wrapper to enable event listeners to execute functinos on other devices
       deviceWrapper.devicePool = this;
-
       deviceWrapper.injectDevice(device, mapItem, this.globalConfig, this.deviceEventCallback);
       
       this.devices.push(deviceWrapper);      

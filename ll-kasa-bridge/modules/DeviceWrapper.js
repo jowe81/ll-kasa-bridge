@@ -57,7 +57,7 @@ const cmdFailPrefix = '[FAIL]';
 
       // Process linked devices
       this.processLinkedDevices(changeInfo);
-
+      
       deviceEventCallback(event, this);
     }
 
@@ -499,7 +499,7 @@ const cmdFailPrefix = '[FAIL]';
         .join(',');
 
       if (groupMatesSynced.length) {
-        log(`Synced ${groupMatesSynced.length} group mates: ${groupMatesLabels}`)
+        log(`Synced ${groupMatesSynced.length} group mate(s): ${groupMatesLabels}`)
       }
     }
 
