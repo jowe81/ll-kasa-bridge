@@ -74,7 +74,9 @@ const devicePool = {
       const deviceWrapper = Object.create(DeviceWrapper);      
       const mapItem = await this.getDeviceMapItemById(device.id);
 
-      mapItem.groups = this.getGroupsForChannel(mapItem.channel);
+      if (mapItem) {
+        mapItem.groups = this.getGroupsForChannel(mapItem.channel);
+      }
 
       // Store a backreference to the pool in each wrapper to enable event listeners to execute functinos on other devices
       deviceWrapper.devicePool = this;

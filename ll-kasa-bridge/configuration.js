@@ -240,12 +240,12 @@ const globalConfig = {
       settings: {
         transitionTime: 1 * HOUR,
         offset: {
-          sunset: 30 * MINUTE,
+          sunset: 0 * MINUTE,
           sunrise: -30 * MINUTE,
         }
       },
       periodicallyActive: {
-        restriction: 'dusk',
+        restriction: 'duskToDawn',
       },
       stateData: {
         brightness: {
@@ -282,7 +282,7 @@ const globalConfig = {
             offset: -45 * MINUTE,
           },
           stateData: {
-            onOff: 1,
+            on_off: 1,
             brightness: 1,
           },
         },
@@ -341,7 +341,7 @@ const globalConfig = {
             event: 'sunrise',          
           },
           stateData: {
-            onOff: 0,
+            on_off: 0,
           },
         },
         /**
@@ -402,7 +402,30 @@ const globalConfig = {
           onlyWhenSameStateAs: []
         },
       ],  
-    }
+    },
+    {
+      id: "Bedroom Desk Lights",
+      channels: [ 3, 16, 37 ],
+      linkedDevices: [
+        { 
+          channel: 14,
+          // Sync the switch to the powerstate of this device or just toggle it?
+          sync: true,
+          // Only has effect if sync === true: should the device be inversely synced
+          inverse: false,
+          // Sync/toggle when this device is set to the on position
+          onPosition: true, 
+          // Sync/toggle when this device is set to the off position
+          offPosition: true,
+          // NOT YET IMPLEMENTED: Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
+          onlyWhenSameStateAs: []
+        },
+      ],  
+    },
+    {
+      id: "Kitchen Counter Lights",
+      channels: [ 42, 43 ],
+    },
   ],
 }
 
@@ -454,6 +477,9 @@ const deviceMap = [
     channel: 6, 
     id: "8012C3A3B58B58E8081EDBCF694C8CBC1F790A02",
     subType: SUBTYPE_BULB,
+    filters: [
+      { refId: 'naturalLight' }
+    ],    
 
   },
   {
@@ -461,6 +487,9 @@ const deviceMap = [
     channel: 7, 
     id: "8012511ABF75C811DB47A833DD2EDAED1F791417",
     subType: SUBTYPE_BULB,
+    filters: [
+      { refId: 'naturalLight' }
+    ],    
   },
 
   //Hallway
@@ -485,24 +514,39 @@ const deviceMap = [
     channel: 10, 
     id: "8012D32B889FD9CE23C825CEB1C2EFD41F73D8E2",
     subType: SUBTYPE_BULB,
+    filters: [
+      { refId: 'naturalLight' }
+    ],    
+
   },
   {
     alias: 'Bathroom 2',
     channel: 11, 
     id: "8012F65B8543DA7FFFC8A3F756D1EBE61F742CDF",
     subType: SUBTYPE_BULB,
+    filters: [
+      { refId: 'naturalLight' }
+    ],    
+
   },
   {
     alias: 'Bathroom 3',
     channel: 12, 
     id: "80128096836910A62F80A6B532C1461E1F79D295",
     subType: SUBTYPE_BULB,
+    filters: [
+      { refId: 'naturalLight' }
+    ],    
+
   },
   {
     alias: 'Bathroom 4',
     channel: 13, 
     id: "8012EE37548E3F0F48405DECC13D0B801F779B2B",
     subType: SUBTYPE_BULB,
+    filters: [
+      { refId: 'naturalLight' }
+    ],    
   },
   {
     alias: 'Bedroom Desk Switch',
@@ -609,7 +653,7 @@ const deviceMap = [
     filters: [{
       refId: 'naturalLight',
       periodicallyActive: true,
-      applyPartially: 0.15,
+      applyPartially: 0.125,
     }]
   },
   {
@@ -915,6 +959,25 @@ const deviceMap = [
     channel: 41, 
     id: "8012FA2584FE5D30C3E2F13FC023719B1F7B385D",
     subType: SUBTYPE_BULB,
+    //filters: [ { refId: 'naturalLight'}],
+  },
+  {
+    alias: 'Kitchen Counter Main',
+    channel: 42, 
+    id: "8006DE7EE2F73CBEA4629F293A1684A52042804800",
+    subType: SUBTYPE_PLUG,
+  },
+  {
+    alias: 'Kitchen Counter Sink',
+    channel: 43, 
+    id: "8006DE7EE2F73CBEA4629F293A1684A52042804801",
+    subType: SUBTYPE_PLUG,
+  },
+  {
+    alias: 'Kitchen Cabinets Aleds',
+    channel: 44, 
+    id: "8006DE7EE2F73CBEA4629F293A1684A52042804802",
+    subType: SUBTYPE_PLUG,
   },
 
   

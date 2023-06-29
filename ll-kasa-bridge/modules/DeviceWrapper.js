@@ -55,6 +55,9 @@ const cmdFailPrefix = '[FAIL]';
       // Process target devices
       this.executeCommands(event, this);
 
+      // Process linked devices
+      this.processLinkedDevices(changeInfo);
+
       deviceEventCallback(event, this);
     }
 
@@ -134,8 +137,9 @@ const cmdFailPrefix = '[FAIL]';
 
     if (changeInfo.changed) {
 
-      // If this is a power-state change then there's nothing to analyse
+      // If this is a power-state change then there's nothing to analyse; newState is boolean
       if (this.type === 'IOT.SMARTPLUGSWITCH') {
+        changeInfo.on_off = true;
         return changeInfo;
       }
 
@@ -385,6 +389,35 @@ const cmdFailPrefix = '[FAIL]';
 
     return linkedDevices;    
   },
+
+  /**
+   * Get the other devices in the group   
+   */
+  getGroupMates(groupIds) {
+    const groupMates = [];
+
+    if (Array.isArray(this.groups)) {
+      const allGroups = this.globalConfig.groups;
+
+      // Go through groups and collect the grouped channels either from the groupId passed, or otherwise all groups.
+      Array.isArray(allGroups) && allGroups.forEach(group => {
+
+        if (!Array.isArray(groupIds) || groupIds.includes(group.id)) {
+          // If there are members channels on this group, go through them
+          Array.isArray(group.channels) && group.channels.forEach(channel => {
+
+            if (!groupMates.includes(this.channel) && (channel !== this.channel)) {
+              groupMates.push(channel);
+            }
+          });  
+        }
+      });
+    }
+
+    const resolvedGroupMates = groupMates.map(channel => this.devicePool.getDeviceWrapperByChannel(channel));
+    
+    return resolvedGroupMates;
+  },
  
   injectDevice(device, mapItem, globalConfig, deviceEventCallback) {
     this.device = device;
@@ -444,6 +477,29 @@ const cmdFailPrefix = '[FAIL]';
       // Not a member of groups with linked devices. Use the local definition.
       if (Array.isArray(this.linkedDevices)) {
         linkedDevices = this.linkedDevices;
+      }
+    }
+
+    // If the change was not originated by the backend and this is a group member, sync the other devices in the group.    
+    if (changeInfo?.changed && changeInfo.on_off && changeInfo.origin !== constants.SERVICE_BACKEND) {
+      const groupMatesSynced = [];
+      let otherDevicesInGroup = this.getGroupMates(this.groups);
+
+      otherDevicesInGroup.forEach(deviceWrapper => {            
+        const linkedDevicePowerState = deviceWrapper.getPowerState();
+        const thisDevicePowerState = this.getPowerState();
+        if (linkedDevicePowerState !== thisDevicePowerState) {
+          deviceWrapper.setPowerState(!linkedDevicePowerState, constants.SERVICE_BACKEND_FLIP);
+          groupMatesSynced.push(deviceWrapper);
+        }
+      });
+
+      const groupMatesLabels = groupMatesSynced
+        .map(deviceWrapper => `${deviceWrapper.alias} (${deviceWrapper.channel})`)
+        .join(',');
+
+      if (groupMatesSynced.length) {
+        log(`Synced ${groupMatesSynced.length} group mates: ${groupMatesLabels}`)
       }
     }
 

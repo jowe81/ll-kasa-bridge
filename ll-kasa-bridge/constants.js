@@ -28,6 +28,7 @@ const constants = {
   // Service names
   SERVICE_PERIODIC_FILTER: 'Periodic Filter Service',
   SERVICE_BACKEND: 'backend',
+  SERVICE_BACKEND_FLIP: 'backend (flip)',
   
 };
 
