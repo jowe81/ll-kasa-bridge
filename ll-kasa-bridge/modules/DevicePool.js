@@ -112,9 +112,11 @@ const devicePool = {
     client.on('device-online', async device => {
       const deviceWrapper = await this.getDeviceWrapperById(device.id);
       if (deviceWrapper && !deviceWrapper.isOnline) {
-        log(`Device came online.`, deviceWrapper, 'yellow');
+        log(`Device came online.`, deviceWrapper, 'yellow');        
         deviceWrapper.isOnline = true;
+        deviceWrapper.flushCommandCache();
         deviceWrapper.startPolling();
+        deviceWrapper.lastSeenAt = Date.now();        
       }
     });
     

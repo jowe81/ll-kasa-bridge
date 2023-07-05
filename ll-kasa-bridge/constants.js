@@ -8,7 +8,7 @@ const WEEK = 7 * DAY;
 const constants = {
 
   DEBUG: {
-    debug: true,
+    debug: false,
     channels: [40],
   },
 
@@ -29,6 +29,7 @@ const constants = {
   SERVICE_PERIODIC_FILTER: 'Periodic Filter Service',
   SERVICE_BACKEND: 'backend',
   SERVICE_BACKEND_FLIP: 'backend (flip)',
+  SERVICE_COMMAND_CACHE: 'Command Cache Service',
   
 };
 

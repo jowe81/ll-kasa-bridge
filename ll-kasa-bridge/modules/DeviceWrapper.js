@@ -196,6 +196,87 @@ const cmdFailPrefix = '[FAIL]';
     return changeInfo;
   },
 
+  /**
+   * Cache a comand (used if a command is sent while the device is offline)
+   * @param {boolean|Object} commandObject 
+   */
+  cacheCommand(commandObject, triggerSwitchPosition, commandTimeStamp) {  
+    if (!commandTimeStamp) {
+      commandTimeStamp = Date.now();
+    }
+
+    if (typeof commandObject === 'boolean') {
+      // It's a powerState command.
+      const cache = this.commandCache.powerState;
+
+      if (commandTimeStamp > cache.cachedAt) {
+        // The passed in command is more recent than the one cached before; overwrite.
+        cache.stateData = commandObject;
+        cache.triggerSwitchPosition = triggerSwitchPosition;
+        cache.cachedAt = Date.now();        
+      }
+
+      log(`${cmdPrefix} ${cmdFailPrefix} setPowerState: cached command: ${JSON.stringify(cache.stateData)}`, this, 'yellow');
+
+    } else {
+      // It's a lightState command.
+      const cache = this.commandCache.lightState;
+
+      if (commandTimeStamp > cache.cachedAt) {
+        // The command is more recent than the one cached before, use as source for the merge.
+        _.merge(cache.stateData, commandObject);
+      } else {
+        // The command is older than the one cached, use the cached state as source for the merge.
+        let result = commandObject;
+        _.merge(result, cache.stateData);
+        cache.stateData = result;
+      }
+
+      cache.triggerSwitchPosition = triggerSwitchPosition;
+      cache.cachedAt = Date.now();
+
+      log(`${cmdPrefix} ${cmdFailPrefix} setLightState: cached command ${JSON.stringify(this.commandCache.lightState.stateData)}`, this, 'yellow');
+    }
+  },
+
+  /**
+   * (Re-)initialize the command cache.
+   */
+  initCommandCache() {
+    this.commandCache = {
+      powerState: {
+        cachedAt: 0,
+        stateData: null,
+        triggerSwitchPosition: null,
+      },
+      lightState: { 
+        cachedAt: 0,
+        stateData: {},
+        triggerSwitchPosition: null,
+      }
+    }
+  },
+
+  /**
+   * Execute cached commands.
+   * Called by the devicePool when the device comes back online.
+   */
+  flushCommandCache() {
+    const { powerState, lightState } = this.commandCache;
+
+    if (powerState && (powerState.stateData !== null)) {
+      log(`setPowerState: Flushing command cache, stateData: ${powerState.stateData}`, this, 'yellow');
+      this.setPowerState(powerState.stateData, powerState.triggerSwitchPosition, constants.SERVICE_COMMAND_CACHE);
+    }
+
+    if (lightState && (Object.keys(lightState.stateData).length)) {
+      log(`setLightState: Flushing command cache, stateData: ${JSON.stringify(lightState.stateData)}`, this, 'yellow');
+      this.setLightState(lightState.stateData, lightState.triggerSwitchPosition, constants.SERVICE_COMMAND_CACHE);
+    }
+
+    this.initCommandCache();
+  },
+
   executeCommands(event, originDeviceWrapper) {
 
     // Get targets and data from device configuration
@@ -252,7 +333,7 @@ const cmdFailPrefix = '[FAIL]';
         const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(target.channel)
         if (deviceWrapper) {
           const delay = target.delay ?? 0;
-          setTimeout(() => deviceWrapper.setPowerState(target.stateData, originDeviceWrapper), delay);
+          setTimeout(() => deviceWrapper.setPowerState(target.stateData, triggerSwitchPosition, originDeviceWrapper), delay);
         }
       });    
     }
@@ -422,6 +503,8 @@ const cmdFailPrefix = '[FAIL]';
   injectDevice(device, mapItem, globalConfig, deviceEventCallback) {
     this.device = device;
     this.deviceEventCallback = deviceEventCallback;
+    this.initCommandCache();
+
 
     if (mapItem) {
       // Copy in the mapItem properties.
@@ -451,6 +534,8 @@ const cmdFailPrefix = '[FAIL]';
         log(`Discovered device at ${device.host}`, this, 'yellow');
         resolveDeviceDependencies(this);
         this.addListeners();
+        this.lastSeenAt = Date.now();
+        this.isOnline = true;
       }
     } else {
       if (device) {
@@ -489,7 +574,7 @@ const cmdFailPrefix = '[FAIL]';
         const linkedDevicePowerState = deviceWrapper.getPowerState();
         const thisDevicePowerState = this.getPowerState();
         if (linkedDevicePowerState !== thisDevicePowerState) {
-          deviceWrapper.setPowerState(!linkedDevicePowerState, constants.SERVICE_BACKEND_FLIP);
+          deviceWrapper.setPowerState(!linkedDevicePowerState, newStateBool, constants.SERVICE_BACKEND_FLIP);
           groupMatesSynced.push(deviceWrapper);
         }
       });
@@ -571,7 +656,7 @@ const cmdFailPrefix = '[FAIL]';
         linkedWrapper.__ignoreNextChangeByBackend = true;
 
         log(`Flipping connected device: ${linkedWrapper.alias}`, this);
-        linkedWrapper.setPowerState(!linkedWrapperStateBool, constants.SERVICE_BACKEND);
+        linkedWrapper.setPowerState(!linkedWrapperStateBool, newStateBool, constants.SERVICE_BACKEND);
       }
   
     });
@@ -582,7 +667,14 @@ const cmdFailPrefix = '[FAIL]';
     let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
 
     if (!this.device) {
-      log(`${cmdPrefix} ${cmdFailPrefix} setLightState failed: device not found.`, this, 'red');
+      log(`${cmdPrefix} ${cmdFailPrefix} setLightState error: device not found.`, this, 'red');
+      this.cacheCommand(commandObject, triggerSwitchPosition);      
+      return;
+    }
+
+    if (!this.isOnline) {
+      log(`${cmdPrefix} ${cmdFailPrefix} setLightState error: device is offline.`, this, 'red');
+      this.cacheCommand(commandObject, triggerSwitchPosition);      
       return;
     }
 
@@ -616,67 +708,55 @@ const cmdFailPrefix = '[FAIL]';
       return;
     }
 
-    if (origin === constants.SERVICE_PERIODIC_FILTER) {
-      const stateCheck = commandMatchesCurrentState(this, commandObject);
-
-      if (stateCheck) {
-        // No point in issuing a command that would change nothing.
-        return;
-      }
+    if (commandMatchesCurrentState(this, commandObject)) {
+      // No point in issuing a command that would change nothing.
+      return;
+    }
   
+    try {
+      const success = await this.device.lighting.setLightState(commandObject);   
+      
+      if (!success) {
+        log(`${cmdPrefix} [${originText}] setLightState error: device did not acknowledge success.`, this, 'red');
+        this.cacheCommand(commandObject, triggerSwitchPosition);
+      } else {
+        log(`${cmdPrefix} [${originText}] setLightState ${JSON.stringify(commandObject)}`, this, 'cyan');
+      }
+
+    } catch(err) {
+      log(`${cmdPrefix} [${originText}] ${cmdFailPrefix} setLightState error; caching command: ${JSON.stringify(commandObject)}`, this, null, err);
+      this.cacheCommand(commandObject, triggerSwitchPosition);
+    }
+  },
+
+  async setPowerState(state, triggerSwitchPosition, origin) {    
+    let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
+
+    if (!this.device) {
+      return;
     }
 
     if (!this.isOnline) {
-      log(`${cmdPrefix} ${cmdFailPrefix} setLightState failed: device is offline.`, this, 'red');
+      this.cacheCommand(commandObject, triggerSwitchPosition);      
       return;
     }
 
     try {
-      const data = await this.device.lighting.setLightState(commandObject);
-      log(`${cmdPrefix} [${originText}] setLightState ${JSON.stringify(commandObject)}`, this, 'cyan');
+      const success = await this.device.setPowerState(state);
+
+      if (!success) {
+        log(`${cmdPrefix} [${originText}] setPowerState error: device did not acknowledge success.`, this, 'red');
+        this.cacheCommand(commandObject, triggerSwitchPosition);
+        
+        return;
+      }
+      
+      log(`${cmdPrefix} [${originText}] setPowerState ${state ? 'on' : 'off'}`, this, 'cyan');  
     } catch(err) {
-      log(`${cmdPrefix} [${originText}] ${cmdFailPrefix} setLightState returned an error`, this, null, err);
+      log(`${cmdPrefix} [${originText}]${cmdFailPrefix} setPowerState error; caching command: power-${state ? 'on' : 'off'}`, this, null, err);
+      this.cacheCommand(commandObject, triggerSwitchPosition);
     }
   },
-
-  async setPowerState(state, origin) {    
-    let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
-
-    if (this.device && this.isOnline) {
-      try {
-        const data = await this.device.setPowerState(state);
-        log(`${cmdPrefix} [${originText}] setPowerState ${state ? 'on' : 'off'}`, this, 'cyan');  
-      } catch(err) {
-        log(`${cmdPrefix} [${originText}]${cmdFailPrefix} setPowerState returned an error`, this, null, err);
-      }
-    } else {
-      log(`${cmdPrefix} ${cmdFailPrefix} setPowerState failed: device is offline.`, this, 'red');
-    }
-  },
-
-  async toggle(origin) {
-    console.log("Toggle", origin)    ;
-    if (this.device) {
-      if (this.isOnline) {
-        let state = null;
-        switch (this.type) {
-          case 'IOT.SMARTBULB':
-            state = this.state.lightstate.on_off;
-            break;
-          case 'IOT.SMARTPLUGSWITCH':
-            state = this.state.powerstate;            
-        }
-
-        if (state !== null) {
-          log(`${cmdPrefix} toggle`, this, 'bgBlue');
-          this.setPowerState(!state, origin);
-        }
-        console.log(this.type, !state);
-        //if (this.subType ===)
-      }
-    }
-  },
-
 
   startPolling() {
 
