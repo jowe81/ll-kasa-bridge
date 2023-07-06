@@ -17,6 +17,47 @@ const globalConfig = {
     pollInterval: 5000,
   },
 
+  /**
+   * Classes are used to convenienently select devices that belong together.
+   * When assigning classes to a device or group, referencing the class name of a child class
+   * results in all its parents being assigned to the device automatically.
+   */
+  classTree: {
+    // Lighting
+    'class-lights': {
+
+      // Indoor Lighting
+      'class-indoorLights': {        
+        'class-bathroomLights': {},
+        'class-bedroomLights': {
+          'class-johannesDeskLights': {}
+        },
+        'class-hallwayLights': {},
+        'class-kitchenLights': {
+          'class-kitchenCounterLights': {}
+        },
+        'class-livingRoomLights': {
+          'class-jessDeskLights': {}
+        },
+      },
+
+      // Outdoor Lighting
+      'class-outdoorLights': {},
+    },
+
+    // Devices
+    'class-devices': {
+
+      // Air handling
+      'class-hvac': {
+      },
+
+      // Other
+      'class-electronics': {        
+      }
+    }
+  },
+
   defaults: {
     /**
      * Devices
@@ -366,6 +407,7 @@ const globalConfig = {
     {
       id: "Bed Shelf Lights",
       channels: [ 38 ],
+      class: 'class-bedroomLights',
       linkedDevices: [
         { 
           channel: 101,
@@ -387,6 +429,7 @@ const globalConfig = {
     {
       id: "Jess Desk Lights",
       channels: [ 31, 32, 33, 36, 40 ],
+      class: 'class-jessDeskLights',
       linkedDevices: [
         { 
           channel: 34,
@@ -406,6 +449,7 @@ const globalConfig = {
     {
       id: "Bedroom Desk Lights",
       channels: [ 3, 16, 37 ],
+      class: 'class-johannesDeskLights',
       linkedDevices: [
         { 
           channel: 14,
@@ -434,6 +478,7 @@ const deviceMap = [
   {
     alias: 'Bedroom IKEA lamp',
     channel: 2,
+    class: ['class-johannesDeskLights'],    
     id: "8012E7EA0A70974D997DE95E898FBA261F980E1A",
     subType: SUBTYPE_BULB,
     filters: [
@@ -555,6 +600,16 @@ const deviceMap = [
     subType: SUBTYPE_SWITCH,
     targets: {
       on: [
+        { channel: 8, stateData: true },
+        { 
+          channel: 9,
+          stateData: {
+            on_off: 1,
+            brightness: 20,
+            hue: 30,
+            saturation: 100,
+          }
+        },
         { channel: 5, stateData: true },  // Turn fan on
         { channel: 4, stateData: false }, // Turn heater off          
         { channel: 39, stateData: true }, // Turn audio amp on both ways
@@ -592,6 +647,17 @@ const deviceMap = [
         },
       ],
       off: [
+        { channel: 8, stateData: false },
+        { 
+          channel: 9,
+          stateData: {
+            on_off: 1,
+            brightness: 100,
+            hue: 120,
+            saturation: 100,
+          }
+        },
+
         { channel: 5, stateData: false }, // Turn fan off
         { channel: 4, stateData: true },  // Turn heater on
         { channel: 39, stateData: true }, // Turn audio amp on both ways
@@ -748,6 +814,7 @@ const deviceMap = [
   {
     alias: 'Front Door Lamp',
     channel: 35, 
+    class: 'class-outdoorLights',
     id: "801277C3769ADD0BA769504AAB6B233E1F77F11C",
     subType: SUBTYPE_BULB,
     filters: [

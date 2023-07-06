@@ -4,6 +4,7 @@ const resolveDeviceDependencies = (deviceWrapper) => {
   const { globalConfig } = deviceWrapper.devicePool;
   deviceWrapper.filters = resolveDeviceFilters(deviceWrapper, globalConfig);
   deviceWrapper.groups = resolveDeviceGroups(deviceWrapper, globalConfig);
+  deviceWrapper.classes = resolveDeviceClasses(deviceWrapper, globalConfig);
   return deviceWrapper;
 }
 
@@ -91,6 +92,105 @@ const resolveDeviceGroups = (deviceWrapper, globalConfig) => {
     }).filter(item => item);
 
   return groups;
+}
+
+/**
+ * Return an array of class identifiers.
+ */
+const resolveDeviceClasses = (deviceWrapper, globalConfig) => {
+  // Start with the class field on the deviceWrapper.
+  let resolvedDeviceClasses = resolveClassValue(deviceWrapper.class, globalConfig.classTree ?? {});
+
+  // Add class(es) defined on groups that this device belongs to.
+  deviceWrapper.groups.forEach(groupId => {
+    const group = globalConfig.groups.find(item => item.id === groupId);
+    const classesOnGroup = resolveClassValue(group.class, globalConfig.classTree ?? {});
+
+    resolvedDeviceClasses = [
+      ...resolvedDeviceClasses,
+      ...classesOnGroup,
+    ]
+  });
+
+  return resolvedDeviceClasses;  
+}
+
+/**
+ * Class may be specified as a string (single) or an array (multiple)
+ * on a device configuration.
+*/
+const resolveClassValue = (value, classTree) => {
+
+  if (!(typeof value === 'string' || Array.isArray(value))) {
+    return [];
+  }
+
+  let classNames = [];  
+  let classNamesDirect = [];
+
+  if (typeof value === 'string') {
+    classNamesDirect = [ value ];
+  }
+
+  if (Array.isArray(value)) {
+    classNamesDirect = [ ...value ];
+  }
+  
+  classNamesDirect.forEach(className => {
+    const searchData = {
+      ancestors: [],
+      found: false,
+    }
+
+    getParentClassNames(className, classTree, searchData);
+
+    if (searchData.found) {
+      classNames = [
+        ...classNames,
+        ...searchData.ancestors, 
+        className,          
+      ];    
+    }
+  });
+
+  return classNames;
+}
+
+/**
+ * Get a list of parent classes of className.
+ * (Recursion & backtracking.)
+ */
+const getParentClassNames = (className, classTree, searchData) => {
+  if (searchData.found) {
+    return;
+  }
+  
+  const children = Object.keys(classTree);
+  if (!children.length) {
+    // No descendants - step back
+    searchData.ancestors.pop();    
+    return;
+  }
+  
+  // Iterate over the children
+  children.every(key => {
+    if (key === className) {            
+      // Found the search name      
+      searchData.found = true;      
+      return false;
+    }
+
+    // This key doesn't match the class name, store the path and descend.
+    searchData.ancestors.push(key);    
+    getParentClassNames(className, classTree[key], searchData)
+    
+    return !searchData.found; // Continue the loop if not found
+  })
+
+  if (!searchData.found) {
+    // Path exhausted - step back.
+    searchData.ancestors.pop();
+  }
 }
 
 export { 

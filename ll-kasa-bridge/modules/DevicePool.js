@@ -148,6 +148,18 @@ const devicePool = {
       return groups;
   },
 
+  getDeviceWrappersByClassName(className) {
+    const deviceWrappers = [];
+
+    this.devices.forEach(deviceWrapper => {
+      if (Array.isArray(deviceWrapper.classes) && deviceWrapper.classes.includes(className)) {
+        deviceWrappers.push(deviceWrapper);
+      }
+    })
+
+    return deviceWrappers;
+  },
+
   getLiveDeviceMap() {
     const map = [];
 
