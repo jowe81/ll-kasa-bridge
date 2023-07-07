@@ -1060,7 +1060,78 @@ const deviceMap = [
 
 ];
 
+
+const presets = [
+  {
+    id: 'preset-full',
+    name: 'full',
+    stateData: {
+      lightState: {
+        brightness: 100,
+        on_off: 1,
+      }
+    }
+  },
+  {
+    id: 'preset-min',
+    name: 'minimum brightness',
+    stateData: {
+      lightState: {
+        brightness: 1,
+        on_off: 1,
+      }
+    }
+  },
+  {
+    id: 'preset-off',
+    name: 'minimum brightness',
+    stateData: {
+      lightState: {        
+        on_off: 0,
+      }
+    }
+  },
+  {    
+    id: 'preset-green',
+    name: 'green, fully saturated',
+    stateData: {
+      lightState: {
+        hue: 120,
+        saturation: 100,
+        color_temp: 0,
+        on_off: 1,
+      }
+    }
+  },
+  {
+    id: 'preset-red',
+    name: 'red, fully saturated',
+    stateData: {
+      lightState: {
+        hue: 0,
+        saturation: 100,
+        color_temp: 0,
+        on_off: 1,
+      }
+    }
+  },
+  {    
+    id: 'preset-white',
+    name: 'white',
+    stateData: {
+      lightState: {
+        hue:0,
+        saturation: 0,
+        color_temp: 6000,
+        on_off: 1,
+      }
+    }
+  },
+
+];
+
 export { 
   deviceMap,
   globalConfig,
+  presets,
 }

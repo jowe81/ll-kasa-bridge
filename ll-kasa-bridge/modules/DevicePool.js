@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 import constants from '../constants.js';
 import DeviceWrapper from './DeviceWrapper.js';
+import { getPreset } from './Presets.js';
 import { log } from './Log.js';
 
 import { isBetweenDuskAndDawn, isDawnOrDusk, isDawn, isDusk, getFromSettingsForNextSunEvent } from '../helpers/jDateTimeUtils.js';
@@ -122,6 +123,22 @@ const devicePool = {
     
   },
   
+  applyPresetToClass(className, presetId, origin) {
+    const devices = this.getDeviceWrappersByClassName(className);
+    const preset = getPreset(presetId);
+    console.log(`Retrieved Preset:`, preset);
+
+    devices.forEach(deviceWrapper => {
+      if (preset.stateData?.lightState) {
+        deviceWrapper.setLightState(preset.stateData.lightState, null, origin, null, true);
+      }
+
+      if (preset.stateData?.powerState) {
+        deviceWrapper.setPowerState(preset.stateData.powerState, null, origin, null, true);
+      }      
+    });
+  },
+
   getDeviceWrapperByChannel(channel) {
     return this.devices.find(deviceWrapper => deviceWrapper.channel === channel);
   },

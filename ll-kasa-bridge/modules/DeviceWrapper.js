@@ -663,7 +663,7 @@ const cmdFailPrefix = '[FAIL]';
 
   },
 
-  async setLightState(commandObject, triggerSwitchPosition, origin, filters = null) {    
+  async setLightState(commandObject, triggerSwitchPosition, origin, filters = null, skipAllFilters = false) {    
     let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
 
     if (!this.device) {
@@ -678,29 +678,34 @@ const cmdFailPrefix = '[FAIL]';
       return;
     }
 
-    // Apply filters    
-    if (filters === null) {
-      // No filters were passed in; use filters configured on this device.
-      filters = this.filters;
-    }
 
-    if (Array.isArray(filters) && filters.length) {
-      filters.forEach(filterObject => {
-        const switchPositionSetting = filterObject.switchPosition;
-  
-        // Execute the filter if:
-        if (
-          // the origin of the request the periodic filter service, or
-          (origin === constants.SERVICE_PERIODIC_FILTER) ||
-          // a switchPosition setting has not been defined for the filter, or
-          (typeof switchPositionSetting !== 'boolean') || 
-          // the trigger switch position matches the switchPosition setting.
-          (switchPositionSetting !== null && switchPositionSetting === triggerSwitchPosition)
-        ) {
-          // switchPosition either is not set on the filter, or it matches the trigger switch position.
-          commandObject = this.filter(filterObject, commandObject, true);
-        }
-      });  
+    if (!skipAllFilters) {
+      // Apply filters    
+      if (filters === null) {
+        // No filters were passed in; use filters configured on this device.
+        filters = this.filters;
+      }
+
+      if (Array.isArray(filters) && filters.length) {
+        filters.forEach(filterObject => {
+          const switchPositionSetting = filterObject.switchPosition;
+    
+          // Execute the filter if:
+          if (
+            // the origin of the request the periodic filter service, or
+            (origin === constants.SERVICE_PERIODIC_FILTER) ||
+            // a switchPosition setting has not been defined for the filter, or
+            (typeof switchPositionSetting !== 'boolean') || 
+            // the trigger switch position matches the switchPosition setting.
+            (switchPositionSetting !== null && switchPositionSetting === triggerSwitchPosition)
+          ) {
+            // switchPosition either is not set on the filter, or it matches the trigger switch position.
+            commandObject = this.filter(filterObject, commandObject, true);
+          }
+        });  
+      }
+    } else {
+      console.log(`${this.alias}: no filtering for command ${JSON.stringify(commandObject)}`);
     }
     
     if (!Object.keys(commandObject).length) {

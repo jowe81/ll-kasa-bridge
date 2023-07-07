@@ -22,6 +22,14 @@ const initRouter = (express, devicePool, processRequest) => {
     processRequest(req, res, 'setLightState', devicePool).catch(next);
   });
   
+  kasaRouter.get([ '/applyPreset/class' ], (req, res, next) => {    
+    const { className, presetId } = req.query;
+    console.log(`applying preset ${presetId} to class ${className}`);
+
+    devicePool.applyPresetToClass(className, presetId, 'API');
+    res.send('ok');
+  });
+
   return kasaRouter;
 }
 
