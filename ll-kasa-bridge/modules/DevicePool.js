@@ -123,18 +123,26 @@ const devicePool = {
     
   },
   
-  applyPresetToClass(className, presetId, origin) {
+  applyPresetToClass(className, presetId, origin, suspendPeriodicFilters, resumePeriodicFilters) {
     const devices = this.getDeviceWrappersByClassName(className);
     const preset = getPreset(presetId);
     console.log(`Retrieved Preset:`, preset);
 
     devices.forEach(deviceWrapper => {
-      if (preset.stateData?.lightState) {
-        deviceWrapper.setLightState(preset.stateData.lightState, null, origin, null, true);
+      if (suspendPeriodicFilters) { 
+        deviceWrapper.suspendPeriodicFilters();
       }
 
-      if (preset.stateData?.powerState) {
-        deviceWrapper.setPowerState(preset.stateData.powerState, null, origin, null, true);
+      if (resumePeriodicFilters) { 
+        deviceWrapper.resumePeriodicFilters();
+      }
+
+      if (preset?.stateData?.lightState) {
+        deviceWrapper.setLightState(preset.stateData.lightState, null, origin, null, true);        
+      }
+
+      if (preset?.stateData?.powerState) {
+        deviceWrapper.setPowerState(preset.stateData.powerState, null, origin, null, true);        
       }      
     });
   },
@@ -229,26 +237,35 @@ const devicePool = {
     const tag = `${serviceName}: `;
     log(`${tag}Run filters...`, null);
 
-    let filtersProcessed = 0;
+    let filtersProcessed = 0, filtersSkipped = 0;
 
     if (Array.isArray(this.devices)) {
       this.devices.forEach(deviceWrapper => {
+      
+        if (!deviceWrapper.periodicFiltersSuspended) {
+          const filtersToRun = this._getCurrentlyActivePeriodicFilters(deviceWrapper.filters);
 
-      const filtersToRun = this._getCurrentlyActivePeriodicFilters(deviceWrapper.filters);
-
-      if (Array.isArray(filtersToRun) && filtersToRun.length) {        
-        deviceWrapper.setLightState({}, null, serviceName, filtersToRun);
-        filtersProcessed++;
-      }          
-  
-    });
-
-    if (filtersProcessed) {
-      log(`${tag}Processed ${filtersProcessed} filters.`);
-    } else {
-      log(`${tag}Nothing to do.`);
+          if (Array.isArray(filtersToRun) && filtersToRun.length) {        
+            deviceWrapper.setLightState({}, null, serviceName, filtersToRun);
+            filtersProcessed++;
+          }  
+        } else {
+          filtersSkipped++;
+        }
+    
+      });
     }
+
+    let t = '';
+    if (filtersProcessed) {      
+      t += `Processed ${filtersProcessed} filters. `;
     }
+    
+    if (filtersSkipped) {
+      t += `Skipped ${filtersSkipped} filters. `;
+    }
+
+    log(tag + (t ? t : `Nothing to do.`));
   },
 
   // Filter out filters that shouldn't run

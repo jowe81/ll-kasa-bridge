@@ -36,7 +36,7 @@ const globalConfig = {
         'class-kitchenLights': {
           'class-kitchenCounterLights': {}
         },
-        'class-livingRoomLights': {
+        'class-livingroomLights': {
           'class-jessDeskLights': {}
         },
       },
@@ -469,7 +469,23 @@ const globalConfig = {
     {
       id: "Kitchen Counter Lights",
       channels: [ 42, 43 ],
+      class: 'class-kitchenCounterLights',
     },
+    { 
+      id: "Kitchen Lights",
+      channels: [ 28 ],
+      class: 'class-kitchenLights',
+    },
+    {
+      id: "Bathroom Lights",
+      channels: [ 10, 11, 12, 13 ],
+      class: 'class-bathroomLights',
+    },
+    { 
+      id: "Living Room Lights",
+      channels: [ 29, 30 ],
+      class: 'class-livingroomLights',
+    }
   ],
 }
 
@@ -478,7 +494,7 @@ const deviceMap = [
   {
     alias: 'Bedroom IKEA lamp',
     channel: 2,
-    class: ['class-johannesDeskLights'],    
+    class: 'class-johannesDeskLights',
     id: "8012E7EA0A70974D997DE95E898FBA261F980E1A",
     subType: SUBTYPE_BULB,
     filters: [
@@ -520,6 +536,7 @@ const deviceMap = [
   {
     alias: 'Bedroom Ceiling 1',
     channel: 6, 
+    class: 'class-bedroomLights',
     id: "8012C3A3B58B58E8081EDBCF694C8CBC1F790A02",
     subType: SUBTYPE_BULB,
     filters: [
@@ -529,7 +546,8 @@ const deviceMap = [
   },
   {
     alias: 'Bedroom Ceiling 2',
-    channel: 7, 
+    channel: 7,
+    class: 'class-bedroomLights',
     id: "8012511ABF75C811DB47A833DD2EDAED1F791417",
     subType: SUBTYPE_BULB,
     filters: [
@@ -541,12 +559,14 @@ const deviceMap = [
   {
     alias: 'Hallway Ceiling 1', //Hallway ceiling 2?
     channel: 8,
+    class: 'class-hallwayLights',
     id: "80121D6F58ADDCAC185363C01347F5EA1F752B55",
     subType: SUBTYPE_BULB,
   },
   {
     alias: 'Hallway Ceiling 2',
     channel: 9, 
+    class: 'class-hallwayLights',
     id: "8012DA57516B98CCFFE6467D8F4F01691F73C975",
     subType: SUBTYPE_BULB,
   },

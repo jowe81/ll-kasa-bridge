@@ -791,6 +791,16 @@ const cmdFailPrefix = '[FAIL]';
     }
   },
 
+  suspendPeriodicFilters() {
+    log(`Supending periodic filters.`, this);
+    this.periodicFiltersSuspended = true;
+  },
+
+  resumePeriodicFilters() {
+    log(`Resuming periodic filters.`, this);
+    this.periodicFiltersSuspended = false;
+  },
+
   updateState(data) {
     this.lastSeenAt = Date.now();
     this.state = _.cloneDeep(data);

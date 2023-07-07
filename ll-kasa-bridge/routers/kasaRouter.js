@@ -23,10 +23,10 @@ const initRouter = (express, devicePool, processRequest) => {
   });
   
   kasaRouter.get([ '/applyPreset/class' ], (req, res, next) => {    
-    const { className, presetId } = req.query;
+    const { className, presetId, suspendPeriodicFilters, resumePeriodicFilters } = req.query;
     console.log(`applying preset ${presetId} to class ${className}`);
 
-    devicePool.applyPresetToClass(className, presetId, 'API');
+    devicePool.applyPresetToClass(className, presetId, 'API', suspendPeriodicFilters, resumePeriodicFilters);
     res.send('ok');
   });
 
