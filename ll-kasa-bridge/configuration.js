@@ -405,7 +405,8 @@ const globalConfig = {
    */
   groups: [
     {
-      id: "Bed Shelf Lights",
+      id: "group-bedShelfLights",
+      name: "Bed Shelf Lights",
       channels: [ 38 ],
       class: 'class-bedroomLights',
       linkedDevices: [
@@ -427,7 +428,8 @@ const globalConfig = {
       ],  
     },
     {
-      id: "Jess Desk Lights",
+      id: "group-jessDeskLights",
+      name: "Jess Desk Lights",
       channels: [ 31, 32, 33, 36, 40 ],
       class: 'class-jessDeskLights',
       linkedDevices: [
@@ -447,7 +449,8 @@ const globalConfig = {
       ],  
     },
     {
-      id: "Bedroom Desk Lights",
+      id: "group-bedroomDeskLights",
+      name: "Bedroom Desk Lights",
       channels: [ 3, 16, 37 ],
       class: 'class-johannesDeskLights',
       linkedDevices: [
@@ -467,22 +470,26 @@ const globalConfig = {
       ],  
     },
     {
-      id: "Kitchen Counter Lights",
+      id: "group-kitchenCounterLights",
+      name: "Kitchen Counter Lights",
       channels: [ 42, 43 ],
       class: 'class-kitchenCounterLights',
     },
-    { 
-      id: "Kitchen Lights",
+    {       
+      id: "group-kitchenLights",
+      name: "Kitchen Lights",
       channels: [ 28 ],
       class: 'class-kitchenLights',
     },
     {
-      id: "Bathroom Lights",
+      id: "group-bathroomLights",
+      name: "Bathroom Lights",
       channels: [ 10, 11, 12, 13 ],
       class: 'class-bathroomLights',
     },
     { 
-      id: "Living Room Lights",
+      id: "group-livingroomLights",
+      name: "Living Room Lights",
       channels: [ 29, 30 ],
       class: 'class-livingroomLights',
     }
@@ -1088,6 +1095,26 @@ const presets = [
     stateData: {
       lightState: {
         brightness: 100,
+        on_off: 1,
+      }
+    }
+  },
+  {
+    id: 'preset-half',
+    name: 'minimum brightness',
+    stateData: {
+      lightState: {
+        brightness: 50,
+        on_off: 1,
+      }
+    }
+  },
+  {
+    id: 'preset-low',
+    name: 'minimum brightness',
+    stateData: {
+      lightState: {
+        brightness: 10,
         on_off: 1,
       }
     }

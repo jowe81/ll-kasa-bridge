@@ -7,6 +7,7 @@ import { devicePool } from './modules/DevicePool.js';
 import utils from './helpers/ll-bridge-utils.js';
 import { initRouter } from './routers/kasaRouter.js';
 import devicesRouter from './routers/devices.js';
+import getDevicePoolRouter from './routers/devicePool.js';
 import { log } from './helpers/jUtils.js';
 
 import { importDeviceMap, importGlobalConfig } from './modules/ImportDeviceMap.js';
@@ -20,6 +21,8 @@ import { Server } from 'socket.io';
 
 const app = express();
 app.use(cors());
+app.use(express.urlencoded());
+
 const server = http.createServer(app);
 const io = new Server({
   cors: {
@@ -43,13 +46,13 @@ mongoConnect().then(db => {
   const promises = [];
 
   // Check if we need to import a device map
-  if (process.argv.includes('-import-map')) {
+  if (process.argv.includes('--import-map')) {
     const options = { 'overwriteExisting' : true };
     promises.push(importDeviceMap(db, deviceMap, options));
   }
 
   // Check if need to import the configuration
-  if (process.argv.includes('-import-config')) {
+  if (process.argv.includes('--import-config')) {
     promises.push(importGlobalConfig(db, globalConfig));
   }
 
@@ -65,6 +68,9 @@ mongoConnect().then(db => {
 
       const devices = devicesRouter(express, devicePool);
       app.use('/auto/devices', devices);
+
+      const devicePoolRouter = getDevicePoolRouter(express, devicePool);
+      app.use('/auto/devicePool', devicePoolRouter);
 
       // Initialize socket server.
       io.on('connection', (socket) => {

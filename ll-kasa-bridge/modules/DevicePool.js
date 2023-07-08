@@ -122,20 +122,23 @@ const devicePool = {
     });
     
   },
-  
-  applyPresetToClass(className, presetId, origin, suspendPeriodicFilters, resumePeriodicFilters) {
-    const devices = this.getDeviceWrappersByClassName(className);
-    const preset = getPreset(presetId);
-    console.log(`Retrieved Preset:`, preset);
 
-    devices.forEach(deviceWrapper => {
-      if (suspendPeriodicFilters) { 
-        deviceWrapper.suspendPeriodicFilters();
-      }
+  /**
+   * Apply a preset to a set of devices by target type / target id
+   */  
+  applyPresetTo(targetType, targetId, presetId, options, origin = 'API') {    
+    const deviceWrappers = this.getDeviceWrappers(targetType, targetId);   
+    this.applyPreset(deviceWrappers, presetId, options, origin);
+  },
 
-      if (resumePeriodicFilters) { 
-        deviceWrapper.resumePeriodicFilters();
-      }
+  /**
+   * Apply a preset to a set of devices
+   */  
+  applyPreset(deviceWrappers, presetId, options, origin) {
+    const preset = getPreset(presetId);        
+    
+    deviceWrappers.forEach(deviceWrapper => {
+      log(`Applying preset ${presetId}`, deviceWrapper);
 
       if (preset?.stateData?.lightState) {
         deviceWrapper.setLightState(preset.stateData.lightState, null, origin, null, true);        
@@ -145,6 +148,72 @@ const devicePool = {
         deviceWrapper.setPowerState(preset.stateData.powerState, null, origin, null, true);        
       }      
     });
+  },
+
+  /**
+   * Apply options to a set of devices by target type / target id
+   */
+  applyOptionsTo(targetType, targetId, options, origin = 'API') {
+    if (!(typeof options === 'object' && Object.keys(options).length)) {
+      return;
+    }
+
+    const deviceWrappers = this.getDeviceWrappers(targetType, targetId);
+    this.applyOptions(deviceWrappers, options, origin);
+  },
+
+  /**
+   * Apply options to a set of devices
+   */
+  applyOptions(deviceWrappers, options, origin) {
+    deviceWrappers.forEach(deviceWrapper => {
+      const optionsText = [];
+
+      if (options.suspendPeriodicFilters) { 
+        deviceWrapper.suspendPeriodicFilters();
+        optionsText.push(`suspend periodic filters`);
+      }
+
+      if (options.resumePeriodicFilters) { 
+        deviceWrapper.resumePeriodicFilters();
+        optionsText.push(`resume periodic filters`);
+      }
+
+      const optionsTextStr = optionsText.join(', ');
+
+      log(`Applied options: ${optionsTextStr}`, deviceWrapper);
+    });
+  },
+
+  /**
+   * Get device wrappers by target type / target id
+   */
+  getDeviceWrappers(targetType, targetId) {
+    let deviceWrappers = [];
+
+    switch (targetType) {
+      case 'channel':
+        const deviceWrapper = this.getDeviceWrapperByChannel(parseInt(targetId));
+        if (!deviceWrapper) {
+          log(`Device on channel ${targetId} not found.`);
+        } else {
+          deviceWrappers = [ deviceWrapper ];
+        }        
+        break;
+      
+      case 'class':
+        deviceWrappers = this.getDeviceWrappersByClassName(targetId);
+        if (!deviceWrappers.length) {
+          log(`No devices in class ${targetId}.`);
+        }    
+        break;
+        
+      case 'group':
+        // Todo
+        break;
+    }
+
+    return deviceWrappers;
   },
 
   getDeviceWrapperByChannel(channel) {
@@ -237,32 +306,38 @@ const devicePool = {
     const tag = `${serviceName}: `;
     log(`${tag}Run filters...`, null);
 
+    let devicesProcessed = 0, devicesSkipped = 0;
     let filtersProcessed = 0, filtersSkipped = 0;
 
     if (Array.isArray(this.devices)) {
       this.devices.forEach(deviceWrapper => {
-      
-        if (!deviceWrapper.periodicFiltersSuspended) {
-          const filtersToRun = this._getCurrentlyActivePeriodicFilters(deviceWrapper.filters);
+              
+        const filtersToRun = this._getCurrentlyActivePeriodicFilters(deviceWrapper.filters);
 
-          if (Array.isArray(filtersToRun) && filtersToRun.length) {        
+        if (Array.isArray(filtersToRun) && filtersToRun.length) {        
+          if (!deviceWrapper.periodicFiltersSuspended) {
             deviceWrapper.setLightState({}, null, serviceName, filtersToRun);
-            filtersProcessed++;
-          }  
-        } else {
-          filtersSkipped++;
+            filtersProcessed += filtersToRun.length;
+            devicesProcessed++;
+          } else {
+            filtersSkipped += filtersToRun.length;
+          }
+        }  
+
+        if (deviceWrapper.periodicFiltersSuspended) {      
+          devicesSkipped++;
         }
     
       });
     }
 
     let t = '';
-    if (filtersProcessed) {      
-      t += `Processed ${filtersProcessed} filters. `;
+    if (devicesProcessed) {      
+      t += `Processed ${filtersProcessed} filters on ${devicesProcessed} devices. `;
     }
     
-    if (filtersSkipped) {
-      t += `Skipped ${filtersSkipped} filters. `;
+    if (devicesSkipped) {
+      t += `Skipped ${filtersSkipped} filters on ${devicesSkipped} devices. `;
     }
 
     log(tag + (t ? t : `Nothing to do.`));
