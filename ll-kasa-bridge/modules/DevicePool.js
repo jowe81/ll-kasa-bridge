@@ -82,6 +82,7 @@ const devicePool = {
       // Store a backreference to the pool in each wrapper to enable event listeners to execute functinos on other devices
       deviceWrapper.devicePool = this;
       deviceWrapper.injectDevice(device, mapItem, this.globalConfig, this.deviceEventCallback);
+      deviceWrapper.startPolling();
       
       this.devices.push(deviceWrapper);      
     }
