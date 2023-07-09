@@ -201,6 +201,10 @@ const cmdFailPrefix = '[FAIL]';
    * @param {boolean|Object} commandObject 
    */
   cacheCommand(commandObject, triggerSwitchPosition, commandTimeStamp) {  
+    if (!Object.keys(commandObject).length) {
+      return;
+    }
+
     if (!commandTimeStamp) {
       commandTimeStamp = Date.now();
     }
