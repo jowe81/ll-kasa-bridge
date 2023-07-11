@@ -32,17 +32,13 @@ const Devices = ({wsConnected, devices}) => {
     );
   }
 
-  const boxes = devices.map((device) => {
-            
-      const classes = `deviceContainer ${device.state?.lightstate?.on_off || device.state?.powerstate ? 'deviceOn' : 'deviceOff'}`;
-      const html = <div className={classes} key={device.id} onClick={() => toggle(device)}><label>{ device.alias }</label></div>;
-
-      
+  const boxes = devices.map((device, index) => {            
+      const classes = `deviceContainer ${device.powerState ? 'deviceOn' : 'deviceOff'}`;
+      const html = <div className={classes} key={index} onClick={() => toggle(device)}><label>{ device.alias }</label></div>;      
       return html
     }
   );
 
-  
   return (
     <div>Devices:
       <div className="devicesContainer">{boxes}</div>
