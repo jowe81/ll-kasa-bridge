@@ -767,6 +767,10 @@ const cmdFailPrefix = '[FAIL]';
     }
   },
 
+  async toggle(origin) {
+    this.setPowerState(!this.getPowerState(), null, origin);
+  },
+
   startPolling() {
 
     if (this.device && this.isOnline) {
@@ -808,6 +812,8 @@ const cmdFailPrefix = '[FAIL]';
   updateState(data) {
     this.lastSeenAt = Date.now();
     this.state = _.cloneDeep(data);
+    this.powerState = this.getPowerState();    
+    this.socketHandler.emitDeviceUpdate(this);
   }
 }
 

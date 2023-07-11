@@ -79,11 +79,13 @@ const devicePool = {
         mapItem.groups = this.getGroupsForChannel(mapItem.channel);
       }
 
-      // Store a backreference to the pool in each wrapper to enable event listeners to execute functinos on other devices
+      // Store a backreference to the pool and to the socket handler in each wrapper
       deviceWrapper.devicePool = this;
+      deviceWrapper.socketHandler = this.socketHandler;
+      
       deviceWrapper.injectDevice(device, mapItem, this.globalConfig, this.deviceEventCallback);
       deviceWrapper.startPolling();
-      
+
       this.devices.push(deviceWrapper);      
     }
 
@@ -257,28 +259,28 @@ const devicePool = {
 
   getLiveDeviceMap() {
     const map = [];
-
-    this.devices.forEach(deviceWrapper => {
-
-      const { channel, id, alias, subType, targets, type, host, isOnline, lastSeenAt, state } = deviceWrapper;
-      
-      const item = {
-        channel,
-        id,
-        alias,
-        subType,
-        targets,
-        type,
-        host,
-        isOnline,
-        lastSeenAt,
-        state,
-      };
-
-      map.push(item);
-    });
-
+    this.devices.forEach(deviceWrapper => map.push(this.getLiveDevice(deviceWrapper)));
     return map;
+  },
+
+  getLiveDevice(deviceWrapper) {
+    const { channel, id, alias, subType, targets, type, host, isOnline, lastSeenAt, powerState, state } = deviceWrapper;
+      
+    const item = {
+      channel,
+      id,
+      alias,
+      subType,
+      targets,
+      type,
+      host,
+      isOnline,
+      lastSeenAt,
+      powerState,
+      state,
+    };
+
+    return item;
   },
 
   async getDeviceMapItemById(id) {
@@ -404,9 +406,6 @@ const devicePool = {
 
     return filtersToRun;
   }
-
-
-
 }
 
 
