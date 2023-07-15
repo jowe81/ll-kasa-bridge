@@ -409,6 +409,9 @@ const globalConfig = {
       name: "Bed Shelf Lights",
       channels: [ 38 ],
       class: 'class-bedroomLights',
+      filters: [
+        { refId: 'naturalLight' }
+      ],      
       linkedDevices: [
         { 
           channel: 101,

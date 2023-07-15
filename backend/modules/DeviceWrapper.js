@@ -201,6 +201,10 @@ const cmdFailPrefix = '[FAIL]';
    * @param {boolean|Object} commandObject 
    */
   cacheCommand(commandObject, triggerSwitchPosition, commandTimeStamp) {  
+    if (!['boolean', 'object'].includes(typeof commandObject)) {
+      return;
+    }
+
     if (!Object.keys(commandObject).length) {
       return;
     }
@@ -574,9 +578,10 @@ const cmdFailPrefix = '[FAIL]';
       const groupMatesSynced = [];
       let otherDevicesInGroup = this.getGroupMates(this.groups);
 
+      const thisDevicePowerState = this.getPowerState(); //check this out
+
       otherDevicesInGroup.forEach(deviceWrapper => {            
         const linkedDevicePowerState = deviceWrapper.getPowerState();
-        const thisDevicePowerState = this.getPowerState();
         if (linkedDevicePowerState !== thisDevicePowerState) {
           deviceWrapper.setPowerState(!linkedDevicePowerState, newStateBool, constants.SERVICE_BACKEND_FLIP);
           groupMatesSynced.push(deviceWrapper);
@@ -670,6 +675,11 @@ const cmdFailPrefix = '[FAIL]';
   async setLightState(commandObject, triggerSwitchPosition, origin, filters = null, skipAllFilters = false) {    
     let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
 
+    if (!commandObject || typeof commandObject !== 'object') {
+      log(`${cmdPrefix} ${cmdFailPrefix} setLightState error: no command object passed in`, this, 'red');
+      return;
+    }
+
     if (!this.device) {
       log(`${cmdPrefix} ${cmdFailPrefix} setLightState error: device not found.`, this, 'red');
       this.cacheCommand(commandObject, triggerSwitchPosition);      
@@ -746,7 +756,7 @@ const cmdFailPrefix = '[FAIL]';
     }
 
     if (!this.isOnline) {
-      this.cacheCommand(commandObject, triggerSwitchPosition);      
+      this.cacheCommand(state, triggerSwitchPosition);      
       return;
     }
 
@@ -755,7 +765,7 @@ const cmdFailPrefix = '[FAIL]';
 
       if (!success) {
         log(`${cmdPrefix} [${originText}] setPowerState error: device did not acknowledge success.`, this, 'red');
-        this.cacheCommand(commandObject, triggerSwitchPosition);
+        this.cacheCommand(state, triggerSwitchPosition);
         
         return;
       }
@@ -763,7 +773,7 @@ const cmdFailPrefix = '[FAIL]';
       log(`${cmdPrefix} [${originText}] setPowerState ${state ? 'on' : 'off'}`, this, 'cyan');  
     } catch(err) {
       log(`${cmdPrefix} [${originText}]${cmdFailPrefix} setPowerState error; caching command: power-${state ? 'on' : 'off'}`, this, null, err);
-      this.cacheCommand(commandObject, triggerSwitchPosition);
+      this.cacheCommand(state, triggerSwitchPosition);
     }
   },
 

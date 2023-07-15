@@ -27,7 +27,9 @@ const socketHandler = {
       });
 
       // Clients may execute macros
-      socket.on('auto/command/macro', ({ channel, name, commandObject }) => {
+      socket.on('auto/command/macro', (props) => {
+        console.log('PROPS', props);
+        const { channel, name, commandObject } = props;
         const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel);
 
         if (deviceWrapper) {
