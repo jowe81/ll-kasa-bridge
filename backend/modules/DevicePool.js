@@ -51,10 +51,10 @@ const devicePool = {
 
     await this.loadGlobalConfiguration();
 
-    // Load the filter plugins
     loadFilterPlugins();
-
     this.startPeriodicFilterService();
+
+    this.initDeviceWrappers();
     this.startDiscovery();
   },
 
@@ -71,22 +71,24 @@ const devicePool = {
 
     const client = new TplinkSmarthomeApi.Client();
 
+    // Add a newly discovered device.
     const addDevice = async device => {
-      const deviceWrapper = Object.create(DeviceWrapper);      
+      let deviceWrapper;
+
       const mapItem = await this.getDeviceMapItemById(device.id);
 
       if (mapItem) {
+        // Device is in the map and therefore has an existing wrapper.
+        deviceWrapper = this.getDeviceWrapperByChannel(mapItem.channel);
         mapItem.groups = this.getGroupsForChannel(mapItem.channel);
+      } else {
+        // This device is not in the map (and therefore not in the pool); wrap and add it.
+        deviceWrapper = Object.create(DeviceWrapper);
+        this.devices.push(deviceWrapper);
       }
-
-      // Store a backreference to the pool and to the socket handler in each wrapper
-      deviceWrapper.devicePool = this;
-      deviceWrapper.socketHandler = this.socketHandler;
       
       deviceWrapper.injectDevice(device, mapItem, this.globalConfig, this.deviceEventCallback);
       deviceWrapper.startPolling();
-
-      this.devices.push(deviceWrapper);      
     }
 
     const options = {
@@ -287,10 +289,35 @@ const devicePool = {
     return this.dbDeviceMap.findOne({id});
   },
 
+  async getDeviceMapFromDb() {
+    return this.dbDeviceMap.find({}).toArray();
+  },
+
   async getDeviceWrapperById(id) {
     const mapItem = await this.getDeviceMapItemById(id);
     if (mapItem) {
       return Promise.resolve(this.getDeviceWrapperByChannel(mapItem.channel));
+    }
+  },
+
+  // Create deviceWrappers for all devices on the map.
+  async initDeviceWrappers() {
+    const deviceMap = await this.getDeviceMapFromDb();
+
+    if (Array.isArray(deviceMap)) {
+      deviceMap.forEach(mapItem => {
+        const deviceWrapper = Object.create(DeviceWrapper);      
+  
+        mapItem.groups = this.getGroupsForChannel(mapItem.channel);
+  
+        // Store a backreference to the pool and to the socket handler in each wrapper
+        deviceWrapper.devicePool = this;
+        deviceWrapper.socketHandler = this.socketHandler;
+        
+        // Call this here with a null device. It will be called again once the device is discovered.
+        deviceWrapper.injectDevice(null, mapItem, this.globalConfig, this.deviceEventCallback);  
+        this.devices.push(deviceWrapper);      
+      });
     }
   },
 
