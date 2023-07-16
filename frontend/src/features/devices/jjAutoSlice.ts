@@ -65,7 +65,6 @@ const jjAutoSlice = createSlice({
 
         // Add a single device.
         deviceAdded(devices, action: PayloadAction<Device>) {
-          //devices.push(action.payload);
           addDevice(devices, action.payload);
         },
 
@@ -96,7 +95,7 @@ const jjAutoSlice = createSlice({
 const addDevice = (devices: Device[], addedDevice: Device) => {
   const deviceKey = getDeviceKeyByChannel(devices, addedDevice.channel);
 
-  if (deviceKey) {
+  if (deviceKey !== null) {
     // Device exists, overwrite.
     devices[deviceKey] = addedDevice;
   } else {
