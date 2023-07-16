@@ -5,7 +5,9 @@ function Home() {
     <>
       <div>Welcome to jjAuto</div>
       <div>
-        Devices: <Link to={'/table'}>Table</Link>
+        Devices:&nbsp;
+        <Link to={'/table'}>Table</Link> |&nbsp; 
+        <Link to={'/touch'}>Touch</Link>
       </div>
     </>
   );

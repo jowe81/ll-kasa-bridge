@@ -1,13 +1,14 @@
 import { useAppSelector } from '../../app/hooks.ts';
 import { socket } from '../websockets/socket.tsx';
 
+import './devices.css';
 
 function TableView() {
   const devices = useAppSelector(state => state.jjAuto);
 
   const handleClick = (e) => {
     const channel = e.target.dataset.deviceChannel;
-        
+
     if (channel) {
       socket.emit('auto/command/macro', {
         channel: parseInt(channel),
@@ -15,6 +16,8 @@ function TableView() {
       });    
     }
   }
+
+  
 
   return (
     <>        
@@ -33,23 +36,43 @@ function TableView() {
                         </tr>
                     </thead>
                     <tbody>
-                        {devices.map((device, index) => (
-                            <tr key={index}>
+                        {devices.map((device, index) => {
+                          const powerStatePresent = device.isOnline && typeof device.powerState === 'boolean';
+                          let powerStateClass: string = '';
+                          
+                          if (powerStatePresent) {
+                            switch (device.powerState) {
+                              case true:
+                                powerStateClass = "power-on";
+                                break;
+
+                              case false:
+                                powerStateClass = "power-off";                                
+                                break;
+                                
+                              default:
+                                powerStateClass = "power-off";
+                            }
+                            
+                          }
+                          
+                          return (
+                            <tr key={index}>                              
                                 <td>{device.channel}</td>
                                 <td>{device.alias}</td>
                                 <td>{device.isOnline ? 'yes' : 'no'}</td>
-                                <td>
-                                  {device.isOnline && (device.state?.on_off ? "on" : "off")}                                  
+                                <td className={powerStateClass}>
+                                  {powerStatePresent && (device.powerState ? "on" : "off")}
                                 </td>
                                 <td>                                    
-                                    { (typeof device.powerState === 'boolean') && (device.isOnline) &&
+                                    { powerStatePresent &&
                                       <button data-device-channel={device.channel} onClick={handleClick}>
                                         {device.powerState ? 'Turn off' : 'Turn on'}
                                       </button> 
                                     }                                                                      
                                 </td>
                             </tr>
-                        ))}
+                        )})}
                     </tbody>
                 </table>
             </div>

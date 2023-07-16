@@ -6,6 +6,7 @@ import { socket } from './features/websockets/socket';
 
 import Home from "./Home";
 import TableView from "./features/devices/tableView";
+import TouchView from "./features/devices/touchView";
 
 
 import {
@@ -78,6 +79,7 @@ return (
       <Routes>
         <Route path="/" element={ <Home /> } />
         <Route path="table" element={ <TableView /> } />
+        <Route path="touch" element={ <TouchView /> } />
 
         <Route path="*" element={<Navigate to="/" replace/>}/>
       </Routes>

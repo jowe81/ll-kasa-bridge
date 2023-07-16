@@ -1,0 +1,12 @@
+.power-on {
+  background-color: green;
+
+}
+
+.power-off {
+  background-color: brown;
+}
+
+tr {
+  height: 40px;
+}
