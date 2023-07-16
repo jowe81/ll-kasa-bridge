@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export interface Device  {
-
+export interface Device {
   alias: string;
   channel: number;
   host: string;
@@ -19,21 +18,45 @@ export interface Device  {
     on: any[];
     off: any[];
   };
-p
 }
 
-export interface PowerStateUpdate {
-  channel: number;
-  powerState: boolean;
+export interface Group {
+  id: string;
+  name: string;
+  channels: number[];
+  class: string | string[];
+  filters: object[];
+  linkedDevices: object[];
 }
+
+export interface DeviceStateUpdate {
+  changeInfo: object;
+  data: {
+    channel: number;
+    powerState: boolean;   
+    state: {
+      brightness: number;
+      color_temp: number;
+      hue: number;
+      on_off: number;
+      saturation: number;
+    };
+  }
+}
+
+export interface DeviceOnlineStateUpdate {
+  channel: number;
+  data: {
+    isOnline: boolean;
+  }
+};
 
 const initialState: Device[] = [];
 
 const jjAutoSlice = createSlice({
     name: 'jjAuto',
     initialState,
-    reducers: {
-      
+    reducers: {      
         // Add an array of devices.
         devicesAdded(devices, action: PayloadAction<Device[]>) {
           //action.payload.forEach(device => devices.push(device));
@@ -46,18 +69,29 @@ const jjAutoSlice = createSlice({
           addDevice(devices, action.payload);
         },
 
-        // Update powerState for a single device
-        powerStateUpdated(devices, action:PayloadAction<PowerStateUpdate>) {
-          const deviceKey = getDeviceKeyByChannel(devices, action.payload.channel);
-          
+        // Update device state for a single device
+        deviceStateUpdated(devices, action:PayloadAction<DeviceStateUpdate>) {
+          const { channel, state } = action.payload.data;
 
-          if (deviceKey) {            
-            console.log(`PS-update on ${action.payload.channel}: `, action.payload.powerState, ` (was: `, devices[deviceKey].powerState);
-            devices[deviceKey].powerState = action.payload.powerState;
-          }                        
+          const deviceKey = getDeviceKeyByChannel(devices, action.payload.data.channel);
+        
+          if (deviceKey !== null) {
+            //console.log(`Device State update on ${channel}: `, action.payload.changeInfo, state, ` was: `, devices[deviceKey].state);            
+            devices[deviceKey].state = state;
+            devices[deviceKey].powerState = action.payload.data.powerState;
+          }
         },
+
+        deviceOnlineStateUpdated(devices, action: PayloadAction<DeviceOnlineStateUpdate>) {
+          const deviceKey = getDeviceKeyByChannel(devices, action.payload.channel);
+
+          if (deviceKey !== null) {
+            console.log(`Device Online State update on ${action.payload.channel}: `, action.payload.data.isOnline, ` was: `, devices[deviceKey].isOnline); 
+            devices[deviceKey].isOnline = action.payload.data.isOnline;
+          }
+        }
     }
-})
+});
 
 const addDevice = (devices: Device[], addedDevice: Device) => {
   const deviceKey = getDeviceKeyByChannel(devices, addedDevice.channel);
@@ -86,16 +120,11 @@ const getDeviceKeyByChannel = ((devices: Device[], channel: number): number | nu
   return deviceKey;
 })
 
-const getDeviceByChannel = ((devices: Device[], channel: number):Device | null => {
-  let deviceKey: number | null = getDeviceKeyByChannel(devices, channel);
-
-  return deviceKey ? devices[deviceKey] : null;
-})
-
 export const { 
   devicesAdded, 
-  deviceAdded, 
-  powerStateUpdated
+  deviceAdded,
+  deviceStateUpdated,
+  deviceOnlineStateUpdated,
 } = jjAutoSlice.actions;
 
 

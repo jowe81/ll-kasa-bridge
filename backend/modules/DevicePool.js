@@ -8,6 +8,7 @@ import { log } from './Log.js';
 
 import { isBetweenDuskAndDawn, isDawnOrDusk, isDawn, isDusk, getFromSettingsForNextSunEvent } from '../helpers/jDateTimeUtils.js';
 import { loadFilterPlugins } from './Filters.js';
+import { globalConfig } from '../configuration.js';
 
 /**
  * The DevicePool encapsulates all automation device functionality.
@@ -27,12 +28,6 @@ const devicePool = {
 
     // This function will be injected into the device wrapper and called on device events
     this.deviceEventCallback = (event, deviceWrapper) => {
-
-      //Push device event to sockets
-      io.emit('auto/devicestate', { 
-        event: event, 
-        data: { state: deviceWrapper.state}
-      });
       
       // Run the callback if one was passed in
       if (deviceEventCallback) {
@@ -78,17 +73,16 @@ const devicePool = {
       const mapItem = await this.getDeviceMapItemById(device.id);
 
       if (mapItem) {
-        // Device is in the map and therefore has an existing wrapper.
+        // Device is in the map and therefore has an existing wrapper; inject the device.
         deviceWrapper = this.getDeviceWrapperByChannel(mapItem.channel);
-        mapItem.groups = this.getGroupsForChannel(mapItem.channel);
+        deviceWrapper.injectDevice(device, mapItem, this.globalConfig, this.deviceEventCallback);
       } else {
-        // This device is not in the map (and therefore not in the pool); wrap and add it.
-        deviceWrapper = Object.create(DeviceWrapper);
-        this.devices.push(deviceWrapper);
+        // This device is not in the map (and therefore not in the pool and has no wrapper yet)
+        deviceWrapper = this.initDeviceWrapper(null, device);
       }
-      
-      deviceWrapper.injectDevice(device, mapItem, this.globalConfig, this.deviceEventCallback);
+            
       deviceWrapper.startPolling();
+      deviceWrapper.socketHandler.emitDeviceStateUpdate(deviceWrapper);
     }
 
     const options = {
@@ -112,6 +106,7 @@ const devicePool = {
         log(`Device went offline.`, deviceWrapper, 'yellow');
         deviceWrapper.isOnline = false;
         deviceWrapper.stopPolling();
+        deviceWrapper.socketHandler.emitDeviceOnlineStateUpdate(deviceWrapper);
       }
     });
 
@@ -122,7 +117,8 @@ const devicePool = {
         deviceWrapper.isOnline = true;
         deviceWrapper.flushCommandCache();
         deviceWrapper.startPolling();
-        deviceWrapper.lastSeenAt = Date.now();        
+        deviceWrapper.lastSeenAt = Date.now(); 
+        deviceWrapper.socketHandler.emitDeviceOnlineStateUpdate(deviceWrapper);
       }
     });
     
@@ -266,21 +262,38 @@ const devicePool = {
   },
 
   getLiveDevice(deviceWrapper) {
-    const { channel, id, alias, subType, targets, type, host, isOnline, lastSeenAt, powerState, state } = deviceWrapper;
       
-    const item = {
-      channel,
-      id,
-      alias,
-      subType,
-      targets,
-      type,
-      host,
-      isOnline,
-      lastSeenAt,
-      powerState,
-      state,
-    };
+    const item = {};
+
+    const includeKeys = [
+      'channel',
+      'id',
+      'alias',
+      'subType',
+      'targets',
+      'type',
+      'host',
+      'groups',
+      'classes',
+      'isOnline',
+      'lastSeenAt',
+      'powerState',
+      'state',
+    ]
+
+    const excludeKeys = [
+      'device', 
+      'socketHandler', 
+      'devicePool', 
+      'globalConfig', 
+      'deviceEventCallback'
+    ];
+    
+    const keys = Object.keys(deviceWrapper).filter(key => { 
+      return includeKeys.includes(key);
+    });
+    
+    keys.forEach(key => item[key] = deviceWrapper[key]);
 
     return item;
   },
@@ -305,20 +318,34 @@ const devicePool = {
     const deviceMap = await this.getDeviceMapFromDb();
 
     if (Array.isArray(deviceMap)) {
-      deviceMap.forEach(mapItem => {
-        const deviceWrapper = Object.create(DeviceWrapper);      
-  
-        mapItem.groups = this.getGroupsForChannel(mapItem.channel);
-  
-        // Store a backreference to the pool and to the socket handler in each wrapper
-        deviceWrapper.devicePool = this;
-        deviceWrapper.socketHandler = this.socketHandler;
-        
-        // Call this here with a null device. It will be called again once the device is discovered.
-        deviceWrapper.injectDevice(null, mapItem, this.globalConfig, this.deviceEventCallback);  
-        this.devices.push(deviceWrapper);      
-      });
+      deviceMap.forEach(mapItem => this.initDeviceWrapper(mapItem, null));
     }
+  },
+
+  initDeviceWrapper(mapItem, device) {
+    const deviceWrapper = Object.create(DeviceWrapper);      
+    
+    if (mapItem) {
+      mapItem.groups = this.getGroupsForChannel(mapItem.channel);
+    } else {
+      mapItem = {
+        alias: 'Unmapped device',
+        channel: null,
+        class: 'class-unmappedDevices',
+        id: device?.id,
+      }
+    }
+    
+    // Store a backreference to the pool and to the socket handler in each wrapper
+    deviceWrapper.devicePool = this;
+    deviceWrapper.socketHandler = this.socketHandler;
+    
+    // For items on the deviceMap, injectDevice will first be called with null device. It will be called again once the device is discovered.
+    deviceWrapper.injectDevice(device, mapItem, this.globalConfig, this.deviceEventCallback);  
+
+    this.devices.push(deviceWrapper);
+
+    return deviceWrapper;
   },
 
   async loadGlobalConfiguration() {

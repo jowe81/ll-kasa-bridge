@@ -1,4 +1,5 @@
 import { log } from "../helpers/jUtils.js";
+import { buildCommandObjectFromCurrentState } from './TargetDataProcessor.js';
 
 const socketHandler = {
 
@@ -26,9 +27,12 @@ const socketHandler = {
         socket.emit('auto/devices', this.devicePool.getLiveDeviceMap());
       });
 
+      socket.on('auto/getGroups', () => {
+        socket.emit('auto/groups', this.devicePool.globalConfig.groups);
+      });
+
       // Clients may execute macros
       socket.on('auto/command/macro', (props) => {
-        console.log('PROPS', props);
         const { channel, name, commandObject } = props;
         const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel);
 
@@ -45,13 +49,41 @@ const socketHandler = {
     });
   },
 
+  /**
+   * Broadcast Methods
+   */
+
+  // Push full device update
+  emitDeviceUpdate(deviceWrapper) {
+    this.io.emit('auto/device', this.devicePool.getLiveDevice(deviceWrapper));
+  },
+
+  // Push device state update
+  emitDeviceStateUpdate(deviceWrapper, changeInfo) {
+    this.io.emit('auto/device/state', { 
+      changeInfo,
+      data: {
+        powerState: deviceWrapper.powerState,       
+        state: buildCommandObjectFromCurrentState(deviceWrapper),
+        channel: deviceWrapper.channel,
+      }
+    });
+  },
+
+  // Push device online-state update
+  emitDeviceOnlineStateUpdate(deviceWrapper) {
+    console.log('Emitting onlinestate update for ', deviceWrapper.alias, deviceWrapper.isOnline);
+    this.io.emit('auto/device/onlineState', { 
+      channel: deviceWrapper.channel,
+      data: {
+        isOnline: deviceWrapper.isOnline,        
+      }
+    });
+  },
+
   startSocketServer() {
     this.io.listen(4000);
     log(`Socket Server is listening on port ${this.port}.`);  
-  },
-
-  emitDeviceUpdate(deviceWrapper) {
-    this.io.emit('auto/device', this.devicePool.getLiveDevice(deviceWrapper));
   },
 
   _getDeviceWrapper(channel) {

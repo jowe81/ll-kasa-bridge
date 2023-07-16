@@ -37,9 +37,11 @@ const cmdFailPrefix = '[FAIL]';
         return;
       }
 
+      this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
+      
       const event = this.getPowerState() ? 'power-on' : 'power-off';
       log(event, this);
-
+      
       // See if we should ignore this event.
       if (this.__ignoreNextChangeByBackend) {
         // Ignore this change and remove the flag.
@@ -67,11 +69,13 @@ const cmdFailPrefix = '[FAIL]';
       // This call must come before updateState (it needs the old state).
       const changeInfo = this.analyzeStateChange(newState);
       this.updateState(newState);
-
+      
       // Was this a change at all?
       if (!(changeInfo && changeInfo.changed)) {
         return;
       }
+
+      this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
 
       // Was it an on/off change?
       if (!changeInfo.on_off) {
@@ -822,8 +826,7 @@ const cmdFailPrefix = '[FAIL]';
   updateState(data) {
     this.lastSeenAt = Date.now();
     this.state = _.cloneDeep(data);
-    this.powerState = this.getPowerState();    
-    this.socketHandler.emitDeviceUpdate(this);
+    this.powerState = this.getPowerState();        
   }
 }
 

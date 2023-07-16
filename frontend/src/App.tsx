@@ -6,9 +6,18 @@ import { ConnectionManager } from './features/websockets/ConnectionManager';
 import { ConnectionState } from './features/websockets/ConnectionState';
 
 
-import { 
-  powerStateUpdated, deviceAdded, devicesAdded, 
-  Device, PowerStateUpdate 
+import {
+  // Action methods
+  devicesAdded,
+  deviceAdded,
+  deviceStateUpdated,
+  deviceOnlineStateUpdated,
+  
+  // Types
+  Device, 
+  Group, 
+  DeviceStateUpdate,
+  DeviceOnlineStateUpdate,
 } from './features/devices/jjAutoSlice';
 
 
@@ -37,12 +46,25 @@ function App() {
       dispatch(devicesAdded(devices));
     });
 
-    socket.on('auto/device', (device: Device) => {
-      dispatch(powerStateUpdated(device));
+    socket.on('auto/device/state', (data: DeviceStateUpdate) => {
+      dispatch(deviceStateUpdated(data));
     });
+
+    socket.on('auto/device/onlineState', (data: DeviceOnlineStateUpdate) => {
+      dispatch(deviceOnlineStateUpdated(data));
+    });
+
+    socket.on('auto/device', (device: Device) => {
+      console.log('received auto/device', device);
+    });
+
+    socket.on('auto/groups', (groups: Group[]) => {
+      console.log('Received groups:', groups);
+    })
 
     //Retrieve initial
     socket.emit('auto/getDevices');
+    socket.emit('auto/getGroups');
 
     return () => {
       socket.off('connect', onConnect);
@@ -90,12 +112,15 @@ return (
                                 <td>{device.channel}</td>
                                 <td>{device.alias}</td>
                                 <td>{device.isOnline ? 'yes' : 'no'}</td>
-                                <td>{device.powerState ? "on" : "off"}</td>
                                 <td>
-                                    <button data-device-channel={device.channel} onClick={handleClick}>
-                                    { device.powerState === true ? 'Turn off' : 'Turn on' }
-                                    </button> 
-
+                                  {device.isOnline && (device.state?.on_off ? "on" : "off")}                                  
+                                </td>
+                                <td>                                    
+                                    { (typeof device.powerState === 'boolean') && (device.isOnline) &&
+                                      <button data-device-channel={device.channel} onClick={handleClick}>
+                                        {device.powerState ? 'Turn off' : 'Turn on'}
+                                      </button> 
+                                    }                                                                      
                                 </td>
                             </tr>
                         ))}

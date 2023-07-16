@@ -8,21 +8,27 @@ import constants from "../constants.js";
  */
 const buildCommandObjectFromCurrentState = (deviceWrapper) => {
 
-  const state = deviceWrapper?.state;
-
-  if (!state) {
-    // Have no state info
-    return null;
-  }
+  let commandObject = {};
 
   switch (deviceWrapper.subType) {
     case constants.SUBTYPE_BULB:
-      return buildCommandObjectFromBulbState(deviceWrapper);
+      commandObject = buildCommandObjectFromBulbState(deviceWrapper);
+      break;
 
     case constants.SUBTYPE_LED_STRIP:
-      return buildCommandObjectFromLedStripState(deviceWrapper); 
+      commandObject = buildCommandObjectFromLedStripState(deviceWrapper);
+      break;
+
+    case constants.SUBTYPE_PLUG:
+    case constants.SUBTYPE_SWITCH:
+      // Nothing to do - powerState gets added below.
+      break;
   }
 
+  // Add in power state regardless of device type.
+  commandObject.on_off = deviceWrapper.getPowerState() ? 1 : 0;
+
+  return commandObject;
 }
 
 const buildCommandObjectFromBulbState = (deviceWrapper) => {
@@ -156,5 +162,6 @@ const getCommandObjectFromTargetData = (targetData) => {
 
 export {
   commandMatchesCurrentState,
+  buildCommandObjectFromCurrentState,
   getCommandObjectFromTargetData,
 }
