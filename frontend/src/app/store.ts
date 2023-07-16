@@ -1,11 +1,11 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import localStateReducer from '../features/localState/localStateSlice';
+import jjAutoSliceReducer from '../features/devices/jjAutoSlice';
 import { apiSlice } from '../features/devices/jjautoApiSlice';
 
 export const store = configureStore({
     //calls combineReducers
     reducer: { 
-        localState: localStateReducer,
+        jjAuto: jjAutoSliceReducer,
         [apiSlice.reducerPath]: apiSlice.reducer
     },
     middleware: getDefaultMiddleware => {

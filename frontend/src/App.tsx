@@ -1,22 +1,24 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { useAppDispatch, useAppSelector } from './app/hooks';
-import { useFetchDevicesQuery } from './features/devices/jjautoApiSlice';
-import { toggled } from './features/localState/localStateSlice';
 import { socket } from './socket';
 import { ConnectionManager } from './features/websockets/ConnectionManager';
-
-import axios from 'axios';
 import { ConnectionState } from './features/websockets/ConnectionState';
+
+
+import { 
+  powerStateUpdated, deviceAdded, devicesAdded, 
+  Device, PowerStateUpdate 
+} from './features/devices/jjAutoSlice';
+
 
 function App() {
   
   const dispatch = useAppDispatch();
 
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const localState = useAppSelector(state => state.localState)
+  const devices = useAppSelector(state => state.jjAuto);
 
-  const { data = [], isFetching } = useFetchDevicesQuery();
 
 
   useEffect(() => {
@@ -30,6 +32,14 @@ function App() {
 
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
+
+    socket.on('auto/devices', (devices: Device[]) => {
+      dispatch(devicesAdded(devices));
+    });
+
+    socket.on('auto/device', (device: Device) => {
+      dispatch(powerStateUpdated(device));
+    });
 
     //Retrieve initial
     socket.emit('auto/getDevices');
@@ -62,7 +72,7 @@ return (
             <ConnectionManager/>
             <ConnectionState isConnected={ isConnected }/>
             <div>          
-                <p>Number of devices fetched: {data.length} </p>
+                <p>Number of devices fetched: {devices.length} </p>
 
                 <table>
                     <thead>
@@ -75,8 +85,8 @@ return (
                         </tr>
                     </thead>
                     <tbody>
-                        {data.map(device => (
-                            <tr key={device.id}>
+                        {devices.map((device, index) => (
+                            <tr key={index}>
                                 <td>{device.channel}</td>
                                 <td>{device.alias}</td>
                                 <td>{device.isOnline ? 'yes' : 'no'}</td>
