@@ -10,3 +10,47 @@
 tr {
   height: 40px;
 }
+
+/* Touch view */
+
+.groups-container {
+  display: flex;
+  text-align: left;
+
+}
+
+.group-container {
+  padding: 5px;
+  margin: 10px;
+  background-color: rgb(58, 53, 53);
+}
+
+.device-container {
+  padding: 5px;
+  margin: 5px;
+  background-color: black;  
+  width: 250px;
+}
+
+.device-alias {
+  text-align: center;
+  color: rgb(166, 166, 166);
+}
+.device-meta {
+  color: gray;
+  font-size: 80%;
+}
+
+.device-channel {
+  background-color: blueviolet;
+   
+}
+
+.device-online-state {  
+  float: right;
+}
+
+.device-power {
+  height: 80px;
+  width: 100%;
+}

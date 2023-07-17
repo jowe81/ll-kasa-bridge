@@ -4,7 +4,7 @@ import { socket } from '../websockets/socket.tsx';
 import './devices.css';
 
 function TableView() {
-  const devices = useAppSelector(state => state.jjAuto);
+  const devices = useAppSelector(state => state.devices);
 
   const handleClick = (e) => {
     const channel = e.target.dataset.deviceChannel;

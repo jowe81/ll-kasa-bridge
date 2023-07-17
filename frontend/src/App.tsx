@@ -12,17 +12,22 @@ import TouchView from "./features/devices/touchView";
 import {
   // Action methods
   devicesAdded,
-  deviceAdded,
   deviceStateUpdated,
   deviceOnlineStateUpdated,
   
   // Types
   Device, 
-  Group, 
   DeviceStateUpdate,
   DeviceOnlineStateUpdate,
-} from './features/devices/jjAutoSlice';
+} from './features/devices/devicesSlice';
 
+import {
+  // Action methods
+  groupsAdded,
+  
+  // Types
+  Group
+} from './features/devices/configSlice';
 
 function App() {
   
@@ -60,7 +65,7 @@ function App() {
     });
 
     socket.on('auto/groups', (groups: Group[]) => {
-      console.log('Received groups:', groups);
+      dispatch(groupsAdded(groups));
     })
 
     //Retrieve initial

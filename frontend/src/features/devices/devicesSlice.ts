@@ -8,6 +8,8 @@ export interface Device {
   type: string;
   subType: string;
 
+  groups: string[];
+
   isOnline: boolean;
   lastSeenAt: number;
   powerState: boolean;
@@ -53,8 +55,8 @@ export interface DeviceOnlineStateUpdate {
 
 const initialState: Device[] = [];
 
-const jjAutoSlice = createSlice({
-    name: 'jjAuto',
+const devicesSlice = createSlice({
+    name: 'devices',
     initialState,
     reducers: {      
         // Add an array of devices.
@@ -124,8 +126,8 @@ export const {
   deviceAdded,
   deviceStateUpdated,
   deviceOnlineStateUpdated,
-} = jjAutoSlice.actions;
+} = devicesSlice.actions;
 
 
 
-export default jjAutoSlice.reducer;
+export default devicesSlice.reducer;

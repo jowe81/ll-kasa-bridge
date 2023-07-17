@@ -1,11 +1,13 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import jjAutoSliceReducer from '../features/devices/jjAutoSlice';
+import devicesSliceReducer from '../features/devices/devicesSlice';
+import configSliceReducer from '../features/devices/configSlice';
 import { apiSlice } from '../features/devices/jjautoApiSlice';
 
 export const store = configureStore({
     //calls combineReducers
     reducer: { 
-        jjAuto: jjAutoSliceReducer,
+        devices: devicesSliceReducer,
+        config: configSliceReducer,
         [apiSlice.reducerPath]: apiSlice.reducer
     },
     middleware: getDefaultMiddleware => {
