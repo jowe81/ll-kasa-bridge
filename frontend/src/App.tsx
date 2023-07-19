@@ -5,8 +5,9 @@ import { useAppDispatch } from './app/hooks';
 import { socket } from './features/websockets/socket';
 
 import Home from "./Home";
-import TableView from "./features/devices/tableView";
-import TouchView from "./features/devices/touchView";
+import TableView from "./features/devices/TableView";
+import LocationsView from "./features/devices/LocationsView";
+import GroupsView from "./features/devices/GroupsView";
 
 
 import {
@@ -24,9 +25,11 @@ import {
 import {
   // Action methods
   groupsAdded,
+  locationsAdded,
   
   // Types
-  Group
+  Group,
+  Location,
 } from './features/devices/configSlice';
 
 function App() {
@@ -68,9 +71,14 @@ function App() {
       dispatch(groupsAdded(groups));
     })
 
+    socket.on('auto/locations', (locations: Group[]) => {
+      dispatch(locationsAdded(locations));
+    })
+
     //Retrieve initial
     socket.emit('auto/getDevices');
     socket.emit('auto/getGroups');
+    socket.emit('auto/getLocations');
 
     return () => {
       socket.off('connect', onConnect);
@@ -84,7 +92,8 @@ return (
       <Routes>
         <Route path="/" element={ <Home /> } />
         <Route path="table" element={ <TableView /> } />
-        <Route path="touch" element={ <TouchView /> } />
+        <Route path="locations" element={ <LocationsView /> } />
+        <Route path="groups" element={ <GroupsView /> } />
 
         <Route path="*" element={<Navigate to="/" replace/>}/>
       </Routes>

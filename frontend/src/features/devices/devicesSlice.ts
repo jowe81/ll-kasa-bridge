@@ -5,6 +5,7 @@ export interface Device {
   channel: number;
   host: string;
   id: string;
+  location: string;
   type: string;
   subType: string;
 
@@ -61,7 +62,6 @@ const devicesSlice = createSlice({
     reducers: {      
         // Add an array of devices.
         devicesAdded(devices, action: PayloadAction<Device[]>) {
-          //action.payload.forEach(device => devices.push(device));
           action.payload.forEach(device => addDevice(devices, device));
         },
 

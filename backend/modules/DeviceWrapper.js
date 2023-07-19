@@ -517,7 +517,6 @@ const cmdFailPrefix = '[FAIL]';
     this.deviceEventCallback = deviceEventCallback;
     this.initCommandCache();
 
-
     if (mapItem) {
       // Copy in the mapItem properties.
       Object.keys(mapItem).forEach(key => { 
@@ -525,6 +524,8 @@ const cmdFailPrefix = '[FAIL]';
       });
 
       this.globalConfig = globalConfig;
+
+      resolveDeviceDependencies(this);
 
       if (device) {
         this.id = device.id;
@@ -544,7 +545,6 @@ const cmdFailPrefix = '[FAIL]';
         }
 
         log(`Discovered device at ${device.host}`, this, 'yellow');
-        resolveDeviceDependencies(this);
         this.addListeners();
         this.lastSeenAt = Date.now();
         this.isOnline = true;

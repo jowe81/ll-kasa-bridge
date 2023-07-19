@@ -274,6 +274,7 @@ const devicePool = {
       'type',
       'host',
       'groups',
+      'location',
       'classes',
       'isOnline',
       'lastSeenAt',
@@ -294,7 +295,7 @@ const devicePool = {
     });
     
     keys.forEach(key => item[key] = deviceWrapper[key]);
-
+    console.log('Location at getLiveDevice: ', item.location);
     return item;
   },
 

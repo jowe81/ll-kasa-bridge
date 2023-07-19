@@ -1,10 +1,16 @@
 import _ from 'lodash';
+import constants from '../constants.js';
 
 const resolveDeviceDependencies = (deviceWrapper) => {
   const { globalConfig } = deviceWrapper.devicePool;
   deviceWrapper.filters = resolveDeviceFilters(deviceWrapper, globalConfig);
   deviceWrapper.groups = resolveDeviceGroups(deviceWrapper, globalConfig);
   deviceWrapper.classes = resolveDeviceClasses(deviceWrapper, globalConfig);
+  
+  const locationObject = resolveDeviceLocation(deviceWrapper, globalConfig);
+  deviceWrapper.locationId = locationObject.id;
+  deviceWrapper.location = locationObject.name;
+
   return deviceWrapper;
 }
 
@@ -191,6 +197,24 @@ const getParentClassNames = (className, classTree, searchData) => {
     // Path exhausted - step back.
     searchData.ancestors.pop();
   }
+}
+
+const resolveDeviceLocation = (deviceWrapper, globalConfig) => {
+  let locationId = deviceWrapper.locationId ?? constants.DEVICE_DEFAULT_LOCATION_ID;
+
+  if (!findLocation(globalConfig.locations, locationId)) {
+    // A location id was configured but it's invalid (no matching entry in config)
+    locationId = constants.DEVICE_DEFAULT_LOCATION_ID;
+  }
+
+  const locationObject = findLocation(globalConfig.locations, locationId);
+
+  return locationObject;
+}
+
+const findLocation = (locations, locationId) => {
+  const locationObject = locations.find(item => item.id === locationId);
+  return locationObject;
 }
 
 export { 

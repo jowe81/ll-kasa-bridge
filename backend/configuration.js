@@ -497,6 +497,36 @@ const globalConfig = {
       class: 'class-livingroomLights',
     }
   ],
+
+  /**
+   * Locations
+   */
+  locations: [
+    {
+      id: 'loc-default',
+      name: 'No location assigned',
+    },
+    {
+      id: 'loc-livingRoom',
+      name: 'Living Room',
+    },
+    {
+      id: 'loc-kitchen',
+      name: 'Kitchen',
+    },
+    {
+      id: 'loc-bathroom',
+      name: 'Bathroom',
+    },
+    {
+      id: 'loc-bedroom',
+      name: 'Bedroom',
+    },
+    {
+      id: 'loc-outside',
+      name: 'Outside',
+    },
+  ],
 }
 
 const deviceMap = [
@@ -506,6 +536,7 @@ const deviceMap = [
     channel: 2,
     class: 'class-johannesDeskLights',
     id: "8012E7EA0A70974D997DE95E898FBA261F980E1A",
+    locationId: 'loc-bedroom',
     subType: SUBTYPE_BULB,
     filters: [
       { refId: 'naturalLight' },
@@ -526,6 +557,7 @@ const deviceMap = [
     alias: 'Bedroom Desk Strip top',
     channel: 3,
     id: "80121CF5373D56F7C62278B4C0FE88A01F53DD26",
+    locationId: 'loc-bedroom',
     subType: SUBTYPE_LED_STRIP,
     filters: [
       { refId: 'naturalLight' }
@@ -535,12 +567,14 @@ const deviceMap = [
     alias: 'Bedroom Heater',
     channel: 4,
     id: '80065A4E60A835C49695A74DA7FAE76520436E9C01',
+    locationId: 'loc-bedroom',
     subType: SUBTYPE_PLUG
   },
   {
     alias: 'Bedroom Fan',
     channel: 5, 
     id: "80065A4E60A835C49695A74DA7FAE76520436E9C02",
+    locationId: 'loc-bedroom',
     subType: SUBTYPE_PLUG,
   },
   {
@@ -548,6 +582,7 @@ const deviceMap = [
     channel: 6, 
     class: 'class-bedroomLights',
     id: "8012C3A3B58B58E8081EDBCF694C8CBC1F790A02",
+    locationId: 'loc-bedroom',
     subType: SUBTYPE_BULB,
     filters: [
       { refId: 'naturalLight' }
@@ -559,6 +594,7 @@ const deviceMap = [
     channel: 7,
     class: 'class-bedroomLights',
     id: "8012511ABF75C811DB47A833DD2EDAED1F791417",
+    locationId: 'loc-bedroom',
     subType: SUBTYPE_BULB,
     filters: [
       { refId: 'naturalLight' }
@@ -588,6 +624,7 @@ const deviceMap = [
     alias: 'Bathroom 1',
     channel: 10, 
     id: "8012D32B889FD9CE23C825CEB1C2EFD41F73D8E2",
+    locationId: 'loc-bathroom',
     subType: SUBTYPE_BULB,
     filters: [
       { refId: 'naturalLight' }
@@ -598,6 +635,7 @@ const deviceMap = [
     alias: 'Bathroom 2',
     channel: 11, 
     id: "8012F65B8543DA7FFFC8A3F756D1EBE61F742CDF",
+    locationId: 'loc-bathroom',
     subType: SUBTYPE_BULB,
     filters: [
       { refId: 'naturalLight' }
@@ -608,6 +646,7 @@ const deviceMap = [
     alias: 'Bathroom 3',
     channel: 12, 
     id: "80128096836910A62F80A6B532C1461E1F79D295",
+    locationId: 'loc-bathroom',
     subType: SUBTYPE_BULB,
     filters: [
       { refId: 'naturalLight' }
@@ -618,6 +657,7 @@ const deviceMap = [
     alias: 'Bathroom 4',
     channel: 13, 
     id: "8012EE37548E3F0F48405DECC13D0B801F779B2B",
+    locationId: 'loc-bathroom',
     subType: SUBTYPE_BULB,
     filters: [
       { refId: 'naturalLight' }
@@ -627,6 +667,7 @@ const deviceMap = [
     alias: 'Bedroom Desk Switch',
     channel: 14,
     id: "8006E7EB4A66E3687708A7ABF93FB237200DCDA4",
+    locationId: 'loc-bedroom',
     subType: SUBTYPE_SWITCH,
     targets: {
       on: [
@@ -730,12 +771,14 @@ const deviceMap = [
     alias: 'Bathroom Heater',
     channel: 15,
     id: "80061465B741F3D278857FD2F8E09CD020C3200A",
+    locationId: 'loc-bathroom',
     subType: SUBTYPE_PLUG
   },
   {
     alias: 'Bedroom Desk Strip bottom',
     channel: 16,
     id: "8012ACE65E9CFF19DBAB8CAF5A2BBD942014A9B1",
+    locationId: 'loc-bedroom',
     subType: SUBTYPE_LED_STRIP,
   },
 
@@ -871,12 +914,14 @@ const deviceMap = [
     alias: 'Bedroom Desk Strip Shelving',
     channel: 37, 
     id: "80125B9CDD55CE105CC76F0CA2F6C8CC1F5426D8",
+    locationId: 'loc-bedroom',
     subType: SUBTYPE_LED_STRIP,    
   },
   {
     alias: 'Bed Shelf Strip',
     channel: 38, 
     id: "8012D0E9DD82CBC61A864D093BF05E911F53B1E8",
+    locationId: 'loc-bedroom',
     subType: SUBTYPE_LED_STRIP,
     filters: [      
       { 
@@ -991,6 +1036,7 @@ const deviceMap = [
     alias: 'Jess Bed Switch',
     channel: 101, 
     id: "8006000F366B7DD70835CBF38A51040620662083",
+    locationId: 'loc-bedroom',
     subType: SUBTYPE_SWITCH, 
     targets: {
       on: [
@@ -1018,6 +1064,7 @@ const deviceMap = [
     alias: 'Bedroom Audio Amp',
     channel: 39,
     id: '80065A4E60A835C49695A74DA7FAE76520436E9C00',
+    locationId: 'loc-bedroom',
     subType: SUBTYPE_PLUG
   },
   { 

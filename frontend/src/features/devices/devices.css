@@ -1,10 +1,14 @@
 .power-on {
-  background-color: green;
+  background-color: rgb(0, 95, 0);
 
 }
 
 .power-off {
   background-color: brown;
+}
+
+.power-not-available {
+  background-color: rgb(70, 70, 70);
 }
 
 tr {
@@ -15,12 +19,14 @@ tr {
 
 .groups-container {
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   text-align: left;
 
 }
 
 .group-container {
-  padding: 5px;
+  padding: 2px;
   margin: 10px;
   background-color: rgb(58, 53, 53);
 }
@@ -33,11 +39,11 @@ tr {
 }
 
 .device-alias {
+  color: rgb(233, 233, 233);
   text-align: center;
-  color: rgb(166, 166, 166);
 }
 .device-meta {
-  color: gray;
+  color: rgb(177, 177, 177);
   font-size: 80%;
 }
 
@@ -52,5 +58,11 @@ tr {
 
 .device-power {
   height: 80px;
-  width: 100%;
+  width: 100%;  
+}
+
+.location-container {
+  padding: 2px;
+  margin: 10px;
+  background-color: rgb(58, 53, 53);
 }

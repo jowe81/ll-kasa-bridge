@@ -7,7 +7,8 @@ function Home() {
       <div>
         Devices:&nbsp;
         <Link to={'/table'}>Table</Link> |&nbsp; 
-        <Link to={'/touch'}>Touch</Link>
+        <Link to={'/groups'}>Groups</Link> |&nbsp;
+        <Link to={'/locations'}>Locations</Link>
       </div>
     </>
   );

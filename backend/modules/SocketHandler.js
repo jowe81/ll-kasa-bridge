@@ -31,6 +31,10 @@ const socketHandler = {
         socket.emit('auto/groups', this.devicePool.globalConfig.groups);
       });
 
+      socket.on('auto/getLocations', () => {
+        socket.emit('auto/locations', this.devicePool.globalConfig.locations);
+      });
+
       // Clients may execute macros
       socket.on('auto/command/macro', (props) => {
         const { channel, name, commandObject } = props;

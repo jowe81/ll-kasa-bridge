@@ -30,6 +30,9 @@ const constants = {
   SERVICE_BACKEND: 'backend',
   SERVICE_BACKEND_FLIP: 'backend (flip)',
   SERVICE_COMMAND_CACHE: 'Command Cache Service',
+
+  // Default Location
+  DEVICE_DEFAULT_LOCATION_ID: 'loc-default',
   
 };
 
