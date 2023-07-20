@@ -32,9 +32,23 @@ export interface Group {
   linkedDevices: object[];
 }
 
+export interface LiveState {
+  onlineCount: number;
+  offlineCount: number;
+  notDiscoveredCount: number;
+  totalCount: number;
+  powerOnCount: number;
+  powerOffCount: number;
+}
+
+export interface LiveGroup extends Group {
+  liveState: LiveState;
+}
+
 export interface DeviceStateUpdate {
   changeInfo: object;
   data: {
+    isOnline: boolean;
     channel: number;
     powerState: boolean;   
     state: {
@@ -54,36 +68,49 @@ export interface DeviceOnlineStateUpdate {
   }
 };
 
-const initialState: Device[] = [];
+interface Data {
+  devices: Device[],
+  liveGroupIds: string[],
+}
 
-const devicesSlice = createSlice({
-    name: 'devices',
+const initialState = { 
+  devices: [],
+  liveGroupIds: [],
+};
+
+const dataSlice = createSlice({
+    name: 'data',
     initialState,
     reducers: {      
         // Add an array of devices.
-        devicesAdded(devices, action: PayloadAction<Device[]>) {
-          action.payload.forEach(device => addDevice(devices, device));
+        devicesAdded(data: Data, action: PayloadAction<Device[]>) {
+          action.payload.forEach(device => addDevice(data.devices, device));
+          updateLiveGroupIds(data);
         },
 
         // Add a single device.
-        deviceAdded(devices, action: PayloadAction<Device>) {
-          addDevice(devices, action.payload);
+        deviceAdded(data: Data, action: PayloadAction<Device>) {
+          addDevice(data.devices, action.payload);
+          updateLiveGroupIds(data);
         },
 
         // Update device state for a single device
-        deviceStateUpdated(devices, action:PayloadAction<DeviceStateUpdate>) {
+        deviceStateUpdated(data: Data, action:PayloadAction<DeviceStateUpdate>) {
+          const { devices } = data;
           const { channel, state } = action.payload.data;
 
-          const deviceKey = getDeviceKeyByChannel(devices, action.payload.data.channel);
+          const deviceKey = getDeviceKeyByChannel(data.devices, action.payload.data.channel);
         
           if (deviceKey !== null) {
             //console.log(`Device State update on ${channel}: `, action.payload.changeInfo, state, ` was: `, devices[deviceKey].state);            
             devices[deviceKey].state = state;
             devices[deviceKey].powerState = action.payload.data.powerState;
+            devices[deviceKey].isOnline = action.payload.data.isOnline;
           }
         },
 
-        deviceOnlineStateUpdated(devices, action: PayloadAction<DeviceOnlineStateUpdate>) {
+        deviceOnlineStateUpdated(data: Data, action: PayloadAction<DeviceOnlineStateUpdate>) {
+          const { devices } = data;
           const deviceKey = getDeviceKeyByChannel(devices, action.payload.channel);
 
           if (deviceKey !== null) {
@@ -121,13 +148,34 @@ const getDeviceKeyByChannel = ((devices: Device[], channel: number): number | nu
   return deviceKey;
 })
 
+const updateLiveGroupIds = (data: Data) => {
+  data.liveGroupIds = collectLiveGroupIdsFromDevices(data);
+}
+
+/**
+ * Return the ids of the groups that are live (represented by the devices array)
+ */
+const collectLiveGroupIdsFromDevices = (data: Data): string[] => {
+  const liveGroupIds: string[] = [];
+
+  data.devices.forEach(device => {
+    device.groups.forEach(groupId => {
+      if (!liveGroupIds.includes(groupId)) {
+        liveGroupIds.push(groupId);
+      }
+    });
+  });
+
+  return liveGroupIds;
+}
+
 export const { 
   devicesAdded, 
   deviceAdded,
   deviceStateUpdated,
   deviceOnlineStateUpdated,
-} = devicesSlice.actions;
+} = dataSlice.actions;
 
 
 
-export default devicesSlice.reducer;
+export default dataSlice.reducer;

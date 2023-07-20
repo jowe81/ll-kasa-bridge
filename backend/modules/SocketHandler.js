@@ -36,19 +36,63 @@ const socketHandler = {
       });
 
       // Clients may execute macros
-      socket.on('auto/command/macro', (props) => {
-        const { channel, name, commandObject } = props;
-        const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel);
+      socket.on('auto/command/macro2', (props) => {
+        const { targetId, macroName, commandObject } = props;
+        const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(targetId);
 
         if (deviceWrapper) {
-          log(`Ch ${channel} ${address}: ${name}`, `bgBlue`);
+          log(`Ch ${targetId} ${address}: ${macroName}`, `bgBlue`);
 
-          if (name === 'toggle') {            
+          if (macroName === 'toggleChannel') {            
             deviceWrapper.toggle('ws:' + address);
           }
   
         }
       });
+
+
+      // Clients may execute macros
+      socket.on('auto/command/macro', (props) => {
+        const { targetType, targetId, macroName, commandObject } = props;
+        
+
+        log(`${address}: Macro ${macroName}, ${targetType} ${targetId}`, `bgBlue`);
+
+        switch (targetType) {
+          case 'channel':
+            const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(targetId);
+
+            if (!deviceWrapper) {
+              log(`Device Wrapper not found`, `bgRed`)
+              // Error - no wrapper.
+              return;
+            }
+
+            switch (macroName) {
+              case 'toggleChannel': {
+                deviceWrapper.toggle('ws:' + address);
+              }
+            }
+
+            break;
+
+          case 'group':
+            switch (macroName) {
+              case 'toggleGroup':
+                this.devicePool.toggleGroup(targetId);
+              break;
+            }
+
+            break;
+              
+
+
+          case 'toggle':
+
+          case 'toggleGroup':
+            console.log('Toggle Group');
+        }
+      });      
     
     });
   },
@@ -67,20 +111,10 @@ const socketHandler = {
     this.io.emit('auto/device/state', { 
       changeInfo,
       data: {
+        isOnline: deviceWrapper.isOnline,
         powerState: deviceWrapper.powerState,       
         state: buildCommandObjectFromCurrentState(deviceWrapper),
         channel: deviceWrapper.channel,
-      }
-    });
-  },
-
-  // Push device online-state update
-  emitDeviceOnlineStateUpdate(deviceWrapper) {
-    console.log('Emitting onlinestate update for ', deviceWrapper.alias, deviceWrapper.isOnline);
-    this.io.emit('auto/device/onlineState', { 
-      channel: deviceWrapper.channel,
-      data: {
-        isOnline: deviceWrapper.isOnline,        
       }
     });
   },

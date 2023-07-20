@@ -1,4 +1,5 @@
-import { Device } from './devicesSlice';
+import { Device, Group } from './dataSlice';
+import { LiveGroup } from './dataSlice';
 
 const getPowerStateClass = (device: Device): string => {
   const powerStatePresent = device.isOnline && typeof device.powerState === 'boolean';
@@ -22,6 +23,48 @@ const getPowerStateClass = (device: Device): string => {
   return powerStateClass;
 }
 
+const getPowerStateClassForLiveGroup = (locationInfo, groupId: string): string => {
+  const liveState = locationInfo.liveGroupData[groupId].liveState;
+
+  if (liveState) {
+    console.log('Have livestate for ', locationInfo.id, groupId, liveState);
+
+    if (liveState.onlineCount === liveState.totalCount) {       
+      return liveState.powerOnCount === liveState.onlineCount ? "power-on" : "power-off";
+    }
+  
+    if (liveState.offlineCount === liveState.totalCount) {
+      return "power-off";
+    }
+  
+    if (liveState.notDiscoveredCount) {
+      return "power-not-available";
+    }
+
+    return "power-mixed";  
+  }
+
+  return "power-not-available";  
+}
+
+const getDevicesInGroup = (devices: Device[], group: (LiveGroup | Group)) => {
+  const foundDevices: Device[] = [];
+  group.channels.forEach(channel => {
+    const device = getDeviceByChannel(devices, channel);
+    if (device) {
+      devices.push(device);
+    }
+  })
+
+  return foundDevices;
+}
+
+const getDeviceByChannel = (devices: Device[], channel: number) => {
+  return devices.find(device => device.channel === channel);
+}
+
 export {
-  getPowerStateClass
+  getPowerStateClass,
+  getPowerStateClassForLiveGroup,
+  getDeviceByChannel,
 }

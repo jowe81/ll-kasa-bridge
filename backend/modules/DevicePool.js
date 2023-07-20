@@ -82,7 +82,7 @@ const devicePool = {
       }
             
       deviceWrapper.startPolling();
-      deviceWrapper.socketHandler.emitDeviceStateUpdate(deviceWrapper);
+      deviceWrapper.socketHandler.emitDeviceStateUpdate(deviceWrapper);      
     }
 
     const options = {
@@ -106,7 +106,7 @@ const devicePool = {
         log(`Device went offline.`, deviceWrapper, 'yellow');
         deviceWrapper.isOnline = false;
         deviceWrapper.stopPolling();
-        deviceWrapper.socketHandler.emitDeviceOnlineStateUpdate(deviceWrapper);
+        deviceWrapper.socketHandler.emitDeviceStateUpdate(deviceWrapper);        
       }
     });
 
@@ -117,8 +117,8 @@ const devicePool = {
         deviceWrapper.isOnline = true;
         deviceWrapper.flushCommandCache();
         deviceWrapper.startPolling();
-        deviceWrapper.lastSeenAt = Date.now(); 
-        deviceWrapper.socketHandler.emitDeviceOnlineStateUpdate(deviceWrapper);
+        deviceWrapper.lastSeenAt = Date.now();
+        deviceWrapper.socketHandler.emitDeviceStateUpdate(deviceWrapper);         
       }
     });
     
@@ -354,7 +354,37 @@ const devicePool = {
     this.globalConfig = globalConfig;
     const noMapItems = await this.dbDeviceMap.countDocuments();
     log(`Loaded global configuration and found ${noMapItems} registered devices in the database.`, null, 'white');
-  }, 
+  },
+
+  toggleGroup(groupId) {
+    const group = this.globalConfig.groups.find(group => group.id === groupId);
+    
+    if (group) {
+      let powerOnCount = 0;
+      let powerOffCount = 0;
+      let naCount = 0;
+
+      let deviceWrappers = [];
+
+      group.channels.forEach(channel => {
+        const deviceWrapper = this.getDeviceWrapperByChannel(channel);
+
+        if (!deviceWrapper) {
+          naCount++;
+        } else {
+          deviceWrappers.push(deviceWrapper);
+        }
+      });
+      
+      deviceWrappers.forEach(deviceWrapper => {
+        deviceWrapper.powerState ? powerOnCount++ : powerOffCount++;           
+      });
+
+      const targetState = powerOffCount ? true : false;
+
+      deviceWrappers.forEach(deviceWrapper => deviceWrapper.setPowerState(targetState));
+    }
+  },
 
   // Internal
 

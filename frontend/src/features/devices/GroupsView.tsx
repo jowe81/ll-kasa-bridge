@@ -3,7 +3,7 @@ import { socket } from '../websockets/socket.tsx';
 import { getPowerStateClass } from './helpers.ts';
 import './devices.css';
 
-import { Device } from './devicesSlice.ts';
+import { Device } from './dataSlice.ts';
 
 function TouchView() {
   const devices = useAppSelector(state => state.devices);

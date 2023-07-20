@@ -20,7 +20,7 @@ import {
   Device, 
   DeviceStateUpdate,
   DeviceOnlineStateUpdate,
-} from './features/devices/devicesSlice';
+} from './features/devices/dataSlice';
 
 import {
   // Action methods
@@ -56,6 +56,7 @@ function App() {
     });
 
     socket.on('auto/device/state', (data: DeviceStateUpdate) => {
+      console.log('state update', data);
       dispatch(deviceStateUpdated(data));
     });
 

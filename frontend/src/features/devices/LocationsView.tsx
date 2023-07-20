@@ -1,23 +1,19 @@
 import { useAppSelector } from '../../app/hooks.ts';
 import { socket } from '../websockets/socket.tsx';
-import { getPowerStateClass } from './helpers.ts';
+import { getPowerStateClass, getDeviceByChannel, getPowerStateClassForLiveGroup } from './helpers.ts';
 import './devices.css';
 
-import { Device } from './devicesSlice.ts';
+import { Device, Group } from './dataSlice.ts';
 
 function LocationsView() {
-  const devices = useAppSelector(state => state.devices);
+  const devices = useAppSelector(state => state.data.devices);
+  const liveGroupIds = useAppSelector<string[]>(state => state.data.liveGroupIds);
+
   const groups = useAppSelector(state => state.config.groups);
   const locations = useAppSelector(state => state.config.locations);
   
-
-  const getDevicesInGroup = (groupId: string): Device[] => {
-    const groupMembers = devices.filter(device => device.groups.includes(groupId));
-    return groupMembers;
-  }
-
-  const getDevicesInLocation = (devices: Device[], location: string): Device[] => {
-    const locationMembers = devices.filter(device => device.location === location);
+  const getDevicesInLocation = (devices: Device[], location: string): Device[] => {    
+    const locationMembers = devices.filter(device => device.location === location);        
     return locationMembers;
   }
 
@@ -48,10 +44,14 @@ function LocationsView() {
       const ungroupedDevices = devicesInLocation.filter(device => !device.groups.length && (device.subType !== 'switch'));
       
       const groupedDevices = {};
-      const groupIds = getGroupIdsFromDevices(devicesInLocation);
-      groupIds.forEach(groupId => {
+      const configuredGroupIds = getGroupIdsFromDevices(devicesInLocation);
+      const liveGroupIdsForLocation = configuredGroupIds.filter((groupId: string) => liveGroupIds.includes(groupId));
+      const liveGroups = groups.filter(group => liveGroupIdsForLocation.includes(group.id));
+      const liveGroupData = calculateLiveGroupState(devices, liveGroups);
+      liveGroupIdsForLocation.forEach(groupId => {
         groupedDevices[groupId] = devicesInLocation.filter(device => device.groups.includes(groupId));
       });
+      
 
       const switches = devicesInLocation.filter(device => device.subType === 'switch');
       
@@ -62,9 +62,48 @@ function LocationsView() {
         ungroupedDevices,
         groupedDevices,
         switches,
-        groupIds,
+        liveGroupData,
       }
     });
+  }
+
+  const calculateLiveGroupState = (devices: Device[], liveGroups: Group[]) => {
+    const liveGroupData: any = {};
+    liveGroups.forEach((group, index) => {
+      let onlineCount = 0;
+      let offlineCount = 0;
+      let notDiscoveredCount = 0;
+      let totalCount = group.channels.length;
+
+      let powerOnCount = 0;
+      let powerOffCount = 0;
+
+      group.channels.forEach(channel => {        
+        const device = getDeviceByChannel(devices, channel);
+
+        if (device) {
+          device.isOnline ? onlineCount++ : offlineCount++; 
+          device.powerState ? powerOnCount++ : powerOffCount++;         
+        } else {
+          notDiscoveredCount++;
+        }
+      })
+
+      liveGroupData[group.id] = {
+        ...group,
+        liveState: {
+          onlineCount,
+          offlineCount,
+          notDiscoveredCount,
+          totalCount,
+
+          powerOnCount,
+          powerOffCount,
+        }
+      };
+    });
+
+    return liveGroupData;
   }
 
   const handleClick = (e) => {
@@ -72,13 +111,27 @@ function LocationsView() {
     console.log(`handling click ${e.target}`);
     if (channel) {
       socket.emit('auto/command/macro', {
-        channel: parseInt(channel),
-        name: 'toggle'
+        targetType: 'channel',
+        targetId: parseInt(channel),
+        macroName: 'toggleChannel'
+      });    
+    }
+  }
+
+  const handleGroupClick = (e) => {
+    const groupId = e.currentTarget.dataset.deviceGroupId;
+    console.log(`handling group click ${e.target}`);
+    if (groupId) {
+      socket.emit('auto/command/macro', {
+        targetType: 'group',
+        targetId: groupId,
+        macroName: 'toggleGroup'
       });    
     }
   }
 
   const locationsData = getLocationsData();
+  console.log(`Have locations data for ${locationsData.length} locations`, locationsData);
 
   return (
     <>        
@@ -86,14 +139,16 @@ function LocationsView() {
         {locationsData.map(locationInfo => {
                 
           const groupIds = Object.keys(locationInfo.groupedDevices);
-          
+          console.log(`In ${locationInfo.id}, groups:`, groupIds)
           const groupFields = groupIds.map(groupId => {
             // The contents of each group field            
             const devicesInGroup = locationInfo.groupedDevices[groupId];
             const groupName = getGroupName(groupId);
-            console.log('Group Name:', groupName)
+            console.log('     ', groupName, `${locationInfo.groupedDevices[groupId].length} devices`);
+
+
             return (
-              <div key={'group_' + groupId} className='device-power'>
+              <div key={'group_' + groupId} className={ 'device-power ' + getPowerStateClassForLiveGroup(locationInfo, groupId)} data-device-group-id={groupId} onClick={handleGroupClick}>
                 <div className='device-meta'>
                   {devicesInGroup.length} devices
                   <div className='device-online-state'>

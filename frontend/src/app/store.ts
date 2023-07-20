@@ -1,12 +1,12 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import devicesSliceReducer from '../features/devices/devicesSlice';
+import dataSliceReducer from '../features/devices/dataSlice';
 import configSliceReducer from '../features/devices/configSlice';
 import { apiSlice } from '../features/devices/jjautoApiSlice';
 
 export const store = configureStore({
     //calls combineReducers
     reducer: { 
-        devices: devicesSliceReducer,
+        data: dataSliceReducer,
         config: configSliceReducer,
         [apiSlice.reducerPath]: apiSlice.reducer
     },
