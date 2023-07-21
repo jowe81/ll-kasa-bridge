@@ -5,6 +5,8 @@ export interface Group {
   name: string;
   channels: number[];
   class: string | string[];
+  displayLabel?: string;
+  display?: boolean;
   filters: object[];
   linkedDevices: object[];
 }

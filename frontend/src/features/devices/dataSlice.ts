@@ -3,10 +3,13 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 export interface Device {
   alias: string;
   channel: number;
+  displayLabel?: string;
+  display?: boolean;
   host: string;
   id: string;
   location: string;
   type: string;
+  deviceType?: string;
   subType: string;
 
   groups: string[];
@@ -28,6 +31,8 @@ export interface Group {
   name: string;
   channels: number[];
   class: string | string[];
+  displayLabel?: string;
+  display?: boolean;
   filters: object[];
   linkedDevices: object[];
 }

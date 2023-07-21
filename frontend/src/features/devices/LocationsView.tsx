@@ -13,7 +13,7 @@ function LocationsView() {
   const locations = useAppSelector(state => state.config.locations);
   
   const getDevicesInLocation = (devices: Device[], location: string): Device[] => {    
-    const locationMembers = devices.filter(device => device.location === location);        
+    const locationMembers = devices.filter(device => device.display && device.location === location);        
     return locationMembers;
   }
 
@@ -34,17 +34,26 @@ function LocationsView() {
   const getGroupName = (groupId) => { 
     const group = groups.find(group => group.id === groupId);
     if (group) {
-      return group.name;
+      return group.displayLabel ?? group.name;
     }
   }
 
   const getLocationsData = () => {
-    return locations.map(location => {
+    
+    const locationsData: any[] = [];
+
+    locations.forEach(location => {
       const devicesInLocation = getDevicesInLocation(devices, location.name);
+
+      if (!devicesInLocation.length) {      
+        // Skip this location - it has no devices.
+        return;
+      }
+
       const ungroupedDevices = devicesInLocation.filter(device => !device.groups.length && (device.subType !== 'switch'));
       
       const groupedDevices = {};
-      const configuredGroupIds = getGroupIdsFromDevices(devicesInLocation);
+      const configuredGroupIds = getGroupIdsFromDevices(devicesInLocation);      
       const liveGroupIdsForLocation = configuredGroupIds.filter((groupId: string) => liveGroupIds.includes(groupId));
       const liveGroups = groups.filter(group => liveGroupIdsForLocation.includes(group.id));
       const liveGroupData = calculateLiveGroupState(devices, liveGroups);
@@ -55,7 +64,7 @@ function LocationsView() {
 
       const switches = devicesInLocation.filter(device => device.subType === 'switch');
       
-      return {
+      locationsData.push({
         id: location.id,
         name: location.name,
         devices: devicesInLocation,
@@ -63,8 +72,10 @@ function LocationsView() {
         groupedDevices,
         switches,
         liveGroupData,
-      }
+      });
     });
+
+    return locationsData;
   }
 
   const calculateLiveGroupState = (devices: Device[], liveGroups: Group[]) => {
@@ -139,41 +150,46 @@ function LocationsView() {
         {locationsData.map(locationInfo => {
                 
           const groupIds = Object.keys(locationInfo.groupedDevices);
-          console.log(`In ${locationInfo.id}, groups:`, groupIds)
           const groupFields = groupIds.map(groupId => {
             // The contents of each group field            
             const devicesInGroup = locationInfo.groupedDevices[groupId];
             const groupName = getGroupName(groupId);
-            console.log('     ', groupName, `${locationInfo.groupedDevices[groupId].length} devices`);
 
-
-            return (
-              <div key={'group_' + groupId} className={ 'device-power ' + getPowerStateClassForLiveGroup(locationInfo, groupId)} data-device-group-id={groupId} onClick={handleGroupClick}>
-                <div className='device-meta'>
-                  {devicesInGroup.length} devices
-                  <div className='device-online-state'>
-                    {'group state'}
+            /**
+             * Only attempt to render the group associated with the groupId if it's in state.config.groups
+             * (server won't return groups with display: false).
+             * 
+             * Ideally this filtering should happen in the data slice
+             */
+            if (groups.find(group => group.id === groupId)) {
+              return (
+                <div key={'group_' + groupId} className={ 'powerstate-toggle-button ' + getPowerStateClassForLiveGroup(locationInfo, groupId)} data-device-group-id={groupId} onClick={handleGroupClick}>
+                  <div className='device-meta'>
+                    {devicesInGroup.length} devices
+                    <div className='device-online-state'>
+                      {'state'}
+                    </div>
                   </div>
+  
+                  <div className='device-alias'>{groupName}</div>
                 </div>
-
-                <div className='device-alias'>{groupName}</div>
-              </div>
-            );
+              );  
+            }
           });
 
           const deviceFields = locationInfo.ungroupedDevices.map(device => {
             const powerStateClass = getPowerStateClass(device);
 
             return (
-              <div key={'device_' + device.channel} className={ 'device-power ' + powerStateClass} data-device-channel={device.channel} onClick={handleClick}>
+              <div key={'device_' + device.channel} className={ 'powerstate-toggle-button ' + powerStateClass} data-device-channel={device.channel} onClick={handleClick}>
                 <div className='device-meta'>
-                  Ch {device.channel} | Groups {device.groups.length}
+                  Ch {device.channel}
                   <div className='device-online-state'>
                     {device.isOnline ? 'online' : 'offline'}
                   </div>
                 </div>
                 <div className='device-alias'>
-                  {device.alias}
+                  {device.displayLabel ?? device.alias}
                 </div>                                                  
               </div> 
             )
@@ -183,15 +199,15 @@ function LocationsView() {
             const powerStateClass = getPowerStateClass(device);
 
             return (
-              <div key={'switch_' + device.channel} className={ 'device-power ' + powerStateClass} data-device-channel={device.channel} onClick={handleClick}>
+              <div key={'switch_' + device.channel} className={ 'powerstate-toggle-button ' + powerStateClass} data-device-channel={device.channel} onClick={handleClick}>
                 <div className='device-meta'>
-                  Ch {device.channel} | Groups {device.groups.length}
+                  Ch {device.channel}
                   <div className='device-online-state'>
                     {device.isOnline ? 'online' : 'offline'}
                   </div>
                 </div>
                 <div className='device-alias'>
-                  {device.alias}
+                  {device.displayLabel ?? device.alias}
                 </div>                                                  
               </div> 
             )
@@ -199,12 +215,12 @@ function LocationsView() {
 
           return(
               <div key={locationInfo.id} className="location-container">
-                Location: { locationInfo.name }
+                <div className="location-label">{ locationInfo.name }</div>
                 <div>
                   {
                     (groupFields.length > 0) &&
                     <>
-                      <div>Groups:</div>
+                      {/* <div>Groups:</div> */}
                       <div>
                         {groupFields}
                       </div>
@@ -213,7 +229,7 @@ function LocationsView() {
                   {
                     (deviceFields.length > 0) &&
                     <>
-                      <div>Devices:</div>
+                      {/* <div>Devices:</div> */}
                       <div>
                         {deviceFields}
                       </div>
@@ -221,12 +237,12 @@ function LocationsView() {
                   }
                   {
                     (switchFields.length > 0) &&
-                      <>
-                        <div>Switches:</div> 
-                        <div>
-                          {switchFields}
-                        </div>
-                      </>
+                    <>
+                      {/* <div>Switches:</div> */}
+                      <div>
+                        {switchFields}
+                      </div>
+                    </>
                   }                  
                 </div>
               </div>

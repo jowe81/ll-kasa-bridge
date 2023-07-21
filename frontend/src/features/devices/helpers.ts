@@ -27,8 +27,6 @@ const getPowerStateClassForLiveGroup = (locationInfo, groupId: string): string =
   const liveState = locationInfo.liveGroupData[groupId].liveState;
 
   if (liveState) {
-    console.log('Have livestate for ', locationInfo.id, groupId, liveState);
-
     if (liveState.onlineCount === liveState.totalCount) {       
       return liveState.powerOnCount === liveState.onlineCount ? "power-on" : "power-off";
     }

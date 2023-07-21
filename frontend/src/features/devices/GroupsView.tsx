@@ -52,7 +52,7 @@ function TouchView() {
                       </div>
 
                       { powerStateClass &&
-                        <button className={ 'device-power ' + powerStateClass} data-device-channel={device.channel} onClick={handleClick}>
+                        <button className={ 'powerstate-toggle-button ' + powerStateClass} data-device-channel={device.channel} onClick={handleClick}>
                           {device.powerState ? 'Turn off' : 'Turn on'}
                         </button> 
                       }                                                                      

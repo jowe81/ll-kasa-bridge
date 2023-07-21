@@ -56,13 +56,28 @@ tr {
   float: right;
 }
 
-.device-power {
-  height: 80px;
-  width: 100%;  
+.powerstate-toggle-button {
+  height: 60px;
+  padding: 0px 3px;
+  min-width: 180px;
+  margin: 10px 5px;
+  border: 1px solid gray;
+  border-radius:5px;
+}
+
+.powerstate-toggle-button-half-width {
+  min-width: 100px;
 }
 
 .location-container {
-  padding: 2px;
-  margin: 10px;
+  padding: 5px;
+  margin: 5px;
   background-color: rgb(58, 53, 53);
+  border-radius: 5px;
+}
+
+.location-label {
+  color:rgb(154, 154, 154);
+  text-align: center;
+  font-weight: bold;
 }
