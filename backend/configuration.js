@@ -1,6 +1,18 @@
 import constants from './constants.js';
 const { SECOND, MINUTE, HOUR } = constants;
-const { SUBTYPE_BULB, SUBTYPE_LED_STRIP, SUBTYPE_PLUG, SUBTYPE_SWITCH } = constants;
+const { 
+  SUBTYPE_BULB, 
+  SUBTYPE_LED_STRIP, 
+  SUBTYPE_PLUG,
+  SUBTYPE_SWITCH,
+
+  DEVICETYPE_AIR_AC,
+  DEVICETYPE_AIR_FAN,
+  DEVICETYPE_AIR_HEAT,
+  DEVICETYPE_ENTERTAINMENT,
+  DEVICETYPE_LIGHT,
+
+} = constants;
 
 const globalConfig = {
 
@@ -409,6 +421,7 @@ const globalConfig = {
       name: "Bed Shelf Lights",
       channels: [ 38 ],
       class: 'class-bedroomLights',
+      display: false,
       filters: [
         { refId: 'naturalLight' }
       ],      
@@ -435,6 +448,8 @@ const globalConfig = {
       name: "Jess Desk Lights",
       channels: [ 31, 32, 33, 36, 40 ],
       class: 'class-jessDeskLights',
+      displayLabel: 'Desk',
+      display: false,
       linkedDevices: [
         { 
           channel: 34,
@@ -454,8 +469,9 @@ const globalConfig = {
     {
       id: "group-bedroomDeskLights",
       name: "Bedroom Desk Lights",
-      channels: [ 3, 16, 37 ],
+      channels: [ 2, 3, 16, 37 ],
       class: 'class-johannesDeskLights',
+      displayLabel: 'Desk',
       linkedDevices: [
         { 
           channel: 14,
@@ -473,20 +489,37 @@ const globalConfig = {
       ],  
     },
     {
+      id: "group-bedroomCeilingLights",
+      name: "Bedroom Ceiling Lights",
+      channels: [ 6, 7 ],
+      class: 'class-bedroomLights',
+      displayLabel: 'Ceiling',
+    },
+    {
       id: "group-kitchenCounterLights",
       name: "Kitchen Counter Lights",
       channels: [ 42, 43 ],
       class: 'class-kitchenCounterLights',
+      displayLabel: 'Counter',
     },
     {       
       id: "group-kitchenLights",
-      name: "Kitchen Lights",
+      name: "Kitchen Table Lights",
       channels: [ 28 ],
       class: 'class-kitchenLights',
+      displayLabel: 'Table',
+    },
+    {       
+      id: "group-hallwayLights",
+      name: "Hallway Lights",
+      channels: [ 8, 9 ],
+      class: 'class-kitchenLights',
+      displayLabel: 'Lights',
     },
     {
       id: "group-bathroomLights",
       name: "Bathroom Lights",
+      displayLabel: 'Lights',
       channels: [ 10, 11, 12, 13 ],
       class: 'class-bathroomLights',
     },
@@ -515,6 +548,10 @@ const globalConfig = {
       name: 'Kitchen',
     },
     {
+      id: 'loc-hallway',
+      name: 'Hallway',
+    },
+    {
       id: 'loc-bathroom',
       name: 'Bathroom',
     },
@@ -535,6 +572,7 @@ const deviceMap = [
     alias: 'Bedroom IKEA lamp',
     channel: 2,
     class: 'class-johannesDeskLights',
+    displayLabel: 'IKEA Lamp',
     id: "8012E7EA0A70974D997DE95E898FBA261F980E1A",
     locationId: 'loc-bedroom',
     subType: SUBTYPE_BULB,
@@ -567,6 +605,8 @@ const deviceMap = [
     alias: 'Bedroom Heater',
     channel: 4,
     id: '80065A4E60A835C49695A74DA7FAE76520436E9C01',
+    deviceType: DEVICETYPE_AIR_HEAT,
+    displayLabel: 'Heater',
     locationId: 'loc-bedroom',
     subType: SUBTYPE_PLUG
   },
@@ -575,6 +615,8 @@ const deviceMap = [
     channel: 5, 
     id: "80065A4E60A835C49695A74DA7FAE76520436E9C02",
     locationId: 'loc-bedroom',
+    deviceType: DEVICETYPE_AIR_FAN,
+    displayLabel: 'Fan',
     subType: SUBTYPE_PLUG,
   },
   {
@@ -607,6 +649,7 @@ const deviceMap = [
     channel: 8,
     class: 'class-hallwayLights',
     id: "80121D6F58ADDCAC185363C01347F5EA1F752B55",
+    locationId: 'loc-hallway',
     subType: SUBTYPE_BULB,
   },
   {
@@ -614,6 +657,7 @@ const deviceMap = [
     channel: 9, 
     class: 'class-hallwayLights',
     id: "8012DA57516B98CCFFE6467D8F4F01691F73C975",
+    locationId: 'loc-hallway',
     subType: SUBTYPE_BULB,
   },
 
@@ -668,6 +712,7 @@ const deviceMap = [
     channel: 14,
     id: "8006E7EB4A66E3687708A7ABF93FB237200DCDA4",
     locationId: 'loc-bedroom',
+    display: false,
     subType: SUBTYPE_SWITCH,
     targets: {
       on: [
@@ -785,9 +830,10 @@ const deviceMap = [
   //Living Room
   //***** ***** ***** ***** ***** **ppp p****
   {
-    alias: 'Living Room Ikea 1',
+    alias: 'Kitchen Ikea 1',
     channel: 28, 
     id: "801264A4EC3F66CAC02D4FF78712E6D11F992564",
+    locationId: 'loc-kitchen',
     subType: SUBTYPE_BULB,
     filters: [{
       refId: 'naturalLight',
@@ -796,9 +842,10 @@ const deviceMap = [
     }]
   },
   {
-    alias: 'Living Room Ikea 2',
+    alias: 'Living Room Ikea 1',
     channel: 29, 
     id: "8012F095B949B648B1BE7C8A050FA39E1F78FAE8",
+    locationId: 'loc-livingRoom',
     subType: SUBTYPE_BULB,
     filters: [{
       refId: 'naturalLight',
@@ -807,9 +854,10 @@ const deviceMap = [
     }]
   },
   {
-    alias: 'Living Room Ikea 3',
+    alias: 'Living Room Ikea 2',
     channel: 30, 
     id: "8012AE4AF3CF80CD50EC66E4F87F3E291F99397C",
+    locationId: 'loc-livingRoom',
     subType: SUBTYPE_BULB,
     filters: [{
       refId: 'naturalLight',
@@ -818,16 +866,18 @@ const deviceMap = [
     }]
   },
   {
-    alias: 'Living Room Ikea 4',
+    alias: 'Living Room Ikea 3',
     channel: 31, 
-    id: "8012DEFBED48C05561BF6C2F5D8A490D1F77A75D",
+    id: "8012FA2584FE5D30C3E2F13FC023719B1F7B385D",
+    locationId: 'loc-livingRoom',
     subType: SUBTYPE_BULB,
     filters: [ { refId: 'naturalLight' }],
   },
   {
-    alias: 'Living Room Ikea 5',
+    alias: 'Living Room Ikea 4',
     channel: 32, 
     id: "8012D9195E6D17B426B7F74DE432D6A21F9BD8BE",
+    locationId: 'loc-livingRoom',
     subType: SUBTYPE_BULB,
     filters: [ { refId: 'naturalLight'} ],
   },
@@ -835,6 +885,7 @@ const deviceMap = [
     alias: 'Jess\' Desk Lamp',
     channel: 33, 
     id: "8012D2D5067A0F9AE37075A3FA816E341F9D35A9",
+    locationId: 'loc-livingRoom',
     subType: SUBTYPE_BULB,
     filters: [ { refId: 'naturalLight'} ],
   },
@@ -842,6 +893,8 @@ const deviceMap = [
     alias: 'Switch in Jess\' desk',
     channel: 34, 
     id: "800686BE89C5D37A63B4E70AB37689212066F343",
+    displayLabel: 'Jess \' desk',
+    locationId: 'loc-livingRoom',
     subType: SUBTYPE_SWITCH,
     targets: {
       on: [
@@ -908,6 +961,7 @@ const deviceMap = [
     alias: 'Jess Storage Shelves',
     channel: 36, 
     id: "80120A8622D026338547E3D7E88D70931F9E81A8",
+    locationId: 'loc-livingRoom',
     subType: SUBTYPE_LED_STRIP,
   },
   {
@@ -1036,6 +1090,7 @@ const deviceMap = [
     alias: 'Jess Bed Switch',
     channel: 101, 
     id: "8006000F366B7DD70835CBF38A51040620662083",
+    displayLabel: 'Bed Shelf',
     locationId: 'loc-bedroom',
     subType: SUBTYPE_SWITCH, 
     targets: {
@@ -1065,12 +1120,15 @@ const deviceMap = [
     channel: 39,
     id: '80065A4E60A835C49695A74DA7FAE76520436E9C00',
     locationId: 'loc-bedroom',
+    deviceType: DEVICETYPE_ENTERTAINMENT,
+    displayLabel: 'Amp',
     subType: SUBTYPE_PLUG
   },
   { 
     alias: 'Jess Desk Strip',
     channel: 40,
     id: '8012984E9F504FC4AEC384A012A6BEE01F54FA11',
+    locationId: 'loc-livingRoom',
     subType: SUBTYPE_LED_STRIP,
     filters: [ 
       {
@@ -1099,28 +1157,25 @@ const deviceMap = [
     ],
   },
   {
-    alias: 'Ikea Hallway',
-    channel: 41, 
-    id: "8012FA2584FE5D30C3E2F13FC023719B1F7B385D",
-    subType: SUBTYPE_BULB,
-    //filters: [ { refId: 'naturalLight'}],
-  },
-  {
     alias: 'Kitchen Counter Main',
     channel: 42, 
     id: "8006DE7EE2F73CBEA4629F293A1684A52042804800",
+    locationId: 'loc-kitchen',
     subType: SUBTYPE_PLUG,
   },
   {
     alias: 'Kitchen Counter Sink',
     channel: 43, 
     id: "8006DE7EE2F73CBEA4629F293A1684A52042804801",
+    locationId: 'loc-kitchen',
     subType: SUBTYPE_PLUG,
   },
   {
     alias: 'Kitchen Cabinets Aleds',
     channel: 44, 
     id: "8006DE7EE2F73CBEA4629F293A1684A52042804802",
+    display: false,
+    locationId: 'loc-kitchen',
     subType: SUBTYPE_PLUG,
   },
 
