@@ -19,11 +19,18 @@ const constants = {
   DAY,
   WEEK,
 
-  // Device subtypes
+  // Kasa subtypes
   SUBTYPE_BULB: 'bulb',
   SUBTYPE_LED_STRIP: 'led-strip',
   SUBTYPE_PLUG: 'plug',
   SUBTYPE_SWITCH: 'switch',
+
+  // Device types
+  DEVICETYPE_AIR_FAN: 'fan',
+  DEVICETYPE_AIR_HEAT: 'heater',
+  DEVICETYPE_AIR_AC: 'a/c',
+  DEVICETYPE_LIGHT: 'light', // A non-smart plug-in-light
+  DEVICETYPE_ENTERTAINMENT: 'entertainment',  
 
   // Service names
   SERVICE_PERIODIC_FILTER: 'Periodic Filter Service',

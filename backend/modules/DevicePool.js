@@ -269,7 +269,10 @@ const devicePool = {
       'channel',
       'id',
       'alias',
+      'displayLabel',
+      'display',
       'subType',
+      'deviceType',
       'targets',
       'type',
       'host',
@@ -282,6 +285,10 @@ const devicePool = {
       'state',
     ]
 
+    const defaults = {
+      'display': true,
+    };
+
     const excludeKeys = [
       'device', 
       'socketHandler', 
@@ -293,10 +300,17 @@ const devicePool = {
     const keys = Object.keys(deviceWrapper).filter(key => { 
       return includeKeys.includes(key);
     });
-    
+
+    Object.keys(defaults).forEach(key => item[key] = defaults[key]);    
     keys.forEach(key => item[key] = deviceWrapper[key]);
-    console.log('Location at getLiveDevice: ', item.location);
+        
     return item;
+  },
+
+  getDisplayGroups() {
+    const groups = this.globalConfig.groups.filter(group => group.display !== false);
+    groups.forEach(group => group.display = true);    
+    return groups;
   },
 
   async getDeviceMapItemById(id) {

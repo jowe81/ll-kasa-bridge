@@ -28,7 +28,7 @@ const socketHandler = {
       });
 
       socket.on('auto/getGroups', () => {
-        socket.emit('auto/groups', this.devicePool.globalConfig.groups);
+        socket.emit('auto/groups', this.devicePool.getDisplayGroups());
       });
 
       socket.on('auto/getLocations', () => {
