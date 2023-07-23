@@ -17,12 +17,11 @@ tr {
 
 /* Touch view */
 
-.groups-container {
+.locations-container {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   text-align: left;
-
 }
 
 .group-container {
@@ -48,8 +47,7 @@ tr {
 }
 
 .device-channel {
-  background-color: blueviolet;
-   
+  background-color: blueviolet;   
 }
 
 .device-online-state {  
@@ -59,14 +57,44 @@ tr {
 .powerstate-toggle-button {
   height: 60px;
   padding: 0px 3px;
-  min-width: 180px;
+  width: 180px;
   margin: 10px 5px;
   border: 1px solid gray;
   border-radius:5px;
+  background-size: 20%;
+  background-position: bottom left;
+  background-repeat: no-repeat;
 }
 
-.powerstate-toggle-button-half-width {
-  min-width: 100px;
+.icon-fan {
+  background-image: url('/icons/fan.png');
+}
+
+.icon-bulb, .icon-light {
+  background-image: url('/icons/bulb.png');
+}
+
+.icon-heater {
+  background-image: url('/icons/heater.png');
+}
+
+.icon-entertainment {
+  background-image: url('/icons/entertainment.png');
+}
+
+.small-buttons {
+  width: 198px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  text-align: left;
+}
+
+.powerstate-toggle-button-small {
+  width: 80px;
+  margin-bottom: 0px;
+  background-size: contain;
+  background-position: 8px 10px;
 }
 
 .location-container {

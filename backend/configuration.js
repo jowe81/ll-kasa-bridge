@@ -605,7 +605,7 @@ const deviceMap = [
     alias: 'Bedroom Heater',
     channel: 4,
     id: '80065A4E60A835C49695A74DA7FAE76520436E9C01',
-    deviceType: DEVICETYPE_AIR_HEAT,
+    displayType: DEVICETYPE_AIR_HEAT,
     displayLabel: 'Heater',
     locationId: 'loc-bedroom',
     subType: SUBTYPE_PLUG
@@ -615,7 +615,7 @@ const deviceMap = [
     channel: 5, 
     id: "80065A4E60A835C49695A74DA7FAE76520436E9C02",
     locationId: 'loc-bedroom',
-    deviceType: DEVICETYPE_AIR_FAN,
+    displayType: DEVICETYPE_AIR_FAN,
     displayLabel: 'Fan',
     subType: SUBTYPE_PLUG,
   },
@@ -856,7 +856,7 @@ const deviceMap = [
   {
     alias: 'Living Room Ikea 2',
     channel: 30, 
-    id: "8012AE4AF3CF80CD50EC66E4F87F3E291F99397C",
+    id: "80124378042EF9B324B75F639D993F9F20F23759",
     locationId: 'loc-livingRoom',
     subType: SUBTYPE_BULB,
     filters: [{
@@ -868,7 +868,7 @@ const deviceMap = [
   {
     alias: 'Living Room Ikea 3',
     channel: 31, 
-    id: "8012FA2584FE5D30C3E2F13FC023719B1F7B385D",
+    id: "8012DEFBED48C05561BF6C2F5D8A490D1F77A75D",
     locationId: 'loc-livingRoom',
     subType: SUBTYPE_BULB,
     filters: [ { refId: 'naturalLight' }],
@@ -942,6 +942,7 @@ const deviceMap = [
     channel: 35, 
     class: 'class-outdoorLights',
     id: "801277C3769ADD0BA769504AAB6B233E1F77F11C",
+    locationId: 'loc-outside',
     subType: SUBTYPE_BULB,
     filters: [
       { refId: 'sunEvents-outdoorLights' },
@@ -1091,6 +1092,7 @@ const deviceMap = [
     channel: 101, 
     id: "8006000F366B7DD70835CBF38A51040620662083",
     displayLabel: 'Bed Shelf',
+    displayType: DEVICETYPE_LIGHT,
     locationId: 'loc-bedroom',
     subType: SUBTYPE_SWITCH, 
     targets: {
@@ -1120,7 +1122,7 @@ const deviceMap = [
     channel: 39,
     id: '80065A4E60A835C49695A74DA7FAE76520436E9C00',
     locationId: 'loc-bedroom',
-    deviceType: DEVICETYPE_ENTERTAINMENT,
+    displayType: DEVICETYPE_ENTERTAINMENT,
     displayLabel: 'Amp',
     subType: SUBTYPE_PLUG
   },

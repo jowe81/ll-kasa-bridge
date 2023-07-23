@@ -517,7 +517,7 @@ const cmdFailPrefix = '[FAIL]';
     this.deviceEventCallback = deviceEventCallback;
     this.initCommandCache();
 
-    if (mapItem) {
+    if (mapItem && mapItem.channel) {
       // Copy in the mapItem properties.
       Object.keys(mapItem).forEach(key => { 
         this[key] = mapItem[key];

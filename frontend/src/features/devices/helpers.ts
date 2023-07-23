@@ -27,19 +27,27 @@ const getPowerStateClassForLiveGroup = (locationInfo, groupId: string): string =
   const liveState = locationInfo.liveGroupData[groupId].liveState;
 
   if (liveState) {
-    if (liveState.onlineCount === liveState.totalCount) {       
-      return liveState.powerOnCount === liveState.onlineCount ? "power-on" : "power-off";
-    }
-  
-    if (liveState.offlineCount === liveState.totalCount) {
-      return "power-off";
-    }
-  
-    if (liveState.notDiscoveredCount) {
-      return "power-not-available";
-    }
+    if (liveState.discoveredCount > 0) {
+      // Have data for one or more devices
 
-    return "power-mixed";  
+      if (liveState.powerOnCount === liveState.discoveredCount) {
+        // All powered on
+        return 'power-on';
+      }
+  
+      if (liveState.powerOnCount === 0) {
+        // All powered off
+        return 'power-off';
+      }
+  
+      // Some powered on, some powered off
+      return 'power-mixed';        
+
+    } else {
+      // None of the devices were discovered
+
+      return 'power-not-available';
+    }
   }
 
   return "power-not-available";  

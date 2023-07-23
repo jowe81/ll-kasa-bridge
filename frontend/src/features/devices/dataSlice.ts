@@ -9,7 +9,7 @@ export interface Device {
   id: string;
   location: string;
   type: string;
-  deviceType?: string;
+  displayType?: string;
   subType: string;
 
   groups: string[];

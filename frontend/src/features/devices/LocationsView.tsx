@@ -1,6 +1,8 @@
 import { useAppSelector } from '../../app/hooks.ts';
 import { socket } from '../websockets/socket.tsx';
 import { getPowerStateClass, getDeviceByChannel, getPowerStateClassForLiveGroup } from './helpers.ts';
+import constants from '../../constants.ts';
+
 import './devices.css';
 
 import { Device, Group } from './dataSlice.ts';
@@ -51,6 +53,14 @@ function LocationsView() {
       }
 
       const ungroupedDevices = devicesInLocation.filter(device => !device.groups.length && (device.subType !== 'switch'));
+
+      const ungroupedOtherDevices = ungroupedDevices.filter((device: Device)  => {
+        return !constants.deviceTypesLighting.includes(device.displayType ?? device.subType);
+      });
+
+      const ungroupedLights = ungroupedDevices.filter((device: Device)  => {
+        return constants.deviceTypesLighting.includes(device.displayType ?? device.subType)
+      });
       
       const groupedDevices = {};
       const configuredGroupIds = getGroupIdsFromDevices(devicesInLocation);      
@@ -69,6 +79,8 @@ function LocationsView() {
         name: location.name,
         devices: devicesInLocation,
         ungroupedDevices,
+        ungroupedLights,
+        ungroupedOtherDevices,
         groupedDevices,
         switches,
         liveGroupData,
@@ -83,7 +95,7 @@ function LocationsView() {
     liveGroups.forEach((group, index) => {
       let onlineCount = 0;
       let offlineCount = 0;
-      let notDiscoveredCount = 0;
+      let notDiscoveredCount = 0;      
       let totalCount = group.channels.length;
 
       let powerOnCount = 0;
@@ -93,8 +105,12 @@ function LocationsView() {
         const device = getDeviceByChannel(devices, channel);
 
         if (device) {
-          device.isOnline ? onlineCount++ : offlineCount++; 
-          device.powerState ? powerOnCount++ : powerOffCount++;         
+          if (device.lastSeenAt) {
+            device.isOnline ? onlineCount++ : offlineCount++; 
+            device.powerState ? powerOnCount++ : powerOffCount++;           
+          } else {
+            notDiscoveredCount++;
+          }
         } else {
           notDiscoveredCount++;
         }
@@ -106,6 +122,7 @@ function LocationsView() {
           onlineCount,
           offlineCount,
           notDiscoveredCount,
+          discoveredCount: totalCount - notDiscoveredCount,
           totalCount,
 
           powerOnCount,
@@ -146,14 +163,11 @@ function LocationsView() {
 
   return (
     <>        
-      <div className="groups-container">
+      <div className="locations-container">
         {locationsData.map(locationInfo => {
                 
           const groupIds = Object.keys(locationInfo.groupedDevices);
           const groupFields = groupIds.map(groupId => {
-            // The contents of each group field            
-            const devicesInGroup = locationInfo.groupedDevices[groupId];
-            const groupName = getGroupName(groupId);
 
             /**
              * Only attempt to render the group associated with the groupId if it's in state.config.groups
@@ -162,12 +176,20 @@ function LocationsView() {
              * Ideally this filtering should happen in the data slice
              */
             if (groups.find(group => group.id === groupId)) {
+
+              // The contents of each group field            
+              const devicesInGroup = locationInfo.groupedDevices[groupId];
+              const groupName = getGroupName(groupId);                          
+              const { onlineCount, offlineCount, discoveredCount, notDiscoveredCount, totalCount } = locationInfo.liveGroupData[groupId].liveState;
+
+              const notDiscoveredText = notDiscoveredCount > 0 ? `[${notDiscoveredCount} N/A]` : ``;
+  
               return (
-                <div key={'group_' + groupId} className={ 'powerstate-toggle-button ' + getPowerStateClassForLiveGroup(locationInfo, groupId)} data-device-group-id={groupId} onClick={handleGroupClick}>
+                <div key={'group_' + groupId} className={ 'group-button powerstate-toggle-button ' + getPowerStateClassForLiveGroup(locationInfo, groupId)} data-device-group-id={groupId} onClick={handleGroupClick}>
                   <div className='device-meta'>
-                    {devicesInGroup.length} devices
+                    G | {devicesInGroup.length} devices
                     <div className='device-online-state'>
-                      {'state'}
+                    &nbsp;{ notDiscoveredText } { onlineCount }/{ discoveredCount } online
                     </div>
                   </div>
   
@@ -177,13 +199,14 @@ function LocationsView() {
             }
           });
 
-          const deviceFields = locationInfo.ungroupedDevices.map(device => {
+          const ungroupedLightsFields = locationInfo.ungroupedLights.map(device => {
             const powerStateClass = getPowerStateClass(device);
+            const bgIconClass = `icon-${device.displayType ?? device.subType ?? 'none'}`;
 
             return (
-              <div key={'device_' + device.channel} className={ 'powerstate-toggle-button ' + powerStateClass} data-device-channel={device.channel} onClick={handleClick}>
+              <div key={'device_' + device.channel} className={ `device-button ${bgIconClass} powerstate-toggle-button ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
                 <div className='device-meta'>
-                  Ch {device.channel}
+                  D | Ch {device.channel}
                   <div className='device-online-state'>
                     {device.isOnline ? 'online' : 'offline'}
                   </div>
@@ -195,13 +218,33 @@ function LocationsView() {
             )
           });
 
-          const switchFields = locationInfo.switches.map(device => {
+          const ungroupedOtherDeviceFields = locationInfo.ungroupedOtherDevices.map(device => {
             const powerStateClass = getPowerStateClass(device);
+            const bgIconClass = `icon-${device.displayType ?? device.subType ?? 'none'}`;
 
             return (
-              <div key={'switch_' + device.channel} className={ 'powerstate-toggle-button ' + powerStateClass} data-device-channel={device.channel} onClick={handleClick}>
+              <div key={'device_' + device.channel} className={ `device-button ${bgIconClass} powerstate-toggle-button powerstate-toggle-button-small  ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
                 <div className='device-meta'>
-                  Ch {device.channel}
+                  {device.channel}
+                  <div className='device-online-state'>
+                  {device.isOnline ? device.displayLabel ?? device.alias : 'offline'}
+                  </div>
+                </div>
+                <div className='device-alias'>
+                </div>                                                  
+              </div> 
+            )
+          });
+
+
+          const switchFields = locationInfo.switches.map(device => {
+            const powerStateClass = getPowerStateClass(device);
+            const bgIconClass = `icon-${device.displayType ?? device.subType ?? 'none'}`;
+
+            return (
+              <div key={'switch_' + device.channel} className={ `switch-button ${bgIconClass} powerstate-toggle-button ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
+                <div className='device-meta'>
+                  S | Ch {device.channel}
                   <div className='device-online-state'>
                     {device.isOnline ? 'online' : 'offline'}
                   </div>
@@ -221,17 +264,8 @@ function LocationsView() {
                     (groupFields.length > 0) &&
                     <>
                       {/* <div>Groups:</div> */}
-                      <div>
+                      <div className="groups-container">
                         {groupFields}
-                      </div>
-                    </>
-                  }
-                  {
-                    (deviceFields.length > 0) &&
-                    <>
-                      {/* <div>Devices:</div> */}
-                      <div>
-                        {deviceFields}
                       </div>
                     </>
                   }
@@ -244,6 +278,24 @@ function LocationsView() {
                       </div>
                     </>
                   }                  
+                  {
+                    (ungroupedLightsFields.length > 0) &&
+                    <>
+                      {/* <div>Devices:</div> */}
+                      <div>
+                        {ungroupedLightsFields}
+                      </div>
+                    </>
+                  }
+                  {
+                    (ungroupedOtherDeviceFields.length > 0) &&
+                    <>
+                      {/* <div>Devices:</div> */}
+                      <div className='small-buttons'>
+                        {ungroupedOtherDeviceFields}
+                      </div>
+                    </>
+                  }
                 </div>
               </div>
           );

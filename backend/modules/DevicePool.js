@@ -272,7 +272,7 @@ const devicePool = {
       'displayLabel',
       'display',
       'subType',
-      'deviceType',
+      'displayType',
       'targets',
       'type',
       'host',
@@ -303,7 +303,7 @@ const devicePool = {
 
     Object.keys(defaults).forEach(key => item[key] = defaults[key]);    
     keys.forEach(key => item[key] = deviceWrapper[key]);
-        
+
     return item;
   },
 
