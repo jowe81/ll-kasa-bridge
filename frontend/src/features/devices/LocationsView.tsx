@@ -177,25 +177,43 @@ function LocationsView() {
              */
             if (groups.find(group => group.id === groupId)) {
 
+
               // The contents of each group field            
               const devicesInGroup = locationInfo.groupedDevices[groupId];
-              const groupName = getGroupName(groupId);                          
-              const { onlineCount, offlineCount, discoveredCount, notDiscoveredCount, totalCount } = locationInfo.liveGroupData[groupId].liveState;
+              const groupName = getGroupName(groupId);
+              const group = locationInfo.liveGroupData[groupId];
+              const { onlineCount, offlineCount, discoveredCount, notDiscoveredCount, totalCount } = group.liveState;
+              const bgIconClass = `icon-${group.displayType ?? group.subType ?? 'none'}`;
+              
+              if (group.displayFullSizeButton) {
+                const notDiscoveredText = notDiscoveredCount > 0 ? `[${notDiscoveredCount} N/A]` : ``;
 
-              const notDiscoveredText = notDiscoveredCount > 0 ? `[${notDiscoveredCount} N/A]` : ``;
-  
-              return (
-                <div key={'group_' + groupId} className={ 'group-button powerstate-toggle-button ' + getPowerStateClassForLiveGroup(locationInfo, groupId)} data-device-group-id={groupId} onClick={handleGroupClick}>
-                  <div className='device-meta'>
-                    G | {devicesInGroup.length} devices
-                    <div className='device-online-state'>
-                    &nbsp;{ notDiscoveredText } { onlineCount }/{ discoveredCount } online
+                return (
+                  <div key={'group_' + groupId} className={ 'group-button powerstate-toggle-button ' + getPowerStateClassForLiveGroup(locationInfo, groupId)} data-device-group-id={groupId} onClick={handleGroupClick}>
+                    <div className='device-meta'>
+                      G | {devicesInGroup.length} devices
+                      <div className='device-online-state'>
+                      &nbsp;{ notDiscoveredText } { onlineCount }/{ discoveredCount } online
+                      </div>
                     </div>
+    
+                    <div className='device-alias'>{groupName}</div>
                   </div>
-  
-                  <div className='device-alias'>{groupName}</div>
-                </div>
-              );  
+                );                    
+              } else {
+                return (                  
+                  <div key={'group_' + groupId} className={ `group-button ${bgIconClass} powerstate-toggle-button powerstate-toggle-button-small ` + getPowerStateClassForLiveGroup(locationInfo, groupId)} data-device-group-id={groupId} onClick={handleGroupClick}>
+                    <div className='device-meta'>
+                      { notDiscoveredCount }/{ onlineCount }/{ discoveredCount }
+                      <div className='device-online-state'>
+                        { groupName }
+                      </div>
+                    </div>
+    
+                    <div className='device-alias'></div>
+                  </div>
+                );    
+              }              
             }
           });
 
@@ -203,19 +221,34 @@ function LocationsView() {
             const powerStateClass = getPowerStateClass(device);
             const bgIconClass = `icon-${device.displayType ?? device.subType ?? 'none'}`;
 
-            return (
-              <div key={'device_' + device.channel} className={ `device-button ${bgIconClass} powerstate-toggle-button ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
-                <div className='device-meta'>
-                  D | Ch {device.channel}
-                  <div className='device-online-state'>
-                    {device.isOnline ? 'online' : 'offline'}
+            if (device.displayFullSizeButton) {
+              return (
+                <div key={'device_' + device.channel} className={ `device-button ${bgIconClass} powerstate-toggle-button ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
+                  <div className='device-meta'>
+                    D | Ch {device.channel}
+                    <div className='device-online-state'>
+                      {device.isOnline ? 'online' : 'offline'}
+                    </div>
                   </div>
-                </div>
-                <div className='device-alias'>
-                  {device.displayLabel ?? device.alias}
-                </div>                                                  
-              </div> 
-            )
+                  <div className='device-alias'>
+                    {device.displayLabel ?? device.alias}
+                  </div>                                                  
+                </div> 
+              )  
+            } else {
+              return (
+                <div key={'device_' + device.channel} className={ `device-button ${bgIconClass} powerstate-toggle-button powerstate-toggle-button-small  ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
+                  <div className='device-meta'>
+                    { device.channel }
+                    <div className='device-online-state'>
+                    { device.displayLabel ?? device.alias }
+                    </div>
+                  </div>
+                  <div className='device-alias'>
+                  </div>                                                  
+                </div> 
+              )
+            }
           });
 
           const ungroupedOtherDeviceFields = locationInfo.ungroupedOtherDevices.map(device => {
@@ -240,60 +273,76 @@ function LocationsView() {
           const switchFields = locationInfo.switches.map(device => {
             const powerStateClass = getPowerStateClass(device);
             const bgIconClass = `icon-${device.displayType ?? device.subType ?? 'none'}`;
-
-            return (
-              <div key={'switch_' + device.channel} className={ `switch-button ${bgIconClass} powerstate-toggle-button ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
-                <div className='device-meta'>
-                  S | Ch {device.channel}
-                  <div className='device-online-state'>
-                    {device.isOnline ? 'online' : 'offline'}
+            
+            if (device.displayFullSizeButton) { 
+              return (
+                <div key={'switch_' + device.channel} className={ `switch-button ${bgIconClass} powerstate-toggle-button ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
+                  <div className='device-meta'>
+                    S | Ch {device.channel}
+                    <div className='device-online-state'>
+                      {device.isOnline ? 'online' : 'offline'}
+                    </div>
                   </div>
-                </div>
-                <div className='device-alias'>
-                  {device.displayLabel ?? device.alias}
-                </div>                                                  
-              </div> 
-            )
+                  <div className='device-alias'>
+                    {device.displayLabel ?? device.alias}
+                  </div>                                                  
+                </div> 
+              )  
+            } else {
+              return (
+                <div key={'switch_' + device.channel} className={ `device-button ${bgIconClass} powerstate-toggle-button powerstate-toggle-button-small  ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
+                  <div className='device-meta'>
+                    { device.channel }
+                    <div className='device-online-state'>
+                    { device.displayLabel ?? device.alias }
+                    </div>
+                  </div>
+                  <div className='device-alias'>
+                  </div>                                                  
+                </div> 
+              )
+
+            }
           });
 
           return(
               <div key={locationInfo.id} className="location-container">
                 <div className="location-label">{ locationInfo.name }</div>
-                <div>
+                <div className="location-buttons-container">
                   {
                     (groupFields.length > 0) &&
                     <>
                       {/* <div>Groups:</div> */}
-                      <div className="groups-container">
+                      {/* <div className="groups-container"> */}
                         {groupFields}
-                      </div>
+                      {/* </div> */}
                     </>
                   }
                   {
                     (switchFields.length > 0) &&
                     <>
                       {/* <div>Switches:</div> */}
-                      <div>
+                      {/* <div> */}
                         {switchFields}
-                      </div>
+                      {/* </div> */}
                     </>
                   }                  
                   {
                     (ungroupedLightsFields.length > 0) &&
                     <>
                       {/* <div>Devices:</div> */}
-                      <div>
+                      {/* <div> */}
                         {ungroupedLightsFields}
-                      </div>
+                      {/* </div> */}
                     </>
                   }
                   {
                     (ungroupedOtherDeviceFields.length > 0) &&
                     <>
                       {/* <div>Devices:</div> */}
-                      <div className='small-buttons'>
+                      {/* <div className='small-buttons'> */}
                         {ungroupedOtherDeviceFields}
-                      </div>
+                      {/* </div> */}
                     </>
                   }
                 </div>

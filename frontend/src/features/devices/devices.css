@@ -1,10 +1,21 @@
-.power-on {
-  background-color: rgb(0, 95, 0);
+.power-on-fan {
+  background-color: rgb(50, 71, 226);
+}
 
+.power-on-heater {
+  background-color: rgb(174, 36, 36);
+}
+
+.power-on, .power-on-light, .power-on-bulb, .power-on-led-strip {
+  background-color: rgb(0, 95, 0);
+}
+
+.power-on-entertainment {
+  background-color: rgb(134, 28, 108);
 }
 
 .power-off {
-  background-color: brown;
+  background-color: rgb(89, 44, 44);
 }
 
 .power-not-available {
@@ -19,7 +30,7 @@ tr {
 
 .locations-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
   text-align: left;
 }
@@ -101,7 +112,14 @@ tr {
   padding: 5px;
   margin: 5px;
   background-color: rgb(58, 53, 53);
-  border-radius: 5px;
+  border-radius: 5px;  
+}
+
+.location-buttons-container {
+  width: 198px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .location-label {

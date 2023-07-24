@@ -32,7 +32,8 @@ export interface Group {
   channels: number[];
   class: string | string[];
   displayLabel?: string;
-  display?: boolean;
+  displayType?: string;
+  display?: boolean;  
   filters: object[];
   linkedDevices: object[];
 }

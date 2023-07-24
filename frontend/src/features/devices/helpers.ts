@@ -6,13 +6,15 @@ const getPowerStateClass = (device: Device): string => {
   let powerStateClass: string = '';
   
   if (powerStatePresent) {
+    const displayType = device.displayType ?? device.subType;
+
     switch (device.powerState) {
       case true:
-        powerStateClass = "power-on";
+        powerStateClass = "power-on" + (displayType ? `-${displayType}` : ``);
         break;
   
       case false:
-        powerStateClass = "power-off";                                
+        powerStateClass = "power-off";
         break;
                 
     }                            

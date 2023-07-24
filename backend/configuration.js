@@ -422,6 +422,8 @@ const globalConfig = {
       channels: [ 38 ],
       class: 'class-bedroomLights',
       display: false,
+      displayLabel: 'Bed',
+      displayType: constants.DEVICETYPE_LIGHT,
       filters: [
         { refId: 'naturalLight' }
       ],      
@@ -450,6 +452,7 @@ const globalConfig = {
       class: 'class-jessDeskLights',
       displayLabel: 'Desk',
       display: false,
+      displayType: constants.DEVICETYPE_LIGHT,
       linkedDevices: [
         { 
           channel: 34,
@@ -472,6 +475,7 @@ const globalConfig = {
       channels: [ 2, 3, 16, 37 ],
       class: 'class-johannesDeskLights',
       displayLabel: 'Desk',
+      displayType: constants.DEVICETYPE_LIGHT,
       linkedDevices: [
         { 
           channel: 14,
@@ -493,6 +497,7 @@ const globalConfig = {
       name: "Bedroom Ceiling Lights",
       channels: [ 6, 7 ],
       class: 'class-bedroomLights',
+      displayType: constants.DEVICETYPE_LIGHT,
       displayLabel: 'Ceiling',
     },
     {
@@ -501,6 +506,8 @@ const globalConfig = {
       channels: [ 42, 43 ],
       class: 'class-kitchenCounterLights',
       displayLabel: 'Counter',
+      displayType: constants.DEVICETYPE_LIGHT,
+
     },
     {       
       id: "group-kitchenLights",
@@ -508,17 +515,20 @@ const globalConfig = {
       channels: [ 28 ],
       class: 'class-kitchenLights',
       displayLabel: 'Table',
+      displayType: constants.DEVICETYPE_LIGHT,
     },
     {       
       id: "group-hallwayLights",
       name: "Hallway Lights",
       channels: [ 8, 9 ],
       class: 'class-kitchenLights',
-      displayLabel: 'Lights',
+      displayLabel: 'Ceiling',
+      displayType: constants.DEVICETYPE_LIGHT,
     },
     {
       id: "group-bathroomLights",
       name: "Bathroom Lights",
+      displayType: constants.DEVICETYPE_LIGHT,
       displayLabel: 'Lights',
       channels: [ 10, 11, 12, 13 ],
       class: 'class-bathroomLights',
@@ -526,6 +536,8 @@ const globalConfig = {
     { 
       id: "group-livingroomLights",
       name: "Living Room Lights",
+      displayLabel: 'Main',
+      displayType: constants.DEVICETYPE_LIGHT,
       channels: [ 29, 30 ],
       class: 'class-livingroomLights',
     }
@@ -817,7 +829,9 @@ const deviceMap = [
     channel: 15,
     id: "80061465B741F3D278857FD2F8E09CD020C3200A",
     locationId: 'loc-bathroom',
-    subType: SUBTYPE_PLUG
+    subType: SUBTYPE_PLUG,
+    displayLabel: "Heater",
+    displayType: DEVICETYPE_AIR_HEAT,
   },
   {
     alias: 'Bedroom Desk Strip bottom',
@@ -893,7 +907,8 @@ const deviceMap = [
     alias: 'Switch in Jess\' desk',
     channel: 34, 
     id: "800686BE89C5D37A63B4E70AB37689212066F343",
-    displayLabel: 'Jess \' desk',
+    displayLabel: 'Jess Desk',
+    displayType: constants.DEVICETYPE_LIGHT,
     locationId: 'loc-livingRoom',
     subType: SUBTYPE_SWITCH,
     targets: {
@@ -942,6 +957,7 @@ const deviceMap = [
     channel: 35, 
     class: 'class-outdoorLights',
     id: "801277C3769ADD0BA769504AAB6B233E1F77F11C",
+    displayLabel: 'Entrance',
     locationId: 'loc-outside',
     subType: SUBTYPE_BULB,
     filters: [
