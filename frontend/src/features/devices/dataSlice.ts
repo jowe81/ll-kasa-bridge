@@ -36,11 +36,13 @@ export interface Group {
   display?: boolean;  
   filters: object[];
   linkedDevices: object[];
+  liveState?: LiveState;
 }
 
 export interface LiveState {
   onlineCount: number;
   offlineCount: number;
+  discoveredCount: number;
   notDiscoveredCount: number;
   totalCount: number;
   powerOnCount: number;

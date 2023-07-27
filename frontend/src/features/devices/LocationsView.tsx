@@ -1,11 +1,13 @@
 import { useAppSelector } from '../../app/hooks.ts';
 import { socket } from '../websockets/socket.tsx';
-import { getPowerStateClass, getDeviceByChannel, getPowerStateClassForLiveGroup } from './helpers.ts';
+import { getDeviceByChannel } from './helpers.ts';
 import constants from '../../constants.ts';
 
 import './devices.css';
 
 import { Device, Group } from './dataSlice.ts';
+import TouchButtonDevice from './TouchButtonDevice.tsx';
+import TouchButtonGroup from './TouchButtonGroup.tsx';
 
 function LocationsView() {
   const devices = useAppSelector(state => state.data.devices);
@@ -31,13 +33,6 @@ function LocationsView() {
     });
 
     return groupIds;
-  }
-
-  const getGroupName = (groupId) => { 
-    const group = groups.find(group => group.id === groupId);
-    if (group) {
-      return group.displayLabel ?? group.name;
-    }
   }
 
   const getLocationsData = () => {
@@ -154,7 +149,7 @@ function LocationsView() {
         targetType: 'group',
         targetId: groupId,
         macroName: 'toggleGroup'
-      });    
+      });
     }
   }
 
@@ -176,175 +171,52 @@ function LocationsView() {
              * Ideally this filtering should happen in the data slice
              */
             if (groups.find(group => group.id === groupId)) {
-
-
-              // The contents of each group field            
-              const devicesInGroup = locationInfo.groupedDevices[groupId];
-              const groupName = getGroupName(groupId);
-              const group = locationInfo.liveGroupData[groupId];
-              const { onlineCount, offlineCount, discoveredCount, notDiscoveredCount, totalCount } = group.liveState;
-              const bgIconClass = `icon-${group.displayType ?? group.subType ?? 'none'}`;
-              
-              if (group.displayFullSizeButton) {
-                const notDiscoveredText = notDiscoveredCount > 0 ? `[${notDiscoveredCount} N/A]` : ``;
-
-                return (
-                  <div key={'group_' + groupId} className={ 'group-button powerstate-toggle-button ' + getPowerStateClassForLiveGroup(locationInfo, groupId)} data-device-group-id={groupId} onClick={handleGroupClick}>
-                    <div className='device-meta'>
-                      G | {devicesInGroup.length} devices
-                      <div className='device-online-state'>
-                      &nbsp;{ notDiscoveredText } { onlineCount }/{ discoveredCount } online
-                      </div>
-                    </div>
-    
-                    <div className='device-alias'>{groupName}</div>
-                  </div>
-                );                    
-              } else {
-                return (                  
-                  <div key={'group_' + groupId} className={ `group-button ${bgIconClass} powerstate-toggle-button powerstate-toggle-button-small ` + getPowerStateClassForLiveGroup(locationInfo, groupId)} data-device-group-id={groupId} onClick={handleGroupClick}>
-                    <div className='device-meta'>
-                      { notDiscoveredCount }/{ onlineCount }/{ discoveredCount }
-                      <div className='device-online-state'>
-                        { groupName }
-                      </div>
-                    </div>
-    
-                    <div className='device-alias'></div>
-                  </div>
-                );    
-              }              
+              const props = {
+                group: locationInfo.liveGroupData[groupId],
+                onClick: handleGroupClick,
+              }
+              return <TouchButtonGroup key={'group_' + groupId} {...props}></TouchButtonGroup>;
             }
           });
 
           const ungroupedLightsFields = locationInfo.ungroupedLights.map(device => {
-            const powerStateClass = getPowerStateClass(device);
-            const bgIconClass = `icon-${device.displayType ?? device.subType ?? 'none'}`;
-
-            if (device.displayFullSizeButton) {
-              return (
-                <div key={'device_' + device.channel} className={ `device-button ${bgIconClass} powerstate-toggle-button ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
-                  <div className='device-meta'>
-                    D | Ch {device.channel}
-                    <div className='device-online-state'>
-                      {device.isOnline ? 'online' : 'offline'}
-                    </div>
-                  </div>
-                  <div className='device-alias'>
-                    {device.displayLabel ?? device.alias}
-                  </div>                                                  
-                </div> 
-              )  
-            } else {
-              return (
-                <div key={'device_' + device.channel} className={ `device-button ${bgIconClass} powerstate-toggle-button powerstate-toggle-button-small  ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
-                  <div className='device-meta'>
-                    { device.channel }
-                    <div className='device-online-state'>
-                    { device.displayLabel ?? device.alias }
-                    </div>
-                  </div>
-                  <div className='device-alias'>
-                  </div>                                                  
-                </div> 
-              )
+            const props = {
+              device,
+              onClick: handleClick,
             }
+
+            return <TouchButtonDevice key={'device_' + device.channel} {...props}></TouchButtonDevice>;
           });
 
           const ungroupedOtherDeviceFields = locationInfo.ungroupedOtherDevices.map(device => {
-            const powerStateClass = getPowerStateClass(device);
-            const bgIconClass = `icon-${device.displayType ?? device.subType ?? 'none'}`;
+            const props = {
+              device,
+              onClick: handleClick,
+            };
 
-            return (
-              <div key={'device_' + device.channel} className={ `device-button ${bgIconClass} powerstate-toggle-button powerstate-toggle-button-small  ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
-                <div className='device-meta'>
-                  {device.channel}
-                  <div className='device-online-state'>
-                  {device.isOnline ? device.displayLabel ?? device.alias : 'offline'}
-                  </div>
-                </div>
-                <div className='device-alias'>
-                </div>                                                  
-              </div> 
-            )
+            return <TouchButtonDevice key={'device_' + device.channel} {...props}></TouchButtonDevice>;
+
           });
 
 
           const switchFields = locationInfo.switches.map(device => {
-            const powerStateClass = getPowerStateClass(device);
-            const bgIconClass = `icon-${device.displayType ?? device.subType ?? 'none'}`;
-            
-            if (device.displayFullSizeButton) { 
-              return (
-                <div key={'switch_' + device.channel} className={ `switch-button ${bgIconClass} powerstate-toggle-button ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
-                  <div className='device-meta'>
-                    S | Ch {device.channel}
-                    <div className='device-online-state'>
-                      {device.isOnline ? 'online' : 'offline'}
-                    </div>
-                  </div>
-                  <div className='device-alias'>
-                    {device.displayLabel ?? device.alias}
-                  </div>                                                  
-                </div> 
-              )  
-            } else {
-              return (
-                <div key={'switch_' + device.channel} className={ `device-button ${bgIconClass} powerstate-toggle-button powerstate-toggle-button-small  ${powerStateClass}` } data-device-channel={device.channel} onClick={handleClick}>
-                  <div className='device-meta'>
-                    { device.channel }
-                    <div className='device-online-state'>
-                    { device.displayLabel ?? device.alias }
-                    </div>
-                  </div>
-                  <div className='device-alias'>
-                  </div>                                                  
-                </div> 
-              )
-
-            }
+            const props = {
+              device,
+              onClick: handleClick,
+            };
+  
+            return <TouchButtonDevice key={'device_' + device.channel} {...props}></TouchButtonDevice>;
+  
           });
 
           return(
               <div key={locationInfo.id} className="location-container">
                 <div className="location-label">{ locationInfo.name }</div>
                 <div className="location-buttons-container">
-                  {
-                    (groupFields.length > 0) &&
-                    <>
-                      {/* <div>Groups:</div> */}
-                      {/* <div className="groups-container"> */}
-                        {groupFields}
-                      {/* </div> */}
-                    </>
-                  }
-                  {
-                    (switchFields.length > 0) &&
-                    <>
-                      {/* <div>Switches:</div> */}
-                      {/* <div> */}
-                        {switchFields}
-                      {/* </div> */}
-                    </>
-                  }                  
-                  {
-                    (ungroupedLightsFields.length > 0) &&
-                    <>
-                      {/* <div>Devices:</div> */}
-                      {/* <div> */}
-                        {ungroupedLightsFields}
-                      {/* </div> */}
-                    </>
-                  }
-                  {
-                    (ungroupedOtherDeviceFields.length > 0) &&
-                    <>
-                      {/* <div>Devices:</div> */}
-                      {/* <div className='small-buttons'> */}
-                        {ungroupedOtherDeviceFields}
-                      {/* </div> */}
-                    </>
-                  }
+                  { (groupFields.length > 0) && groupFields }
+                  { (switchFields.length > 0) && switchFields }
+                  { (ungroupedLightsFields.length > 0) && ungroupedLightsFields }
+                  { (ungroupedOtherDeviceFields.length > 0) && ungroupedOtherDeviceFields }
                 </div>
               </div>
           );

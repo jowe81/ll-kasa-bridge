@@ -127,3 +127,8 @@ tr {
   text-align: center;
   font-weight: bold;
 }
+
+.device-pending {
+  
+  background-color: gray !important;
+}

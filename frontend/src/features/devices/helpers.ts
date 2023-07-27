@@ -25,8 +25,7 @@ const getPowerStateClass = (device: Device): string => {
   return powerStateClass;
 }
 
-const getPowerStateClassForLiveGroup = (locationInfo, groupId: string): string => {
-  const liveState = locationInfo.liveGroupData[groupId].liveState;
+const getPowerStateClassForLiveGroup = (liveState): string => {
 
   if (liveState) {
     if (liveState.discoveredCount > 0) {
