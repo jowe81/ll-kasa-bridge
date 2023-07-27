@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Group } from './dataSlice.ts';
+import constants from '../../constants.ts';
+
+const setPowerStateTimeout = constants.SECOND * 5;
 
 const TouchButtonGroup = (props) => {
 
   const group: Group = props.group;
   const onClick: Function = props.onClick;
 
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, setIsPending] = useState<boolean | number>(false);
   const [powerState, setPowerState] = useState<boolean | null | undefined>(null);
 
 
@@ -16,7 +19,7 @@ const TouchButtonGroup = (props) => {
   const powerStateClass = getPowerStateClassForLiveGroup(group);
 
   const handleClick = (e) => {
-    setIsPending(true);    
+    setIsPending(Date.now());    
     onClick(e);
   }
 
@@ -25,8 +28,21 @@ const TouchButtonGroup = (props) => {
 
     if ((typeof powerState === 'boolean') && (powerState !== groupPowerState)) {
       setIsPending(false);
-    }  
-  }, [group])
+    } 
+
+    // Set an interval that checks on the timeout for the expected powerstate change to return.
+    const handle = setInterval(() => {
+      if (typeof isPending === 'number') {
+        if (Date.now() > isPending + setPowerStateTimeout) {
+          setIsPending(false);
+        }  
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(handle);
+    }
+  }, [group, isPending])
 
   if (group.id === 'group-bedroomDeskLights') console.log(`Rendering group ${group.name}`, powerState, groupPowerState, powerStateClass);
 
