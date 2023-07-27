@@ -19,6 +19,9 @@ const constants = {
   DAY,
   WEEK,
 
+  // When a device goes offline the saved powerstate for its wrapper will be discarded after this timeout.
+  DEVICE_POWERSTATE_TIMEOUT: 30 * SECOND,
+
   // Kasa subtypes
   SUBTYPE_BULB: 'bulb',
   SUBTYPE_LED_STRIP: 'led-strip',

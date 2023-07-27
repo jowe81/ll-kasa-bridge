@@ -69,7 +69,10 @@ const getPowerStateClass = (device: Device): string => {
       case false:
         powerStateClass = "power-off";
         break;
-                
+             
+      default:
+        powerStateClass = "power-not-available";
+        break;
     }                            
   } else {
     powerStateClass = "power-not-available";

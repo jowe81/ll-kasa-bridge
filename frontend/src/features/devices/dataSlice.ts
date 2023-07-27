@@ -47,6 +47,7 @@ export interface LiveState {
   totalCount: number;
   powerOnCount: number;
   powerOffCount: number;
+  powerUndefinedCount: number;
 }
 
 export interface LiveGroup extends Group {

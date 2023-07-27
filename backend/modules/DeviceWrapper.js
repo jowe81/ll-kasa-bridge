@@ -5,6 +5,7 @@ import { log, debug } from './Log.js';
 import { commandMatchesCurrentState, getCommandObjectFromTargetData } from './TargetDataProcessor.js';
 import { getFilterPlugins } from "./Filters.js";
 import { resolveDeviceDependencies } from './DependencyResolver.js';
+import { socketHandler } from './SocketHandler.js';
 
 
 const cmdPrefix = '[CMD]';
@@ -547,7 +548,7 @@ const cmdFailPrefix = '[FAIL]';
         log(`Discovered device at ${device.host}`, this, 'yellow');
         this.addListeners();
         this.lastSeenAt = Date.now();
-        this.isOnline = true;
+        this.setOnline();
       }
     } else {
       if (device) {
@@ -783,6 +784,38 @@ const cmdFailPrefix = '[FAIL]';
 
   async toggle(origin) {
     this.setPowerState(!this.getPowerState(), null, origin);
+  },
+
+  setOnline() {
+    this.offlineSince = null;
+    this.isOnline = true;
+    this.flushCommandCache();
+    this.startPolling();
+    this.lastSeenAt = Date.now();                 
+    socketHandler.emitDeviceStateUpdate(this);
+  },
+
+  setOffline() {
+    const offlineSince = Date.now();
+    this.offlineSince = offlineSince;
+    this.isOnline = false;
+    this.stopPolling();
+    socketHandler.emitDeviceStateUpdate(this);
+
+    const self = this;
+    log('Setting timeout to discard Powerstate', this, 'yellow');
+
+    const handle = setTimeout(() => {
+      if (this.offlineSince === offlineSince) {
+        // Onlinestate has not changed since the timeout was set; discard powerstate
+        log('Discarding Powerstate', this, 'yellow');
+        this.powerState = undefined;
+        socketHandler.emitDeviceStateUpdate(this, { changed: true, on_off: true });
+      } else {
+        // Online state has changed at least once since the timeout was set, discard the timeout.
+        clearTimeout(handle);
+      }
+    }, constants.DEVICE_POWERSTATE_TIMEOUT);
   },
 
   startPolling() {

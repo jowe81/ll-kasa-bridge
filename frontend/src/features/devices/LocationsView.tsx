@@ -95,14 +95,19 @@ function LocationsView() {
 
       let powerOnCount = 0;
       let powerOffCount = 0;
+      let powerUndefinedCount = 0;
 
       group.channels.forEach(channel => {        
         const device = getDeviceByChannel(devices, channel);
 
         if (device) {
           if (device.lastSeenAt) {
-            device.isOnline ? onlineCount++ : offlineCount++; 
-            device.powerState ? powerOnCount++ : powerOffCount++;           
+            device.isOnline ? onlineCount++ : offlineCount++;
+            if (typeof device.powerState === 'boolean') {
+              device.powerState ? powerOnCount++ : powerOffCount++;             
+            } else {
+              powerUndefinedCount++;
+            }            
           } else {
             notDiscoveredCount++;
           }
@@ -122,6 +127,7 @@ function LocationsView() {
 
           powerOnCount,
           powerOffCount,
+          powerUndefinedCount,
         }
       };
     });

@@ -83,12 +83,12 @@ const getPowerStateDataForLiveGroup = (group: Group): { state: boolean | null | 
     if (liveState.discoveredCount > 0) {
       // Have data for one or more devices
 
-      if (liveState.powerOnCount === liveState.discoveredCount) {
+      if (liveState.powerOnCount > 0 && liveState.powerOnCount === liveState.discoveredCount - liveState.powerUndefinedCount) {
         // All powered on
         return { state: true, class: 'power-on' };
       }
   
-      if (liveState.powerOnCount === 0) {
+      if (liveState.powerOffCount > 0) {
         // All powered off
         return { state: false, class: 'power-off' };
       }

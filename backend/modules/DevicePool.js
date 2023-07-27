@@ -104,9 +104,7 @@ const devicePool = {
       const deviceWrapper = await this.getDeviceWrapperById(device.id);
       if (deviceWrapper && deviceWrapper.isOnline) {
         log(`Device went offline.`, deviceWrapper, 'yellow');
-        deviceWrapper.isOnline = false;
-        deviceWrapper.stopPolling();
-        deviceWrapper.socketHandler.emitDeviceStateUpdate(deviceWrapper);        
+        deviceWrapper.setOffline();       
       }
     });
 
@@ -114,11 +112,7 @@ const devicePool = {
       const deviceWrapper = await this.getDeviceWrapperById(device.id);
       if (deviceWrapper && !deviceWrapper.isOnline) {
         log(`Device came online.`, deviceWrapper, 'yellow');        
-        deviceWrapper.isOnline = true;
-        deviceWrapper.flushCommandCache();
-        deviceWrapper.startPolling();
-        deviceWrapper.lastSeenAt = Date.now();
-        deviceWrapper.socketHandler.emitDeviceStateUpdate(deviceWrapper);         
+        deviceWrapper.setOnline();
       }
     });
     

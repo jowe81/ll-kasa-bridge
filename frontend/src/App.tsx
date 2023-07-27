@@ -56,7 +56,7 @@ function App() {
     });
 
     socket.on('auto/device/state', (data: DeviceStateUpdate) => {
-      console.log('state update', data);
+      console.log(`state update ch ${data.data.channel}, power: ${data.data.powerState}`, data);
       dispatch(deviceStateUpdated(data));
     });
 
