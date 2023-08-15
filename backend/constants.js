@@ -27,6 +27,10 @@ const constants = {
   SUBTYPE_LED_STRIP: 'led-strip',
   SUBTYPE_PLUG: 'plug',
   SUBTYPE_SWITCH: 'switch',
+  SUBTYPE_THERMOMETER: 'thermometer',
+
+  // Other subtypes
+  SUBTYPE_THERMOMETER: 'thermometer',  
 
   // Device types
   DEVICETYPE_AIR_FAN: 'fan',
@@ -34,6 +38,8 @@ const constants = {
   DEVICETYPE_AIR_AC: 'a/c',
   DEVICETYPE_LIGHT: 'light', // A non-smart plug-in-light
   DEVICETYPE_ENTERTAINMENT: 'entertainment',  
+
+  DEVICETYPE_ESP: 'ESP',
 
   // Service names
   SERVICE_PERIODIC_FILTER: 'Periodic Filter Service',

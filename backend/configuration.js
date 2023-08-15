@@ -11,6 +11,7 @@ const {
   DEVICETYPE_AIR_HEAT,
   DEVICETYPE_ENTERTAINMENT,
   DEVICETYPE_LIGHT,
+  DEVICETYPE_ESP,
 
 } = constants;
 
@@ -29,6 +30,9 @@ const globalConfig = {
     pollInterval: 5000,
   },
 
+  [DEVICETYPE_ESP]: {
+    pollInterval: 10000,
+  },
   /**
    * Classes are used to convenienently select devices that belong together.
    * When assigning classes to a device or group, referencing the class name of a child class
@@ -1196,8 +1200,33 @@ const deviceMap = [
     locationId: 'loc-kitchen',
     subType: SUBTYPE_PLUG,
   },
+  {
+    alias: 'Outside',
+    channel: 201,
+    id: 'esp-01',
+    url: 'http://192.168.1.23/read',
+    jsonPath: 'temperature_sensors',
+    jsonPathId: { local_id: 0 },
+    display: true,
+    locationId: 'loc-outside',
+    type: constants.DEVICETYPE_ESP,
+    subType: constants.SUBTYPE_THERMOMETER,
+  },
+  {
+    alias: 'Living Room',
+    channel: 202,
+    id: 'esp-02',
+    url: 'http://192.168.1.23/read',
+    jsonPath: 'temperature_sensors',
+    jsonPathId: { local_id: 1 },
+    display: true,
+    locationId: 'loc-livingRoom',
+    type: constants.DEVICETYPE_ESP,
+    subType: constants.SUBTYPE_THERMOMETER,
+  }
 
-  
+
+
   
 //Kitchen and living room all: ***** ***** ***** *p*p* pp*p* ppppp **
 //Full on: **1** ***** ****1 11*1* 11*1* 11111 111

@@ -3,12 +3,14 @@ import _ from 'lodash';
 
 import constants from '../constants.js';
 import DeviceWrapper from './DeviceWrapper.js';
+import EspDeviceWrapper from './EspDeviceWrapper.js';
 import { getPreset } from './Presets.js';
 import { log } from './Log.js';
 
 import { isBetweenDuskAndDawn, isDawnOrDusk, isDawn, isDusk, getFromSettingsForNextSunEvent } from '../helpers/jDateTimeUtils.js';
 import { loadFilterPlugins } from './Filters.js';
 import { globalConfig } from '../configuration.js';
+import { socketHandler } from './SocketHandler.js';
 
 /**
  * The DevicePool encapsulates all automation device functionality.
@@ -327,7 +329,28 @@ const devicePool = {
     const deviceMap = await this.getDeviceMapFromDb();
 
     if (Array.isArray(deviceMap)) {
-      deviceMap.forEach(mapItem => this.initDeviceWrapper(mapItem, null));
+      const EspCache = {};
+
+
+      deviceMap.forEach(mapItem => {
+        if (!mapItem.id) {
+          // Must have ID
+          log(`Ignoring device on channel ${mapItem.channel} without id. Please check configuration.`);
+          return;
+        }
+
+        switch (mapItem.type) {          
+          case constants.DEVICETYPE_ESP:
+            const deviceWrapper = Object.create(EspDeviceWrapper);
+            deviceWrapper.init(EspCache, mapItem, globalConfig, null, this, socketHandler);
+            this.devices.push(deviceWrapper);
+            break;
+    
+          default:
+            this.initDeviceWrapper(mapItem, null);
+            break;
+        }
+      });
     }
   },
 

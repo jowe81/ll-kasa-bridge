@@ -1,5 +1,6 @@
 import { log } from "../helpers/jUtils.js";
 import { buildCommandObjectFromCurrentState } from './TargetDataProcessor.js';
+import constants from "../constants.js";
 
 const socketHandler = {
 
@@ -108,15 +109,37 @@ const socketHandler = {
 
   // Push device state update
   emitDeviceStateUpdate(deviceWrapper, changeInfo) {
-    this.io.emit('auto/device/state', { 
+    const payload = {
       changeInfo,
-      data: {
-        isOnline: deviceWrapper.isOnline,
-        powerState: deviceWrapper.powerState,       
-        state: buildCommandObjectFromCurrentState(deviceWrapper),
-        channel: deviceWrapper.channel,
-      }
-    });
+      data: null,
+    };
+
+    switch (deviceWrapper.type) {
+
+      // ESP
+      case constants.DEVICETYPE_ESP:
+        payload.data = {          
+          state: deviceWrapper.state,
+        }
+
+        switch (deviceWrapper.subType) {
+          case constants.SUBTYPE_THERMOMETER:
+            payload.data.tempC = deviceWrapper.state.tempC;
+            break;
+        }
+        break
+
+      // Kasa
+      default:
+        payload.data = {
+          isOnline: deviceWrapper.isOnline,
+          powerState: deviceWrapper?.powerState,       
+          state: buildCommandObjectFromCurrentState(deviceWrapper),
+          channel: deviceWrapper.channel,  
+        }
+    }
+
+    this.io.emit('auto/device/state', payload);
   },
 
   startSocketServer() {

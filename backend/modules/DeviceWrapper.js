@@ -31,7 +31,11 @@ const cmdFailPrefix = '[FAIL]';
 
       // This call must come before updateState (it needs the old state).
       const changeInfo = this.analyzeStateChange(newState);
-      this.updateState(newState);
+
+      if (typeof changeInfo === 'undefined' || changeInfo.changed) {
+        // This is the initial state update or an actual change: update in both cases.
+        this._updateState(newState);
+      }
 
       // There was no change.
       if (!(changeInfo && changeInfo.changed)) {
@@ -69,7 +73,7 @@ const cmdFailPrefix = '[FAIL]';
 
       // This call must come before updateState (it needs the old state).
       const changeInfo = this.analyzeStateChange(newState);
-      this.updateState(newState);
+      this._updateState(newState);
       
       // Was this a change at all?
       if (!(changeInfo && changeInfo.changed)) {
@@ -856,7 +860,7 @@ const cmdFailPrefix = '[FAIL]';
     this.periodicFiltersSuspended = false;
   },
 
-  updateState(data) {
+  _updateState(data) {
     this.lastSeenAt = Date.now();
     this.state = _.cloneDeep(data);
     this.powerState = this.getPowerState();        
