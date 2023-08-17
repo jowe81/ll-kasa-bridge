@@ -168,7 +168,7 @@ const collectLiveGroupIdsFromDevices = (data: Data): string[] => {
   const liveGroupIds: string[] = [];
 
   data.devices.forEach(device => {
-    device.groups.forEach(groupId => {
+    device.groups?.forEach(groupId => {
       if (!liveGroupIds.includes(groupId)) {
         liveGroupIds.push(groupId);
       }
