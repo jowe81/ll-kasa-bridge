@@ -259,9 +259,8 @@ const devicePool = {
 
   getLiveDevice(deviceWrapper) {
       
-    const item = {};
-
-    const includeKeys = [
+    // Include these keys for all devices.
+    let includeKeys = [
       'channel',
       'id',
       'alias',
@@ -269,33 +268,68 @@ const devicePool = {
       'display',
       'subType',
       'displayType',
-      'targets',
-      'type',
-      'host',
-      'groups',
-      'location',
-      'classes',
-      'isOnline',
-      'lastSeenAt',
-      'powerState',
-      'state',
-    ]
+    ];
 
-    const defaults = {
-      'display': true,
+    // Use these defaults for all devices.
+    let defaults = {
+      'display': true 
     };
 
-    const excludeKeys = [
-      'device', 
+    // Exclude these keys for all devices.
+    let excludeKeys = [
       'socketHandler', 
       'devicePool', 
       'globalConfig', 
       'deviceEventCallback'
     ];
     
+    switch (deviceWrapper.type) {
+
+      // ESP
+      case constants.DEVICETYPE_ESP:
+
+        switch (deviceWrapper.subType) {
+
+          case constants.SUBTYPE_THERMOMETER:
+            includeKeys.push(
+              'state',
+            );
+            break;
+    
+        }
+        break;
+
+      // Kasa
+      case 'IOT.SMARTBULB':
+      case 'IOT.SMARTPLUGSWITCH':
+      default:
+
+        includeKeys.push(
+          'targets',
+          'type',
+          'host',
+          'groups',
+          'location',
+          'classes',
+          'isOnline',
+          'lastSeenAt',
+          'powerState',
+          'state',
+        );
+        
+        excludeKeys.push(
+          'device', 
+        );
+    
+        break;
+
+    }
+    
     const keys = Object.keys(deviceWrapper).filter(key => { 
       return includeKeys.includes(key);
     });
+
+    const item = {};
 
     Object.keys(defaults).forEach(key => item[key] = defaults[key]);    
     keys.forEach(key => item[key] = deviceWrapper[key]);

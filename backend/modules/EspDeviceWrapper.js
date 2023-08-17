@@ -115,6 +115,18 @@ const EspDeviceWrapper = {
           if (this.subType === constants.SUBTYPE_THERMOMETER) {
             // This needs to be done regardless of whether the data changed from the last poll.
             this.__trendData = this.processThermometerTrendData(this.__trendData, this.state.tempC);
+
+            // Inject the trend field into the update payload (makes the addition of trend transparent).
+            payload.trend = {
+              diff: this.__trendData?.diff,
+              trend: this.__trendData?.trend,  
+            }
+
+            // Trenddata can change even if device data does not. 
+            if (this.state.diff !== this.__trendData?.diff) {
+              // Set changeInfo.changed to trigger a socket push.
+              changeInfo.changed = true;
+            }
           }
           
           if (changeInfo.changed) {
@@ -214,12 +226,13 @@ const EspDeviceWrapper = {
         
         // diff represents the current trend.
         newTrendData.diff = newTrendData.avgTempNow -  newTrendData.avgTempPast;
-
-        newTrendData.trendString = "steady";
+        
+        // Come up with a digest.
+        newTrendData.trend = "steady";
         if (newTrendData.diff > espConstants.thermo.TREND_TRESHOULD) {
-          newTrendData.trendString = "up";
+          newTrendData.trend = "up";
         } else if (newTrendData.diff < -espConstants.thermo.TREND_TRESHOULD) {
-          newTrendData.trendString = "down";
+          newTrendData.trend = "down";
         }
 
       }

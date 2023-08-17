@@ -121,13 +121,7 @@ const socketHandler = {
         payload.data = {          
           state: deviceWrapper.state,
         }
-
-        switch (deviceWrapper.subType) {
-          case constants.SUBTYPE_THERMOMETER:
-            payload.data.tempC = deviceWrapper.state.tempC;
-            break;
-        }
-        break
+        break;
 
       // Kasa
       default:
@@ -137,6 +131,8 @@ const socketHandler = {
           state: buildCommandObjectFromCurrentState(deviceWrapper),
           channel: deviceWrapper.channel,  
         }
+        break;
+
     }
 
     this.io.emit('auto/device/state', payload);
