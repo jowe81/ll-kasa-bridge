@@ -8,6 +8,7 @@ import './devices.css';
 import { Device, Group } from './dataSlice.ts';
 import TouchButtonDevice from './TouchButtonDevice.tsx';
 import TouchButtonGroup from './TouchButtonGroup.tsx';
+import Thermometer from './Thermometer.tsx';
 
 function LocationsView() {
   const devices = useAppSelector(state => state.data.devices);
@@ -47,7 +48,7 @@ function LocationsView() {
         return;
       }
 
-      const ungroupedDevices = devicesInLocation.filter(device => !device.groups.length && (device.subType !== 'switch'));
+      const ungroupedDevices = devicesInLocation.filter(device => !device.groups.length && (!['switch', 'thermometer'].includes(device.subType)));
 
       const ungroupedOtherDevices = ungroupedDevices.filter((device: Device)  => {
         return !constants.deviceTypesLighting.includes(device.displayType ?? device.subType);
@@ -68,6 +69,8 @@ function LocationsView() {
       
 
       const switches = devicesInLocation.filter(device => device.subType === 'switch');
+
+      const thermometers =  devicesInLocation.filter(device => device.subType === 'thermometer');
       
       locationsData.push({
         id: location.id,
@@ -78,6 +81,7 @@ function LocationsView() {
         ungroupedOtherDevices,
         groupedDevices,
         switches,
+        thermometers,
         liveGroupData,
       });
     });
@@ -100,7 +104,7 @@ function LocationsView() {
       group.channels.forEach(channel => {        
         const device = getDeviceByChannel(devices, channel);
 
-        if (device) {
+        if (device && device.type !== constants.DEVICETYPE_ESP) {
           if (device.lastSeenAt) {
             device.isOnline ? onlineCount++ : offlineCount++;
             if (typeof device.powerState === 'boolean') {
@@ -215,10 +219,21 @@ function LocationsView() {
   
           });
 
+          let thermometerField;
+
+          if (locationInfo.thermometers?.length) {
+            const thermometer = locationInfo.thermometers[0];
+            const props = {
+              thermometer,
+            }
+            thermometerField = <Thermometer key={'device_' + thermometer.channel} {...props}></Thermometer>;
+          }
+
           return(
               <div key={locationInfo.id} className="location-container">
                 <div className="location-label">{ locationInfo.name }</div>
                 <div className="location-buttons-container">
+                  { thermometerField }
                   { (groupFields.length > 0) && groupFields }
                   { (switchFields.length > 0) && switchFields }
                   { (ungroupedLightsFields.length > 0) && ungroupedLightsFields }

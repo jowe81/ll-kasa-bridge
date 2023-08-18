@@ -165,6 +165,7 @@ const makeLiveDeviceObject = (deviceWrapper, includeKeys, defaults, excludeKeys,
     const globalIncludeKeys = [
       'channel',
       'id',
+      'type',
       'alias',
       'displayLabel',
       'display',
@@ -209,7 +210,7 @@ const makeLiveDeviceObject = (deviceWrapper, includeKeys, defaults, excludeKeys,
 
     // Put the defaults on the new object.
     Object.keys(defaults).forEach(key => item[key] = defaults[key]);
-    
+
     // Get the data from the deviceWrapper.
     includeKeys.forEach(key => (typeof deviceWrapper[key] !== 'undefined') && (item[key] = deviceWrapper[key]));
 

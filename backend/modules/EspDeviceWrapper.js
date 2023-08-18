@@ -45,6 +45,8 @@ const EspDeviceWrapper = {
     this.channel = mapItem.channel;
     this.id = mapItem.id;
     this.url = mapItem.url;
+    const urlParts = mapItem.url.split(/[\/]+/);
+    this.host = urlParts && urlParts.length > 1 ? urlParts[1] : 'N/A';
     this.jsonPath = mapItem.jsonPath;
     this.jsonPathId = mapItem.jsonPathId;
     this.display = mapItem.display;
@@ -303,6 +305,7 @@ const EspDeviceWrapper = {
     const data = {
       state: this.state,
       channel: this.channel,
+      isOnline: this.isOnline,
     };
 
     return data;

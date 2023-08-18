@@ -52,6 +52,24 @@ tr {
   color: rgb(233, 233, 233);
   text-align: center;
 }
+
+.device-footer {
+  font-size: 80%;
+  text-align: center;
+  position: relative;
+  bottom: 2px;
+  color: rgb(177, 177, 177);
+}
+
+.text-blue {
+  color: rgb(137, 161, 255) !important;
+}
+
+.text-red {
+  color: rgb(255, 137, 186) !important;
+}
+
+
 .device-meta {
   color: rgb(177, 177, 177);
   font-size: 80%;

@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import constants from "../../constants.js";
 
-export interface Device {
+
+export interface BaseDevice {
   alias: string;
   channel: number;
   displayLabel?: string;
@@ -11,20 +13,28 @@ export interface Device {
   type: string;
   displayType?: string;
   subType: string;
-
   groups: string[];
-
+  classes: string[];
   isOnline: boolean;
   lastSeenAt: number;
-  powerState: boolean;
 
   state: any;
+
+}
+
+export interface KasaDevice extends BaseDevice {
+  powerState: boolean;
 
   targets: {
     on: any[];
     off: any[];
   };
 }
+
+export interface EspDevice extends BaseDevice {
+}
+
+export type Device = KasaDevice | EspDevice;
 
 export interface Group {
   id: string;
@@ -108,12 +118,20 @@ const dataSlice = createSlice({
           const { devices } = data;
           const { channel, state } = action.payload.data;
 
-          const deviceKey = getDeviceKeyByChannel(data.devices, action.payload.data.channel);
+          const deviceKey = getDeviceKeyByChannel(data.devices, channel);
         
           if (deviceKey !== null) {
-            //console.log(`Device State update on ${channel}: `, action.payload.changeInfo, state, ` was: `, devices[deviceKey].state);            
+            console.log(`Device State update on ${channel}: `, devices[deviceKey].type, typeof devices[deviceKey]);            
+            switch (devices[deviceKey].type) {
+              case constants.DEVICETYPE_ESP:
+                break;
+
+              default:
+                devices[deviceKey].powerState = action.payload.data.powerState;
+
+            }
+
             devices[deviceKey].state = state;
-            devices[deviceKey].powerState = action.payload.data.powerState;
             devices[deviceKey].isOnline = action.payload.data.isOnline;
           }
         },
