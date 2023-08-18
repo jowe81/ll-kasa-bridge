@@ -3,7 +3,18 @@ import constants from '../constants.js';
 
 const resolveDeviceDependencies = (deviceWrapper) => {
   const { globalConfig } = deviceWrapper.devicePool;
-  deviceWrapper.filters = resolveDeviceFilters(deviceWrapper, globalConfig);
+
+  switch (deviceWrapper.type) {
+    case constants.DEVICETYPE_ESP:
+      break;
+
+    // Kasa
+    default:
+      deviceWrapper.filters = resolveDeviceFilters(deviceWrapper, globalConfig);
+      break;
+
+  }
+
   deviceWrapper.groups = resolveDeviceGroups(deviceWrapper, globalConfig);
   deviceWrapper.classes = resolveDeviceClasses(deviceWrapper, globalConfig);
   

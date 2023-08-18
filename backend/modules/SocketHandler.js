@@ -104,6 +104,8 @@ const socketHandler = {
 
   // Push full device update
   emitDeviceUpdate(deviceWrapper) {
+    const payload = this.devicePool.getLiveDevice(deviceWrapper);
+    // [201, 202].includes(deviceWrapper.channel) && console.log('FULL update', payload)
     this.io.emit('auto/device', this.devicePool.getLiveDevice(deviceWrapper));
   },
 
@@ -111,30 +113,10 @@ const socketHandler = {
   emitDeviceStateUpdate(deviceWrapper, changeInfo) {
     const payload = {
       changeInfo,
-      data: null,
+      data: deviceWrapper.getLiveDeviceStateUpdate(),
     };
 
-    switch (deviceWrapper.type) {
-
-      // ESP
-      case constants.DEVICETYPE_ESP:
-        payload.data = {          
-          state: deviceWrapper.state,
-        }
-        break;
-
-      // Kasa
-      default:
-        payload.data = {
-          isOnline: deviceWrapper.isOnline,
-          powerState: deviceWrapper?.powerState,       
-          state: buildCommandObjectFromCurrentState(deviceWrapper),
-          channel: deviceWrapper.channel,  
-        }
-        break;
-
-    }
-
+    // [201, 202].includes(deviceWrapper.channel) && console.log('PARTIAL update', payload)
     this.io.emit('auto/device/state', payload);
   },
 

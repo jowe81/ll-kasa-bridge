@@ -14,6 +14,14 @@ const initRouter = (express, devicePool, processRequest) => {
     next();
   })
   
+  kasaRouter.get('/slow', (req, res, next) => {
+    console.log(req.query);
+    const { delay } = req.query;
+    setTimeout(() => {
+      res.status(200).send(`This response was issued after ${delay} seconds.`);
+    }, delay * 1000);
+  })
+
   kasaRouter.get([ '/setPowerState', '/setpowerstate', '/switch' ], (req, res, next) => {    
     processRequest(req, res, 'setPowerState', devicePool).catch(next);
   });

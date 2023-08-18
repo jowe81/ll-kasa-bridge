@@ -6,6 +6,8 @@ import { commandMatchesCurrentState, getCommandObjectFromTargetData } from './Ta
 import { getFilterPlugins } from "./Filters.js";
 import { resolveDeviceDependencies } from './DependencyResolver.js';
 import { socketHandler } from './SocketHandler.js';
+import { buildCommandObjectFromCurrentState, makeLiveDeviceObject } from './TargetDataProcessor.js';
+
 
 
 const cmdPrefix = '[CMD]';
@@ -432,6 +434,38 @@ const cmdFailPrefix = '[FAIL]';
     return commandObject;
   },
 
+  getLiveDevice() {
+    return makeLiveDeviceObject(
+      this, [
+        // Include
+        'targets',
+        'type',
+        'powerState',
+      ], {
+        // Default
+        'display': true,
+      }, [
+        // Exclude
+        'device',
+      ],
+      // Use global defaults
+      true,
+    );
+  },
+
+  /**
+   * Return a state update to be emitted to the sockets
+   */
+   getLiveDeviceStateUpdate() {
+    const data = {
+      isOnline: this.isOnline,
+      powerState: this.powerState,       
+      state: buildCommandObjectFromCurrentState(this),
+      channel: this.channel,
+    };
+
+    return data;
+  },
 
   // Return power state as a boolean, regardless of the type of device
   getPowerState() {

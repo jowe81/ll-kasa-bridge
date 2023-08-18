@@ -3,6 +3,9 @@ import axios from 'axios';
 import constants from '../constants.js';
 import { log, debug } from './Log.js';
 import { globalConfig } from '../configuration.js';
+import { resolveDeviceDependencies } from './DependencyResolver.js';
+import { makeLiveDeviceObject } from './TargetDataProcessor.js';
+
 
 const espConstants = {
 
@@ -49,6 +52,8 @@ const EspDeviceWrapper = {
     this.type = mapItem.type;
     this.subType = mapItem.subType;
     
+    resolveDeviceDependencies(this);
+        
     requiredFields.forEach(field => {       
       if (!this.field) { 
         return false;
@@ -68,7 +73,7 @@ const EspDeviceWrapper = {
 
     // Spin up a code that queries the esps at an interval and caches their responses.
     if (!cache._pollingIntervalHandler) {
-      const pollInterval = globalConfig[this.type].pollInterval;
+      this.pollInterval = globalConfig[this.type].pollInterval;
 
       cache._pollingIntervalHandler = setInterval(async () => {
         try {
@@ -81,7 +86,7 @@ const EspDeviceWrapper = {
         } catch(err) {
           log(`Polling error for ${this.url}: ${err.message}`);
         }
-      }, pollInterval);
+      }, this.pollInterval);
     }
 
     this.startPolling();
@@ -89,13 +94,15 @@ const EspDeviceWrapper = {
 
   // This will only poll the cache
   startPolling() {
-    const pollInterval = globalConfig[this.type].pollInterval;    
+    const pollInterval = globalConfig[this.type].pollInterval;
     log(`Polling and updating this ${this.type}-${this.subType} at ${this.url} every ${pollInterval} ms.`, this);
     this._pollingIntervalHandler = setInterval(async () => {
 
       try {
 
         const data = this.cache?.espData[this.url];        
+
+        this._updateOnlineState(data);
 
         if (data?.data) {
 
@@ -122,8 +129,8 @@ const EspDeviceWrapper = {
               trend: this.__trendData?.trend,  
             }
 
-            // Trenddata can change even if device data does not. 
-            if (this.state.diff !== this.__trendData?.diff) {
+            // Trenddata can change even if device data does not. Only trigger if significant part changes.
+            if (this.state?.diff?.toFixed(2) !== this.__trendData?.diff?.toFixed(2)) {
               // Set changeInfo.changed to trigger a socket push.
               changeInfo.changed = true;
             }
@@ -272,6 +279,43 @@ const EspDeviceWrapper = {
     //let changed = 'changed': this?.state && tempC !== this?.state.tempC,
 
 
+  },
+
+  getLiveDevice() {
+    return makeLiveDeviceObject(
+      this, [
+        // Include
+      ], {
+        // Default
+        'display': true,
+      }, [
+        // Exclude
+      ],
+      // Use global defaults
+      true,
+    );
+  },
+
+  /**
+   * Return a state update to be emitted to the sockets
+   */
+  getLiveDeviceStateUpdate() {
+    const data = {
+      state: this.state,
+      channel: this.channel,
+    };
+
+    return data;
+  },
+
+  _updateOnlineState(cacheData) {
+    if (cacheData?.timestamp > Date.now() - this.pollInterval * 2) {
+      // Allow a bit of grace beyond the pollInterval
+      this.isOnline = true;
+      this.lastSeenAt = Date.now();
+    } else {
+      this.isOnline = false;
+    }  
   },
 
   _updateState(data) {

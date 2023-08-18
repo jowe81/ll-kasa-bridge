@@ -160,8 +160,65 @@ const getCommandObjectFromTargetData = (targetData) => {
   return commandObject;
 };
 
+const makeLiveDeviceObject = (deviceWrapper, includeKeys, defaults, excludeKeys, useGlobalDefaultKeys = true) => {
+    // Include these keys for all devices.
+    const globalIncludeKeys = [
+      'channel',
+      'id',
+      'alias',
+      'displayLabel',
+      'display',
+      'subType',
+      'displayType',
+      'location',
+      'host',
+      'groups',
+      'classes',
+      'isOnline',
+      'lastSeenAt',
+      'state',
+    ];
+
+  
+    // Use these defaults for all devices.
+    const globalDefaults = {
+      'display': true 
+    };
+
+    // Exclude these keys for all devices.
+    const globalExcludeKeys = [
+      'socketHandler', 
+      'devicePool', 
+      'globalConfig', 
+      'deviceEventCallback'
+    ];
+
+    // Assign the global defaults if requested.
+    if (useGlobalDefaultKeys) {
+      globalIncludeKeys.forEach(key => includeKeys.push(key));
+      globalExcludeKeys.forEach(key => excludeKeys.push(key));      
+      Object.keys(globalDefaults).forEach(key => {
+        // Add this key/value into defaults if it's not in there yet.
+        if (typeof(defaults[key]) === 'undefined') {
+          defaults[key] = globalDefaults[key];
+        }
+      });
+    }
+
+    const item = {};
+
+    // Put the defaults on the new object.
+    Object.keys(defaults).forEach(key => item[key] = defaults[key]);
+    
+    // Get the data from the deviceWrapper.
+    includeKeys.forEach(key => (typeof deviceWrapper[key] !== 'undefined') && (item[key] = deviceWrapper[key]));
+
+    return item;
+}
+
 export {
   commandMatchesCurrentState,
   buildCommandObjectFromCurrentState,
   getCommandObjectFromTargetData,
+  makeLiveDeviceObject,
 }
