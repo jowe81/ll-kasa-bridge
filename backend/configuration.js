@@ -1203,27 +1203,104 @@ const deviceMap = [
   {
     alias: 'Outside',
     channel: 201,
-    id: 'esp-01',
+    id: 'esp8266-01-0',
     url: 'http://192.168.1.23/read',
-    jsonPath: 'temperature_sensors',
-    jsonPathId: { local_id: 0 },
     display: true,
     locationId: 'loc-outside',
     type: constants.DEVICETYPE_ESP,
     subType: constants.SUBTYPE_THERMOMETER,
+    settings: {
+      jsonPath: 'temperature_sensors',
+      jsonPathId: { local_id: 0 },
+      jsonPathKey: 'tempC',
+      trends: {
+        short: {
+          label: 'short',
+          avg_calc_history_length: 15 * MINUTE,
+          avg_calc_data_window: 3 * MINUTE,    
+        },
+        mid: {
+          label: 'mid',
+          avg_calc_history_length: 30 * MINUTE,
+          avg_calc_data_window: 6 * MINUTE,    
+        },
+        long: {
+          label: 'long',
+          avg_calc_history_length: 60 * MINUTE,
+          avg_calc_data_window: 10 * MINUTE,    
+        },
+      },
+      
+    }
   },
   {
     alias: 'Living Room',
     channel: 202,
-    id: 'esp-02',
+    id: 'esp8266-01-1',
     url: 'http://192.168.1.23/read',
-    jsonPath: 'temperature_sensors',
-    jsonPathId: { local_id: 1 },
     display: true,
     locationId: 'loc-livingRoom',
     type: constants.DEVICETYPE_ESP,
     subType: constants.SUBTYPE_THERMOMETER,
-  }
+    settings: {
+      jsonPath: 'temperature_sensors',
+      jsonPathId: { local_id: 1 },
+      jsonPathKey: 'tempC',
+      trends: {
+        short: {
+          label: 'short',
+          avg_calc_history_length: 15 * MINUTE,
+          avg_calc_data_window: 3 * MINUTE,    
+        },
+      },      
+    }
+  },
+  {
+    alias: 'Bedroom',
+    channel: 203,
+    id: 'esp8266-02-0',
+    url: 'http://192.168.1.22/read',
+    display: true,
+    locationId: 'loc-bedroom',
+    type: constants.DEVICETYPE_ESP,
+    subType: constants.SUBTYPE_THERMOMETER,
+    settings: {
+      jsonPath: 'ds18b20',
+      jsonPathId: { local_id: 0 },
+      jsonPathKey: 'temperature',
+      trends: {
+        short: {
+          label: 'short',
+          avg_calc_history_length: 15 * MINUTE,
+          avg_calc_data_window: 3 * MINUTE,    
+        },
+      },      
+    }
+  },
+  {
+    alias: 'Bathroom',
+    channel: 204,
+    id: 'esp8266-02-1',
+    url: 'http://192.168.1.22/read',
+    display: true,
+    locationId: 'loc-bathroom',
+    type: constants.DEVICETYPE_ESP,
+    subType: constants.SUBTYPE_THERMOMETER,
+    settings: {
+      jsonPath: 'ds18b20',
+      jsonPathId: { local_id: 1 },
+      jsonPathKey: 'temperature',
+      trends: {
+        short: {
+          label: 'short',
+          avg_calc_history_length: 15 * MINUTE,
+          avg_calc_data_window: 3 * MINUTE,    
+        },
+      },      
+    }
+  },
+
+  
 
 
 

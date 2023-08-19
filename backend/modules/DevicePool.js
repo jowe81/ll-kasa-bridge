@@ -286,7 +286,6 @@ const devicePool = {
     if (Array.isArray(deviceMap)) {
       const EspCache = {};
 
-
       deviceMap.forEach(mapItem => {
         if (!mapItem.id) {
           // Must have ID
