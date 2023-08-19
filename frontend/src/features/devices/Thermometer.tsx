@@ -1,3 +1,4 @@
+import constants from '../../constants.ts';
 import { Device } from './dataSlice.ts';
 
 const Thermometer = (props) => {
@@ -10,9 +11,16 @@ const Thermometer = (props) => {
   const trendFields: JSX.Element[] = [];
   const trends = device.state?.trends;
 
+  const tempC = device.state?.tempC;
+  const invalidTemp = tempC === -127;
+
   if (trends) {
     Object.keys(trends).forEach(trendKey => {
       const trend = trends[trendKey];
+
+      if (typeof trend.diff === 'undefined' || invalidTemp ) {
+        return;
+      }
 
       let trendColorClass = 'text-gray';
       let trendBgColorClass = 'bg-gray';
@@ -29,16 +37,19 @@ const Thermometer = (props) => {
       }
       const footerClasses = `thermometer-footer boxed ${trendColorClass} ${trendBgColorClass}`;
     
+      const windowInMinutes = Math.round(trend.historyLength / constants.MINUTE);
+
       const field = 
         <div className={footerClasses}>
-          { trend.trend } { trend.diff?.toFixed(2)}°
+          { windowInMinutes }m: { trend.diff?.toFixed(2)}°
         </div>;
 
       trendFields.push(field);
     })
   }
 
-  const currentTempC = device.state?.tempC ? device.state.tempC.toFixed(1) + '°C' : 'N/A';
+
+  const currentTempC = (tempC && !invalidTemp) ? device.state.tempC.toFixed(1) + '°C' : 'N/A';
 
   let html = <></>;
 

@@ -254,7 +254,6 @@ const devicePool = {
   getLiveDeviceMap() {
     const map = [];
     this.devices.forEach(deviceWrapper => map.push(deviceWrapper.getLiveDevice(deviceWrapper)));
-    console.log("MAP:", map[map.length-1]);
     return map;
   },
 

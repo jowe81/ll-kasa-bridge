@@ -152,21 +152,15 @@ const EspDeviceWrapper = {
             Object.keys(this.settings.trends).forEach(trendKey => {
               const diff = this.__trendData[trendKey] ? this.__trendData[trendKey].diff : 0;
               const trend = this.__trendData[trendKey] ? this.__trendData[trendKey].trend : 'n/a';
+              const historyLength = this.__trendData[trendKey] ? this.__trendData[trendKey].historyLength : 'n/a';
 
               payload.trends[trendKey] = {
                 diff,
                 trend,
+                historyLength,
               }
             })
             
-            // The first trend gets listed directly for ease of access.
-            const firstTrendKey = Object.keys(this.settings.trends)[0];
-            payload.trend = {
-              diff: this.__trendData[firstTrendKey].diff,
-              trend: this.__trendData[firstTrendKey].trend,  
-            }
-
-            console.log("THI ORIG", payload.trend);
             // Trenddata can change even if device data does not. Only trigger if significant part changes.
             if (this.state?.diff?.toFixed(2) !== this.__trendData?.diff?.toFixed(2)) {
               // Set changeInfo.changed to trigger a socket push.
@@ -175,7 +169,7 @@ const EspDeviceWrapper = {
           }
           
           if (changeInfo.changed) {
-            // This is an actual change.
+            // This is an actual change. Passing trendData as some gets injected into the payload/state.
             this._updateState(payload);
             this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
           } else {
@@ -215,7 +209,6 @@ const EspDeviceWrapper = {
    * @returns {*} newTrendData 
    */
   processThermometerTrendData(currTrendData, currentTemp) {
-    console.log(`processing for channel ${this.channel}, current: ${currentTemp}`);
 
     const getAvgTempFromDataPoints = (dataPoints) => dataPoints.reduce((prev, current, index) => {
         // First time the accumulator has the full object.
@@ -340,10 +333,7 @@ const EspDeviceWrapper = {
       return null;
     }
 
-    console.log('Av dps: ' , availableDatapoints);
-
-    const mostRecentDatapoint = this.__trendData[firstTrendKey].dataPoints[availableDatapoints - 1];
-    return mostRecentDatapoint;
+    return this.__trendData[firstTrendKey].dataPoints[availableDatapoints - 1];
   },
 
   getLiveDevice() {
@@ -384,7 +374,7 @@ const EspDeviceWrapper = {
     }  
   },
 
-  _updateState(payload) {
+  _updateState(payload, trendData) {
     this.lastSeenAt = Date.now();
 
     // Handle the fact that some ESPs have different field names for the temperature field.
