@@ -220,18 +220,23 @@ function LocationsView() {
           });
 
           let thermometerField;
+          let locationLabelField;
 
           if (locationInfo.thermometers?.length) {
             const thermometer = locationInfo.thermometers[0];
             const props = {
               thermometer,
+              locationLabel: locationInfo.name,
             }
             thermometerField = <Thermometer key={'device_' + thermometer.channel} {...props}></Thermometer>;
+            
+          } else {
+            locationLabelField = <div className="location-label">{ locationInfo.name }</div>
           }
 
           return(
               <div key={locationInfo.id} className="location-container">
-                <div className="location-label">{ locationInfo.name }</div>
+                { locationLabelField }
                 <div className="location-buttons-container">
                   { thermometerField }
                   { (groupFields.length > 0) && groupFields }

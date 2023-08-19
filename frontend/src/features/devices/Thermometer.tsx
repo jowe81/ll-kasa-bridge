@@ -3,22 +3,43 @@ import { Device } from './dataSlice.ts';
 const Thermometer = (props) => {
 
   const device: Device = props.thermometer;
-  console.log('Thermometer', device)
+  const locationLabel = props.locationLabel;
+
   const bgIconClass = `none`;
 
-  const { trend } = device.state;
+  const trendFields: JSX.Element[] = [];
+  const trends = device.state?.trends;
 
-  let trendColorClass = 'text-gray';
+  if (trends) {
+    Object.keys(trends).forEach(trendKey => {
+      const trend = trends[trendKey];
 
-  if (typeof trend.diff !== 'undefined') {
-    if (trend.diff > 0.2) {
-      trendColorClass = 'text-red';
-    } else if (trend.diff < -0.2) {
-      trendColorClass = 'text-blue';
-    }
+      let trendColorClass = 'text-gray';
+      let trendBgColorClass = 'bg-gray';
+
+      if (typeof trend.diff !== 'undefined') {
+        if (trend.diff > 0.2) {
+          trendColorClass = 'text-red';
+          trendBgColorClass = 'bg-red';
+        } else if (trend.diff < -0.2) {
+          trendColorClass = 'text-blue';
+          trendBgColorClass = 'bg-blue';
+        }
+      
+      }
+      const footerClasses = `thermometer-footer boxed ${trendColorClass} ${trendBgColorClass}`;
+    
+      const field = 
+        <div className={footerClasses}>
+          { trend.trend } { trend.diff?.toFixed(2)}°
+        </div>;
+
+      trendFields.push(field);
+    })
   }
-  
-  const footerClasses = `device-footer ${trendColorClass}`;
+
+  const currentTempC = device.state?.tempC ? device.state.tempC.toFixed(1) + '°C' : 'N/A';
+
   let html = <></>;
 
   html = (
@@ -29,18 +50,21 @@ const Thermometer = (props) => {
         { device.displayLabel }
         </div>
       </div>
-      <div className='device-alias'>
-        { device.state.tempC.toFixed(1) + '°C' }
+      <div className='location-label-in-thermometer'>
+        <div>{ locationLabel }</div>
       </div>
-      <div className={footerClasses}>
-        { device.state.trend.trend } { trend?.diff.toFixed(2)}
-      </div>              
+      <div className='thermometer-main-text'>
+        { currentTempC }
+      </div>
+      <div className='thermometer-trends'>
+        { ...trendFields }
+      </div>
     </>
   );
 
   return (
     <div 
-      className={`device-button ${bgIconClass} powerstate-toggle-button powerstate-toggle-button-small`}
+      className={`device-button ${bgIconClass} thermometer-triple-width `}
       data-device-channel={device.channel} 
     >
       {html}                            

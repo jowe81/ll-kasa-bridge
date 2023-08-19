@@ -1,5 +1,5 @@
 .power-on-fan {
-  background-color: rgb(50, 71, 226);
+  background-color: rgb(71, 71, 156);
 }
 
 .power-on-heater {
@@ -11,7 +11,7 @@
 }
 
 .power-on-entertainment {
-  background-color: rgb(134, 28, 108);
+  background-color: rgb(112, 32, 92);
 }
 
 .power-off {
@@ -61,14 +61,32 @@ tr {
   color: rgb(177, 177, 177);
 }
 
+.bg-gray {
+  background-color: rgb(77, 77, 77);
+}
+
+
 .text-blue {
-  color: rgb(137, 161, 255) !important;
+  color: rgb(230, 230, 255) !important;
+}
+
+.bg-blue {
+  background-color: rgb(77, 77, 141);
 }
 
 .text-red {
-  color: rgb(255, 137, 186) !important;
+  color: rgb(255, 230, 230) !important;
 }
 
+.bg-red {
+  background-color: rgb(141, 77, 77);
+}
+
+.boxed {
+  padding: 2px;
+  min-width:80px;
+  text-align: center;
+}
 
 .device-meta {
   color: rgb(177, 177, 177);
@@ -81,6 +99,41 @@ tr {
 
 .device-online-state {  
   float: right;
+}
+
+.thermometer-triple-width {
+  height: 50px;
+  padding: 0px 3px;
+  width: 280px;
+  margin: 10px 5px;
+  margin-bottom:0px;
+  border: 1px solid gray;
+  border-radius:5px;
+  background-size: 20%;
+  background-position: bottom left;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+.thermometer-trends {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
+
+.thermometer-main-text {  
+  text-align: right;
+  font-size:100%;
+  margin-top: -18px;
+  
+}
+
+.thermometer-footer {
+  font-size: 80%;
+  text-align: center;
+  position: relative;
+  bottom: 0px;
+  color: rgb(177, 177, 177);
 }
 
 .powerstate-toggle-button {
@@ -134,7 +187,7 @@ tr {
 }
 
 .location-buttons-container {
-  width: 198px;
+  width: 294px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -143,10 +196,21 @@ tr {
 .location-label {
   color:rgb(154, 154, 154);
   text-align: center;
+  font-weight: bold;  
+}
+
+.location-label-in-thermometer {
+  position:absolute;  
+  top: 2px;
+  width: 100%;
+  color:rgb(154, 154, 154);
+  text-align: center;
   font-weight: bold;
 }
 
-.device-pending {
-  
+.location-label-in-thermometer > div {
+  margin: 0px auto;
+}
+.device-pending {  
   background-color: gray !important;
 }
