@@ -32,6 +32,7 @@ export interface KasaDevice extends BaseDevice {
 }
 
 export interface EspDevice extends BaseDevice {
+  powerState?: boolean;
 }
 
 export type Device = KasaDevice | EspDevice;
@@ -123,7 +124,7 @@ const dataSlice = createSlice({
           if (deviceKey !== null) {
             console.log(`Device State update on ${channel}: `, devices[deviceKey].type, typeof devices[deviceKey]);            
             switch (devices[deviceKey].type) {
-              case constants.DEVICETYPE_ESP:
+              case constants.SUBTYPE_THERMOMETER:
                 break;
 
               default:

@@ -6,12 +6,16 @@ const {
   SUBTYPE_PLUG,
   SUBTYPE_SWITCH,
 
-  DEVICETYPE_AIR_AC,
-  DEVICETYPE_AIR_FAN,
-  DEVICETYPE_AIR_HEAT,
-  DEVICETYPE_ENTERTAINMENT,
-  DEVICETYPE_LIGHT,
-  DEVICETYPE_ESP,
+  SUBTYPE_AIR_AC,
+  SUBTYPE_AIR_FAN,
+  SUBTYPE_AIR_AC_HEAT,
+  SUBTYPE_ENTERTAINMENT,
+  SUBTYPE_LIGHT,
+  SUBTYPE_THERMOMETER,
+
+  DEVICETYPE_ESP_THERMOMETER,
+  DEVICETYPE_ESP_RELAY,
+  DEVICETYPE_ESP_MAILBOX,
 
 } = constants;
 
@@ -30,7 +34,15 @@ const globalConfig = {
     pollInterval: 5000,
   },
 
-  [DEVICETYPE_ESP]: {
+  [DEVICETYPE_ESP_THERMOMETER]: {
+    pollInterval: 10000,
+  },
+
+  [DEVICETYPE_ESP_RELAY]: {
+    pollInterval: 10000,
+  },
+
+  [DEVICETYPE_ESP_MAILBOX]: {
     pollInterval: 10000,
   },
 
@@ -428,7 +440,7 @@ const globalConfig = {
       class: 'class-bedroomLights',
       display: false,
       displayLabel: 'Bed',
-      displayType: constants.DEVICETYPE_LIGHT,
+      displayType: constants.SUBTYPE_LIGHT,
       filters: [
         { refId: 'naturalLight' }
       ],      
@@ -457,7 +469,7 @@ const globalConfig = {
       class: 'class-jessDeskLights',
       displayLabel: 'Desk',
       display: false,
-      displayType: constants.DEVICETYPE_LIGHT,
+      displayType: constants.SUBTYPE_LIGHT,
       linkedDevices: [
         { 
           channel: 34,
@@ -480,7 +492,7 @@ const globalConfig = {
       channels: [ 2, 3, 16, 37 ],
       class: 'class-johannesDeskLights',
       displayLabel: 'Desk',
-      displayType: constants.DEVICETYPE_LIGHT,
+      displayType: constants.SUBTYPE_LIGHT,
       linkedDevices: [
         { 
           channel: 14,
@@ -502,7 +514,7 @@ const globalConfig = {
       name: "Bedroom Ceiling Lights",
       channels: [ 6, 7 ],
       class: 'class-bedroomLights',
-      displayType: constants.DEVICETYPE_LIGHT,
+      displayType: constants.SUBTYPE_LIGHT,
       displayLabel: 'Ceiling',
     },
     {
@@ -511,7 +523,7 @@ const globalConfig = {
       channels: [ 42, 43 ],
       class: 'class-kitchenCounterLights',
       displayLabel: 'Counter',
-      displayType: constants.DEVICETYPE_LIGHT,
+      displayType: constants.SUBTYPE_LIGHT,
 
     },
     {       
@@ -520,7 +532,7 @@ const globalConfig = {
       channels: [ 28 ],
       class: 'class-kitchenLights',
       displayLabel: 'Table',
-      displayType: constants.DEVICETYPE_LIGHT,
+      displayType: constants.SUBTYPE_LIGHT,
     },
     {       
       id: "group-hallwayLights",
@@ -528,12 +540,12 @@ const globalConfig = {
       channels: [ 8, 9 ],
       class: 'class-kitchenLights',
       displayLabel: 'Ceiling',
-      displayType: constants.DEVICETYPE_LIGHT,
+      displayType: constants.SUBTYPE_LIGHT,
     },
     {
       id: "group-bathroomLights",
       name: "Bathroom Lights",
-      displayType: constants.DEVICETYPE_LIGHT,
+      displayType: constants.SUBTYPE_LIGHT,
       displayLabel: 'Lights',
       channels: [ 10, 11, 12, 13 ],
       class: 'class-bathroomLights',
@@ -542,7 +554,7 @@ const globalConfig = {
       id: "group-livingroomLights",
       name: "Living Room Lights",
       displayLabel: 'Main',
-      displayType: constants.DEVICETYPE_LIGHT,
+      displayType: constants.SUBTYPE_LIGHT,
       channels: [ 29, 30 ],
       class: 'class-livingroomLights',
     }
@@ -622,7 +634,7 @@ const deviceMap = [
     alias: 'Bedroom Heater',
     channel: 4,
     id: '80065A4E60A835C49695A74DA7FAE76520436E9C01',
-    displayType: DEVICETYPE_AIR_HEAT,
+    displayType: SUBTYPE_AIR_AC_HEAT,
     displayLabel: 'Heater',
     locationId: 'loc-bedroom',
     subType: SUBTYPE_PLUG
@@ -632,7 +644,7 @@ const deviceMap = [
     channel: 5, 
     id: "80065A4E60A835C49695A74DA7FAE76520436E9C02",
     locationId: 'loc-bedroom',
-    displayType: DEVICETYPE_AIR_FAN,
+    displayType: SUBTYPE_AIR_FAN,
     displayLabel: 'Fan',
     subType: SUBTYPE_PLUG,
   },
@@ -836,7 +848,7 @@ const deviceMap = [
     locationId: 'loc-bathroom',
     subType: SUBTYPE_PLUG,
     displayLabel: "Heater",
-    displayType: DEVICETYPE_AIR_HEAT,
+    displayType: SUBTYPE_AIR_AC_HEAT,
   },
   {
     alias: 'Bedroom Desk Strip bottom',
@@ -913,7 +925,7 @@ const deviceMap = [
     channel: 34, 
     id: "800686BE89C5D37A63B4E70AB37689212066F343",
     displayLabel: 'Jess Desk',
-    displayType: constants.DEVICETYPE_LIGHT,
+    displayType: constants.SUBTYPE_LIGHT,
     locationId: 'loc-livingRoom',
     subType: SUBTYPE_SWITCH,
     targets: {
@@ -1113,7 +1125,7 @@ const deviceMap = [
     channel: 101, 
     id: "8006000F366B7DD70835CBF38A51040620662083",
     displayLabel: 'Bed Shelf',
-    displayType: DEVICETYPE_LIGHT,
+    displayType: SUBTYPE_LIGHT,
     locationId: 'loc-bedroom',
     subType: SUBTYPE_SWITCH, 
     targets: {
@@ -1143,7 +1155,7 @@ const deviceMap = [
     channel: 39,
     id: '80065A4E60A835C49695A74DA7FAE76520436E9C00',
     locationId: 'loc-bedroom',
-    displayType: DEVICETYPE_ENTERTAINMENT,
+    displayType: SUBTYPE_ENTERTAINMENT,
     displayLabel: 'Amp',
     subType: SUBTYPE_PLUG
   },
@@ -1208,7 +1220,7 @@ const deviceMap = [
     url: 'http://192.168.1.23/read',
     display: true,
     locationId: 'loc-outside',
-    type: constants.DEVICETYPE_ESP,
+    type: constants.DEVICETYPE_ESP_THERMOMETER,
     subType: constants.SUBTYPE_THERMOMETER,
     settings: {
       jsonPath: 'temperature_sensors',
@@ -1241,7 +1253,7 @@ const deviceMap = [
     url: 'http://192.168.1.23/read',
     display: true,
     locationId: 'loc-livingRoom',
-    type: constants.DEVICETYPE_ESP,
+    type: constants.DEVICETYPE_ESP_THERMOMETER,
     subType: constants.SUBTYPE_THERMOMETER,
     settings: {
       jsonPath: 'temperature_sensors',
@@ -1263,7 +1275,7 @@ const deviceMap = [
     url: 'http://192.168.1.22/read',
     display: true,
     locationId: 'loc-bedroom',
-    type: constants.DEVICETYPE_ESP,
+    type: constants.DEVICETYPE_ESP_THERMOMETER,
     subType: constants.SUBTYPE_THERMOMETER,
     settings: {
       jsonPath: 'ds18b20',
@@ -1285,7 +1297,7 @@ const deviceMap = [
     url: 'http://192.168.1.22/read',
     display: true,
     locationId: 'loc-bathroom',
-    type: constants.DEVICETYPE_ESP,
+    type: constants.DEVICETYPE_ESP_THERMOMETER,
     subType: constants.SUBTYPE_THERMOMETER,
     settings: {
       jsonPath: 'ds18b20',

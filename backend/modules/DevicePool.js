@@ -293,16 +293,21 @@ const devicePool = {
         }
 
         switch (mapItem.type) {          
-          case constants.DEVICETYPE_ESP:
+          // ESP Devices
+          case constants.DEVICETYPE_ESP_THERMOMETER:
           case constants.DEVICETYPE_ESP_RELAY:
             const deviceWrapper = Object.create(EspDeviceWrapper);
             deviceWrapper.init(EspCache, mapItem, globalConfig, null, this, socketHandler);
             this.devices.push(deviceWrapper);
             break;
-    
+
+          // KASA Devices (have no type defined in configuration; assigned at discovery)
+          case constants.DEVICETYPE_KASA_SMARTBULB:
+          case constants.DEVICETYPE_KASA_SMARTPLUGSWITCH:
           default:
             this.initDeviceWrapper(mapItem, null);
             break;
+
         }
       });
     }

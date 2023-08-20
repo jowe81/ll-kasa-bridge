@@ -5,7 +5,7 @@ const resolveDeviceDependencies = (deviceWrapper) => {
   const { globalConfig } = deviceWrapper.devicePool;
 
   switch (deviceWrapper.type) {
-    case constants.DEVICETYPE_ESP:
+    case constants.SUBTYPE_THERMOMETER:
       break;
 
     // Kasa

@@ -495,10 +495,9 @@ const EspDeviceWrapper = {
       case constants.DEVICETYPE_ESP_RELAY:
         // It sends back a string! Dang!
         payload = payload === 'false' ? false : true;
-    }
+        break;
 
-    switch (this.subType) {
-      case constants.SUBTYPE_THERMOMETER:
+      case constants.DEVICETYPE_ESP_THERMOMETER:
         // Handle the fact that some ESPs have different field names for the temperature field.
         const { jsonPathKey } = this.settings;
 

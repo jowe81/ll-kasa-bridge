@@ -51,11 +51,11 @@ function LocationsView() {
       const ungroupedDevices = devicesInLocation.filter(device => !device.groups.length && (!['switch', 'thermometer'].includes(device.subType)));
 
       const ungroupedOtherDevices = ungroupedDevices.filter((device: Device)  => {
-        return !constants.deviceTypesLighting.includes(device.displayType ?? device.subType);
+        return !constants.DEVICETYPES_LIGHTING.includes(device.displayType ?? device.subType);
       });
 
       const ungroupedLights = ungroupedDevices.filter((device: Device)  => {
-        return constants.deviceTypesLighting.includes(device.displayType ?? device.subType)
+        return constants.DEVICETYPES_LIGHTING.includes(device.displayType ?? device.subType)
       });
       
       const groupedDevices = {};
@@ -104,7 +104,7 @@ function LocationsView() {
       group.channels.forEach(channel => {        
         const device = getDeviceByChannel(devices, channel);
 
-        if (device && device.type !== constants.DEVICETYPE_ESP) {
+        if (device && constants.DEVICETYPES_WITH_POWERSTATE.includes(device.type)) {
           if (device.lastSeenAt) {
             device.isOnline ? onlineCount++ : offlineCount++;
             if (typeof device.powerState === 'boolean') {

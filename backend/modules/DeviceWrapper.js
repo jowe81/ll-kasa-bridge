@@ -56,7 +56,7 @@ const cmdFailPrefix = '[FAIL]';
         return;
       }
 
-      if (!this.type === 'IOT.SMARTPLUGSWITCH' && this.subType === constants.SUBTYPE_SWITCH) {
+      if (!this.type === constants.DEVICETYPE_KASA_SMARTPLUGSWITCH && this.subType === constants.SUBTYPE_SWITCH) {
         // This isn't an actual switch (does it matter?)
         return;
       }
@@ -103,11 +103,11 @@ const cmdFailPrefix = '[FAIL]';
     const deviceEventCallback = this.deviceEventCallback ? this.deviceEventCallback : () => {};
 
     switch (this.device.type) {
-      case 'IOT.SMARTPLUGSWITCH':
+      case constants.DEVICETYPE_KASA_SMARTPLUGSWITCH:
         this.device.on('power-update', onOffListener);
         break;
   
-      case 'IOT.SMARTBULB':
+      case constants.DEVICETYPE_KASA_SMARTBULB:
         this.device.on('lightstate-update', lightStateListener);
         break;
     }
@@ -149,7 +149,7 @@ const cmdFailPrefix = '[FAIL]';
     if (changeInfo.changed) {
 
       // If this is a power-state change then there's nothing to analyse; newState is boolean
-      if (this.type === 'IOT.SMARTPLUGSWITCH') {
+      if (this.type === constants.DEVICETYPE_KASA_SMARTPLUGSWITCH) {
         changeInfo.on_off = true;
         return changeInfo;
       }
@@ -472,13 +472,13 @@ const cmdFailPrefix = '[FAIL]';
     let powerState = undefined;
 
     switch (this.type) {
-      case 'IOT.SMARTBULB':
+      case constants.DEVICETYPE_KASA_SMARTBULB:
         if ([0, 1].includes(this.state?.on_off)) {
           powerState = this.state.on_off === 1 ? true : false;
         }
         break;
 
-      case 'IOT.SMARTPLUGSWITCH':
+      case constants.DEVICETYPE_KASA_SMARTPLUGSWITCH:
         if (typeof this.state === 'boolean') {
           powerState = this.state;
         }
@@ -647,7 +647,7 @@ const cmdFailPrefix = '[FAIL]';
     linkedDevices.forEach(linkInfo => {      
       const linkedWrapper = this.devicePool.getDeviceWrapperByChannel(linkInfo.channel);
 
-      if (this.type !== 'IOT.SMARTBULB' && changeInfo.origin === constants.SERVICE_BACKEND && linkedWrapper.type === 'IOT.SMARTPLUGSWITCH') {
+      if (this.type !== constants.DEVICETYPE_KASA_SMARTBULB && changeInfo.origin === constants.SERVICE_BACKEND && linkedWrapper.type === constants.DEVICETYPE_KASA_SMARTPLUGSWITCH) {
         /**
          * Ignoring change for the linked device, because this is not a smart bulb,  
          * the change was backend originated, and the linked device is a smartplugswitch.
