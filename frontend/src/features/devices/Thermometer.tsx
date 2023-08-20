@@ -22,26 +22,42 @@ const Thermometer = (props) => {
         return;
       }
 
+      const referenceThreshould = 2; // 2 degrees change within 5 minutes
+      const alertThreshold = trend.historyLength / (5 * constants.MINUTE) * referenceThreshould;
+      //console.log (`AlertThresh for ${device.alias}: ${(trend.historyLength / constants.MINUTE).toFixed(0)}m`, alertThreshold.toFixed(10))
+
       let trendColorClass = 'text-gray';
       let trendBgColorClass = 'bg-gray';
 
       if (typeof trend.diff !== 'undefined') {
-        if (trend.diff > 0.2) {
+        if (trend.diff >= 0.2) {
           trendColorClass = 'text-red';
           trendBgColorClass = 'bg-red';
-        } else if (trend.diff < -0.2) {
+
+          // Fast heating - indicate danger
+          if (trend.diff > alertThreshold) {
+            trendBgColorClass = 'bg-bright-red';
+          }
+        } else if (trend.diff <= -0.2) {
           trendColorClass = 'text-blue';
           trendBgColorClass = 'bg-blue';
+
+          if (trend.diff < -alertThreshold) {
+            trendBgColorClass = 'bg-bright-blue';
+          }
         }
       
       }
       const footerClasses = `thermometer-footer boxed ${trendColorClass} ${trendBgColorClass}`;
     
-      const windowInMinutes = Math.round(trend.historyLength / constants.MINUTE);
-
+      const windowInMinutes = Math.ceil(trend.historyLength / constants.MINUTE);
+      let valueStr = trend.diff?.toFixed(1) + '°';
+      if (trend.diff > 0) {
+        valueStr = '+' + valueStr;
+      }
       const field = 
         <div className={footerClasses}>
-          { windowInMinutes }m: { trend.diff?.toFixed(2)}°
+          { windowInMinutes }m: { Math.abs(trend.diff) > 0.09 ? valueStr : 'steady'}
         </div>;
 
       trendFields.push(field);

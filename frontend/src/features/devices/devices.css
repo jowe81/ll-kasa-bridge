@@ -62,7 +62,7 @@ tr {
 }
 
 .bg-gray {
-  background-color: rgb(77, 77, 77);
+  background-color: rgb(64, 64, 64);
 }
 
 
@@ -81,6 +81,15 @@ tr {
 .bg-red {
   background-color: rgb(141, 77, 77);
 }
+
+.bg-bright-red {
+  background-color: rgb(255, 0, 0);
+}
+
+.bg-bright-blue {
+  background-color: rgb(0, 0, 255);
+}
+
 
 .boxed {
   padding: 2px;
@@ -106,9 +115,11 @@ tr {
   padding: 0px 3px;
   width: 280px;
   margin: 10px 5px;
-  margin-bottom:0px;
-  border: 1px solid gray;
-  border-radius:5px;
+  margin-top: 0px;
+  margin-bottom:-4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgb(89, 86, 86);
+  
   background-size: 20%;
   background-position: bottom left;
   background-repeat: no-repeat;
@@ -134,6 +145,7 @@ tr {
   position: relative;
   bottom: 0px;
   color: rgb(177, 177, 177);
+  /*border-radius: 3px;*/
 }
 
 .powerstate-toggle-button {

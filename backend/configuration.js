@@ -1293,9 +1293,20 @@ const deviceMap = [
       trends: {
         short: {
           label: 'short',
-          avg_calc_history_length: 15 * MINUTE,
-          avg_calc_data_window: 3 * MINUTE,    
+          avg_calc_history_length: 5 * MINUTE,
+          avg_calc_data_window: 1 * MINUTE,    
         },
+        mid: {
+          label: 'mid',
+          avg_calc_history_length: 20 * MINUTE,
+          avg_calc_data_window: 5 * MINUTE,    
+        },
+        long: {
+          label: 'long',
+          avg_calc_history_length: 60 * MINUTE,
+          avg_calc_data_window: 10 * MINUTE,    
+        },
+
       },      
     }
   },
