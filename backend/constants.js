@@ -26,11 +26,11 @@ const constants = {
   SUBTYPE_BULB: 'bulb',
   SUBTYPE_LED_STRIP: 'led-strip',
   SUBTYPE_PLUG: 'plug',
-  SUBTYPE_SWITCH: 'switch',
-  SUBTYPE_THERMOMETER: 'thermometer',
+  SUBTYPE_SWITCH: 'switch',  
 
-  // Other subtypes
-  SUBTYPE_THERMOMETER: 'thermometer',  
+  // Other subtypes  
+  SUBTYPE_THERMOMETER: 'thermometer',
+  SUBTYPE_MAIL_COMPARTMENT: 'mailbox',
 
   // Device types
   DEVICETYPE_AIR_FAN: 'fan',
@@ -40,6 +40,8 @@ const constants = {
   DEVICETYPE_ENTERTAINMENT: 'entertainment',  
 
   DEVICETYPE_ESP: 'ESP',
+  DEVICETYPE_ESP_RELAY: 'ESP_RELAY',
+  DEVICETYPE_ESP_MAILBOX: 'ESP_MAILBOX',
 
   // Service names
   SERVICE_PERIODIC_FILTER: 'Periodic Filter Service',
@@ -49,6 +51,9 @@ const constants = {
 
   // Default Location
   DEVICE_DEFAULT_LOCATION_ID: 'loc-default',
+
+  // Default Poll interval
+  ESP_DEFAULT_POLL_INTERVAL: 10 * SECOND,
   
 };
 

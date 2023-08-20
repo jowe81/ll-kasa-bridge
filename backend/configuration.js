@@ -33,6 +33,7 @@ const globalConfig = {
   [DEVICETYPE_ESP]: {
     pollInterval: 10000,
   },
+
   /**
    * Classes are used to convenienently select devices that belong together.
    * When assigning classes to a device or group, referencing the class name of a child class
@@ -1306,8 +1307,39 @@ const deviceMap = [
           avg_calc_history_length: 60 * MINUTE,
           avg_calc_data_window: 10 * MINUTE,    
         },
-
       },      
+    },
+  },
+  {
+    alias: 'Mailbox Lights',
+    channel: 205,
+    id: 'esp32-01-0',
+    url: 'http://192.168.1.25/read',
+    display: true,
+    locationId: 'loc-outside',
+    type: constants.DEVICETYPE_ESP_RELAY,
+    subType: constants.SUBTYPE_BULB,
+    settings: {
+      jsonPath: null, // Top level      
+      jsonPathKey: 'lights_on',
+      engageUrl: 'http://192.168.1.25/write?lights=on',
+      disengageUrl: 'http://192.168.1.25/write?lights=off',
+    }
+  },
+  {
+    alias: 'Mailbox Lock',
+    channel: 206,
+    id: 'esp32-01-1',
+    url: 'http://192.168.1.25/read',
+    display: true,
+    locationId: 'loc-outside',
+    type: constants.DEVICETYPE_ESP_RELAY,
+    subType: constants.SUBTYPE_MAIL_COMPARTMENT,
+    settings: {
+      jsonPath: null, // Top level      
+      jsonPathKey: 'door_locked',
+      engageUrl: 'http://192.168.1.25/write?door=lock',
+      disengageUrl: 'http://192.168.1.25/write?door=unlock',
     }
   },
 

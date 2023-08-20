@@ -294,6 +294,7 @@ const devicePool = {
 
         switch (mapItem.type) {          
           case constants.DEVICETYPE_ESP:
+          case constants.DEVICETYPE_ESP_RELAY:
             const deviceWrapper = Object.create(EspDeviceWrapper);
             deviceWrapper.init(EspCache, mapItem, globalConfig, null, this, socketHandler);
             this.devices.push(deviceWrapper);

@@ -25,6 +25,7 @@ const constants: any = {
   SUBTYPE_PLUG: 'plug',
   SUBTYPE_SWITCH: 'switch',
   SUBTYPE_THERMOMETER: 'thermometer',
+  SUBTYPE_MAIL_COMPARTMENT: 'mailbox',
   
   // Device types
   DEVICETYPE_AIR_FAN: 'fan',
@@ -34,6 +35,8 @@ const constants: any = {
   DEVICETYPE_ENTERTAINMENT: 'entertainment',  
   
   DEVICETYPE_ESP: 'ESP',
+  DEVICETYPE_ESP_RELAY: 'ESP_RELAY',
+  DEVICETYPE_ESP_MAILBOX: 'ESP_MAILBOX',
 
   // Service names
   SERVICE_PERIODIC_FILTER: 'Periodic Filter Service',

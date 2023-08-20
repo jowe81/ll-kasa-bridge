@@ -79,7 +79,14 @@ const EspDeviceWrapper = {
 
     // Query the esps at an interval and cache their responses.
     if (!cache._pollingIntervalHandler) {
-      this.pollInterval = globalConfig[this.type].pollInterval;
+      
+      if (globalConfig[this.type]) {
+        this.pollInterval = globalConfig[this.type].pollInterval;
+      }
+
+      if (!this.pollInterval) {
+        this.pollInterval = constants.ESP_DEFAULT_POLL_INTERVAL ?? 10000;
+      }
 
       if (!cache._pollingHandlers[this.url]) {
         // Not polling this url yet; spin up an interval.
@@ -102,74 +109,123 @@ const EspDeviceWrapper = {
 
   // This will only poll the cache
   startPolling() {
-    const pollInterval = globalConfig[this.type].pollInterval;
+    const pollInterval = (globalConfig[this.type] && globalConfig[this.type].pollInterval) ?? constants.ESP_DEFAULT_POLL_INTERVAL;
     log(`Polling and updating this ${this.type}-${this.subType} at ${this.url} every ${pollInterval} ms.`, this);
 
-    this.__trendData = {};
 
-    // Initialize the trend data cache (kept on this device)
-    Object.keys(this.settings.trends).forEach(trendKey => this.__trendData[trendKey] = {
-      avgTempPast: null,
-      avgTempNow: null,
-      dataPoints: [],
-    });
+    if (this.subType === constants.SUBTYPE_THERMOMETER) {
+      // Initialize the trend data cache (kept on this device)
+      this.__trendData = {};
 
+      Object.keys(this.settings.trends).forEach(trendKey => this.__trendData[trendKey] = {
+        avgTempPast: null,
+        avgTempNow: null,
+        dataPoints: [],
+      });
+    }
+
+    // Start the polling
     this._pollingIntervalHandler = setInterval(async () => {
 
-      try {
-
-        const data = this.cache?.espData[this.url];        
-
+      try {        
+        // Get the latest data for this device from the cache. This has a timestamp and a data field.
+        const data = this.cache?.espData[this.url];
         this._updateOnlineState(data);
 
+        // Payload is the actual new data in the cache for this device (which may be shared among several devices)
+        let payload = data?.data;
+
+        // Get changeInfo here for the entire ESP - may be overwritten by subtypes below.
+        let changeInfo = this.analyzeStateChange(payload);
+        
         if (data?.data) {
+          // Cache contains payload.
           const { jsonPath, jsonPathId, jsonPathKey } = this.settings;
-          const payloadFieldKey = Object.keys(jsonPathId)[0];
-          const payload = data.data[jsonPath].find(item => item[payloadFieldKey] === jsonPathId[payloadFieldKey]);
-          const changeInfo = this.analyzeStateChange(payload);
 
 
-          if (typeof changeInfo === 'undefined') {
-            // This is the initial state update.
-            log(`Received initial state update.`, this);
-            this._updateState(payload);
-            this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
-            return;
-          }
+          switch (this.subType) {
+            case constants.SUBTYPE_THERMOMETER:
 
-          const { tempC } = this.state;
-
-          
-
-          // Not the initial update, and may or may not have an actual change.
-          if (this.subType === constants.SUBTYPE_THERMOMETER) {
-            // This needs to be done regardless of whether the data changed from the last poll.
-            this.__trendData = this.processThermometerTrendData(this.__trendData, tempC);
-
-            // Inject the trends/trend field into the update payload (makes the addition of trend transparent).
-            payload.trends = {};
-            
-            Object.keys(this.settings.trends).forEach(trendKey => {
-              const diff = this.__trendData[trendKey] ? this.__trendData[trendKey].diff : 0;
-              const trend = this.__trendData[trendKey] ? this.__trendData[trendKey].trend : 'n/a';
-              const historyLength = this.__trendData[trendKey] ? this.__trendData[trendKey].historyLength : 'n/a';
-
-              payload.trends[trendKey] = {
-                diff,
-                trend,
-                historyLength,
+              // Multiple thermometers can be on an ESP device; look for the right temperature.
+              const payloadFieldKey = Object.keys(jsonPathId)[0];
+              payload = data.data[jsonPath].find(item => item[payloadFieldKey] === jsonPathId[payloadFieldKey]);
+              changeInfo = this.analyzeStateChange(payload);
+    
+              if (typeof changeInfo === 'undefined') {
+                // This is the initial state update.
+                log(`Received initial state update.`, this);
+                this._updateState(payload);
+                this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
+                return;
               }
-            })
-            
-            // Trenddata can change even if device data does not. Only trigger if significant part changes.
-            if (this.state?.diff?.toFixed(2) !== this.__trendData?.diff?.toFixed(2)) {
-              // Set changeInfo.changed to trigger a socket push.
-              changeInfo.changed = true;
-            }
+
+              // Not the initial update, and may or may not have an actual change.
+              
+              // This needs to be done regardless of whether the data changed from the last poll.
+              this.__trendData = this.processThermometerTrendData(this.__trendData, this.state.tempC);
+  
+              // Inject the trends/trend field into the update payload (makes the addition of trend transparent).
+              payload.trends = {};
+              
+              Object.keys(this.settings.trends).forEach(trendKey => {
+                const diff = this.__trendData[trendKey] ? this.__trendData[trendKey].diff : 0;
+                const trend = this.__trendData[trendKey] ? this.__trendData[trendKey].trend : 'n/a';
+                const historyLength = this.__trendData[trendKey] ? this.__trendData[trendKey].historyLength : 'n/a';
+  
+                payload.trends[trendKey] = {
+                  diff,
+                  trend,
+                  historyLength,
+                }
+              })
+              
+              // Trenddata can change even if device data does not. Only trigger if significant part changes.
+              if (this.state?.diff?.toFixed(2) !== this.__trendData?.diff?.toFixed(2)) {
+                // Set changeInfo.changed to trigger a socket push.
+                changeInfo.changed = true;
+              }
+              break;
+
+            case constants.SUBTYPE_BULB:
+              // All we care about here is the lights_on field              
+              payload = payload.lights_on;
+              changeInfo = this.analyzeStateChange(payload);
+
+              if (typeof changeInfo === 'undefined') {
+                // This is the initial state update.
+                log(`Received initial state update.`, this);
+                this._updateState(payload);
+                this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
+                return;
+              }
+
+              console.log('lights on?', payload, changeInfo);
+              break;
+
+            case constants.SUBTYPE_MAIL_COMPARTMENT:
+              // All we care about here is the door_locked field
+              payload = payload.door_locked;
+              changeInfo = this.analyzeStateChange(payload);
+              
+              if (typeof changeInfo === 'undefined') {
+                // This is the initial state update.
+                log(`Received initial state update.`, this);
+                this._updateState(payload);
+                this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
+                return;
+              }
+
+              console.log('door locked?', payload, changeInfo);
+              break;
+  
+
+
+            default:
+              break;
           }
-          
-          if (changeInfo.changed) {
-            // This is an actual change. Passing trendData as some gets injected into the payload/state.
+
+          if (changeInfo?.changed) {
+            // This is an actual change.
             this._updateState(payload);
             this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
           } else {
@@ -184,7 +240,7 @@ const EspDeviceWrapper = {
               }
 
               
-              log(`${this.alias} temperature: ${tempC} °C`, this);              
+              log(`${this.alias} temperature: ${this.state.tempC} °C`, this);              
               break;
 
             default:
@@ -197,6 +253,7 @@ const EspDeviceWrapper = {
 
       } catch(err) {
         log(`Polling error: ${err.message}`, this);
+        console.log(err)
       }
       
     }, pollInterval);
@@ -314,10 +371,15 @@ const EspDeviceWrapper = {
     let changeInfo = {};
     changeInfo.changed = !_.isEqual(this.state, newState);
 
+    switch (this.subType) {
+      case constants.SUBTYPE_BULB:
+      case constants.SUBTYPE_MAIL_COMPARTMENT:
+        // These only have a boolean. So if 'state' changed, on_off changed too.
+        changeInfo.on_off = changeInfo.changed;
+        break;
+    }
+
     return changeInfo;
-    //let changed = 'changed': this?.state && tempC !== this?.state.tempC,
-
-
   },
 
   getLatestDataPoint() {
@@ -361,7 +423,58 @@ const EspDeviceWrapper = {
       isOnline: this.isOnline,
     };
 
+    switch (this.type) {
+      case constants.DEVICETYPE_ESP_RELAY:
+        data.powerState = this.getPowerState();
+    }
+
     return data;
+  },
+
+  getPowerState() {
+    switch (this.type) {
+      case constants.DEVICETYPE_ESP_RELAY: // Includes mailbox lights, mailbox lock      
+        return this.state;
+    }
+  },
+
+  async toggle() {
+    switch (this.type) {
+      case constants.DEVICETYPE_ESP_RELAY:
+        const currentPowerState = this.getPowerState();
+        console.log(`Current PowerState: ${currentPowerState} ${typeof currentPowerState} (state: ${this.state})`);
+        try {
+          if (currentPowerState) {
+            await axios.get(this.settings.disengageUrl);
+            log(`Disengaging relay`, this);
+          } else {
+            await axios.get(this.settings.engageUrl);
+            log(`Engaging relay`, this);
+          }  
+          const newPowerState = !currentPowerState;
+          console.log(`Change happened, new state should be ${newPowerState}`)
+          this._updateState(newPowerState);
+          this.socketHandler.emitDeviceStateUpdate(this, this.analyzeStateChange(this.state));
+
+        } catch (err) {
+          if (!this.__failCount) {
+            this.__failCount = 0;
+          }
+
+          this.__failCount++;
+
+          if (this.__failCount < 3) {
+            log(`Error trying to switch relay: ${err.message}. Retrying (attempt ${this.__failCount + 1}).`, this)
+            // Try again
+            this.toggle();
+          } else {
+            log(`Error trying to switch relay: ${err.message}. Giving up.`, this)
+          }
+          
+        }
+
+        break;
+    }
   },
 
   _updateOnlineState(cacheData) {
@@ -376,40 +489,58 @@ const EspDeviceWrapper = {
 
   _updateState(payload, trendData) {
     this.lastSeenAt = Date.now();
+    console.log('Updating State ', this.type, this.subType)
 
-    // Handle the fact that some ESPs have different field names for the temperature field.
-    const { jsonPathKey } = this.settings;
-
-    if (jsonPathKey !== 'tempC') {
-      payload.tempC = payload[jsonPathKey];
-      delete payload[jsonPathKey];
+    switch (this.type) {
+      case constants.DEVICETYPE_ESP_RELAY:
+        // It sends back a string! Dang!
+        payload = payload === 'false' ? false : true;
     }
 
-    // Handle any outliers (invalid readings are included in outliers as they are extreme values like -127).
-    const latestDataPoint = this.getLatestDataPoint();
-    const latestTempC = latestDataPoint?.tempC;
+    switch (this.subType) {
+      case constants.SUBTYPE_THERMOMETER:
+        // Handle the fact that some ESPs have different field names for the temperature field.
+        const { jsonPathKey } = this.settings;
 
-    let readingIsOutlier = null;
-    
-    // If we have a previous sample, compare against, otherwise can't do anything.
-    if (latestTempC) {      
-      if (Math.random() > 0.5) {
-        payload.tempC = payload.tempC + 6;
-      }
-      if (Math.abs(latestTempC - payload.tempC) >= espConstants.thermo.OUTLIER_THRESHOULD) {
-        // Reading differs too much from previous.
-        readingIsOutlier = true;
-      } else {
-        readingIsOutlier = false;
-      }
+        if (jsonPathKey !== 'tempC') {
+          payload.tempC = payload[jsonPathKey];
+          delete payload[jsonPathKey];
+        }
 
-      if (readingIsOutlier) {
-        // Interpolate by overwriting the reading with the previous one.
-        payload.tempC = latestTempC;
-      }
+        // Handle any outliers (invalid readings are included in outliers as they are extreme values like -127).
+        const latestDataPoint = this.getLatestDataPoint();
+        const latestTempC = latestDataPoint?.tempC;
+
+        let readingIsOutlier = null;
+        
+        // If we have a previous sample, compare against, otherwise can't do anything.
+        if (latestTempC) {      
+          if (Math.random() > 0.5) {
+            payload.tempC = payload.tempC + 6;
+          }
+          if (Math.abs(latestTempC - payload.tempC) >= espConstants.thermo.OUTLIER_THRESHOULD) {
+            // Reading differs too much from previous.
+            readingIsOutlier = true;
+          } else {
+            readingIsOutlier = false;
+          }
+
+          if (readingIsOutlier) {
+            // Interpolate by overwriting the reading with the previous one.
+            payload.tempC = latestTempC;
+          }
+        }
+        break;
     }
 
     this.state = _.cloneDeep(payload);
+
+    switch (this.type) {
+      case constants.DEVICETYPE_ESP_RELAY:
+        this.powerState = this.getPowerState();
+        console.log(this.channel, this.state, this.powerState)
+        break;
+    }
   }
   
 
