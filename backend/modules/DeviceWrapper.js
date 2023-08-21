@@ -438,6 +438,7 @@ const cmdFailPrefix = '[FAIL]';
     return makeLiveDeviceObject(
       this, [
         // Include
+        'hvacType',
         'targets',
         'type',
         'powerState',

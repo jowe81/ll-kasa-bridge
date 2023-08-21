@@ -8,7 +8,7 @@ const {
 
   SUBTYPE_AIR_AC,
   SUBTYPE_AIR_FAN,
-  SUBTYPE_AIR_AC_HEAT,
+  SUBTYPE_AIR_HEAT,
   SUBTYPE_ENTERTAINMENT,
   SUBTYPE_LIGHT,
   SUBTYPE_THERMOMETER,
@@ -634,10 +634,11 @@ const deviceMap = [
     alias: 'Bedroom Heater',
     channel: 4,
     id: '80065A4E60A835C49695A74DA7FAE76520436E9C01',
-    displayType: SUBTYPE_AIR_AC_HEAT,
+    displayType: SUBTYPE_AIR_HEAT,
     displayLabel: 'Heater',
     locationId: 'loc-bedroom',
-    subType: SUBTYPE_PLUG
+    subType: SUBTYPE_PLUG,
+    hvacType: SUBTYPE_AIR_HEAT,
   },
   {
     alias: 'Bedroom Fan',
@@ -848,7 +849,8 @@ const deviceMap = [
     locationId: 'loc-bathroom',
     subType: SUBTYPE_PLUG,
     displayLabel: "Heater",
-    displayType: SUBTYPE_AIR_AC_HEAT,
+    displayType: SUBTYPE_AIR_HEAT,
+    hvacType: SUBTYPE_AIR_HEAT,
   },
   {
     alias: 'Bedroom Desk Strip bottom',
@@ -1355,6 +1357,26 @@ const deviceMap = [
       jsonPathKey: 'door_locked',
       engageUrl: 'http://192.168.1.25/write?door=lock',
       disengageUrl: 'http://192.168.1.25/write?door=unlock',
+    }
+  },
+  {
+    alias: 'Bathroom Thermostat',
+    channel: 207,
+    id: 'thermostat-bathroom',
+    display: true,
+    displayLabel: 'Thermostat',
+    displayType: constants.SUBTYPE_THERMOSTAT,
+    locationId: 'loc-bathroom',
+    type: constants.DEVICETYPE_VIRTUAL,
+    subType: constants.SUBTYPE_THERMOSTAT,    
+    settings: {
+      hysteresis: 2,  // Hysteresis in degrees Celsius
+      checkInterval: 1 * MINUTE,
+      target: null,   // Will initialize to current temperature
+      heat: true,     // Should the room be heated?
+      heaters: [15],   // Channel numbers of heaters in location      
+      cool: false,    // Should the room be cooled?
+      acs: [],        // Channel numbers of ac units in location      
     }
   },
 

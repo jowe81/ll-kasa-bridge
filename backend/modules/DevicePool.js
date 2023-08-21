@@ -4,6 +4,8 @@ import _ from 'lodash';
 import constants from '../constants.js';
 import DeviceWrapper from './DeviceWrapper.js';
 import EspDeviceWrapper from './EspDeviceWrapper.js';
+import VirtualDeviceWrapper from './VirtualDeviceWrapper.js';
+
 import { getPreset } from './Presets.js';
 import { log } from './Log.js';
 
@@ -292,12 +294,20 @@ const devicePool = {
           return;
         }
 
+        let deviceWrapper;
+
         switch (mapItem.type) {          
           // ESP Devices
           case constants.DEVICETYPE_ESP_THERMOMETER:
           case constants.DEVICETYPE_ESP_RELAY:
-            const deviceWrapper = Object.create(EspDeviceWrapper);
+            deviceWrapper = Object.create(EspDeviceWrapper);
             deviceWrapper.init(EspCache, mapItem, globalConfig, null, this, socketHandler);
+            this.devices.push(deviceWrapper);
+            break;
+
+          case constants.DEVICETYPE_VIRTUAL:
+            deviceWrapper = Object.create(VirtualDeviceWrapper);
+            deviceWrapper.init(mapItem, globalConfig, null, this, socketHandler);
             this.devices.push(deviceWrapper);
             break;
 

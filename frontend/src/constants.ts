@@ -27,6 +27,8 @@ const constants: any = {
   DEVICETYPE_ESP_RELAY: 'ESP_RELAY',
   DEVICETYPE_ESP_MAILBOX: 'ESP_MAILBOX',
 
+  DEVICETYPE_VIRTUAL: 'Virtual',
+
   // Subtypes
   SUBTYPE_BULB: 'bulb',
   SUBTYPE_LED_STRIP: 'led-strip',
@@ -37,11 +39,12 @@ const constants: any = {
   SUBTYPE_MAIL_COMPARTMENT: 'mailbox',
 
   SUBTYPE_AIR_FAN: 'fan',
-  SUBTYPE_AIR_AC_HEAT: 'heater',
+  SUBTYPE_AIR_HEAT: 'heater',
   SUBTYPE_AIR_AC: 'a/c',
   SUBTYPE_LIGHT: 'light', // A non-smart plug-in-light
-  SUBTYPE_ENTERTAINMENT: 'entertainment',  
+  SUBTYPE_ENTERTAINMENT: 'entertainment',
 
+  SUBTYPE_THERMOSTAT: 'thermostat',
 
   // Service names
   SERVICE_PERIODIC_FILTER: 'Periodic Filter Service',
@@ -63,7 +66,7 @@ constants.DEVICETYPES_LIGHTING = [
 constants.DEVICETYPES_HVAC = [
   constants.SUBTYPE_AIR_AC,
   constants.SUBTYPE_AIR_FAN,
-  constants.SUBTYPE_AIR_AC_HEAT,
+  constants.SUBTYPE_AIR_HEAT,
 ];
 
 

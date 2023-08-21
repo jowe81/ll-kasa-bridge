@@ -10,19 +10,9 @@ import { makeLiveDeviceObject } from './TargetDataProcessor.js';
 const espConstants = {
 
   thermo: {
-    // Max length of the time window to consider for trend calculation
-    AVG_CALC_MAX_HISTORY_LENGTH: 15 * constants.MINUTE,
-
-    // How many data points can be used to get each avg value?
-    AVG_CALC_MAX_DATA_POINTS: 30,
-
-    // How much difference (in degrees) constitutes a trend?
-    TREND_TRESHOULD: 0.2,
-
     // How much does a reading need to differ from the previous to be considered and outlier?
     OUTLIER_THRESHOULD: 3,
   }
-
   
 };
 
@@ -329,15 +319,7 @@ const EspDeviceWrapper = {
             
             // diff represents the current trend.
             trendData.diff = trendData.avgTempNow -  trendData.avgTempPast;
-            
-            // Come up with a digest.
-            trendData.trend = "steady";
-            if (trendData.diff > espConstants.thermo.TREND_TRESHOULD) {
-              trendData.trend = "up";
-            } else if (trendData.diff < -espConstants.thermo.TREND_TRESHOULD) {
-              trendData.trend = "down";
-            }
-    
+                
           }
         } else {
           // No existing data.
@@ -404,6 +386,7 @@ const EspDeviceWrapper = {
     return makeLiveDeviceObject(
       this, [
         // Include
+        'hvacType',
       ], {
         // Default
         'display': true,
