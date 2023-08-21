@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Device } from './dataSlice.ts';
+import constants from '../../constants.ts';
 
 const TouchButtonDevice = ({device, onClick}) => {
 
@@ -7,7 +8,7 @@ const TouchButtonDevice = ({device, onClick}) => {
   const [powerState, setPowerState] = useState(null);
 
   const powerStateClass = getPowerStateClass(device);
-  const bgIconClass = `icon-${device.displayType ?? device.subType ?? 'none'}`;
+  const bgIconClass = getBgIconClass(device)
 
   const handleClick = (e) => {
     setIsPending(true);    
@@ -52,6 +53,27 @@ const TouchButtonDevice = ({device, onClick}) => {
       {html}                            
     </div> 
   )
+}
+
+const getBgIconClass = (device: Device) => {
+  let bgIconClass = '';
+
+  switch (device.subType) {
+    case constants.SUBTYPE_MAIL_COMPARTMENT:
+      bgIconClass = `icon-${device.displayType ?? device.subType ?? 'none'}`;
+      if (device.powerState === true) {
+        bgIconClass += '-locked';
+      } else if (device.powerState === false) {
+        bgIconClass += '-unlocked';
+      }
+      break;
+
+    default:
+      bgIconClass = `icon-${device.displayType ?? device.subType ?? 'none'}`;
+      break;
+  }
+
+  return bgIconClass;
 }
 
 const getPowerStateClass = (device: Device): string => {

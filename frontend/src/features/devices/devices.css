@@ -2,11 +2,16 @@
   background-color: rgb(71, 71, 156);
 }
 
-.power-on-heater {
+.power-on-heater,
+.power-on-mailbox {
   background-color: rgb(174, 36, 36);
 }
 
-.power-on, .power-on-light, .power-on-bulb, .power-on-led-strip {
+
+.power-on, 
+.power-on-light, 
+.power-on-bulb, 
+.power-on-led-strip {
   background-color: rgb(0, 95, 0);
 }
 
@@ -174,6 +179,14 @@ tr {
 
 .icon-entertainment {
   background-image: url('/icons/entertainment.png');
+}
+
+.icon-mailbox-locked {
+  background-image: url('/icons/locked.png');
+}
+
+.icon-mailbox-unlocked {
+  background-image: url('/icons/unlocked.png');
 }
 
 .small-buttons {

@@ -53,6 +53,8 @@ const EspDeviceWrapper = {
     this.host = urlParts && urlParts.length > 1 ? urlParts[1] : 'N/A';
     this.settings = mapItem.settings;
     this.display = mapItem.display;
+    this.displayLabel = mapItem.displayLabel;
+    this.displayType = mapItem.displayType;
     this.locationId = mapItem.locationId;
     this.type = mapItem.type;
     this.subType = mapItem.subType;
@@ -434,7 +436,7 @@ const EspDeviceWrapper = {
   getPowerState() {
     switch (this.type) {
       case constants.DEVICETYPE_ESP_RELAY: // Includes mailbox lights, mailbox lock      
-        return this.state;
+        return !!this.state;
     }
   },
 
@@ -453,6 +455,8 @@ const EspDeviceWrapper = {
           }  
           const newPowerState = !currentPowerState;
           console.log(`Change happened, new state should be ${newPowerState}`)
+
+          this._updateCache(newPowerState);
           this._updateState(newPowerState);
           this.socketHandler.emitDeviceStateUpdate(this, this.analyzeStateChange(this.state));
 
@@ -477,6 +481,13 @@ const EspDeviceWrapper = {
     }
   },
 
+  // Updates the timestamp on the cache entry for this device
+  _updateCache(payload) {
+    const data = this.cache?.espData[this.url];
+    data.timestamp = Date.now();
+    data.data = payload;
+  },
+
   _updateOnlineState(cacheData) {
     if (cacheData?.timestamp > Date.now() - this.pollInterval * 2) {
       // Allow a bit of grace beyond the pollInterval
@@ -494,7 +505,7 @@ const EspDeviceWrapper = {
     switch (this.type) {
       case constants.DEVICETYPE_ESP_RELAY:
         // It sends back a string! Dang!
-        payload = payload === 'false' ? false : true;
+        payload = payload === 'true' ? true : false;
         break;
 
       case constants.DEVICETYPE_ESP_THERMOMETER:
