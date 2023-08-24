@@ -141,7 +141,6 @@ function LocationsView() {
 
   const handleClick = (e) => {
     const channel = e.currentTarget.dataset.deviceChannel;
-    console.log(`handling click ${e.target}`);
     if (channel) {
       socket.emit('auto/command/macro', {
         targetType: 'channel',

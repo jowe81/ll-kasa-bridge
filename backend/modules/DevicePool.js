@@ -5,6 +5,7 @@ import constants from '../constants.js';
 import DeviceWrapper from './DeviceWrapper.js';
 import EspDeviceWrapper from './EspDeviceWrapper.js';
 import VirtualDeviceWrapper from './VirtualDeviceWrapper.js';
+import Location from './Location.js';
 
 import { getPreset } from './Presets.js';
 import { log } from './Log.js';
@@ -29,6 +30,7 @@ const devicePool = {
     this.dbDeviceMap = db.collection('DeviceMap');
     this.dbConfig = this.db.collection('Config');
     this.devices = [];
+    this.locations = {};
 
     // This function will be injected into the device wrapper and called on device events
     this.deviceEventCallback = (event, deviceWrapper) => {
@@ -51,18 +53,21 @@ const devicePool = {
     await this.loadGlobalConfiguration();
 
     loadFilterPlugins();
-    this.startPeriodicFilterService();
+    this.startPeriodicServices();
 
     this.initDeviceWrappers();
+    this.initLocations();
     this.startDiscovery();
   },
 
-  startPeriodicFilterService() {    
+  startPeriodicServices() {    
     const settings = this.globalConfig?.defaults?.periodicFilters;
     const interval = settings?.checkInterval ?? constants.MINUTE;
+    log(`Starting periodic services at check interval (ms): ${interval}`, null, 'white');
   
-    log(`Starting periodic filter service at check interval (ms): ${interval}`, null, 'white');
-    setInterval(() => this._runPeriodicFilters(this), interval);
+    setInterval(() => {
+      this._runPeriodicFilters();
+    }, interval);
   },
 
   startDiscovery() {
@@ -253,6 +258,39 @@ const devicePool = {
     return deviceWrappers;
   },
 
+  getDeviceWrappersByLocation(locationId) {
+    return this.getDeviceWrappersByFilter({ location: locationId });
+  },
+
+  getDeviceWrappersByFilter(filter) {
+    if (!filter) {
+      return [];
+    }
+
+    const deviceWrappers = [];
+
+    this.devices.forEach(deviceWrapper => {
+      const keys = Object.keys(filter);
+      let isMatch = true;
+
+      keys.every(key => {   
+        
+        if (deviceWrapper[key] !== filter[key]) {
+          isMatch = false;
+          return false;
+        }
+
+        return true;
+      });
+
+      if (isMatch) {
+        deviceWrappers.push(deviceWrapper);
+      }
+    });
+
+    return deviceWrappers;
+  },
+
   getLiveDeviceMap() {
     const map = [];
     this.devices.forEach(deviceWrapper => map.push(deviceWrapper.getLiveDevice(deviceWrapper)));
@@ -348,6 +386,20 @@ const devicePool = {
 
     return deviceWrapper;
   },
+
+  initLocations() {
+    this.globalConfig.locations.forEach(locationConfigObject => {
+      if (!this.locations[locationConfigObject.id]) {
+        const location = Object.create(Location);
+        if (location.init(locationConfigObject, this)) {
+          this.locations[locationConfigObject.id] = location;  
+        }
+      }
+    });
+
+    log(`Initialized ${Object.keys(this.locations).length} of ${this.globalConfig.locations.length} locations.`, null, 'white');
+  },
+
 
   async loadGlobalConfiguration() {
     const globalConfig = await this.dbConfig.findOne();
@@ -490,7 +542,8 @@ const devicePool = {
     }
 
     return filtersToRun;
-  }
+  },
+
 }
 
 

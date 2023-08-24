@@ -134,6 +134,10 @@ const EspDeviceWrapper = {
           // Cache contains payload.
           const { jsonPath, jsonPathId, jsonPathKey } = this.settings;
 
+          if (!data.data[jsonPath]) {
+            log(`Received invalid data.`, this, 'bgRed');
+            return;
+          }
 
           switch (this.subType) {
             case constants.SUBTYPE_THERMOMETER:
@@ -191,7 +195,6 @@ const EspDeviceWrapper = {
                 return;
               }
 
-              console.log('lights on?', payload, changeInfo);
               break;
 
             case constants.SUBTYPE_MAIL_COMPARTMENT:
@@ -207,7 +210,6 @@ const EspDeviceWrapper = {
                 return;
               }
 
-              console.log('door locked?', payload, changeInfo);
               break;
   
 
@@ -386,6 +388,7 @@ const EspDeviceWrapper = {
     return makeLiveDeviceObject(
       this, [
         // Include
+        'powerState',
         'hvacType',
       ], {
         // Default
@@ -427,7 +430,7 @@ const EspDeviceWrapper = {
     switch (this.type) {
       case constants.DEVICETYPE_ESP_RELAY:
         const currentPowerState = this.getPowerState();
-        console.log(`Current PowerState: ${currentPowerState} ${typeof currentPowerState} (state: ${this.state})`);
+
         try {
           if (currentPowerState) {
             await axios.get(this.settings.disengageUrl);
@@ -437,7 +440,6 @@ const EspDeviceWrapper = {
             log(`Engaging relay`, this);
           }  
           const newPowerState = !currentPowerState;
-          console.log(`Change happened, new state should be ${newPowerState}`)
 
           this._updateCache(newPowerState);
           this._updateState(newPowerState);
@@ -483,7 +485,6 @@ const EspDeviceWrapper = {
 
   _updateState(payload, trendData) {
     this.lastSeenAt = Date.now();
-    console.log('Updating State ', this.type, this.subType)
 
     switch (this.type) {
       case constants.DEVICETYPE_ESP_RELAY:
@@ -531,7 +532,6 @@ const EspDeviceWrapper = {
     switch (this.type) {
       case constants.DEVICETYPE_ESP_RELAY:
         this.powerState = this.getPowerState();
-        console.log(this.channel, this.state, this.powerState)
         break;
     }
   }

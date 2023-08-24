@@ -5,30 +5,53 @@ import { log, debug } from './Log.js';
 import { globalConfig } from '../configuration.js';
 import { resolveDeviceDependencies } from './DependencyResolver.js';
 import { makeLiveDeviceObject } from './TargetDataProcessor.js';
-import DeviceWrapper from './DeviceWrapper.js';
-import e from 'cors';
+import { thermostatIntervalHandler } from './virtualDeviceProcessing/thermostat.js';
 
-const localConstants = {
+const cmdPrefix = '[CMD]';
+const cmdFailPrefix = '[FAIL]';
 
-  thermostat: {
-    // Do not check more often than the minimum set here.
-    MIN_CHECKING_INTERVAL: 10 * constants.SECOND,
+const localConstants = constants.DEVICETYPE_DEFAULTS[constants.DEVICETYPE_VIRTUAL];
 
-    // Boundaries for target temperature settings.
-    TARGET_MAX: 30,
-    TARGET_MIN: 10,
-    TARGET_DEFAULT: 22,
-  }
-  
-};
-
-
-const EspDeviceWrapper = {
+const VirtualDeviceWrapper = {
   device: null,
   initialized: false,
 
   addCallback(callbackFn, event) {
     log(`Adding callback to '${event}`, this);
+  },
+
+  /**
+   * Compare newState against the current state of the device.
+   * 
+   * @param   {} newState 
+   * @returns {} Infomation about the change or undefined if current state doesn't exist.
+   */
+   analyzeStateChange(newState) {
+    if (this.state === undefined) {
+      // Have no current state. Just received the first update.
+      return undefined;
+    }
+
+    let changeInfo = {};
+    changeInfo.changed = !_.isEqual(this.state, newState);
+
+    switch (this.subType) {
+      case constants.SUBTYPE_THERMOSTAT:
+        changeInfo.on_off = changeInfo.changed;
+        break;
+    }
+
+    return changeInfo;
+  },
+
+  getPowerState() {
+    switch (this.subType) {
+      case constants.SUBTYPE_THERMOSTAT:
+      default:
+        return this.powerState;
+        break;
+    }    
+    
   },
 
   init(mapItem, globalConfig, deviceEventCallback, devicePool, socketHandler) {
@@ -50,6 +73,8 @@ const EspDeviceWrapper = {
     this.locationId = mapItem.locationId;
     this.type = mapItem.type;
     this.subType = mapItem.subType;
+    this.powerState = false;
+    this.isOnline = true; // Always online.
     
     resolveDeviceDependencies(this);
         
@@ -73,11 +98,26 @@ const EspDeviceWrapper = {
     this.start();
   },
 
+  setPowerState(newPowerState, triggerSwitchPosition, origin) {
+    let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
+    log(`${cmdPrefix} [${originText}] setPowerState ${newPowerState ? 'on' : 'off'}`, this, 'cyan');  
+
+    this._updateState(newPowerState);
+
+    switch (this.subType) {
+      case constants.SUBTYPE_THERMOSTAT:
+        log(`Thermostat turned ${newPowerState ? 'on' : 'off'}.`, this);
+        break;
+        
+    }    
+    
+  },
+
   // Start operating.
   start() {
-    const interval = this._runPreChecks();
+    this.interval = 5000;// this._runPreChecks();
 
-    if (!interval) {
+    if (!this.interval) {
       log(`Unable to start thermostat for ${this.location}. Check configuration.`, this, 'bgRed');
       return;
     }
@@ -86,44 +126,38 @@ const EspDeviceWrapper = {
     if (this.settings.heat) modes.push('heat');
     if (this.settings.cool) modes.push('cool');
     
-    log(`Check-Interval: ${ Math.ceil(interval / constants.SECOND) } seconds. Target: ${this.settings.target}°C.`, this);
+    log(`Check-Interval: ${ Math.ceil(this.interval / constants.SECOND) } seconds. Target: ${this.settings.target}°C.`, this);
 
-    this._checkingIntervalHandler = setInterval(async () => {
-      
-    }, interval);
+    // Turn off when first starting.
+    this.setPowerState(false);
+
   },
 
-  
-  /**
-   * Compare newState against the current state of the device.
-   * 
-   * @param   {} newState 
-   * @returns {} Infomation about the change or undefined if current state doesn't exist.
-   */
-  analyzeStateChange(newState) {
-    if (this.state === undefined) {
-      // Have no current state. Just received the first update.
-      return undefined;
+  toggle(origin) {    
+    this.setPowerState(!this.getPowerState(), null, origin);
+  },
+
+  updateIntervalHandler() {
+    if (this._checkingIntervalHandler) {
+      // Clear always. If needed it will be rescheduled below.
+      clearInterval(this._checkingIntervalHandler);
     }
 
-    let changeInfo = {};
-    changeInfo.changed = !_.isEqual(this.state, newState);
+    if (this.interval) {
 
-    switch (this.subType) {
-      case constants.SUBTYPE_BULB:
-      case constants.SUBTYPE_MAIL_COMPARTMENT:
-        // These only have a boolean. So if 'state' changed, on_off changed too.
-        changeInfo.on_off = changeInfo.changed;
-        break;
+      switch (this.subType) {
+        case constants.SUBTYPE_THERMOSTAT:
+          thermostatIntervalHandler(this.devicePool, this, localConstants);
+          break;
+      }
     }
-
-    return changeInfo;
   },
 
   getLiveDevice() {
     return makeLiveDeviceObject(
       this, [
         // Include
+        'powerState',
       ], {
         // Default
         'display': true,
@@ -145,19 +179,12 @@ const EspDeviceWrapper = {
       isOnline: this.isOnline,
     };
 
-    switch (this.type) {
-      case constants.DEVICETYPE_ESP_RELAY:
+    switch (this.subType) {
+      case constants.SUBTYPE_THERMOSTAT:
         data.powerState = this.getPowerState();
     }
 
     return data;
-  },
-
-  getPowerState() {
-    switch (this.type) {
-      case constants.DEVICETYPE_ESP_RELAY: // Includes mailbox lights, mailbox lock      
-        return !!this.state;
-    }
   },
 
   /**
@@ -238,12 +265,18 @@ const EspDeviceWrapper = {
     }      
   },
 
-  _updateState(payload, trendData) {
+  _updateState(payload) {
     this.lastSeenAt = Date.now();
-    this.state = _.cloneDeep(payload);
+
+    if (!_.isEqual(this.state, payload)) {
+      this.state = _.cloneDeep(payload);
+      this.powerState = this.state;
+      this.updateIntervalHandler();
+      this.socketHandler.emitDeviceStateUpdate(this, this.analyzeStateChange(payload));      
+    }    
   }
   
 
 };
 
-export default EspDeviceWrapper;
+export default VirtualDeviceWrapper;

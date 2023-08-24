@@ -33,7 +33,7 @@ const TouchButtonDevice = ({device, onClick}) => {
     html = (
       <>
         <div className='device-meta'>
-          { device.channel }
+          { device.subType !== constants.SUBTYPE_THERMOSTAT ? device.channel : ''}
           <div className='device-online-state'>
           { device.displayLabel ?? device.alias }
           </div>

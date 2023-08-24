@@ -65,6 +65,20 @@ const constants = {
   
 };
 
+constants.SUBTYPES = [
+  constants.SUBTYPE_AIR_AC,
+  constants.SUBTYPE_AIR_FAN,
+  constants.SUBTYPE_AIR_HEAT,
+  constants.SUBTYPE_BULB,
+  constants.SUBTYPE_ENTERTAINMENT,
+  constants.SUBTYPE_LED_STRIP,
+  constants.SUBTYPE_LIGHT,
+  constants.SUBTYPE_MAIL_COMPARTMENT,
+  constants.SUBTYPE_PLUG,
+  constants.SUBTYPE_SWITCH,
+  constants.SUBTYPE_THERMOMETER,
+  constants.SUBTYPE_THERMOSTAT,
+]
 
 constants.DEVICETYPES_LIGHTING = [
   constants.SUBTYPE_LIGHT,
@@ -83,6 +97,23 @@ constants.DEVICETYPES_WITH_POWERSTATE = [
   constants.DEVICETYPE_KASA_SMARTPLUGSWITCH,
   constants.DEVICETYPE_KASA_SMARTBULB,
   constants.DEVICETYPE_ESP_RELAY,
-]
+];
+
+constants.DEVICETYPE_DEFAULTS = {
+  [constants.DEVICETYPE_VIRTUAL]: {
+    [constants.SUBTYPE_THERMOSTAT]: {
+      // Do not check more often than the minimum set here.
+      MIN_CHECKING_INTERVAL: 10 * constants.SECOND,
+  
+      // Boundaries for target temperature settings.
+      TARGET_MAX: 30,
+      TARGET_MIN: 10,
+      TARGET_DEFAULT: 22,
+  
+      // If we haven't had a room temperature update during this time, shut off HVAC devices.
+      SAFETY_SHUTOFF_DELAY: 2 * constants.MINUTE,
+    }  
+  }
+};
 
 export default constants;

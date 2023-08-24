@@ -26,6 +26,10 @@ const masterLogFile = 'jj-auto.log';
     prefix += `Ch ${channel}` + (deviceWrapper.device ? ` (${deviceWrapper.alias})` : ``);
   }
 
+  if (deviceWrapper?.type === 'location') {
+    prefix += `Location '${deviceWrapper.name}': `;
+  }
+
   let line;
   const colon = channel ? ': ' : '';
 

@@ -17,7 +17,6 @@ function TouchView() {
 
   const handleClick = (e) => {
     const channel = e.target.dataset.deviceChannel;
-    console.log(`handling click ${e.target}`);
     if (channel) {
       socket.emit('auto/command/macro', {
         channel: parseInt(channel),

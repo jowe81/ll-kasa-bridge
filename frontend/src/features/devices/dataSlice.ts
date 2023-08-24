@@ -35,7 +35,12 @@ export interface EspDevice extends BaseDevice {
   powerState?: boolean;
 }
 
-export type Device = KasaDevice | EspDevice;
+export interface VirtualDevice extends BaseDevice {
+  powerState?: boolean;
+}
+
+
+export type Device = KasaDevice | EspDevice | VirtualDevice;
 
 export interface Group {
   id: string;
