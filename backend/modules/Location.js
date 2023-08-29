@@ -47,8 +47,21 @@ const Location = {
     return this.devicePool.getDeviceWrappersByFilter(filter);
   },
 
+  /**
+   * Return true if at least one heater is turned on.
+   * @returns boolean
+   */
   isHeating() {
+    let isHeating = false;
+    this.getHeaters().every(heater => {
+      if (!heater.getPowerState()) {
+        return true;
+      }
 
+      isHeating = true;      
+    });
+
+    return isHeating;
   },
 
   isCooling() {
@@ -75,13 +88,6 @@ const Location = {
    */
    getTemperature(safetyShutoffDelay) {
     const thermometers = this.getThermometers();
-
-    // Mockup
-    thermometers.push(_.cloneDeep(thermometers[0]),_.cloneDeep(thermometers[0]), _.cloneDeep(thermometers[0]));
-    thermometers[0].state =  {tempC: 23};
-    thermometers[0].lastSeenAt = Date.now() - 5 * constants.MINUTE;
-    thermometers[2].state =  {tempC: 24};
-    thermometers[2].lastSeenAt = Date.now() - 1 * constants.MINUTE;
 
     if (!thermometers.length) {
       return null;

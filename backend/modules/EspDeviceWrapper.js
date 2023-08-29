@@ -134,7 +134,7 @@ const EspDeviceWrapper = {
           // Cache contains payload.
           const { jsonPath, jsonPathId, jsonPathKey } = this.settings;
 
-          if (!data.data[jsonPath]) {
+          if (jsonPath && !data.data[jsonPath]) {
             log(`Received invalid data.`, this, 'bgRed');
             return;
           }

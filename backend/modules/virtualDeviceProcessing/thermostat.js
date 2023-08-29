@@ -11,48 +11,68 @@ const thermostatIntervalHandler = (devicePool, thermostat) => {
 
   if (thermostat.getPowerState()) {
     thermostat._checkingIntervalHandler = setInterval(async () => {
-      console.log('Thermostat Processing');
       const location = devicePool.locations[thermostat.locationId];
+      const { heat, cool, hysteresis, target } = thermostat.settings;
       const temperature = location.getTemperature(localConstants.SAFETY_SHUTOFF_DELAY);
-      const currentTempC = temperature.tempC;
-      console.log(thermostat.locationId, temperature, thermostat.settings);
+      const currentTempC = temperature?.tempC;
 
-      const { heat, cool, hysteresis, starget } = thermostat.settings;
+      // Trigger shutoff if there no temperature at all, or only stale temperature
+      const safetyShutoff = !temperature || temperature.isStale;
 
-      const target = 26;
-      console.log(`Temp is ${currentTempC}, target is ${target}, heat is ${heat ? 'active' : 'inactive'}, heat powerstate is ${location.isHeating() ? 'on' : 'off'}`);
 
       let liveDeviceCount = 0;
       
       if (heat) {
         const isHeating = location.isHeating();
+        const msg = `Temp is ${currentTempC}°C, target is ${target}°C, hysteresis is ${hysteresis}°, heat is ${isHeating ? "on" : "off"}; turn it ${isHeating ? "off" : "on"}`;
+        
+        let switchHeatTo = null;
         if (isHeating && (currentTempC >= target + hysteresis)) {
-          // Turn off the heat
-          console.log('Turn off heat');
-          liveDeviceCount = location.setHeating(false);
+          switchHeatTo = false;
         }
 
         if (!isHeating && (currentTempC < target - hysteresis)) {
-          // Turn on the heat
-          console.log('Turn on heat');
-          liveDeviceCount = location.setHeating(true);
+          switchHeatTo = true;
+        }   
+        
+        // Override in case of safety shutoff
+        if (safetyShutoff) {          
+          switchHeatTo = false;
+        }
+
+        if (switchHeatTo !== null) {
+          log(safetyShutoff ? 'Thermostat heating safety-shutoff triggered. No temperature from location or temperature is stale.' : msg, thermostat, safetyShutoff ? 'bgRed' : null);
+          liveDeviceCount = location.setHeating(switchHeatTo);
         }
       }
 
       if (cool) {
         const isCooling = location.isCooling();
-        if (isCooling && (currentTempC <= target - hysteresis)) {
-          // Turn off the AC
-          liveDeviceCount = location.setCooling(false);
+        const msg = `Temp is ${currentTempC}°C, target is ${target}°C, hysteresis is ${hysteresis}°, AC is ${isCooling ? "on" : "off"}; turn it ${isCooling ? "off" : "on"}`;
+        
+        let switchAcTo = null;
+        if (!isCooling && (currentTempC >= target + hysteresis)) {
+          switchAcTo = true;
         }
 
-        if (!isCooling && (currentTempC > target + hysteresis)) {
-          // Turn on the AC
-          liveDeviceCount = location.setCooling(true);
+        if (isCooling && (currentTempC < target - hysteresis)) {
+          switchAcTo = false;
+        }   
+        
+        // Override in case of safety shutoff
+        if (safetyShutoff) {          
+          switchAcTo = false;
+        }
+
+        if (switchAcTo) {
+          log(safetyShutoff ? 'Thermostat cooling safety-shutoff triggered. No temperature from location or temperature is stale.' : msg, thermostat, safetyShutoff ? 'bgRed' : null);
+          liveDeviceCount = location.setHeating(switchAcTo);
         }
       }
 
-      log(`Issued commands to ${liveDeviceCount} devices`, thermostat);
+      if (liveDeviceCount) {
+        log(`Issued commands to ${liveDeviceCount} devices`, thermostat);
+      }
 
     }, thermostat.interval);
   }
