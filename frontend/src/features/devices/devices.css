@@ -124,12 +124,49 @@ tr {
   margin-top: 0px;
   margin-bottom:-4px;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgb(89, 86, 86);
+  /* border-bottom: 1px solid rgb(89, 86, 86); */
   
   background-size: 20%;
   background-position: bottom left;
   background-repeat: no-repeat;
   position: relative;
+}
+
+/* Thermostat */
+.thermostat-triple-width {
+  height: 50px;
+  padding: 0px 3px;
+  width: 280px;
+  margin: 10px 5px;
+  margin-bottom:-5px;
+  margin-top: 0px;
+  
+  background-size: 20%;
+  background-position: bottom left;
+  background-repeat: no-repeat;
+  position: relative;
+
+}
+
+.thermostat-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-top:10px;
+}
+
+.thermostat-button {
+  font-size: 80%;
+  text-align: center;
+  position: relative;
+  bottom: 0px;
+  color: rgb(177, 177, 177);
+  height: 25px;
+}
+
+.button-border {
+  border-radius: 3px;
+  border: 1px solid gray;
 }
 
 .thermometer-trends {

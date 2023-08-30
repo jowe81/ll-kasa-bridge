@@ -73,6 +73,9 @@ const VirtualDeviceWrapper = {
     this.locationId = mapItem.locationId;
     this.type = mapItem.type;
     this.subType = mapItem.subType;
+    this.state = {
+      powerState: null,
+    }
     this.powerState = false;
     this.isOnline = true; // Always online.
     
@@ -94,15 +97,51 @@ const VirtualDeviceWrapper = {
       return false;
     }
 
+    this.state.target = this.settings.target ?? localConstants.TARGET_DEFAULT;
+
     log(`Initializing ${this.subType} for location ${this.location}. Mode is ${ modes.join(' and ') }, hysteresis is ${this.settings.hysteresis}°C.`, this);
     this.start();
+  },
+
+
+  nudgeTarget(up) {
+    const baseAmount = this.settings?.nudgeBy ?? 0.5;
+    const amount = up ? baseAmount : -baseAmount
+
+    this.setTarget(this.state.target + amount);
+  },
+
+  setTarget(tempC) {
+    const minTarget = localConstants.thermostat.TARGET_MIN;
+    const maxTarget = localConstants.thermostat.TARGET_MAX;
+
+    if (!(tempC > 0 && tempC <= maxTarget && tempC >= minTarget)) {
+      log(`Attempt to set invalid target temperature: ${tempC}°C. Allowed min/max: ${minTarget}°C / ${maxTarget}°C.`, this);
+      return;
+    }
+
+    log(`Setting target to ${tempC}°C`, this);
+
+    const currentState = this.state;
+    const newState = {
+      ...currentState,
+      target: tempC,
+    };
+    
+    this._updateState(newState);
   },
 
   setPowerState(newPowerState, triggerSwitchPosition, origin) {
     let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
     log(`${cmdPrefix} [${originText}] setPowerState ${newPowerState ? 'on' : 'off'}`, this, 'cyan');  
 
-    this._updateState(newPowerState);
+    const currentState = this.state;
+    const newState = {
+      ...currentState,
+      powerState: newPowerState,
+    };
+    
+    this._updateState(newState);
 
     switch (this.subType) {
       case constants.SUBTYPE_THERMOSTAT:
@@ -112,6 +151,8 @@ const VirtualDeviceWrapper = {
     }    
     
   },
+
+
 
   // Start operating.
   start() {
@@ -270,7 +311,7 @@ const VirtualDeviceWrapper = {
 
     if (!_.isEqual(this.state, payload)) {
       this.state = _.cloneDeep(payload);
-      this.powerState = this.state;
+      this.powerState = this.state.powerState;
       this.updateIntervalHandler();
       this.socketHandler.emitDeviceStateUpdate(this, this.analyzeStateChange(payload));      
     }    

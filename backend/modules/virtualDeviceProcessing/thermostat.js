@@ -12,7 +12,8 @@ const thermostatIntervalHandler = (devicePool, thermostat) => {
   if (thermostat.getPowerState()) {
     thermostat._checkingIntervalHandler = setInterval(async () => {
       const location = devicePool.locations[thermostat.locationId];
-      const { heat, cool, hysteresis, target } = thermostat.settings;
+      const { heat, cool, hysteresis } = thermostat.settings;
+      const { target } = thermostat.state;
       const temperature = location.getTemperature(localConstants.SAFETY_SHUTOFF_DELAY);
       const currentTempC = temperature?.tempC;
 

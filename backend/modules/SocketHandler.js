@@ -70,9 +70,18 @@ const socketHandler = {
             }
 
             switch (macroName) {
-              case 'toggleChannel': {
+              case 'toggleChannel': 
                 deviceWrapper.toggle('ws:' + address);
-              }
+                break;                
+
+              case 'thermostatDown':
+                deviceWrapper.nudgeTarget(false);
+                break;
+
+              case 'thermostatUp':
+                deviceWrapper.nudgeTarget(true);
+                break;
+                  
             }
 
             break;

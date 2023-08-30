@@ -9,6 +9,7 @@ import { Device, Group } from './dataSlice.ts';
 import TouchButtonDevice from './TouchButtonDevice.tsx';
 import TouchButtonGroup from './TouchButtonGroup.tsx';
 import Thermometer from './Thermometer.tsx';
+import Thermostat from './Thermostat.tsx';
 
 function LocationsView() {
   const devices = useAppSelector(state => state.data.devices);
@@ -71,6 +72,12 @@ function LocationsView() {
       const switches = devicesInLocation.filter(device => device.subType === 'switch');
 
       const thermometers =  devicesInLocation.filter(device => device.subType === 'thermometer');
+
+      let thermostat;
+      const thermostats = devicesInLocation.filter(device => device.subType === 'thermostat');
+      if (thermostats.length) {
+        thermostat = thermostats[0];
+      }
       
       locationsData.push({
         id: location.id,
@@ -82,6 +89,7 @@ function LocationsView() {
         groupedDevices,
         switches,
         thermometers,
+        thermostat,
         liveGroupData,
       });
     });
@@ -162,6 +170,31 @@ function LocationsView() {
     }
   }
 
+  const handleThermostatClick = (e) => {
+    const channel = e.currentTarget.dataset.deviceChannel;
+    const { action } = e.currentTarget.dataset;
+    console.log('action', action);
+    let macroName;
+    switch (action) {
+      case 'down':
+        macroName = 'thermostatDown';
+        break;
+      
+      case 'up':
+        macroName = 'thermostatUp';
+        break;
+    }
+
+    if (channel) {
+      socket.emit('auto/command/macro', {
+        targetType: 'channel',
+        targetId: parseInt(channel),
+        macroName,
+      });    
+    }
+  }
+
+
   const locationsData = getLocationsData();
   console.log(`Have locations data for ${locationsData.length} locations`, locationsData);
 
@@ -220,24 +253,35 @@ function LocationsView() {
 
           let thermometerField;
           let locationLabelField;
+          let thermostatField;
 
           if (locationInfo.thermometers?.length) {
             const thermometer = locationInfo.thermometers[0];
-            const props = {
+            const thermometerProps = {
               thermometer,
               locationLabel: locationInfo.name,
             }
-            thermometerField = <Thermometer key={'device_' + thermometer.channel} {...props}></Thermometer>;
+            thermometerField = <Thermometer key={'device_' + thermometer.channel} {...thermometerProps}></Thermometer>;
             
+            if (locationInfo.thermostat) {
+              const thermostatProps = {
+                thermostat: locationInfo.thermostat,
+                handleThermostatClick,
+              }
+              thermostatField = <Thermostat key={'device_' + locationInfo.thermostat.channel} {...thermostatProps}></Thermostat>
+            }
           } else {
             locationLabelField = <div className="location-label">{ locationInfo.name }</div>
           }
+
+          
 
           return(
               <div key={locationInfo.id} className="location-container">
                 { locationLabelField }
                 <div className="location-buttons-container">
                   { thermometerField }
+                  { thermostatField }
                   { (groupFields.length > 0) && groupFields }
                   { (switchFields.length > 0) && switchFields }
                   { (ungroupedLightsFields.length > 0) && ungroupedLightsFields }
