@@ -97,7 +97,7 @@ const VirtualDeviceWrapper = {
       return false;
     }
 
-    this.state.target = this.settings.target ?? localConstants.TARGET_DEFAULT;
+    this.state.target = this.settings.target ?? localConstants.thermostat.TARGET_DEFAULT;
 
     log(`Initializing ${this.subType} for location ${this.location}. Mode is ${ modes.join(' and ') }, hysteresis is ${this.settings.hysteresis}°C.`, this);
     this.start();

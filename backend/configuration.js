@@ -1372,11 +1372,26 @@ const deviceMap = [
     settings: {
       hysteresis: 1,  // Hysteresis in degrees Celsius
       checkInterval: 1 * MINUTE,
-      target: 25,   // Will initialize to current temperature if not set
+      target: 25,   // Will initialize to default if not set
       heat: true,     // Should the room be heated?
-      heaters: [15],   // Channel numbers of heaters in location      
       cool: false,    // Should the room be cooled?
-      acs: [],        // Channel numbers of ac units in location      
+    }
+  },
+  {
+    alias: 'Bedroom Thermostat',
+    channel: 208,
+    id: 'thermostat-bedroom',
+    display: true,
+    displayLabel: 'Thermostat',
+    displayType: constants.SUBTYPE_THERMOSTAT,
+    locationId: 'loc-bedroom',
+    type: constants.DEVICETYPE_VIRTUAL,
+    subType: constants.SUBTYPE_THERMOSTAT,    
+    settings: {
+      hysteresis: 1,  // Hysteresis in degrees Celsius
+      checkInterval: 1 * MINUTE,
+      heat: true,     // Should the room be heated?
+      cool: false,    // Should the room be cooled?
     }
   },
 
