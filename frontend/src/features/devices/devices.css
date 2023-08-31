@@ -162,6 +162,34 @@ tr {
   bottom: 0px;
   color: rgb(177, 177, 177);
   height: 25px;
+  background-size: 40%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.thermostat-target {
+  color: rgba(245, 245, 245, 0.723);
+  font-size: 120%;
+}
+
+.thermostat-target-disabled {
+  opacity: 50%;
+  font-size: 120%;
+}
+
+.thermostat-button-disabled {  
+  background-color: rgba(98, 94, 94, 0.355) !important;
+  border: 1px solid rgba(255, 255, 255, 0.0) !important;
+} 
+
+.thermostat-arrow-up {
+  background-image: url('/icons/arrow-up.png');
+  background-color: rgba(255, 0, 0, 0.355);
+}
+
+.thermostat-arrow-down {
+  background-image: url('/icons/arrow-down.png');
+  background-color: rgba(0, 21, 255, 0.355);
 }
 
 .button-border {
@@ -188,7 +216,7 @@ tr {
   position: relative;
   bottom: 0px;
   color: rgb(177, 177, 177);
-  /*border-radius: 3px;*/
+  border-radius: 3px;
 }
 
 .powerstate-toggle-button {

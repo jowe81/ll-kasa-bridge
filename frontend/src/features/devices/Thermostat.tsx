@@ -9,6 +9,7 @@ const Thermostat = (props) => {
   const device: Device = props.thermostat;
   const handleThermostatClick = props.handleThermostatClick;
   const bgIconClass = `none`;
+  const powerState = device.powerState;
 
   useEffect(() => {
     setTarget(device.state.target);
@@ -18,16 +19,25 @@ const Thermostat = (props) => {
     }  
   }, [device])  
   
-  const targetField =  <div className='thermostat-button boxed'>{target}°C</div>;
+  
+  let downButtonClasses = 'thermostat-button button-border boxed thermostat-arrow-down';
+  let targetFieldClasses = 'thermostat-button boxed thermostat-target';
+  let upButtonClasses = 'thermostat-button button-border boxed thermostat-arrow-up';
+  if (!powerState) {
+    downButtonClasses += ' thermostat-button-disabled';
+    targetFieldClasses += ' thermostat-target-disabled';
+    upButtonClasses += ' thermostat-button-disabled';
+  }
+
 
   let html = <></>;
 
   html = (
     <>
       <div className='thermostat-buttons'>
-        <div className='thermostat-button button-border boxed' data-device-channel={device.channel} data-action='down' onClick={handleThermostatClick}>Down</div>
-       { targetField }
-        <div className='thermostat-button button-border boxed' data-device-channel={device.channel} data-action='up' onClick={handleThermostatClick}>Up</div>
+        <div className={downButtonClasses} data-device-channel={device.channel} data-action='down' onClick={handleThermostatClick}></div>
+        <div className={targetFieldClasses}>{target}°C</div>
+        <div className={upButtonClasses} data-device-channel={device.channel} data-action='up' onClick={handleThermostatClick}></div>
       </div>
     </>
   );
