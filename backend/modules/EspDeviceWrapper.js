@@ -486,10 +486,21 @@ const EspDeviceWrapper = {
   _updateState(payload) {
     this.lastSeenAt = Date.now();
 
+    if (typeof payload === 'undefined') {
+      log(`Error: Undefined payload in state update. Ignoring.`, this, 'bgRed');
+      return;
+    }
+
     switch (this.type) {
       case constants.DEVICETYPE_ESP_RELAY:
         // It sends back a string! Dang!
-        payload = (payload === 'true' || payload) ? true : false;
+        if (payload === 'true') {
+          payload = true;          
+        }
+
+        if (payload ==='false') {
+          payload = false;
+        }
         break;
 
       case constants.DEVICETYPE_ESP_THERMOMETER:
