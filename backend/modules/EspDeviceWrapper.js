@@ -483,13 +483,13 @@ const EspDeviceWrapper = {
     }  
   },
 
-  _updateState(payload, trendData) {
+  _updateState(payload) {
     this.lastSeenAt = Date.now();
 
     switch (this.type) {
       case constants.DEVICETYPE_ESP_RELAY:
         // It sends back a string! Dang!
-        payload = payload === 'true' ? true : false;
+        payload = (payload === 'true' || payload) ? true : false;
         break;
 
       case constants.DEVICETYPE_ESP_THERMOMETER:
