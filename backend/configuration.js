@@ -535,11 +535,11 @@ const globalConfig = {
       displayType: constants.SUBTYPE_LIGHT,
     },
     {       
-      id: "group-hallwayLights",
+      id: "group-hallwayCeiling",
       name: "Hallway Lights",
       channels: [ 8, 9 ],
       class: 'class-kitchenLights',
-      displayLabel: 'Ceiling',
+      displayLabel: 'Hallway',
       displayType: constants.SUBTYPE_LIGHT,
     },
     {
@@ -675,11 +675,11 @@ const deviceMap = [
 
   //Hallway
   {
-    alias: 'Hallway Ceiling 1', //Hallway ceiling 2?
+    alias: 'Hallway Ceiling 1', //Hallway ceiling 2?    
     channel: 8,
     class: 'class-hallwayLights',
     id: "80121D6F58ADDCAC185363C01347F5EA1F752B55",
-    locationId: 'loc-hallway',
+    locationId: 'loc-kitchen',
     subType: SUBTYPE_BULB,
   },
   {
@@ -687,7 +687,7 @@ const deviceMap = [
     channel: 9, 
     class: 'class-hallwayLights',
     id: "8012DA57516B98CCFFE6467D8F4F01691F73C975",
-    locationId: 'loc-hallway',
+    locationId: 'loc-kitchen',
     subType: SUBTYPE_BULB,
   },
 
@@ -1265,7 +1265,17 @@ const deviceMap = [
         short: {
           label: 'short',
           avg_calc_history_length: 15 * MINUTE,
-          avg_calc_data_window: 3 * MINUTE,    
+          avg_calc_data_window: 1 * MINUTE,    
+        },
+        mid: {
+          label: 'mid',
+          avg_calc_history_length: 45 * MINUTE,
+          avg_calc_data_window: 5 * MINUTE,    
+        },
+        long: {
+          label: 'long',
+          avg_calc_history_length: 90 * MINUTE,
+          avg_calc_data_window: 10 * MINUTE,    
         },
       },      
     }
@@ -1287,7 +1297,17 @@ const deviceMap = [
         short: {
           label: 'short',
           avg_calc_history_length: 15 * MINUTE,
-          avg_calc_data_window: 3 * MINUTE,    
+          avg_calc_data_window: 1 * MINUTE,    
+        },
+        mid: {
+          label: 'mid',
+          avg_calc_history_length: 45 * MINUTE,
+          avg_calc_data_window: 5 * MINUTE,    
+        },
+        long: {
+          label: 'long',
+          avg_calc_history_length: 90 * MINUTE,
+          avg_calc_data_window: 10 * MINUTE,    
         },
       },      
     }

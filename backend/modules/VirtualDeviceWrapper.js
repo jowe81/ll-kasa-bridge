@@ -5,7 +5,7 @@ import { log, debug } from './Log.js';
 import { globalConfig } from '../configuration.js';
 import { resolveDeviceDependencies } from './DependencyResolver.js';
 import { makeLiveDeviceObject } from './TargetDataProcessor.js';
-import { thermostatIntervalHandler } from './virtualDeviceProcessing/thermostat.js';
+import { thermostatHandler } from './virtualDeviceProcessing/thermostat.js';
 
 const cmdPrefix = '[CMD]';
 const cmdFailPrefix = '[FAIL]';
@@ -45,13 +45,7 @@ const VirtualDeviceWrapper = {
   },
 
   getPowerState() {
-    switch (this.subType) {
-      case constants.SUBTYPE_THERMOSTAT:
-      default:
-        return this.powerState;
-        break;
-    }    
-    
+    return this.powerState;    
   },
 
   init(mapItem, globalConfig, deviceEventCallback, devicePool, socketHandler) {
@@ -87,48 +81,15 @@ const VirtualDeviceWrapper = {
       }
     });
     
+    this._deviceHandlers = {};
+         
 
-    let modes = [];
-    if (this.settings.heat) modes.push('heat');
-    if (this.settings.cool) modes.push('cool');
-
-    if (!modes.length) {
-      // No mode configured.
-      return false;
+    switch (this.subType) {
+      case constants.SUBTYPE_THERMOSTAT:
+        this._deviceHandlers = thermostatHandler(devicePool, this);
+        this._deviceHandlers.init();
     }
-
-    this.state.target = this.settings.target ?? localConstants.thermostat.TARGET_DEFAULT;
-
-    log(`Initializing ${this.subType} for location ${this.location}. Mode is ${ modes.join(' and ') }, hysteresis is ${this.settings.hysteresis}°C.`, this);
-    this.start();
-  },
-
-
-  nudgeTarget(up) {
-    const baseAmount = this.settings?.nudgeBy ?? 0.5;
-    const amount = up ? baseAmount : -baseAmount
-
-    this.setTarget(this.state.target + amount);
-  },
-
-  setTarget(tempC) {
-    const minTarget = localConstants.thermostat.TARGET_MIN;
-    const maxTarget = localConstants.thermostat.TARGET_MAX;
-
-    if (!(tempC > 0 && tempC <= maxTarget && tempC >= minTarget)) {
-      log(`Attempt to set invalid target temperature: ${tempC}°C. Allowed min/max: ${minTarget}°C / ${maxTarget}°C.`, this);
-      return;
-    }
-
-    log(`Setting target to ${tempC}°C`, this);
-
-    const currentState = this.state;
-    const newState = {
-      ...currentState,
-      target: tempC,
-    };
     
-    this._updateState(newState);
   },
 
   setPowerState(newPowerState, triggerSwitchPosition, origin) {
@@ -152,28 +113,6 @@ const VirtualDeviceWrapper = {
     
   },
 
-
-
-  // Start operating.
-  start() {
-    this.interval = 5000;// this._runPreChecks();
-
-    if (!this.interval) {
-      log(`Unable to start thermostat for ${this.location}. Check configuration.`, this, 'bgRed');
-      return;
-    }
-
-    let modes = [];
-    if (this.settings.heat) modes.push('heat');
-    if (this.settings.cool) modes.push('cool');
-    
-    log(`Check-Interval: ${ Math.ceil(this.interval / constants.SECOND) } seconds. Target: ${this.settings.target}°C.`, this);
-
-    // Turn off when first starting.
-    this.setPowerState(false);
-
-  },
-
   toggle(origin) {    
     this.setPowerState(!this.getPowerState(), null, origin);
   },
@@ -188,7 +127,7 @@ const VirtualDeviceWrapper = {
 
       switch (this.subType) {
         case constants.SUBTYPE_THERMOSTAT:
-          thermostatIntervalHandler(this.devicePool, this, localConstants);
+          this._checkingIntervalHandler = this._deviceHandlers?.thermostatIntervalHandler(this.devicePool, this, localConstants);
           break;
       }
     }
@@ -226,57 +165,6 @@ const VirtualDeviceWrapper = {
     }
 
     return data;
-  },
-
-  /**
-   * Run checks to make sure required devices are present and settings ok. Returns interval > 0 or false.
-   * @returns integer|boolean
-   */
-  _runPreChecks() {
-    const { settings } = this;
-
-    // Check interval
-    let interval = settings.checkInterval ?? (globalConfig[this.type] && globalConfig[this.type].pollInterval) ?? constants.ESP_DEFAULT_POLL_INTERVAL;
-
-    if (interval < localConstants.thermostat.MIN_CHECKING_INTERVAL) {
-      interval = localConstants.thermostat.MIN_CHECKING_INTERVAL;
-      settings.checkInterval = interval;      
-    }
-
-    // Target temperature
-    let target = settings.target;
-
-    if (!(target >= localConstants.thermostat.TARGET_MIN && target <= localConstants.thermostat.TARGET_MAX)) {
-      target = localConstants.thermostat.TARGET_DEFAULT;
-      settings.target = target;
-    }
-
-    let heatersVerified = false;
-    let acsVerified = false;
-
-    // Verify required device(s)
-    if (settings.heat) {
-      heatersVerified = this._verifyDevices(constants.SUBTYPE_AIR_HEAT, settings.heaters);
-    } else {
-      heatersVerified = true;      
-    }
-
-    if (settings.cool) {
-      acsVerified = this._verifyDevices(constants.SUBTYPE_AIR_HEAT, settings.acs);
-    } else {
-      acsVerified = true;      
-    }
-
-    const allDevicesVerified = heatersVerified && acsVerified;
-
-    if (!allDevicesVerified) {
-      log(`Thermostat error: could not verify devices required for the configured mode.`, this);
-      return false;
-    }
-
-    log(`Verified ${settings.heaters?.length ?? 0} heater(s), ${settings.acs?.length ?? 0} air conditioner(s).`, this);
-
-    return interval;
   },
 
   _verifyDevices(hvacType, channels) {

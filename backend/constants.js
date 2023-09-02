@@ -103,8 +103,8 @@ constants.DEVICETYPE_DEFAULTS = {
   [constants.DEVICETYPE_VIRTUAL]: {
     [constants.SUBTYPE_THERMOSTAT]: {
       // Do not check more often than the minimum set here.
-      MIN_CHECKING_INTERVAL: 10 * constants.SECOND,
-  
+      CHECKING_INTERVAL_MIN: 10 * constants.SECOND,
+      CHECKING_INTERVAL_DEFAULT: 1 * MINUTE,
       // Boundaries for target temperature settings.
       TARGET_MAX: 30,
       TARGET_MIN: 10,

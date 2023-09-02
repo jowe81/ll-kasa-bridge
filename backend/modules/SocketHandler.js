@@ -75,11 +75,11 @@ const socketHandler = {
                 break;                
 
               case 'thermostatDown':
-                deviceWrapper.nudgeTarget(false);
+                deviceWrapper._deviceHandlers?.nudgeTarget(false);
                 break;
 
               case 'thermostatUp':
-                deviceWrapper.nudgeTarget(true);
+                deviceWrapper._deviceHandlers?.nudgeTarget(true);
                 break;
                   
             }
