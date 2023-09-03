@@ -1414,6 +1414,32 @@ const deviceMap = [
       cool: false,    // Should the room be cooled?
     }
   },
+  {
+    alias: 'Kitchen Timer',
+    channel: 209,
+    id: 'timer-kitchen',
+    display: true,
+    displayLabel: 'Timer',
+    displayType: constants.SUBTYPE_TIMER,
+    locationId: 'loc-kitchen',
+    type: constants.DEVICETYPE_VIRTUAL,
+    subType: constants.SUBTYPE_TIMER,
+    settings: {
+      checkInterval: 1 * SECOND,
+      timers: [
+        {
+          length: 3 * MINUTE,
+          ttl: 3 * MINUTE,
+          audiofile: null,
+        },
+        {
+          length: 4 * MINUTE,
+          ttl: 3 * MINUTE,
+          audiofile: null,
+        }
+      ],
+    }
+  },
 
   
 

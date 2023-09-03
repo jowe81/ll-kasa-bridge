@@ -12,6 +12,8 @@ import { log } from './Log.js';
 
 import { isBetweenDuskAndDawn, isDawnOrDusk, isDawn, isDusk, getFromSettingsForNextSunEvent } from '../helpers/jDateTimeUtils.js';
 import { loadFilterPlugins } from './Filters.js';
+import { loadDeviceHandlerPlugins } from './VirtualDeviceHandlers.js';
+
 import { globalConfig } from '../configuration.js';
 import { socketHandler } from './SocketHandler.js';
 
@@ -52,10 +54,11 @@ const devicePool = {
 
     await this.loadGlobalConfiguration();
 
-    loadFilterPlugins();
+    await loadFilterPlugins();
+    await loadDeviceHandlerPlugins();
+    await this.initDeviceWrappers();
+    
     this.startPeriodicServices();
-
-    this.initDeviceWrappers();
     this.initLocations();
     this.startDiscovery();
   },
@@ -375,7 +378,7 @@ const devicePool = {
       }
     }
     
-    // Store a backreference to the pool and to the socket handler in each wrapper
+    // Store a backreference to the pool and to the socket deviceHandler in each wrapper
     deviceWrapper.devicePool = this;
     deviceWrapper.socketHandler = this.socketHandler;
     

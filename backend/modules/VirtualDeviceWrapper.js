@@ -5,7 +5,7 @@ import { log, debug } from './Log.js';
 import { globalConfig } from '../configuration.js';
 import { resolveDeviceDependencies } from './DependencyResolver.js';
 import { makeLiveDeviceObject } from './TargetDataProcessor.js';
-import { thermostatHandler } from './virtualDeviceProcessing/thermostat.js';
+import { getDeviceHandlerPlugins } from './VirtualDeviceHandlers.js';
 
 const cmdPrefix = '[CMD]';
 const cmdFailPrefix = '[FAIL]';
@@ -80,16 +80,13 @@ const VirtualDeviceWrapper = {
         return false;
       }
     });
-    
-    this._deviceHandlers = {};
-         
+        
+    this.deviceHandler = {};         
 
-    switch (this.subType) {
-      case constants.SUBTYPE_THERMOSTAT:
-        this._deviceHandlers = thermostatHandler(devicePool, this);
-        this._deviceHandlers.init();
-    }
-    
+    // Device-specific initialization (using plugin)
+    const deviceHandlerPlugins = getDeviceHandlerPlugins();
+    const getHandlerInstance = deviceHandlerPlugins[`${this.subType}Handler`].default;    
+    this.deviceHandler = getHandlerInstance(devicePool, this);    
   },
 
   setPowerState(newPowerState, triggerSwitchPosition, origin) {
@@ -104,34 +101,13 @@ const VirtualDeviceWrapper = {
     
     this._updateState(newState);
 
-    switch (this.subType) {
-      case constants.SUBTYPE_THERMOSTAT:
-        log(`Thermostat turned ${newPowerState ? 'on' : 'off'}.`, this);
-        break;
-        
-    }    
-    
+    log(`Virtual ${this.subType} turned ${newPowerState ? 'on' : 'off'}.`, this);  
   },
 
   toggle(origin) {    
     this.setPowerState(!this.getPowerState(), null, origin);
   },
 
-  updateIntervalHandler() {
-    if (this._checkingIntervalHandler) {
-      // Clear always. If needed it will be rescheduled below.
-      clearInterval(this._checkingIntervalHandler);
-    }
-
-    if (this.interval) {
-
-      switch (this.subType) {
-        case constants.SUBTYPE_THERMOSTAT:
-          this._checkingIntervalHandler = this._deviceHandlers?.thermostatIntervalHandler(this.devicePool, this, localConstants);
-          break;
-      }
-    }
-  },
 
   getLiveDevice() {
     return makeLiveDeviceObject(
@@ -167,26 +143,6 @@ const VirtualDeviceWrapper = {
     return data;
   },
 
-  _verifyDevices(hvacType, channels) {
-    if (!(hvacType && channels && channels.length)) {
-      return false;
-    }
-
-    let verified = true;
-
-    channels.every(channel => {
-      const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(channel);
-
-      if (!(deviceWrapper && deviceWrapper.locationId === this.locationId && deviceWrapper.hvacType === hvacType)) {
-        // Quit early if non-compliant device was found.
-        verified = false;
-        return false;
-      }
-    });
-
-    return verified;
-  },
-
   _updateOnlineState(isRunning) {
     if (isRunning) {
       this.isOnline = isRunning;
@@ -200,7 +156,6 @@ const VirtualDeviceWrapper = {
     if (!_.isEqual(this.state, payload)) {
       this.state = _.cloneDeep(payload);
       this.powerState = this.state.powerState;
-      this.updateIntervalHandler();
       this.socketHandler.emitDeviceStateUpdate(this, this.analyzeStateChange(payload));      
     }    
   }

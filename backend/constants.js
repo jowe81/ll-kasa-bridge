@@ -50,6 +50,7 @@ const constants = {
   SUBTYPE_ENTERTAINMENT: 'entertainment',  
 
   SUBTYPE_THERMOSTAT: 'thermostat',
+  SUBTYPE_TIMER: 'timer',
 
   // Service names
   SERVICE_PERIODIC_FILTER: 'Periodic Filter Service',
@@ -78,6 +79,7 @@ constants.SUBTYPES = [
   constants.SUBTYPE_SWITCH,
   constants.SUBTYPE_THERMOMETER,
   constants.SUBTYPE_THERMOSTAT,
+  constants.SUBTYPE_TIMER,
 ]
 
 constants.DEVICETYPES_LIGHTING = [
@@ -112,8 +114,14 @@ constants.DEVICETYPE_DEFAULTS = {
   
       // If we haven't had a room temperature update during this time, shut off HVAC devices.
       SAFETY_SHUTOFF_DELAY: 2 * constants.MINUTE,
-    }  
-  }
+    },
+
+    [constants.SUBTYPE_TIMER]: {
+      CHECKING_INTERVAL_MIN: 1 * constants.SECOND,
+      CHECKING_INTERVAL_DEFAULT: 1 * constants.SECOND,
+    },  
+  },
+
 };
 
 export default constants;

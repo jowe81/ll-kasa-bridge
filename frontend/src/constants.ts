@@ -45,6 +45,7 @@ const constants: any = {
   SUBTYPE_ENTERTAINMENT: 'entertainment',
 
   SUBTYPE_THERMOSTAT: 'thermostat',
+  SUBTYPE_TIMER: 'timer',
 
   // Service names
   SERVICE_PERIODIC_FILTER: 'Periodic Filter Service',
