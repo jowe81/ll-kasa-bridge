@@ -1408,8 +1408,8 @@ const deviceMap = [
     type: constants.DEVICETYPE_VIRTUAL,
     subType: constants.SUBTYPE_THERMOSTAT,    
     settings: {
-      hysteresis: 1,  // Hysteresis in degrees Celsius
-      checkInterval: 1 * MINUTE,
+      hysteresis: 0.5,  // Hysteresis in degrees Celsius
+      checkInterval: 30 * SECOND,
       heat: true,     // Should the room be heated?
       cool: false,    // Should the room be cooled?
     }
@@ -1425,7 +1425,7 @@ const deviceMap = [
     type: constants.DEVICETYPE_VIRTUAL,
     subType: constants.SUBTYPE_TIMER,
     settings: {
-      checkInterval: 1 * SECOND,
+      checkInterval: 30 * SECOND,
       timers: [
         {
           length: 3 * MINUTE,

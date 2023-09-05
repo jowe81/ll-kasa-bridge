@@ -85,8 +85,11 @@ const VirtualDeviceWrapper = {
 
     // Device-specific initialization (using plugin)
     const deviceHandlerPlugins = getDeviceHandlerPlugins();
-    const getHandlerInstance = deviceHandlerPlugins[`${this.subType}Handler`].default;    
-    this.deviceHandler = getHandlerInstance(devicePool, this);    
+    const handlerGenerator = deviceHandlerPlugins[`${this.subType}Handler`];
+    if (handlerGenerator) {
+      const getHandlerInstance = deviceHandlerPlugins[`${this.subType}Handler`].default;    
+      this.deviceHandler = getHandlerInstance(devicePool, this);      
+    }
   },
 
   setPowerState(newPowerState, triggerSwitchPosition, origin) {

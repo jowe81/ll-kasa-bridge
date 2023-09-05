@@ -108,12 +108,18 @@ constants.DEVICETYPE_DEFAULTS = {
       CHECKING_INTERVAL_MIN: 10 * constants.SECOND,
       CHECKING_INTERVAL_DEFAULT: 1 * MINUTE,
       // Boundaries for target temperature settings.
-      TARGET_MAX: 30,
-      TARGET_MIN: 10,
+      TARGET_MAX: 28,
+      TARGET_MIN: 15,
       TARGET_DEFAULT: 22,
   
       // If we haven't had a room temperature update during this time, shut off HVAC devices.
       SAFETY_SHUTOFF_DELAY: 2 * constants.MINUTE,
+
+      // Shut off room heating if this temperature is exceeded (including when thermostat is off)
+      SAFETY_SHUTOFF_HIGH_TEMP: 30,
+
+      // Shut off airconditioning if it gets colder (including when thermostat is off)
+      SAFETY_SHUTOFF_LOW_TEMP: 13,
     },
 
     [constants.SUBTYPE_TIMER]: {
