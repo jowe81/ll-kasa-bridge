@@ -119,8 +119,36 @@ const log = (text, color = null, err) => {
   }  
 }
 
+
+const findByField = (field, value, arr, returnIndex = false) => {
+  if (!field || !value || !arr) {
+    return null;
+  }
+
+  let foundItem = null;
+  let foundIndex = null;
+
+  arr.every((item, index) => {
+    if (item && (item[field] === value)) {
+      foundItem = item;
+      foundIndex = index;
+      return false;
+    }
+
+    return true;
+  })
+
+  return returnIndex ? foundIndex : foundItem;
+}
+
+const findById = (id, arr) => {
+  return findByField('id', id, arr);
+}
+
 export {
     allAreBoolean,
+    findByField,
+    findById,
     getFileNames,
     getFormattedDate,
     getSystemConstants,

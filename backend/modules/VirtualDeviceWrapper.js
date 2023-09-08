@@ -86,7 +86,9 @@ const VirtualDeviceWrapper = {
     // Device-specific initialization (using plugin)
     const deviceHandlerPlugins = getDeviceHandlerPlugins();
     const handlerGenerator = deviceHandlerPlugins[`${this.subType}Handler`];
+
     if (handlerGenerator) {
+      log(`Instantiating handler for device of type: ${this.type}/${this.subType}`, this);
       const getHandlerInstance = deviceHandlerPlugins[`${this.subType}Handler`].default;    
       this.deviceHandler = getHandlerInstance(devicePool, this);      
     }
@@ -104,7 +106,7 @@ const VirtualDeviceWrapper = {
     
     this._updateState(newState);
 
-    log(`Virtual ${this.subType} turned ${newPowerState ? 'on' : 'off'}.`, this);  
+    log(`${this.subType} turned ${newPowerState ? 'on' : 'off'}.`, this);  
   },
 
   toggle(origin) {    

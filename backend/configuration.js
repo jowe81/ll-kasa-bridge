@@ -1425,18 +1425,28 @@ const deviceMap = [
     type: constants.DEVICETYPE_VIRTUAL,
     subType: constants.SUBTYPE_TIMER,
     settings: {
-      checkInterval: 30 * SECOND,
       timers: [
         {
+          id: '3m',
+          label: null, // will be set to id if undefined or null
           length: 3 * MINUTE,
+          ttl: 3 * MINUTE,
+          repeatAlarmEvery: 30 * SECOND, // will default to a minute if undefined or null
+          audiofile: null,
+        },
+        {
+          id: '4m',          
+          length: 4 * MINUTE,
           ttl: 3 * MINUTE,
           audiofile: null,
         },
         {
-          length: 4 * MINUTE,
+          id: '6m30',
+          length: 6 * MINUTE + 30 * SECOND,
           ttl: 3 * MINUTE,
           audiofile: null,
-        }
+        },
+
       ],
     }
   },

@@ -39,24 +39,6 @@ const loadDeviceHandlerPlugins = async () => {
   
     log(`Loaded ${Object.keys(handlerPlugins).length} device handler(s).`);
     
-    // Object.keys(handlerPlugins).forEach(pluginName => {
-    //   const deviceHandlerPlugin = handlerPlugins[pluginName];
-
-    //   /**
-    //    * Initialize this plugin. The wrapper MUST return an init function 
-    //    * and may return additional functions and data.
-    //    */
-    //   const { init, functions, data } = deviceHandlerPlugin.default();
-
-    //   if (!init) {
-    //     log(`Failed to initialize device handler plugin '${pluginName}. Make sure it returns a function 'init'.`, 'red');        
-    //   }
-
-    //   log(`Initialized device handler plugin '${pluginName}'`)
-    //   console.log(deviceHandlerPlugin)
-    //   handlerPlugins[pluginName] = deviceHandlerPlugin.default();
-    // });
-
     // Cache them so next time we don't have to do the fs operations
     cachedDeviceHandlerPlugins = handlerPlugins;
 
