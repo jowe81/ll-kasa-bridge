@@ -119,13 +119,12 @@ const socketHandler = {
   },
 
   // Push device state update
-  emitDeviceStateUpdate(deviceWrapper, changeInfo) {
+  emitDeviceStateUpdate(data, changeInfo) {
     const payload = {
       changeInfo,
-      data: deviceWrapper.getLiveDeviceStateUpdate(),
+      data,
     };
-
-    // [201, 202].includes(deviceWrapper.channel) && console.log('PARTIAL update', payload)
+    
     this.io.emit('auto/device/state', payload);
   },
 

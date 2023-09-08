@@ -151,7 +151,7 @@ const EspDeviceWrapper = {
                 // This is the initial state update.
                 log(`Received initial state update.`, this);
                 this._updateState(payload);
-                this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
+                this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo);
                 return;
               }
 
@@ -191,7 +191,7 @@ const EspDeviceWrapper = {
                 // This is the initial state update.
                 log(`Received initial state update.`, this);
                 this._updateState(payload);
-                this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
+                this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo);
                 return;
               }
 
@@ -206,7 +206,7 @@ const EspDeviceWrapper = {
                 // This is the initial state update.
                 log(`Received initial state update.`, this);
                 this._updateState(payload);
-                this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
+                this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo);
                 return;
               }
 
@@ -221,7 +221,7 @@ const EspDeviceWrapper = {
           if (changeInfo?.changed) {
             // This is an actual change.
             this._updateState(payload);
-            this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
+            this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo);
           } else {
             // No change.
             return;
@@ -443,7 +443,7 @@ const EspDeviceWrapper = {
 
           this._updateCache(newPowerState);
           this._updateState(newPowerState);
-          this.socketHandler.emitDeviceStateUpdate(this, this.analyzeStateChange(this.state));
+          this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), this.analyzeStateChange(this.state));
 
         } catch (err) {
           if (!this.__failCount) {

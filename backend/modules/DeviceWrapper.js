@@ -44,7 +44,7 @@ const cmdFailPrefix = '[FAIL]';
         return;
       }
 
-      this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
+      this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo);
       
       const event = this.getPowerState() ? 'power-on' : 'power-off';
       log(event, this);
@@ -82,7 +82,7 @@ const cmdFailPrefix = '[FAIL]';
         return;
       }
 
-      this.socketHandler.emitDeviceStateUpdate(this, changeInfo);
+      this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo);
 
       // Was it an on/off change?
       if (!changeInfo.on_off) {
@@ -831,7 +831,7 @@ const cmdFailPrefix = '[FAIL]';
     this.flushCommandCache();
     this.startPolling();
     this.lastSeenAt = Date.now();                 
-    socketHandler.emitDeviceStateUpdate(this);
+    socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate());
   },
 
   setOffline() {
@@ -839,7 +839,7 @@ const cmdFailPrefix = '[FAIL]';
     this.offlineSince = offlineSince;
     this.isOnline = false;
     this.stopPolling();
-    socketHandler.emitDeviceStateUpdate(this);
+    socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate());
 
     const self = this;
     log('Setting timeout to discard Powerstate', this, 'yellow');
@@ -849,7 +849,7 @@ const cmdFailPrefix = '[FAIL]';
         // Onlinestate has not changed since the timeout was set; discard powerstate
         log('Discarding Powerstate', this, 'yellow');
         this.powerState = undefined;
-        socketHandler.emitDeviceStateUpdate(this, { changed: true, on_off: true });
+        socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), { changed: true, on_off: true });
       } else {
         // Online state has changed at least once since the timeout was set, discard the timeout.
         clearTimeout(handle);

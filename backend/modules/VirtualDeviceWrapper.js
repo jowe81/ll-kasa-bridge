@@ -90,7 +90,7 @@ const VirtualDeviceWrapper = {
     if (handlerGenerator) {
       log(`Instantiating handler for device of type: ${this.type}/${this.subType}`, this);
       const getHandlerInstance = deviceHandlerPlugins[`${this.subType}Handler`].default;    
-      this.deviceHandler = getHandlerInstance(devicePool, this);      
+      this.deviceHandler = getHandlerInstance(devicePool, this);  
     }
   },
 
@@ -115,6 +115,11 @@ const VirtualDeviceWrapper = {
 
 
   getLiveDevice() {
+    if (typeof this.deviceHandler.getLiveDevice === 'function') {
+      return this.deviceHandler.getLiveDevice();
+    }
+
+    // Default
     return makeLiveDeviceObject(
       this, [
         // Include
@@ -135,7 +140,7 @@ const VirtualDeviceWrapper = {
    */
   getLiveDeviceStateUpdate() {
     const data = {
-      state: this.state,
+      state: this._getState(),
       channel: this.channel,
       isOnline: this.isOnline,
     };
@@ -146,6 +151,17 @@ const VirtualDeviceWrapper = {
     }
 
     return data;
+  },
+
+  /**
+   * Get the state from the handler if it supports it.
+   */
+  _getState() {
+    if (typeof this.deviceHandler.getState === 'function') {
+      return this.deviceHandler.getState();
+    }
+
+    return this.state;
   },
 
   _updateOnlineState(isRunning) {
@@ -161,7 +177,7 @@ const VirtualDeviceWrapper = {
     if (!_.isEqual(this.state, payload)) {
       this.state = _.cloneDeep(payload);
       this.powerState = this.state.powerState;
-      this.socketHandler.emitDeviceStateUpdate(this, this.analyzeStateChange(payload));      
+      this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), this.analyzeStateChange(payload));      
     }    
   }
   

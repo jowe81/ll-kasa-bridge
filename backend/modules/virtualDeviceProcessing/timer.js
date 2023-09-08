@@ -3,9 +3,8 @@ import _ from "lodash";
 import constants from "../../constants.js";
 import { log, debug } from '..//Log.js';
 import { findByField, findById } from "../../helpers/jUtils.js";
-
+import { makeLiveDeviceObject } from '../TargetDataProcessor.js';
 import { spawn } from 'child_process';
-
 
 const localConstants = constants.DEVICETYPE_DEFAULTS[constants.DEVICETYPE_VIRTUAL][constants.SUBTYPE_TIMER];
 
@@ -18,6 +17,26 @@ class TimerHandler {
     this.deviceWrapper = deviceWrapper;
 
     this.init();
+  };
+
+  getLiveDevice() {
+    console.log('Getting LiveDevice from Timer');
+    return makeLiveDeviceObject(this, [
+        // Include
+        'powerState',
+      ], {
+        // Default
+        'display': true,
+      }, [
+        // Exclude
+      ],
+      // Use global defaults
+      true,
+    );
+  };
+
+  getState() {
+    return this.state;
   };
 
   init() {
@@ -35,7 +54,8 @@ class TimerHandler {
     
     this.deviceWrapper._deviceHandlers = this;
 
-    this.liveTimers = [];
+    this.state = {};
+    this.state.liveTimers = [];
 
     // Start the interval check
     if (this._checkingIntervalHandler) {
@@ -45,6 +65,7 @@ class TimerHandler {
     this._checkingIntervalHandler = setInterval(() => this.timerIntervalHandler(), this.deviceWrapper.interval ?? localConstants.CHECKING_INTERVAL_DEFAULT);
     
     this.initialized = true;    
+    this.setTimerFor(30 * constants.SECOND);
   };
 
 
@@ -52,7 +73,7 @@ class TimerHandler {
    * Find a live timer by id
    */
   _getLiveTimer(timerId) {
-    const liveTimer = findById(timerId, this.liveTimers);
+    const liveTimer = findById(timerId, this.state.liveTimers);
   };
 
   /**
@@ -93,7 +114,8 @@ class TimerHandler {
 
     log(`Set timer for ${timer.hLength}: ${JSON.stringify(timer)}`, this.deviceWrapper);
 
-    this.liveTimers.push(timer);
+    this.state.liveTimers.push(timer);
+    
   };
 
   /**
@@ -115,10 +137,10 @@ class TimerHandler {
    * Silence/terminate the live timer object that's passed in.
    */
   killLiveTimer(liveTimer) {
-    const index = findByField('expires', liveTimer.expires, this.liveTimers, true);
+    const index = findByField('expires', liveTimer.expires, this.state.liveTimers, true);
     console.log('Killing timer at Index: ', index);
     if (index !== null) {
-      this.liveTimers.splice(index, 1);
+      this.state.liveTimers.splice(index, 1);
     }
   };
 
@@ -169,7 +191,7 @@ class TimerHandler {
       return false;
     }
 
-    this.liveTimers.forEach((liveTimer, index) => {
+    this.state.liveTimers.forEach((liveTimer, index) => {
       const now = Date.now();
       liveTimer.expiresIn = liveTimer.expires - now;
 
@@ -193,7 +215,16 @@ class TimerHandler {
           this.killLiveTimer(liveTimer);
         }
       }
-    });    
+    });  
+    
+    const changeInfo = {
+      on_off: false,
+      timers: this.state.liveTimers.length ? true : false, // If there are live timers, they are changing.
+    }
+
+    if (changeInfo.timers) {
+      this.deviceWrapper.socketHandler.emitDeviceStateUpdate(this.deviceWrapper.getLiveDeviceStateUpdate(), changeInfo);
+    }
   };
 
   /**
