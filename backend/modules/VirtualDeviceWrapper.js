@@ -54,6 +54,10 @@ const VirtualDeviceWrapper = {
     this.devicePool = devicePool;
     this.socketHandler = socketHandler;
 
+    this.listeners = {
+      'powerState': [],
+    };
+
     const requiredFields = ['alias', 'channel', 'id', 'settings', 'display', 'locationId', 'type', 'subType'];
 
     this.alias = mapItem.alias;
@@ -106,7 +110,7 @@ const VirtualDeviceWrapper = {
 
     this._updateState(newState);
 
-    log(`${this.subType} turned ${newPowerState ? 'on' : 'off'}.`, this);  
+    log(`Power state change: ${this.subType} turned ${newPowerState ? 'on' : 'off'}.`, this);  
   },
 
   toggle(origin) {  
@@ -150,6 +154,13 @@ const VirtualDeviceWrapper = {
     return data;
   },
 
+  subscribeListener(event, listenerFn) {
+    switch (event) {
+      case 'powerState':
+        this.listeners.powerState.push(listenerFn);
+    }
+  },
+
   _emitDeviceStateUpdate(changeInfo) {
     this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo);
   },
@@ -163,6 +174,14 @@ const VirtualDeviceWrapper = {
     }
 
     return this.state;
+  },
+
+  _trigger(event, data) {
+    const functions = this.listeners[event];
+
+    if (functions) {
+      this.listeners[event].forEach(listenerFn => listenerFn(data));
+    }
   },
 
   _updateOnlineState(isRunning) {
@@ -182,6 +201,10 @@ const VirtualDeviceWrapper = {
       
       this.state = _.cloneDeep(payload);
       this.powerState = this.state.powerState;
+
+      if (changeInfo?.on_off) {
+        this._trigger('powerState', this.powerState);
+      }
 
       this._emitDeviceStateUpdate(changeInfo);      
     }    

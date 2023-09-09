@@ -80,6 +80,16 @@ class ThermostatHandler {
     this.thermostat.setPowerState(false);
     
     this.thermostat._deviceHandlers = this;
+
+    this.thermostat.subscribeListener('powerState', (newPowerState) => {
+
+      const location = this.devicePool.locations[this.thermostat.locationId];
+      if (!newPowerState && location) {
+        location.setHeating(false);
+        location.setCooling(false);
+        log(`Sending power-off command to heating and cooling in location ${location.name}.`, this.thermostat);
+      }
+    });
     
     log(`Initialized ${this.thermostat.subType} for location ${this.thermostat.location}. Mode is ${ modes.join(' and ') }, hysteresis is ${this.thermostat.settings.hysteresis}°C.`, this.thermostat);
     log(`Check-Interval: ${ Math.ceil(this.thermostat.interval / constants.SECOND) } seconds. Target: ${this.thermostat.settings.target}°C.`, this.thermostat);
