@@ -44,7 +44,7 @@ const cmdFailPrefix = '[FAIL]';
         return;
       }
 
-      this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo);
+      this._emitDeviceStateUpdate(changeInfo);
       
       const event = this.getPowerState() ? 'power-on' : 'power-off';
       log(event, this);
@@ -82,7 +82,7 @@ const cmdFailPrefix = '[FAIL]';
         return;
       }
 
-      this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo);
+      this._emitDeviceStateUpdate(changeInfo);
 
       // Was it an on/off change?
       if (!changeInfo.on_off) {
@@ -594,6 +594,7 @@ const cmdFailPrefix = '[FAIL]';
         log(`Found unmapped device at ${device.host} - ID ${device.id}, type ${device.type}`, this, 'magenta');
       }
     }
+    this._emitDeviceStateUpdate();
   },
 
   // After a change, see if linked devices need to be adjusted
@@ -831,7 +832,7 @@ const cmdFailPrefix = '[FAIL]';
     this.flushCommandCache();
     this.startPolling();
     this.lastSeenAt = Date.now();                 
-    socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate());
+    this._emitDeviceStateUpdate();
   },
 
   setOffline() {
@@ -839,7 +840,7 @@ const cmdFailPrefix = '[FAIL]';
     this.offlineSince = offlineSince;
     this.isOnline = false;
     this.stopPolling();
-    socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate());
+    this._emitDeviceStateUpdate();
 
     const self = this;
     log('Setting timeout to discard Powerstate', this, 'yellow');
@@ -849,7 +850,7 @@ const cmdFailPrefix = '[FAIL]';
         // Onlinestate has not changed since the timeout was set; discard powerstate
         log('Discarding Powerstate', this, 'yellow');
         this.powerState = undefined;
-        socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), { changed: true, on_off: true });
+        this._emitDeviceStateUpdate({ changed: true, on_off: true });
       } else {
         // Online state has changed at least once since the timeout was set, discard the timeout.
         clearTimeout(handle);
@@ -895,6 +896,10 @@ const cmdFailPrefix = '[FAIL]';
     this.periodicFiltersSuspended = false;
   },
 
+  _emitDeviceStateUpdate(changeInfo) {
+    this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo);
+  },
+  
   _updateState(data) {
     this.lastSeenAt = Date.now();
     this.state = _.cloneDeep(data);

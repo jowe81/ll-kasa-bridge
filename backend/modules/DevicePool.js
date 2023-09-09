@@ -93,8 +93,7 @@ const devicePool = {
         deviceWrapper = this.initDeviceWrapper(null, device);
       }
             
-      deviceWrapper.startPolling();
-      deviceWrapper.socketHandler.emitDeviceStateUpdate(deviceWrapper.getLiveDeviceStateUpdate());      
+      deviceWrapper.startPolling();      
     }
 
     const options = {

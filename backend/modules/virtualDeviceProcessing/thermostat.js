@@ -1,7 +1,7 @@
 import _ from "lodash";
-
+import { makeLiveDeviceObject } from '../TargetDataProcessor.js';
 import constants from "../../constants.js";
-import { log, debug } from '..//Log.js';
+import { log, debug } from '../Log.js';
 
 const localConstants = constants.DEVICETYPE_DEFAULTS[constants.DEVICETYPE_VIRTUAL][constants.SUBTYPE_THERMOSTAT];
 
@@ -15,6 +15,36 @@ class ThermostatHandler {
 
     this.init() 
   };
+
+  analyzeStateChange(oldState, newState) {
+    if (oldState === undefined) {
+      // Have no current state. Just received the first update.
+      return undefined;
+    }
+
+    let changeInfo = {};
+    changeInfo.changed = !_.isEqual(oldState, newState);
+    changeInfo.on_off = oldState?.powerState !== newState.powerState;
+    changeInfo.target = newState?.target !== oldState?.target;
+
+    return changeInfo;
+  };
+
+  getLiveDevice() {
+    return makeLiveDeviceObject(this.thermostat, [
+        // Include
+        'powerState',
+      ], {
+        // Default
+        'display': true,
+      }, [
+        // Exclude
+      ],
+      // Use global defaults
+      true,
+    );
+  };
+
 
   init() {
     if (!(this.thermostat && this.devicePool)) {
@@ -45,14 +75,15 @@ class ThermostatHandler {
       target = localConstants.TARGET_DEFAULT;
       this.thermostat.settings.target = target;
     }    
-    
-    log(`Initialized ${this.thermostat.subType} for location ${this.thermostat.location}. Mode is ${ modes.join(' and ') }, hysteresis is ${this.thermostat.settings.hysteresis}°C.`, this.thermostat);
-    log(`Check-Interval: ${ Math.ceil(this.thermostat.interval / constants.SECOND) } seconds. Target: ${this.thermostat.settings.target}°C.`, this.thermostat);
 
     // Turn off when first starting.
     this.thermostat.setPowerState(false);
     
     this.thermostat._deviceHandlers = this;
+    
+    log(`Initialized ${this.thermostat.subType} for location ${this.thermostat.location}. Mode is ${ modes.join(' and ') }, hysteresis is ${this.thermostat.settings.hysteresis}°C.`, this.thermostat);
+    log(`Check-Interval: ${ Math.ceil(this.thermostat.interval / constants.SECOND) } seconds. Target: ${this.thermostat.settings.target}°C.`, this.thermostat);
+
 
     // Start the interval check
     if (this._checkingIntervalHandler) {

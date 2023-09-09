@@ -45,7 +45,7 @@ const VirtualDeviceWrapper = {
   },
 
   getPowerState() {
-    return this.powerState;    
+    return this.state.powerState;    
   },
 
   init(mapItem, globalConfig, deviceEventCallback, devicePool, socketHandler) {
@@ -103,13 +103,13 @@ const VirtualDeviceWrapper = {
       ...currentState,
       powerState: newPowerState,
     };
-    
+
     this._updateState(newState);
 
     log(`${this.subType} turned ${newPowerState ? 'on' : 'off'}.`, this);  
   },
 
-  toggle(origin) {    
+  toggle(origin) {  
     this.setPowerState(!this.getPowerState(), null, origin);
   },
 
@@ -139,18 +139,19 @@ const VirtualDeviceWrapper = {
    * Return a state update to be emitted to the sockets
    */
   getLiveDeviceStateUpdate() {
+    const state = this._getState();
     const data = {
-      state: this._getState(),
+      state,
+      powerState: state.powerState,
       channel: this.channel,
-      isOnline: this.isOnline,
+      isOnline: this.isOnline,      
     };
 
-    switch (this.subType) {
-      case constants.SUBTYPE_THERMOSTAT:
-        data.powerState = this.getPowerState();
-    }
-
     return data;
+  },
+
+  _emitDeviceStateUpdate(changeInfo) {
+    this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo);
   },
 
   /**
@@ -175,9 +176,14 @@ const VirtualDeviceWrapper = {
     this.lastSeenAt = Date.now();
 
     if (!_.isEqual(this.state, payload)) {
+      const changeInfo = this.deviceHandler.analyzeStateChange ?
+       this.deviceHandler.analyzeStateChange(this.state, payload) :
+       undefined;
+      
       this.state = _.cloneDeep(payload);
       this.powerState = this.state.powerState;
-      this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), this.analyzeStateChange(payload));      
+
+      this._emitDeviceStateUpdate(changeInfo);      
     }    
   }
   

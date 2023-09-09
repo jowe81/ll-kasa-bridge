@@ -19,6 +19,18 @@ class TimerHandler {
     this.init();
   };
 
+  analyzeStateChange(newState) {
+    if (this.deviceWrapper.state === undefined) {
+      // Have no current state. Just received the first update.
+      return undefined;
+    }
+
+    let changeInfo = {};
+    changeInfo.changed = !_.isEqual(this.state, newState);
+
+    return changeInfo;
+  };
+
   getLiveDevice() {
     console.log('Getting LiveDevice from Timer');
     return makeLiveDeviceObject(this, [
@@ -65,7 +77,7 @@ class TimerHandler {
     this._checkingIntervalHandler = setInterval(() => this.timerIntervalHandler(), this.deviceWrapper.interval ?? localConstants.CHECKING_INTERVAL_DEFAULT);
     
     this.initialized = true;    
-    this.setTimerFor(30 * constants.SECOND);
+    //this.setTimerFor(30 * constants.SECOND);
   };
 
 
