@@ -1,4 +1,5 @@
 import NumPadButton from "./NumPadButton";
+import './numPad.css';
 
 function NumPad(props) {
 

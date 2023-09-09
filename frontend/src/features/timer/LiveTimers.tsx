@@ -1,20 +1,22 @@
 import LiveTimer from "./LiveTimer";
 
-function CurrentTimers(props) {
+import './liveTimers.css';
+
+function LiveTimers(props) {
 
   const liveTimers = [
     { label:'0:03:00' },
-    { label:'0:04:23' },
-    { label:'0:06:27' },
+    // { label:'0:04:23' },
+    // { label:'0:06:27' },
   ]
 
   const liveTimersJsx = liveTimers.map(timer => <LiveTimer timer={timer}/>);
 
   return (
-    <div className="timer-panel-item current-timers">
+    <div className="timer-panel-item live-timers">
       { liveTimersJsx }
     </div>
   )
 }
 
-export default CurrentTimers;
+export default LiveTimers;

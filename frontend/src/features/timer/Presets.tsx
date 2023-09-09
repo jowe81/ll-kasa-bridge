@@ -1,7 +1,9 @@
 import PresetButton from "./PresetButton";
+import './presets.css';
 
 function Presets(props) {
   const presetButtons = [
+    { label: 'Custom' },
     { label: '1m' },
     { label: '3m' },
     { label: '4m' },

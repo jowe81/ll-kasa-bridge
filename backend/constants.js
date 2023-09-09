@@ -126,7 +126,7 @@ constants.DEVICETYPE_DEFAULTS = {
       CHECKING_INTERVAL_MIN: 1 * constants.SECOND,
       CHECKING_INTERVAL_DEFAULT: 1 * constants.SECOND,
 
-      AUDIO_PATH: './files/',
+      AUDIO_PATH: './media-files/',
       AUDIO_FILE_EXPIRED_TIMER_DEFAULT: 'alert_default.mp3',
     },  
   },

@@ -7,7 +7,7 @@ import './timer.css';
 
 import { Device, Group } from '../devices/dataSlice.ts';
 
-import CurrentTimers from './CurrentTimers.tsx';
+import LiveTimers from './LiveTimers.tsx';
 import NudgePanel from './NudgePanel.tsx';
 import Presets from './Presets.tsx';
 import NumPad from './NumPad.tsx';
@@ -16,7 +16,7 @@ function TimerPanel() {
   return (
     <div className='timer-panel-container'>
       <div className='touch-ui-panel-header'>Timers</div>
-      <CurrentTimers />
+      <LiveTimers />
       <NudgePanel />
       <Presets />
       <NumPad />
