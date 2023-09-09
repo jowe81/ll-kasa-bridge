@@ -1,0 +1,18 @@
+.touch-ui-container {
+  border: 1px solid rgb(109, 109, 109);
+  width: 1900px;
+  margin: 0px;
+  margin-left: 2px;
+  margin-top: 2px;
+  display: flex;
+  transform: scale(1s);
+}
+
+.touch-ui-main-column {
+  padding: 10px;
+}
+
+.touch-ui-panel-header {
+  text-align: center;
+  width: 300px;
+}

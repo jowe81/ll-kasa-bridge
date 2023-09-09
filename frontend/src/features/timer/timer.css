@@ -1,0 +1,62 @@
+.timer-panel-container {
+  background-color: brown;
+  width: 300px;
+  border-radius: 5px;
+  padding-top: 5px;
+  margin-top: 5px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  text-align: left;
+}
+
+
+.timer-panel-item {
+  width: 270px;  
+  background-color: black;
+  margin: 5px auto;
+  padding: 3px;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.base-button {
+  width: 70px; 
+  height: 60px;
+  border-radius: 5px;
+  border: 1px solid gray;
+  height: 60px;
+  padding: 0px 3px;
+  margin: 10px 5px;
+  margin-bottom: 0px;
+  border: 1px solid gray;
+  background-size: 20%;
+  background-position: bottom left;
+  background-repeat: no-repeat;
+  text-align: center;
+}
+
+.num-pad-button {
+  border-radius: 30px;
+  padding-top: 5px;  
+  height: 45px;
+  font-size: 160%;
+}
+
+.nudge-button {
+  width: 49px;
+  padding-top: 3px;
+  height: 30px;
+}
+
+.preset-button {
+  /* */
+}
+
+.live-timer {
+  width: 260px;
+  border: 1px solid rgb(60, 60, 60);
+  font-size: 150%;
+  height: 40px;
+  padding-top: 5px;
+}

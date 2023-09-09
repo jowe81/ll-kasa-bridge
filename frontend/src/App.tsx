@@ -5,10 +5,9 @@ import { useAppDispatch } from './app/hooks';
 import { socket } from './features/websockets/socket';
 
 import Home from "./Home";
+import TouchUi from "./TouchUi";
 import TableView from "./features/devices/TableView";
-import LocationsView from "./features/devices/LocationsView";
-import GroupsView from "./features/devices/GroupsView";
-
+import AutomationPanel from "./features/devices/AutomationPanel";
 
 import {
   // Action methods
@@ -92,9 +91,9 @@ return (
     <div className="App">
       <Routes>
         <Route path="/" element={ <Home /> } />
+        <Route path="touch" element = { <TouchUi />} />
         <Route path="table" element={ <TableView /> } />
-        <Route path="locations" element={ <LocationsView /> } />
-        <Route path="groups" element={ <GroupsView /> } />
+        <Route path="automation-panel" element={ <AutomationPanel /> } />
 
         <Route path="*" element={<Navigate to="/" replace/>}/>
       </Routes>

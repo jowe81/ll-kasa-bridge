@@ -11,7 +11,7 @@ import TouchButtonGroup from './TouchButtonGroup.tsx';
 import Thermometer from './Thermometer.tsx';
 import Thermostat from './Thermostat.tsx';
 
-function LocationsView() {
+function AutomationPanel() {
   const devices = useAppSelector(state => state.data.devices);
   const liveGroupIds = useAppSelector<string[]>(state => state.data.liveGroupIds);
 
@@ -299,4 +299,4 @@ function LocationsView() {
   )
 }
 
-export default LocationsView;
+export default AutomationPanel;

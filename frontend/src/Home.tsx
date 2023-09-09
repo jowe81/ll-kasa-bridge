@@ -6,9 +6,8 @@ function Home() {
       <div>Welcome to jjAuto</div>
       <div>
         Devices:&nbsp;
-        <Link to={'/table'}>Table</Link> |&nbsp; 
-        <Link to={'/groups'}>Groups</Link> |&nbsp;
-        <Link to={'/locations'}>Locations</Link>
+        <Link to={'/touch'}>Touch UI</Link> |&nbsp; 
+        <Link to={'/automation-panel'}>Automation Panel</Link>
       </div>
     </>
   );
