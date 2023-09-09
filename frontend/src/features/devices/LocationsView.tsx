@@ -52,7 +52,10 @@ function LocationsView() {
       const ungroupedDevices = devicesInLocation.filter(device => !device.groups.length && (!['switch', 'thermometer'].includes(device.subType)));
 
       const ungroupedOtherDevices = ungroupedDevices.filter((device: Device)  => {
-        return !constants.DEVICETYPES_LIGHTING.includes(device.displayType ?? device.subType);
+        return ![ 
+          ...constants.DEVICETYPES_LIGHTING,
+          ...constants.DEVICETYPES_CUSTOM_DISPLAY,
+        ].includes(device.displayType ?? device.subType);
       });
 
       const ungroupedLights = ungroupedDevices.filter((device: Device)  => {

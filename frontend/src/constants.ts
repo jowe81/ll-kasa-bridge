@@ -75,6 +75,11 @@ constants.DEVICETYPES_WITH_POWERSTATE = [
   constants.DEVICETYPE_KASA_SMARTPLUGSWITCH,
   constants.DEVICETYPE_KASA_SMARTBULB,
   constants.DEVICETYPE_ESP_RELAY,
+  constants.DEVICETYPE_VIRTUAL,
+]
+
+constants.DEVICETYPES_CUSTOM_DISPLAY = [
+  constants.SUBTYPE_TIMER,
 ]
 
 export default constants;

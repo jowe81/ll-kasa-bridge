@@ -31,9 +31,8 @@ class TimerHandler {
     return changeInfo;
   };
 
-  getLiveDevice() {
-    console.log('Getting LiveDevice from Timer');
-    return makeLiveDeviceObject(this, [
+  getLiveDevice() {    
+    return makeLiveDeviceObject(this.deviceWrapper, [
         // Include
         'powerState',
       ], {
