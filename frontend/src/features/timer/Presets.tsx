@@ -2,8 +2,9 @@ import PresetButton from "./PresetButton";
 import './presets.css';
 
 function Presets(props) {
+
   const presetButtons = [
-    { label: 'Custom' },
+    { label: 'Custom', onClick: props.onCustomClick },
     { label: '1m' },
     { label: '3m' },
     { label: '4m' },
@@ -11,7 +12,7 @@ function Presets(props) {
     { label: '10m' },
   ];
 
-  const presetButtonsJsx = presetButtons.map(button => <PresetButton button={button} />);
+  const presetButtonsJsx = presetButtons.map((button, index) => <PresetButton key={index} button={button} />);
 
   return (
     <div className="timer-panel-item presets">{ presetButtonsJsx }</div>

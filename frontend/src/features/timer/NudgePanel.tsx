@@ -10,7 +10,7 @@ function NudgePanel(props) {
     { label: '>>' },
   ];
 
-  const nudgeButtonsJsx = nudgeButtons.map(btn => <NudgeButton button={btn} />);
+  const nudgeButtonsJsx = nudgeButtons.map((button, index) => <NudgeButton key={index} button={button} />);
 
   return (
     <div className="timer-panel-item nudge-panel">{ nudgeButtonsJsx }</div>

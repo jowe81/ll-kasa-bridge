@@ -13,12 +13,12 @@ function NumPad(props) {
     { label: '7' },
     { label: '8' },
     { label: '9' },
-    { label: 'X' },
+    { label: 'X', value: '_cancel' },
     { label: '0' },
-    { label: 'Set' },
+    { label: 'Set', value: '_set' },
   ];
 
-  const numPadButtonsJsx = numPadButtons.map(button => <NumPadButton button={button} />);
+  const numPadButtonsJsx = numPadButtons.map((button, index) => <NumPadButton key={index} onButtonPress={props.onButtonPress} button={button} />);
 
   return (
     <div className="timer-panel-item num-pad">{ numPadButtonsJsx }</div>

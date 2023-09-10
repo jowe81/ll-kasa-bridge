@@ -10,7 +10,7 @@ function LiveTimers(props) {
     // { label:'0:06:27' },
   ]
 
-  const liveTimersJsx = liveTimers.map(timer => <LiveTimer timer={timer}/>);
+  const liveTimersJsx = liveTimers.map((timer, index) => <LiveTimer key={index} timer={timer}/>);
 
   return (
     <div className="timer-panel-item live-timers">
