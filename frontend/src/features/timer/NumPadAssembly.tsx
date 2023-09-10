@@ -20,7 +20,7 @@ function NumPadAssembly(props) {
         close(getTimerLength(currentValue));
         break;
 
-      case '_cancel':
+      case '_x':
         if (currentValue) {
           // Clear value on first push on cancel.
           setCurrentValue('');
@@ -28,6 +28,14 @@ function NumPadAssembly(props) {
           // Cancel (hide the assmbly).
           close();          
         }
+        break;
+
+      case '_close':
+        close();
+        break;
+
+      case '_clear':
+        setCurrentValue('');
         break;
 
       default:
@@ -38,9 +46,15 @@ function NumPadAssembly(props) {
 
   const displayValue = getDisplayValue(currentValue);
   
+  const displayProps = {
+    onButtonPress,
+    currentValue,
+    displayValue,    
+  }
+
   return (
     <>
-      <InputField value={displayValue}/>
+      <InputField { ...displayProps }/>
       <NumPad onButtonPress={onButtonPress}/>
     </>
   )

@@ -1,11 +1,15 @@
 import './inputField.css';
 
 
-function InputField({value}) {
+function InputField({displayValue, onButtonPress, currentValue}) {
 
   return (
     <div className="timer-panel-item input-field">
-      {value ?? "_" }
+      <div className="action-buttons">
+        <div className="base-button input-field-button" data-value="_close" onClick={onButtonPress}>Cancel</div>
+        <div className="base-button input-field-button" data-value="_clear" onClick={onButtonPress}>Clear</div>
+      </div>
+      <div className="input-field-display">{displayValue}</div>      
     </div>
   );
 }

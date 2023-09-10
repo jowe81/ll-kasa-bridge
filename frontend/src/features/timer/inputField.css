@@ -1,4 +1,26 @@
 .input-field {
- font-size: 150%;
  background-color: rgb(112, 68, 68);
+ text-align: right;
+ display: flex; 
+ justify-content: space-between;
 }
+
+.input-field .action-buttons {
+  display: flex;
+}
+
+.input-field-button {
+  width: 50px;
+  height: 30px;
+  margin: 2px 5px;
+  padding-top: 4px;
+  
+}
+
+.input-field-display {
+  display: block !important;
+  text-align: right;
+  padding-right: 10px;
+  font-size: 160%;
+}
+

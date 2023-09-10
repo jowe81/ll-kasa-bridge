@@ -13,7 +13,7 @@ function NumPad(props) {
     { label: '7' },
     { label: '8' },
     { label: '9' },
-    { label: 'X', value: '_cancel' },
+    { label: '00' },
     { label: '0' },
     { label: 'Set', value: '_set' },
   ];
