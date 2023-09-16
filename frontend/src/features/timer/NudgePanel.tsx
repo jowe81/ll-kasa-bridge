@@ -3,11 +3,39 @@ import './nudgePanel.css';
 
 function NudgePanel(props) {
 
+  const {nudgeTimer, liveTimers, selectedTimer} = props;
+
+  const liveTimer = liveTimers?.find(timer => timer.liveId == selectedTimer);
+
   const nudgeButtons = [
-    { label: '<<' },
-    { label: '<' },
-    { label: '>' },
-    { label: '>>' },
+    { 
+      nudgeTimer,
+      liveTimer,
+      label: '--', 
+      up: false, 
+      fast: true, 
+    },
+    { 
+      nudgeTimer,
+      liveTimer,
+      label: '-',
+      up: false,
+      fast: false,
+    },
+    { 
+      nudgeTimer,
+      liveTimer,
+      label: '+',
+      up: true,
+      fast: false,
+    },
+    { 
+      nudgeTimer,
+      liveTimer,
+      label: '++',
+      up: true,
+      fast: true,
+    },
   ];
 
   const nudgeButtonsJsx = nudgeButtons.map((button, index) => <NudgeButton key={index} button={button} />);

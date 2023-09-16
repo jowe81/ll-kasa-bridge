@@ -1,21 +1,25 @@
 .live-timers {
-  height: 80px;
+  height: 95px;
   overflow-y: scroll;
   color:rgb(171, 171, 255);
 }
 
 .live-timer {
+  display: flex;
+  justify-content: space-between;
   width: 280px;
   font-size: 150%;
   height: 40px;
-  padding-top: 5px;
-  margin-left: 10px;
+  padding: 3px 3px 1px 15px;
+  margin-left: 5px;
   margin-right: 5px;
+  border: 1px solid rgba(0,0,0,0);
+  border-radius: 5px;
 }
 
-.live-timer {
-  display: flex;
-  justify-content: space-between;
+.selected-timer {
+  border: 1px solid rgb(159, 99, 15);
+  
 }
 
 .live-timer-cancel-button {

@@ -16,8 +16,30 @@ import Presets from './Presets.tsx';
 import NumPadAssembly from './NumPadAssembly.tsx';
 
 function TimerPanel() {
-  const devices: Device[] = useAppSelector(state => state.data.devices);
+  const [ numPadOpen, setNumPadOpen ] = useState(false);
+  const [ selectedTimer, setSelectedTimer ] = useState(null);
+
+  const devices: VirtualDevice[] = useAppSelector(state => state.data.devices);
   const timer = devices.find(device => device.subType === constants.SUBTYPE_TIMER);
+
+  if (!timer?.settings) {
+    // Nothing to show if there's no timer device present.
+    return;
+  }
+
+  const selectTimer = (event) => {
+    const timerId = event.currentTarget.dataset.id;
+    const selectedTimerId = event.currentTarget.dataset.selected;
+
+    // Select, or remove the selection if it is already selected.
+    setSelectedTimer(selectedTimerId == timerId ? null : timerId);
+  };
+
+  const nudgeTimer = (event) => {
+    const step = event.currentTarget.dataset.step;
+    console.log(`Nudging ${selectedTimer} with by ${step}`);
+    socket.emit('auto/command/nudgeTimer', { liveTimerId: selectedTimer, step });
+  }
 
   const schedulePresetTimer = (event) => {
     const timerId = event.currentTarget.dataset.id;
@@ -28,35 +50,42 @@ function TimerPanel() {
   };
 
   const cancelLiveTimer = (event) => {
+    event.stopPropagation();
     const timerId = event.currentTarget.dataset.liveId;
     console.log('canceling', timerId);
     socket.emit('auto/command/cancelTimer', timerId);
   }
   
+  const closeNumPad = (ms) => {
+    setNumPadOpen(false);
+    console.log('Closed with value: ' , ms);
+
+    socket.emit('auto/command/setTimerFor', ms);
+  }
+
   const configuredTimers = {};
 
-  timer?.settings?.timers?.forEach((timer, index) => {
+  // Grab the configured timers and add in a scheduling handler.
+  timer.settings.timers?.forEach((timer) => {
     configuredTimers[timer.id] = {
       ...timer,
       onClick: schedulePresetTimer,
     }
   });
 
-
-  const [ numPadOpen, setNumPadOpen ] = useState(false);
-
-  const closeNumPad = (value) => {
-    setNumPadOpen(false);
-    console.log('Closed with value: ' , value)
+  const props = {
+    selectedTimer,
+    selectTimer,
+    cancelLiveTimer,
+    nudgeTimer,
+    liveTimers: timer.state.liveTimers,
   }
-
-
 
   return (
     <div className='timer-panel-container'>
       <div className='touch-ui-panel-header'>Timers</div>
-      <LiveTimers liveTimers={timer?.state.liveTimers} cancelLiveTimer={cancelLiveTimer}/>
-      <NudgePanel />      
+      <LiveTimers {...props}/>
+      <NudgePanel {...props}/>      
       <Presets configuredTimers={configuredTimers} onPresetTimerClick={schedulePresetTimer} onCustomClick={setNumPadOpen}/>
       { numPadOpen && <NumPadAssembly close={closeNumPad} />}      
     </div>

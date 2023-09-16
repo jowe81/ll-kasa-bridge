@@ -98,10 +98,19 @@ const formatTimerTime = (ms) => {
   return negative ?  '-' + absTime : absTime;
 }
 
+const getHumanReadableLength = length => {
+  if (length < constants.MINUTE * 2) {
+    return Math.round(length / constants.SECOND) + 's';
+  }
+
+  return Math.round(length / constants.MINUTE) + 'm';
+}
+
 export {
   getPowerStateClass,
   getPowerStateClassForLiveGroup,
   getDeviceByChannel,
+  getHumanReadableLength,
   formatTimerTime,
   pad,
 }

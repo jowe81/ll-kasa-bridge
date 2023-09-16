@@ -84,7 +84,6 @@ class TimerHandler {
     this._checkingIntervalHandler = setInterval(() => this.timerIntervalHandler(), this.deviceWrapper.interval ?? localConstants.CHECKING_INTERVAL_DEFAULT);
     
     this.initialized = true;    
-    //this.setTimerFor(30 * constants.SECOND);
   };
 
 
@@ -131,6 +130,9 @@ class TimerHandler {
       timer.audiofile = localConstants.AUDIO_FILE_EXPIRED_TIMER_DEFAULT;
     }
 
+    // Use the expiry info as live id
+    timer.liveId = timer.expires;
+
     log(`Set timer for ${timer.hLength}: ${JSON.stringify(timer)}`, this.deviceWrapper);
 
     this.state.liveTimers.push(timer);
@@ -170,6 +172,32 @@ class TimerHandler {
   killLiveTimerByLiveId(liveTimerId) {
     const index = findByField('liveId', Number(liveTimerId), this.state.liveTimers, true);
     this._killLiveTimerAtIndex(index);
+  };
+
+  // Nudge by milliseconds.
+  nudgeLiveTimerByLiveId(liveTimerId, step) {
+    const liveTimer = findByField('liveId', Number(liveTimerId), this.state.liveTimers);
+    
+    if (liveTimer) {
+      liveTimer.expires += Number(step);  
+    }
+  };
+
+  // Return a number of milliseconds based on remaining time.
+  getNudgeStep(expiresIn, fast = false) {
+    if (expiresIn < constants.MINUTE) {
+      // Up to a minute, nudge by 30s / 10s
+      return constants.SECOND * (fast ? 30 : 10);
+    } else if (expiresIn < 5 * constants.MINUTE) {
+      // Up to 5 minutes, nudge by 1m / 30s
+      return constants.SECOND * (fast ? 60 : 30);
+    } else if (expiresIn < 15 * constants.MINUTE) {
+      // Up to 15 minutes, nudge by 5m / 1m
+      return constants.MINUTE * (fast ? 5 : 1);
+    } else {
+      // Otherwise 15m / 5m
+      return constants.MINUTE * (fast ? 15 : 5);
+    }
   }
 
   /**
@@ -211,9 +239,6 @@ class TimerHandler {
     // If the timer was currently set, reset it (reapply the length from current timestamp)
     liveTimer.expires = Date.now() + timer.length;
 
-    // Use the expiry info as live id
-    liveTimer.liveId = liveTimer.expires;
-
     this._setLiveTimer(liveTimer);
   };
 
@@ -224,7 +249,15 @@ class TimerHandler {
 
     this.state.liveTimers.forEach((liveTimer, index) => {
       const now = Date.now();
+
+      // Update the countdown
       liveTimer.expiresIn = liveTimer.expires - now;
+
+      // Provide nudge steps to the frontend
+      liveTimer.nudge = {
+        slow: this.getNudgeStep(liveTimer.expiresIn, false),
+        fast: this.getNudgeStep(liveTimer.expiresIn, true),
+      }
 
       // See if the timer has expired, and if so add the index of the current trigger iteration.
       const msSinceTimerExpired = - liveTimer.expiresIn;
