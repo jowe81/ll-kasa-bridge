@@ -1,3 +1,5 @@
+import constants from '../../constants.ts';
+
 import { Device, Group } from './dataSlice';
 import { LiveGroup } from './dataSlice';
 
@@ -68,10 +70,38 @@ const getDevicesInGroup = (devices: Device[], group: (LiveGroup | Group)) => {
 
 const getDeviceByChannel = (devices: Device[], channel: number) => {
   return devices.find(device => device.channel === channel);
+};
+
+const pad = (s, length, char = '0') => {
+  if (length && s.length < length) {
+    
+    const missingLength = length - s.length;
+    s = char.repeat(missingLength) + s;
+  }
+
+  return s;
+}
+
+const formatTimerTime = (ms) => {
+
+  const negative = ms < 0;
+
+  if (negative) {
+    ms = -ms;
+  }
+
+  const hrs = Math.floor(ms / constants.HOUR).toString();
+  const mins = (Math.floor(ms / constants.MINUTE) % 60).toString();
+  const secs = (Math.floor(ms / constants.SECOND) % 60).toString();
+
+  const absTime = pad(hrs, 2) + ':' + pad(mins, 2) + ':' + pad(secs, 2);
+  return negative ?  '-' + absTime : absTime;
 }
 
 export {
   getPowerStateClass,
   getPowerStateClassForLiveGroup,
   getDeviceByChannel,
+  formatTimerTime,
+  pad,
 }

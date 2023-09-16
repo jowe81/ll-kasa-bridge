@@ -3,16 +3,20 @@ import './presets.css';
 
 function Presets(props) {
 
-  const presetButtons = [
-    { label: 'Custom', onClick: props.onCustomClick },
-    { label: '1m' },
-    { label: '3m' },
-    { label: '4m' },
-    { label: '6m30' },
-    { label: '10m' },
-  ];
+  const timers = { ...props.configuredTimers } ?? {};
 
-  const presetButtonsJsx = presetButtons.map((button, index) => <PresetButton key={index} button={button} />);
+  const presetButtons: any = [];
+
+  Object.keys(timers).forEach(key => {
+    presetButtons.push(timers[key]);
+  })
+
+  // Put this as the last button
+  presetButtons.push({ label: 'Custom', onClick: props.onCustomClick });
+
+  const presetButtonsJsx = presetButtons.map((button, index) => {
+   return <PresetButton key={index} onClick={props.onClick} button={button} />
+  });
 
   return (
     <div className="timer-panel-item presets">{ presetButtonsJsx }</div>

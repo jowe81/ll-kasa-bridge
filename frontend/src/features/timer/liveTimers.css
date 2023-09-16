@@ -5,9 +5,30 @@
 }
 
 .live-timer {
-  width: 260px;
-  border: 1px solid rgb(60, 60, 60);
+  width: 280px;
   font-size: 150%;
   height: 40px;
   padding-top: 5px;
+  margin-left: 10px;
+  margin-right: 5px;
+}
+
+.live-timer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.live-timer-cancel-button {
+  float: right;
+  border: 1px solid rgb(41, 16, 16);
+  border-radius: 5px;
+  height: 33px;
+  margin-right: 5px;
+  width: 80px;
+  text-align: center;
+  color: red;
+  font-size: 80%;
+  margin-top: 0px;
+  padding-top: 3px;
+
 }

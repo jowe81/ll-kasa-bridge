@@ -44,8 +44,6 @@ const TouchButtonGroup = (props) => {
     }
   }, [group, isPending])
 
-  if (group.id === 'group-bedroomDeskLights') console.log(`Rendering group ${group.name}`, powerState, groupPowerState, powerStateClass);
-
   let html = <></>;
 
   if (isPending) {

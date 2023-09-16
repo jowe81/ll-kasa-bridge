@@ -35,6 +35,7 @@ class TimerHandler {
     return makeLiveDeviceObject(this.deviceWrapper, [
         // Include
         'powerState',
+        'settings',
       ], {
         // Default
         'display': true,
@@ -63,6 +64,13 @@ class TimerHandler {
     // Turn on when first starting.
     this.deviceWrapper.setPowerState(true);
     
+    // Add labels to configured timers where missing.
+    this.deviceWrapper.settings.timers?.forEach((timer, index) => {
+      if (!timer.label) {
+        this.deviceWrapper.settings.timers[index]['label'] = timer.id;        
+      }
+    });
+
     this.deviceWrapper._deviceHandlers = this;
 
     this.state = {};
@@ -144,16 +152,25 @@ class TimerHandler {
     return timer;
   };
 
+  _killLiveTimerAtIndex(index) {
+    if (index !== null) {
+      const liveTimer = this.state.liveTimers[index];
+      this.state.liveTimers.splice(index, 1);
+    }
+  };
+
   /**
    * Silence/terminate the live timer object that's passed in.
    */
   killLiveTimer(liveTimer) {
     const index = findByField('expires', liveTimer.expires, this.state.liveTimers, true);
-    console.log('Killing timer at Index: ', index);
-    if (index !== null) {
-      this.state.liveTimers.splice(index, 1);
-    }
+    this._killLiveTimerAtIndex(index);
   };
+
+  killLiveTimerByLiveId(liveTimerId) {
+    const index = findByField('liveId', Number(liveTimerId), this.state.liveTimers, true);
+    this._killLiveTimerAtIndex(index);
+  }
 
   /**
    * Set a live timer for the given length and ttl. All parameters optional.
@@ -194,6 +211,9 @@ class TimerHandler {
     // If the timer was currently set, reset it (reapply the length from current timestamp)
     liveTimer.expires = Date.now() + timer.length;
 
+    // Use the expiry info as live id
+    liveTimer.liveId = liveTimer.expires;
+
     this._setLiveTimer(liveTimer);
   };
 
@@ -227,15 +247,24 @@ class TimerHandler {
         }
       }
     });  
-    
+
+    const currentLiveTimers = this.state.liveTimers;
+
     const changeInfo = {
       on_off: false,
-      timers: this.state.liveTimers.length ? true : false, // If there are live timers, they are changing.
+      timers: _.isEqual(
+        this._previousliveTimers, 
+        this.state.liveTimers
+      ) ? false : true,
     }
-
+    console.log('changeInfo', changeInfo);
     if (changeInfo.timers) {
       this.deviceWrapper.socketHandler.emitDeviceStateUpdate(this.deviceWrapper.getLiveDeviceStateUpdate(), changeInfo);
     }
+
+    this._previousLiveTimers = _.cloneDeep(currentLiveTimers);
+    console.log('new prev', _.cloneDeep(currentLiveTimers), this._previousliveTimerIdList);
+
   };
 
   /**

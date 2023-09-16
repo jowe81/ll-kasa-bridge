@@ -37,6 +37,7 @@ export interface EspDevice extends BaseDevice {
 
 export interface VirtualDevice extends BaseDevice {
   powerState?: boolean;
+  settings: {};
 }
 
 
@@ -127,7 +128,6 @@ const dataSlice = createSlice({
           const deviceKey = getDeviceKeyByChannel(data.devices, channel);
         
           if (deviceKey !== null) {
-            console.log(`Device State update on ${channel}: `, devices[deviceKey].type, typeof devices[deviceKey]);            
             switch (devices[deviceKey].type) {
               case constants.SUBTYPE_THERMOMETER:
                 break;

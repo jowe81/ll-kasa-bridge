@@ -226,6 +226,26 @@ const devicePool = {
     return this.devices.find(deviceWrapper => deviceWrapper.channel === channel);
   },
 
+  getDeviceWrappersByType(type, subType) {
+    const deviceWrappers = this.devices.filter(deviceWrapper => {
+      let result = true;
+
+      if (type && deviceWrapper.type !== type) {
+        // When type is specified it must match.
+        result = false;
+      }
+
+      if (subType && deviceWrapper.subType !== subType) {
+        // When subType is specified it must match.
+        result = false;
+      }
+      
+      return result;
+    });
+
+    return deviceWrappers;
+  },
+
   /**
    * Return an array of group ids that this channel belongs to
    */

@@ -199,7 +199,6 @@ function AutomationPanel() {
 
 
   const locationsData = getLocationsData();
-  console.log(`Have locations data for ${locationsData.length} locations`, locationsData);
 
   return (
     <>        

@@ -103,6 +103,21 @@ const socketHandler = {
             console.log('Toggle Group');
         }
       });      
+
+      socket.on('auto/command/setTimer', (timer) => {
+        console.log('Command/Settimer:', timer);
+        const deviceWrappers = this.devicePool.getDeviceWrappersByType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_TIMER);
+        const timerDeviceWrapper = deviceWrappers.length && deviceWrappers[0];
+        timerDeviceWrapper._deviceHandlers.setTimer(timer.id);
+        console.log('Timer Wrapper:', timerDeviceWrapper.channel);        
+      })
+
+      socket.on('auto/command/cancelTimer', (timerLiveId) => {
+        console.log('Cancelling', timerLiveId);
+        const deviceWrappers = this.devicePool.getDeviceWrappersByType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_TIMER);
+        const timerDeviceWrapper = deviceWrappers.length && deviceWrappers[0];
+        timerDeviceWrapper._deviceHandlers.killLiveTimerByLiveId(timerLiveId);
+      });
     
     });
   },
