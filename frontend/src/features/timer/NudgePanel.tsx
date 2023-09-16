@@ -38,10 +38,19 @@ function NudgePanel(props) {
     },
   ];
 
-  const nudgeButtonsJsx = nudgeButtons.map((button, index) => <NudgeButton key={index} button={button} />);
+  let contentJsx;
+
+  if (liveTimers?.length) {
+    const nudgeButtonsJsx = nudgeButtons.map((button, index) => <NudgeButton key={index} button={button} />);
+    contentJsx = nudgeButtonsJsx;
+  } else {
+    contentJsx = <div className="timer-main-label">Jess's Kitchen Timers</div>
+  }
+
+
 
   return (
-    <div className="timer-panel-item nudge-panel">{ nudgeButtonsJsx }</div>
+    <div className="timer-panel-item nudge-panel">{contentJsx}</div>
   )
 }
 

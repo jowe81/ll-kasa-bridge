@@ -13,7 +13,7 @@
 
 .timer-panel-item {
   width: 280px;  
-  background-color: black;
+  background-color: rgb(41, 20, 20);
   margin: 5px auto;
   padding: 3px;
   display: flex;

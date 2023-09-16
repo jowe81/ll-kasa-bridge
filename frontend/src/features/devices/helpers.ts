@@ -106,7 +106,14 @@ const getHumanReadableLength = length => {
   return Math.round(length / constants.MINUTE) + 'm';
 }
 
+const formatClockTime = (ms, withSeconds = false) => {
+  const date = new Date(ms);
+  const sliceLength = withSeconds ? 8 : 5;
+  return date.toTimeString().slice(0, sliceLength);
+}
+
 export {
+  formatClockTime,
   getPowerStateClass,
   getPowerStateClassForLiveGroup,
   getDeviceByChannel,

@@ -15,4 +15,6 @@
 .touch-ui-panel-header {
   text-align: center;
   width: 300px;
+  font-weight: bold;
+  color:rgba(255, 255, 255, .5)
 }

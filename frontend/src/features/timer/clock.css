@@ -1,0 +1,11 @@
+.clock {
+  height: 95px;
+  overflow-y: hidden;
+  font-size: 72px;
+  color:rgba(137, 112, 90, 0.8);
+  font-weight: bold;
+  width: 100%;
+  text-align: center;  
+  margin-top:-7px;
+  margin-bottom:7px;
+}

@@ -5,10 +5,11 @@ function NudgeButton(props) {
 
   const { button } = props;
 
-  const nudge = button.liveTimer?.nudge;
-
   let label;
   let step;
+
+  const nudge = button.liveTimer?.nudge;
+  
   if (nudge) {
     // How many milliseconds to nudge?
     step = (button.fast ? nudge.fast : nudge.slow);

@@ -1,7 +1,6 @@
 .live-timers {
   height: 95px;
-  overflow-y: scroll;
-  color:rgb(171, 171, 255);
+  overflow-y: scroll;  
 }
 
 .live-timer {
@@ -17,20 +16,37 @@
   border-radius: 5px;
 }
 
+.live-timer-normal {
+  color:rgb(212, 175, 183);
+}
+
+.live-timer-close {
+  color: rgb(190, 169, 83);
+}
+
+.live-timer-closer {
+  color: rgb(250, 153, 42);
+}
+
+.live-timer-expired {
+  color: red;
+}
+
 .selected-timer {
-  border: 1px solid rgb(159, 99, 15);
+  border: 1px solid rgba(159, 99, 15, .5);
+  background-color: rgb(58, 8, 8);
   
 }
 
 .live-timer-cancel-button {
   float: right;
-  border: 1px solid rgb(41, 16, 16);
+  border: 1px solid rgb(94, 50, 50);
   border-radius: 5px;
   height: 33px;
   margin-right: 5px;
   width: 80px;
   text-align: center;
-  color: red;
+  color: rgb(144, 53, 53);
   font-size: 80%;
   margin-top: 0px;
   padding-top: 3px;

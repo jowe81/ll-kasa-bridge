@@ -6,3 +6,9 @@ body {
   background-color: black;
   color:white;
 }
+
+.screen-section-label {
+  color:rgb(154, 154, 154);
+  text-align: center;
+  font-weight: bold;  
+}

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { useAppSelector } from '../../app/hooks.ts';
 import { socket } from '../websockets/socket.tsx';
@@ -14,6 +14,7 @@ import LiveTimers from './LiveTimers.tsx';
 import NudgePanel from './NudgePanel.tsx';
 import Presets from './Presets.tsx';
 import NumPadAssembly from './NumPadAssembly.tsx';
+import Clock from './Clock.tsx';
 
 function TimerPanel() {
   const [ numPadOpen, setNumPadOpen ] = useState(false);
@@ -27,9 +28,22 @@ function TimerPanel() {
     return;
   }
 
+  const liveTimers = timer.state.liveTimers ?? [];
+
+  // If a timer is selected but doesn't exist anymore, deselect it.
+  if (selectedTimer && !liveTimers.find(timer => timer.liveId == selectedTimer)) {
+    setSelectedTimer(null);
+  }
+
+  // If there's only one timer selected it by default.
+  if (liveTimers?.length === 1 && !selectedTimer) {
+    setSelectedTimer(liveTimers[0].liveId);
+  }  
+
   const selectTimer = (event) => {
     const timerId = event.currentTarget.dataset.id;
     const selectedTimerId = event.currentTarget.dataset.selected;
+    console.log('selecttimer', timerId, selectedTimerId);
 
     // Select, or remove the selection if it is already selected.
     setSelectedTimer(selectedTimerId == timerId ? null : timerId);
@@ -75,16 +89,17 @@ function TimerPanel() {
 
   const props = {
     selectedTimer,
-    selectTimer,
+    selectTimer,    
     cancelLiveTimer,
     nudgeTimer,
-    liveTimers: timer.state.liveTimers,
+    liveTimers,
   }
 
   return (
     <div className='timer-panel-container'>
-      <div className='touch-ui-panel-header'>Timers</div>
-      <LiveTimers {...props}/>
+      <div className='touch-ui-panel-header'>Clock</div>
+      { liveTimers.length > 0 && <LiveTimers {...props}/>}
+      { !liveTimers.length && <Clock clockTime={timer.state.clock}/>}
       <NudgePanel {...props}/>      
       <Presets configuredTimers={configuredTimers} onPresetTimerClick={schedulePresetTimer} onCustomClick={setNumPadOpen}/>
       { numPadOpen && <NumPadAssembly close={closeNumPad} />}      

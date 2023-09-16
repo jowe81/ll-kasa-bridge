@@ -247,6 +247,8 @@ class TimerHandler {
       return false;
     }
 
+    this.state.clock = Date.now();
+
     this.state.liveTimers.forEach((liveTimer, index) => {
       const now = Date.now();
 
