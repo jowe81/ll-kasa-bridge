@@ -12,7 +12,11 @@ function Presets(props) {
   })
 
   // Put this as the last button
-  presetButtons.push({ label: 'Custom', onClick: props.onCustomClick });
+  presetButtons.push({ 
+    label: 'Custom', 
+    subLabel: '?',
+    onClick: props.onCustomClick
+  });
 
   const presetButtonsJsx = presetButtons.map((button, index) => {
    return <PresetButton key={index} onClick={props.onClick} button={button} />

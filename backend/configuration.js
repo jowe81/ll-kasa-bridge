@@ -1429,6 +1429,7 @@ const deviceMap = [
         {
           id: '3m',
           label: null, // will be set to id if undefined or null
+          subLabel: 'Tea',
           length: 3 * MINUTE,
           ttl: 3 * MINUTE,
           repeatAlarmEvery: 30 * SECOND, // will default to a minute if undefined or null
@@ -1436,12 +1437,14 @@ const deviceMap = [
         },
         {
           id: '4m',          
+          subLabel: 'Coffee',
           length: 4 * MINUTE,
           ttl: 3 * MINUTE,
           audiofile: null,
         },
         {
           id: '6m30',
+          subLabel: 'Eggs',
           length: 6 * MINUTE + 30 * SECOND,
           ttl: 3 * MINUTE,
           audiofile: null,

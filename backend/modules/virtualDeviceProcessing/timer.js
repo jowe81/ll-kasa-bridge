@@ -249,8 +249,9 @@ class TimerHandler {
 
     this.state.clock = Date.now();
 
+    const now = Date.now();
+
     this.state.liveTimers.forEach((liveTimer, index) => {
-      const now = Date.now();
 
       // Update the countdown
       liveTimer.expiresIn = liveTimer.expires - now;
@@ -262,24 +263,26 @@ class TimerHandler {
       }
 
       // See if the timer has expired, and if so add the index of the current trigger iteration.
-      const msSinceTimerExpired = - liveTimer.expiresIn;
+      const msSinceTimerExpired = - (liveTimer.expires - now);
 
       if (msSinceTimerExpired > 0) {
+        // Timer is expired.
         liveTimer.currentTriggerIndex = Math.floor(msSinceTimerExpired / liveTimer.repeatAlarmEvery);
 
         if (typeof liveTimer.lastTriggerIndexPlayed === 'undefined') {
           liveTimer.lastTriggerIndexPlayed = -1;
         }
-      }
 
-      if (now > liveTimer.expires && now < liveTimer.expires + liveTimer.ttl) {
-        // In Alarm window
-        this.checkAlarm(liveTimer);    
-      } else {
-        if (now > liveTimer.expires + liveTimer.ttl) {
-          // Ttl has expired - turf it automatically
-          this.killLiveTimer(liveTimer);
+        if (now < liveTimer.expires + liveTimer.ttl) {
+          // In Alarm window
+          this.checkAlarm(liveTimer);    
+        } else {
+          if (now > liveTimer.expires + liveTimer.ttl) {
+            // Ttl has expired - turf it automatically
+            this.killLiveTimer(liveTimer);
+          }
         }
+  
       }
     });  
 
@@ -294,6 +297,8 @@ class TimerHandler {
     }
     console.log('changeInfo', changeInfo);
     if (changeInfo.timers) {
+      // Sort the timers by remaining length
+      this.state.liveTimers.sort((a, b) => a.expires > b.expires ? 1 : -1);
       this.deviceWrapper.socketHandler.emitDeviceStateUpdate(this.deviceWrapper.getLiveDeviceStateUpdate(), changeInfo);
     }
 

@@ -1,4 +1,4 @@
-import { formatTimerTime } from '../devices/helpers.ts';
+import { formatTimerTime, formatClockTime } from '../devices/helpers.ts';
 import constants from '../../constants.ts';
 
 function LiveTimer(props) {
@@ -19,11 +19,20 @@ function LiveTimer(props) {
   }
 
   const displayClassNames = `live-timer-display ${colorClass}`;
+  const subLabelClassNames = `sub-label-container ${colorClass}`;
+
+  const subLabelJsx = timer.subLabel ?
+    <span>{timer.subLabel} is ready { timer.expiresIn >= 0 ? `at ${formatClockTime(timer.expires)}` : `now!` }</span> :
+    <span>{timer.expiresIn >= 0 ? `Expires at ${formatClockTime(timer.expires)}` : `Expired!` }</span>;
+
 
   return (
     <div className={className} onClick={selectTimer} data-id={timer.liveId} data-selected={props.selectedTimer}>
-      <div className={displayClassNames}>
-        { expiresIn }
+      <div>
+        <div className={subLabelClassNames}>
+          {subLabelJsx}
+        </div>
+        <div className={displayClassNames}>{ expiresIn }</div>
       </div>
       <div 
         className="live-timer-cancel-button" 

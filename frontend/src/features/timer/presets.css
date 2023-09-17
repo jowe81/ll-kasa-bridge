@@ -4,5 +4,14 @@
 }
 
 .preset-button {
-  /* */
+  border-color: rgb(159, 119, 119);
+}
+
+.preset-button-sub-label {
+  color:rgb(229, 174, 174);
+  font-size: 120%;
+}
+
+.preset-button-label {
+  color:rgb(184, 140, 140)
 }
