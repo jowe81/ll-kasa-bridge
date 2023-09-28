@@ -36,9 +36,9 @@ function TimerPanel() {
   }
 
   // If there's only one timer selected it by default.
-  if (liveTimers?.length === 1 && !selectedTimer) {
+  if (liveTimers?.length && !selectedTimer) {
     setSelectedTimer(liveTimers[0].liveId);
-  }  
+  }
 
   const selectTimer = (event) => {
     const timerId = event.currentTarget.dataset.id;
@@ -72,9 +72,9 @@ function TimerPanel() {
   
   const closeNumPad = (ms) => {
     setNumPadOpen(false);
-    console.log('Closed with value: ' , ms);
-
-    socket.emit('auto/command/setTimerFor', ms);
+    if (ms) {
+      socket.emit('auto/command/setTimerFor', ms);
+    }
   }
 
   const configuredTimers = {};

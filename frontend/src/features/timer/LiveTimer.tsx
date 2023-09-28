@@ -22,7 +22,7 @@ function LiveTimer(props) {
   const subLabelClassNames = `sub-label-container ${colorClass}`;
 
   const subLabelJsx = timer.subLabel ?
-    <span>{timer.subLabel} is ready { timer.expiresIn >= 0 ? `at ${formatClockTime(timer.expires)}` : `now!` }</span> :
+    <span>{timer.subLabel}, ready { timer.expiresIn >= 0 ? `at ${formatClockTime(timer.expires)}` : `now!` }</span> :
     <span>{timer.expiresIn >= 0 ? `Expires at ${formatClockTime(timer.expires)}` : `Expired!` }</span>;
 
 
