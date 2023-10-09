@@ -182,6 +182,8 @@ const externalFlags = () => {
       axios.get(urlInfo.url).then((data) => {          
         storeDataAndFlagLatestChangesGlobally(data.data, urlInfo);
         flagChangesForDevices();
+      }).catch((e) => {
+        console.log('Axios error:', e);
       });
     });
   };
