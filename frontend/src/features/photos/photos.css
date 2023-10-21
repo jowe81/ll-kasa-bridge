@@ -1,0 +1,38 @@
+.photo-container {
+  position: relative;
+  border-radius: 5px;
+  padding: 0px;
+  margin: 5px;
+    
+  width: 1215px;
+  height: 905px;
+  border: 1px solid gray;
+}
+
+.photo-container .photo { 
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: center / contain no-repeat;
+}
+
+.photo-container .background {  
+  position: absolute;
+
+  width: 100%;
+  height: 100%;
+
+  background: center / 200% no-repeat;
+  background-size: 200%;
+
+  filter: blur(8px);
+  -webkit-filter: blur(8px);
+
+  opacity: 50%;
+}
+
+
+.photo-meta {
+  position: absolute;
+  background-color: rgba(50,50,50,.5);
+}

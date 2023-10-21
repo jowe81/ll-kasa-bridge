@@ -82,4 +82,9 @@ constants.DEVICETYPES_CUSTOM_DISPLAY = [
   constants.SUBTYPE_TIMER,
 ]
 
+// Other components
+constants.photos = {
+  refreshInterval: 30 * SECOND,
+}
+
 export default constants;

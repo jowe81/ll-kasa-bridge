@@ -295,7 +295,7 @@ class TimerHandler {
         this.state.liveTimers
       ) ? false : true,
     }
-    console.log('changeInfo', changeInfo);
+
     if (changeInfo.timers) {
       // Sort the timers by remaining length
       this.state.liveTimers.sort((a, b) => a.expires > b.expires ? 1 : -1);
@@ -303,8 +303,6 @@ class TimerHandler {
     }
 
     this._previousLiveTimers = _.cloneDeep(currentLiveTimers);
-    console.log('new prev', _.cloneDeep(currentLiveTimers), this._previousliveTimerIdList);
-
   };
 
   /**
