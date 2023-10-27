@@ -84,7 +84,8 @@ constants.DEVICETYPES_CUSTOM_DISPLAY = [
 
 // Other components
 constants.photos = {
-  refreshInterval: 30 * SECOND,
+  url: `http://johannes-mb.wnet.wn:3020/db/randomUrl`,
+  refreshInterval: 1 * HOUR,
 }
 
 export default constants;

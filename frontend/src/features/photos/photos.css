@@ -35,4 +35,27 @@
 .photo-meta {
   position: absolute;
   background-color: rgba(50,50,50,.5);
+  width: 100%;
+  display:flex;
+  justify-content:space-between;
+}
+
+.photo-meta div {
+  padding: 10px;
+}
+
+.photos-time-controls {
+  display: flex;
+}
+
+.photos-time-controls div {
+  margin: 0px;
+  padding: 0px 5px;
+}
+.photos-time-controls button {
+  height: 30px;
+  width: 100px;
+  margin-top: -5px;
+  background-color: rgba(152, 152, 152, .7);
+  color:rgb(225, 225, 225);
 }
