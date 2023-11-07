@@ -865,7 +865,7 @@ const deviceMap = [
   {
     alias: 'Kitchen Ikea 1',
     channel: 28, 
-    id: "801264A4EC3F66CAC02D4FF78712E6D11F992564",
+    id: "801217E95EAD46CF3A6E6C5F9D70E22020F2079F",
     locationId: 'loc-kitchen',
     subType: SUBTYPE_BULB,
     filters: [{
@@ -877,7 +877,7 @@ const deviceMap = [
   {
     alias: 'Living Room Ikea 1',
     channel: 29, 
-    id: "8012F095B949B648B1BE7C8A050FA39E1F78FAE8",
+    id: "801264A4EC3F66CAC02D4FF78712E6D11F992564",
     locationId: 'loc-livingRoom',
     subType: SUBTYPE_BULB,
     filters: [{

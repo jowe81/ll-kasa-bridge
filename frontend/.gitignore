@@ -1,4 +1,5 @@
 src/assets
+.env
 
 # Logs
 logs

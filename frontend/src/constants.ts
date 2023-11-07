@@ -82,9 +82,17 @@ constants.DEVICETYPES_CUSTOM_DISPLAY = [
   constants.SUBTYPE_TIMER,
 ]
 
+constants.services = {
+  JJ_AUTO_BACKEND_HOST: "http://192.168.1.199",
+  JJ_AUTO_BACKEND_PORT: 4000, 
+  PHOTOS_BACKEND_HOST: "http://192.168.1.199",
+  PHOTOS_BACKEND_PORT: 3020,
+}
+
 // Other components
 constants.photos = {
-  url: `http://johannes-mb.wnet.wn:3020/db/randomUrl`,
+  //url: `http://johannes-mb.wnet.wn:3020/db/randomUrl`,
+  url: `${constants.services.PHOTOS_BACKEND_HOST}:${constants.services.PHOTOS_BACKEND_PORT}/db/randomUrl`,
   refreshInterval: 1 * HOUR,
 }
 
