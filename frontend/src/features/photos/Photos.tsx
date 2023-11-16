@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import './photos.css';
 import constants from '../../constants';
 
-function Photos() {
+function Photos(props: any) {
+  const { fullScreen, fullScreenButton } = props;
 
   const [imageUrl, setImageUrl] = useState<string>('');
   const [meta, setMeta] = useState<string>('');
@@ -11,14 +12,15 @@ function Photos() {
   const [remaining, setRemaining] = useState<number>(0);
 
   const nextBtnClick = () => {
-    refreshPicture()
+    refreshPicture();
+    setStartTime(Date.now());
   }
 
   const refreshPicture = () => {
     axios
     .get(constants.photos.url)
     .then(data => {
-      console.log(data);
+      console.log('Photos, returned fileInfo:', data.data);
       const photoRecord = data.data;
       setImageUrl(photoRecord?.url)
       setMeta(photoRecord?.description);
@@ -49,7 +51,9 @@ function Photos() {
     return () => clearInterval(handler);
   }, [remaining, imageUrl]);
 
-  return (<div className="photo-container">        
+  const containerClassNames = `photo-container ${fullScreen ? `photo-container-full-screen` : `photo-container-embedded`}`;
+
+  return (<div className={containerClassNames}>        
     <div className='background' style={{ backgroundImage: `url(${imageUrl})`}}/>
     <div className='photo' style={{ backgroundImage: `url(${imageUrl})`}}/>
     <div className='photo-meta'>
@@ -59,10 +63,14 @@ function Photos() {
           {millisecondsToHMS(remaining)}
         </div>
         <div>
-          <button onClick={nextBtnClick}>Skip</button>
+          <button onClick={nextBtnClick}>Next</button>
+        </div>
+        <div>
+          {fullScreenButton}
         </div>
       </div>
     </div>
+    
   </div>);
 }
 

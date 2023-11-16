@@ -20,7 +20,7 @@ function TouchUiMainColumn(props) {
 
     case '3':
       content = <>
-        <Photos />
+        <Photos {...props} />
       </>
       break;
 

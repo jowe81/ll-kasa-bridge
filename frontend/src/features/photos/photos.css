@@ -1,12 +1,20 @@
 .photo-container {
   position: relative;
   border-radius: 5px;
-  padding: 0px;
+  padding: 0px;    
+}
+
+.photo-container-embedded {
   margin: 5px;
-    
   width: 1215px;
   height: 905px;
   border: 1px solid gray;
+}
+
+.photo-container-full-screen {
+  margin: 5px;
+  width: 1920px;
+  height: 905px;  
 }
 
 .photo-container .photo { 
