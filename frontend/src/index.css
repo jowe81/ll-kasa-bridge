@@ -27,7 +27,9 @@ body {
   margin: 0px;
   padding: 0px;
   display: flex;
-  place-items: center;
+  /* place-items: center; */
+  align-items: flex-start;
+  justify-content: center;
   min-width: 320px;
   min-height: 100vh;
 }

@@ -36,9 +36,13 @@ tr {
 
 .locations-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex-wrap: wrap;
   text-align: left;
+  /* height: 965px; */
+  height: 100%;
+  align-items: stretch;
+  
 }
 
 .group-container {
@@ -279,7 +283,7 @@ tr {
   padding: 5px;
   margin: 5px;
   background-color: rgb(58, 53, 53);
-  border-radius: 5px;  
+  border-radius: 5px;
 }
 
 .location-buttons-container {

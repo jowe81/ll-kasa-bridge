@@ -60,7 +60,7 @@ function Photos(props: any) {
       <div>{meta}</div>      
       <div className='photos-time-controls'>
         <div className='photos-remaining-time'>
-          {millisecondsToHMS(remaining)}
+          {msToTime(remaining)}
         </div>
         <div>
           <button onClick={nextBtnClick}>Next</button>
@@ -75,7 +75,7 @@ function Photos(props: any) {
 }
 
 // ChatGPT
-function millisecondsToHMS(milliseconds) {
+function msToTime(milliseconds) {
   // Calculate hours, minutes, and seconds
   const seconds = Math.floor(milliseconds / 1000);
   const hours = Math.floor(seconds / 3600);

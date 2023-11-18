@@ -3,7 +3,7 @@ import TimerPanel from "./features/timer/TimerPanel";
 import Photos from "./features/photos/Photos";
 
 function TouchUiMainColumn(props) {
-  const { columnId } = props; 
+  const { columnId, style } = props; 
 
   let content;
   switch (columnId) {
@@ -25,8 +25,8 @@ function TouchUiMainColumn(props) {
       break;
 
   }
-
-  return <div className="touch-ui-main-column">{ content }</div>
+  
+  return <div style={style} className="touch-ui-main-column">{ content }</div>
 }
 
 export default TouchUiMainColumn;

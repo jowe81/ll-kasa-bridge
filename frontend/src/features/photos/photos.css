@@ -1,20 +1,23 @@
 .photo-container {
   position: relative;
   border-radius: 5px;
-  padding: 0px;    
+  padding: 0px;  
 }
 
 .photo-container-embedded {
-  margin: 5px;
-  width: 1215px;
-  height: 905px;
-  border: 1px solid gray;
+  margin: 0px;
+  margin-top: 5px;
+  width: 1250px;
+  height: 100%;
+  border: 1px solid rgb(32, 32, 32);
 }
 
 .photo-container-full-screen {
-  margin: 5px;
-  width: 1920px;
-  height: 905px;  
+  margin: 2px;
+  width: 1900px;
+  height: 930px;
+  /* border: 1px solid yellow; */
+  /* border: 1px solid rgb(84, 84, 84); */
 }
 
 .photo-container .photo { 
