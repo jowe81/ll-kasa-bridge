@@ -1,0 +1,19 @@
+.primary-thermometer {
+  font-size: 56px;
+}
+
+.thermometer-trend {
+  font-size: 20px;
+  width: 100%;
+  color: gray;
+  text-align: right;
+}
+
+.fullscreen-panel-temperature {
+  width: 160px; 
+  padding-right: 10px;
+  height: 100%; 
+}
+
+.primary-thermometer > .thermometer-temp {
+}

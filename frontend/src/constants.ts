@@ -96,4 +96,8 @@ constants.photos = {
   refreshInterval: 30 * MINUTE,
 }
 
+constants.touchPanel = {
+  thermometerChannels: [ 201, 204 ]
+}
+
 export default constants;

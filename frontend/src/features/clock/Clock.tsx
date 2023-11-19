@@ -12,30 +12,10 @@ function Clock(props: any) {
   }, []);
 
     
-  return <><div className="fullscreen-panel-clock">{currentTime(time)}</div></>;
+  return <><div className="fullscreen-panel-clock">{currentTime(time, false)}</div></>;
 }
 
-function msToTime(milliseconds, showSeconds) {
-    // Calculate hours, minutes, and seconds
-    const seconds = Math.floor(milliseconds / 1000);
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const remainingSeconds = seconds % 60;
-
-    // Format the time components with leading zeros if necessary
-    const formattedHours = String(hours).padStart(2, "0");
-    const formattedMinutes = String(minutes).padStart(2, "0");
-    const formattedSeconds = String(remainingSeconds).padStart(2, "0");
-
-    let result = `${formattedHours}:${formattedMinutes}`;
-    if (showSeconds) {
-        result += `:${formattedSeconds}`;
-    }
-
-    return result;
-}
-
-function currentTime(ms, showSeconds) {
+function currentTime(ms, showSeconds = false) {
     // Create a new Date object
     var currentTime = new Date(ms ? ms : null);
 
@@ -45,15 +25,15 @@ function currentTime(ms, showSeconds) {
     var seconds = currentTime.getSeconds();
 
     // Add leading zero if needed
-    hours = hours < 10 ? "0" + hours : hours;
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-    seconds = seconds < 10 ? "0" + seconds : seconds;
+    const h = hours < 10 ? "0" + hours : hours;
+    const m = minutes < 10 ? "0" + minutes : minutes;
+    const s = seconds < 10 ? "0" + seconds : seconds;
 
     // Format the time as hh:mm:ss
-    var formattedTime = hours + ":" + minutes;
+    var formattedTime = h + ":" + m;
     if (showSeconds) {
-      formattedTime += ":" + seconds;
-    } 
+        formattedTime += ":" + s;
+    }
 
     // Display the result
     return formattedTime;

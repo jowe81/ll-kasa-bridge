@@ -1,8 +1,10 @@
 import Clock from "./features/clock/Clock";
+import Temperature from "./features/temperature/Temperature";
 
 function TouchUiPanel() {
   return (<>
-    <Clock />
+    <div className='touch-ui-panel-item'><Temperature /></div>
+    <div className='touch-ui-panel-item'><Clock /></div>
   </>)
 }
 
