@@ -16,53 +16,90 @@ function Temperature(props: any) {
     const primaryThermometer = thermometers.length ? thermometers[0] : null;
     const secondaryThermometer = thermometers.length > 1 ? thermometers[1] : null;
 
-    const getDisplayData = (thermometer: any ) => {
-      if (!thermometer || !thermometer.state) {
-        return {tempC: 'N/A'};
+    const getDisplayData = (thermometer: any, useTrend = 'long') => {
+      const data = {
+          tempC: "N/A",
+          modifier: "",
+          trend: "",
+          trendDirection: "",
+          trendColor: "",
+      };
+
+      if (!thermometer || !thermometer.state?.trends) {
+        return data;
       }
 
       const { state } = thermometer;
 
-      const data = {
-          tempC: state.tempC?.toFixed(1) + "°C",
-          modifier: '',
-          trend: '',
-      };
+      data.tempC = state.tempC?.toFixed(1) + "°C";
 
-      let direction = state.diff > 0 ? 'warming' : 'cooling';
+      let diff:(null|number) = null;
 
-      let modifier: (null|string) = null;
+      if (state.trends[useTrend] && typeof(state.trends[useTrend].diff) === 'number') {
+        diff = state.trends[useTrend].diff;
+      }
 
-      if (Math.abs(state.diff) > 0.25) {
+      if (diff === null) {
+        // No trend data.
+        return data;
+      }
+      const absDiff = Math.abs(diff);
+
+      const minorTrendThreshold = .25;
+      const mediumTrendThreshold = .7;
+      const majorTrendThreshold = 1.3;
+      
+      if (absDiff > minorTrendThreshold) {
+          if (diff > 0) {
+              data.trendDirection = "warming";
+              data.trendColor = "#FF7777DD";
+          } else {
+              data.trendDirection = "cooling";
+              data.trendColor = "#9999FFDD";
+          }
+      } else {
+        data.trendDirection = "steady";
+        data.trendColor = "#DDDDDD";
+      }
+
+      let modifier: (string) = '';
+
+      if (absDiff > minorTrendThreshold) {
           modifier = "a little";
       }
 
-      if (Math.abs(state.diff) > 0.5) {
-          modifier = ''
+      if (absDiff > mediumTrendThreshold) {
+          modifier = "";
       }
 
-      if (Math.abs(state.diff) > 1) {
-          modifier = "a lot";
+      if (absDiff > majorTrendThreshold) {
+          modifier = "quickly";
       }
 
-      data.trend = modifier !== null ? `${direction} ${modifier}` : `steady`;
+      data.trend = modifier !== null ? `${data.trendDirection} ${modifier}` : `steady`;
+      data.trend = `${data.trendDirection} ${modifier}`;
       
       return data;
     }
 
-    const primaryData = getDisplayData(primaryThermometer);
-    const secondaryData = getDisplayData(secondaryThermometer);
+    const primaryData = getDisplayData(primaryThermometer, 'long');
 
-    const style = {
+    const styleTemp = {
         color: tempToColor(primaryData.tempC),
+    };
+
+    const styleTrend = {
+        color: primaryData.trendColor,
     };
 
     return (
         <>
             <div className="fullscreen-panel-temperature">
                 <div className="primary-thermometer">
-                    <div className="thermometer-temp" style={style}>{primaryData.tempC}</div>
-                    <div className="thermometer-trend">
+                    <div className="thermometer-temp" style={styleTemp}>
+                      {primaryData.tempC}
+                    </div>
+                    <div className="thermometer-trend" style={styleTrend}>
                       {primaryData.trend}
                     </div>
                 </div>
