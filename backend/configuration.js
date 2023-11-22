@@ -596,878 +596,870 @@ const globalConfig = {
 }
 
 const deviceMap = [
-  //Bedroom
-  {
-    alias: 'Bedroom IKEA lamp',
-    channel: 2,
-    class: 'class-johannesDeskLights',
-    displayLabel: 'IKEA Lamp',
-    id: "8012E7EA0A70974D997DE95E898FBA261F980E1A",
-    locationId: 'loc-bedroom',
-    subType: SUBTYPE_BULB,
-    filters: [
-      { refId: 'naturalLight' },
-      { refId: 'externalFlags',
-        stateData: {
-          on_off: {
-            value: 0,
-            altValue: 1,
-          }
-        },
-        settings: {
-          flag: 'busy_available',
-        }
-      },
-    ],    
-  },
-  {
-    alias: 'Bedroom Desk Strip top',
-    channel: 3,
-    id: "80121CF5373D56F7C62278B4C0FE88A01F53DD26",
-    locationId: 'loc-bedroom',
-    subType: SUBTYPE_LED_STRIP,
-    filters: [
-      { refId: 'naturalLight' }
-    ],    
-  },
-  { 
-    alias: 'Bedroom Heater',
-    channel: 4,
-    id: '80065A4E60A835C49695A74DA7FAE76520436E9C01',
-    displayType: SUBTYPE_AIR_HEAT,
-    displayLabel: 'Heater',
-    locationId: 'loc-bedroom',
-    subType: SUBTYPE_PLUG,
-    hvacType: SUBTYPE_AIR_HEAT,
-  },
-  {
-    alias: 'Bedroom Fan',
-    channel: 5, 
-    id: "80065A4E60A835C49695A74DA7FAE76520436E9C02",
-    locationId: 'loc-bedroom',
-    displayType: SUBTYPE_AIR_FAN,
-    displayLabel: 'Fan',
-    subType: SUBTYPE_PLUG,
-  },
-  {
-    alias: 'Bedroom Ceiling 1',
-    channel: 6, 
-    class: 'class-bedroomLights',
-    id: "8012C3A3B58B58E8081EDBCF694C8CBC1F790A02",
-    locationId: 'loc-bedroom',
-    subType: SUBTYPE_BULB,
-    filters: [
-      { refId: 'naturalLight' }
-    ],    
-
-  },
-  {
-    alias: 'Bedroom Ceiling 2',
-    channel: 7,
-    class: 'class-bedroomLights',
-    id: "8012511ABF75C811DB47A833DD2EDAED1F791417",
-    locationId: 'loc-bedroom',
-    subType: SUBTYPE_BULB,
-    filters: [
-      { refId: 'naturalLight' }
-    ],    
-  },
-
-  //Hallway
-  {
-    alias: 'Hallway Ceiling 1', //Hallway ceiling 2?    
-    channel: 8,
-    class: 'class-hallwayLights',
-    id: "80121D6F58ADDCAC185363C01347F5EA1F752B55",
-    locationId: 'loc-kitchen',
-    subType: SUBTYPE_BULB,
-  },
-  {
-    alias: 'Hallway Ceiling 2',
-    channel: 9, 
-    class: 'class-hallwayLights',
-    id: "8012DA57516B98CCFFE6467D8F4F01691F73C975",
-    locationId: 'loc-kitchen',
-    subType: SUBTYPE_BULB,
-  },
-
-
-  //Bathroom
-  //***** ***pp pp***
-  {
-    alias: 'Bathroom 1',
-    channel: 10, 
-    id: "8012D32B889FD9CE23C825CEB1C2EFD41F73D8E2",
-    locationId: 'loc-bathroom',
-    subType: SUBTYPE_BULB,
-    filters: [
-      { refId: 'naturalLight' }
-    ],    
-
-  },
-  {
-    alias: 'Bathroom 2',
-    channel: 11, 
-    id: "8012F65B8543DA7FFFC8A3F756D1EBE61F742CDF",
-    locationId: 'loc-bathroom',
-    subType: SUBTYPE_BULB,
-    filters: [
-      { refId: 'naturalLight' }
-    ],    
-
-  },
-  {
-    alias: 'Bathroom 3',
-    channel: 12, 
-    id: "80128096836910A62F80A6B532C1461E1F79D295",
-    locationId: 'loc-bathroom',
-    subType: SUBTYPE_BULB,
-    filters: [
-      { refId: 'naturalLight' }
-    ],    
-
-  },
-  {
-    alias: 'Bathroom 4',
-    channel: 13, 
-    id: "8012EE37548E3F0F48405DECC13D0B801F779B2B",
-    locationId: 'loc-bathroom',
-    subType: SUBTYPE_BULB,
-    filters: [
-      { refId: 'naturalLight' }
-    ],    
-  },
-  {
-    alias: 'Bedroom Desk Switch',
-    channel: 14,
-    id: "8006E7EB4A66E3687708A7ABF93FB237200DCDA4",
-    locationId: 'loc-bedroom',
-    display: false,
-    subType: SUBTYPE_SWITCH,
-    targets: {
-      on: [
-        { channel: 8, stateData: true },
-        { 
-          channel: 9,
-          stateData: {
-            on_off: 1,
-            brightness: 20,
-            hue: 30,
-            saturation: 100,
-          }
-        },
-        { channel: 5, stateData: true },  // Turn fan on
-        { channel: 4, stateData: false }, // Turn heater off          
-        { channel: 39, stateData: true }, // Turn audio amp on both ways
-        { 
-          channel: 2, 
-          stateData: {
-            on_off: 1,
-            brightness: 95,
-          }
-        },
-        { 
-          channel: 3,
-          stateData: {
-            on_off: 1,
-            brightness: 95,
-          }
-        },
-        { 
-          channel: 16,
-          stateData: {
-            on_off: 1,
-            brightness: 20,
-            hue: 240,
-            saturation: 100,
-          }
-        },
-        { 
-          channel: 37,
-          stateData: {
-            on_off: 1,
-            brightness: 20,
-            hue: 240,
-            saturation: 100,
-          }
-        },
-      ],
-      off: [
-        { channel: 8, stateData: false },
-        { 
-          channel: 9,
-          stateData: {
-            on_off: 1,
-            brightness: 100,
-            hue: 120,
-            saturation: 100,
-          }
-        },
-
-        { channel: 5, stateData: false }, // Turn fan off
-        { channel: 4, stateData: true },  // Turn heater on
-        { channel: 39, stateData: true }, // Turn audio amp on both ways
-        { 
-          channel: 2, 
-          stateData: {
-            on_off: 1,
-            brightness: 95,
-          }
-        },
-        { 
-          channel: 3,
-          stateData: {
-            on_off: 1,
-            brightness: 95,
-          }
-        },          
-        { 
-          channel: 16,
-          stateData: {
-            on_off: 1,
-            brightness: 20,
-            hue: 277,
-            saturation: 100,
-          }
-        },
-        { 
-          channel: 37,
-          stateData: {
-            on_off: 1,
-            brightness: 20,
-            hue: 277,
-            saturation: 100,
-          }
-        },
-      ],
-    }   
-  },
-  {
-    alias: 'Bathroom Heater',
-    channel: 15,
-    id: "80061465B741F3D278857FD2F8E09CD020C3200A",
-    locationId: 'loc-bathroom',
-    subType: SUBTYPE_PLUG,
-    displayLabel: "Heater",
-    displayType: SUBTYPE_AIR_HEAT,
-    hvacType: SUBTYPE_AIR_HEAT,
-  },
-  {
-    alias: 'Bedroom Desk Strip bottom',
-    channel: 16,
-    id: "8012ACE65E9CFF19DBAB8CAF5A2BBD942014A9B1",
-    locationId: 'loc-bedroom',
-    subType: SUBTYPE_LED_STRIP,
-  },
-
-  //Living Room
-  //***** ***** ***** ***** ***** **ppp p****
-  {
-    alias: 'Kitchen Ikea 1',
-    channel: 28, 
-    id: "801217E95EAD46CF3A6E6C5F9D70E22020F2079F",
-    locationId: 'loc-kitchen',
-    subType: SUBTYPE_BULB,
-    filters: [{
-      refId: 'naturalLight',
-      periodicallyActive: true,
-      applyPartially: 0.125,
-    }]
-  },
-  {
-    alias: 'Living Room Ikea 1',
-    channel: 29, 
-    id: "801264A4EC3F66CAC02D4FF78712E6D11F992564",
-    locationId: 'loc-livingRoom',
-    subType: SUBTYPE_BULB,
-    filters: [{
-      refId: 'naturalLight',
-      periodicallyActive: true,
-      applyPartially: 0.3,
-    }]
-  },
-  {
-    alias: 'Living Room Ikea 2',
-    channel: 30, 
-    id: "80124378042EF9B324B75F639D993F9F20F23759",
-    locationId: 'loc-livingRoom',
-    subType: SUBTYPE_BULB,
-    filters: [{
-      refId: 'naturalLight',
-      periodicallyActive: true,
-      applyPartially: 0.5,
-    }]
-  },
-  {
-    alias: 'Living Room Ikea 3',
-    channel: 31, 
-    id: "8012DEFBED48C05561BF6C2F5D8A490D1F77A75D",
-    locationId: 'loc-livingRoom',
-    subType: SUBTYPE_BULB,
-    filters: [ { refId: 'naturalLight' }],
-  },
-  {
-    alias: 'Living Room Ikea 4',
-    channel: 32, 
-    id: "8012D9195E6D17B426B7F74DE432D6A21F9BD8BE",
-    locationId: 'loc-livingRoom',
-    subType: SUBTYPE_BULB,
-    filters: [ { refId: 'naturalLight'} ],
-  },
-  {
-    alias: 'Jess\' Desk Lamp',
-    channel: 33, 
-    id: "8012D2D5067A0F9AE37075A3FA816E341F9D35A9",
-    locationId: 'loc-livingRoom',
-    subType: SUBTYPE_BULB,
-    filters: [ { refId: 'naturalLight'} ],
-  },
-  {
-    alias: 'Switch in Jess\' desk',
-    channel: 34, 
-    id: "800686BE89C5D37A63B4E70AB37689212066F343",
-    displayLabel: 'Jess Desk',
-    displayType: constants.SUBTYPE_LIGHT,
-    locationId: 'loc-livingRoom',
-    subType: SUBTYPE_SWITCH,
-    targets: {
-      on: [
-        {
-          channel: 31,
-          stateData: {
-            on_off: 1,
-          },
-          delay: 2000,
-        },
-        {
-          channel: 32,
-          stateData: {
-            on_off: 1,
-          },
-          delay: 2000,
-        },
-        {
-          channel: 33,
-          stateData: {
-            on_off: 1,
-          },
-          delay: 1000,
-        },
-        { channel: 36, stateData: true }, 
-        {
-          channel: 40,
-          stateData: {
-            brightness: 95,
-            on_off: 1,
-          },
-        }
-      ],
-      off: [
-        { channel: 31, stateData: false }, 
-        { channel: 32, stateData: false }, 
-        { channel: 33, stateData: false }, 
-        { channel: 36, stateData: false },
-        { channel: 40, stateData: false }, 
-      ],
-    }   
-  },
-  {
-    alias: 'Front Door Lamp',
-    channel: 35, 
-    class: 'class-outdoorLights',
-    id: "801277C3769ADD0BA769504AAB6B233E1F77F11C",
-    displayLabel: 'Entrance',
-    locationId: 'loc-outside',
-    subType: SUBTYPE_BULB,
-    filters: [
-      { refId: 'sunEvents-outdoorLights' },
-      { 
-        refId: 'naturalLight',
-        settings: {
-          offset: {
-            sunset: 0,
-            sunrise: 0,
-          }
-        }
-      },
-      { refId: 'schedule-outdoorLights'},
-    ],
-  },
-  {
-    alias: 'Jess Storage Shelves',
-    channel: 36, 
-    id: "80120A8622D026338547E3D7E88D70931F9E81A8",
-    locationId: 'loc-livingRoom',
-    subType: SUBTYPE_LED_STRIP,
-  },
-  {
-    alias: 'Bedroom Desk Strip Shelving',
-    channel: 37, 
-    id: "80125B9CDD55CE105CC76F0CA2F6C8CC1F5426D8",
-    locationId: 'loc-bedroom',
-    subType: SUBTYPE_LED_STRIP,    
-  },
-  {
-    alias: 'Bed Shelf Strip',
-    channel: 38, 
-    id: "8012D0E9DD82CBC61A864D093BF05E911F53B1E8",
-    locationId: 'loc-bedroom',
-    subType: SUBTYPE_LED_STRIP,
-    filters: [      
-      { 
-        /**
-         * Optionally reference a globally defined filter by its id.
-         * 
-         * If set, additional parameters may be defined which will override the
-         * defaults of the global filter.
-         * 
-         * refId:
-         */
-        refId: 'sunEvents-nightlights',
-
-        /**
-         * Label for the filter. If not provided it will:
-         * - default to the referenced global filters label if one is specified
-         * - default to pluginName if no global filter is referenced
-         * 
-         * label:
-         */
-        label: 'Led-strip bed',
-
-        /**
-          * Name of the filter plugin (maps to 'filters/name.js' )
-          * 
-          * pluginName:
-          */
- 
-        /**
-         * State data for the filter. Properties must be valid IOT.SMARTBULB parameters.
-         * 
-         * Example for sunEvents:
-         * 
-         * stateDate: {
-         *  brightness: {
-         *    value: 90,
-         *    altValue: 10,
-         *  }
-         * }
-         *
-         */
-        stateData: { 
-          brightness: { 
-            value: 85,
-            altValue: 1,
-          },
-          saturation: {
-            value: 15,
-            altValue: 100, 
-          },
-          hue: {
-            value: 24,
-            altValue: 24,
-          }
-        },
-        
-        // Should this filter be invoked when a switch is turned on or off?
-        switchPosition: true,
-
-        /**
-         * Populate this to add the filter to the periodic filter service runs.
-         *  
-         * Example: 
-         * 
-         * periodicallyActive: {
-         *  interval: 1 * MINUTE,
-         *  restriction: 'duskToDawn'
-         * }
-         */
-
-        settings: {
-          // Settings specific to the sunEvents filter
-          /**
-           * Specify across what time window the transition should occur.
-           * If not set or 0, it will be instant.
-           */
-          transitionTime: 1 * HOUR,
-
-          /**
-           * Specify an optional offset at which the transition should occur.
-           * The offset shifts the transition to before or after the sun event.
-           */
-          offset: 0 * HOUR,
-
-          /**
-           * If atDawnAndDuskOnly is set, apply optional padding on both sides of the time window
-           * resulting from the above parameters.
-           */
-          padding: 5 * MINUTE,
-        },
-      },
-    ],
-  //   linkedDevices: [
-  //     { 
-  //       channel: 101,
-  //       // Sync the switch to the powerstate of this device or just toggle it?
-  //       sync: true,
-  //       // Only has effect if sync === true: should the device be inversely synced
-  //       inverse: false,
-  //       // Sync/toggle when this device is set to the on position
-  //       onPosition: true, 
-  //       // Sync/toggle when this device is set to the off position
-  //       offPosition: true,
-  //       // NOT YET IMPLEMENTED: Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
-  //       onlyWhenSameStateAs: []
-  //     },
-  //     // When this light goes off, take channel 2 with.
-  //     { channel: 2, sync: true, onPosition: false, offPosition: true },
-  //   ],
-  },
-  {
-    alias: 'Jess Bed Switch',
-    channel: 101, 
-    id: "8006000F366B7DD70835CBF38A51040620662083",
-    displayLabel: 'Bed Shelf',
-    displayType: SUBTYPE_LIGHT,
-    locationId: 'loc-bedroom',
-    subType: SUBTYPE_SWITCH, 
-    targets: {
-      on: [
-        { 
-          channel: 38, 
-          stateData: {
-            brightness: 80, 
-            on_off: 1,
-            saturation: 0,
-          }
-        },
-      ],
-      off: [
-        { 
-          channel: 38, 
-          stateData: {
-            on_off: 0, 
-            transition: 20000
-          }
-        },
-      ]
-    }   
-  },
-  { 
-    alias: 'Bedroom Audio Amp',
-    channel: 39,
-    id: '80065A4E60A835C49695A74DA7FAE76520436E9C00',
-    locationId: 'loc-bedroom',
-    displayType: SUBTYPE_ENTERTAINMENT,
-    displayLabel: 'Amp',
-    subType: SUBTYPE_PLUG
-  },
-  { 
-    alias: 'Jess Desk Strip',
-    channel: 40,
-    id: '8012984E9F504FC4AEC384A012A6BEE01F54FA11',
-    locationId: 'loc-livingRoom',
-    subType: SUBTYPE_LED_STRIP,
-    filters: [ 
-      {
-        refId: 'nighttimeGlim',
-      },
-      { 
-        refId: 'naturalLight',
-        settings: {
-          /**
-           * This is a filter specific setting.
-           * naturalLight taps into externalFlags to execute conditionally.
-           */
-          restrictions: [
+    //Bedroom
+    {
+        alias: "Bedroom IKEA lamp",
+        channel: 2,
+        class: "class-johannesDeskLights",
+        displayLabel: "IKEA Lamp",
+        id: "8012E7EA0A70974D997DE95E898FBA261F980E1A",
+        locationId: "loc-bedroom",
+        subType: SUBTYPE_BULB,
+        filters: [
+            { refId: "naturalLight" },
             {
-              type: 'externalFlags',
-              url: 'http://lifelog.wnet.wn/ajax.php?action=getFlags',
-              flagName: 'sleep_wake',
-              flagState: true,  // Block the filter when flag is set to true
+                refId: "externalFlags",
+                stateData: {
+                    on_off: {
+                        value: 0,
+                        altValue: 1,
+                    },
+                },
+                settings: {
+                    flag: "busy_available",
+                },
             },
-          ],
-        },
-        stateData: {
-          color_temp: 0
-        }
-      },
-    ],
-  },
-  {
-    alias: 'Kitchen Counter Main',
-    channel: 42, 
-    id: "8006DE7EE2F73CBEA4629F293A1684A52042804800",
-    locationId: 'loc-kitchen',
-    subType: SUBTYPE_PLUG,
-  },
-  {
-    alias: 'Kitchen Counter Sink',
-    channel: 43, 
-    id: "8006DE7EE2F73CBEA4629F293A1684A52042804801",
-    locationId: 'loc-kitchen',
-    subType: SUBTYPE_PLUG,
-  },
-  {
-    alias: 'Kitchen Cabinets Aleds',
-    channel: 44, 
-    id: "8006DE7EE2F73CBEA4629F293A1684A52042804802",
-    display: false,
-    locationId: 'loc-kitchen',
-    subType: SUBTYPE_PLUG,
-  },
-  {
-    alias: 'Outside',
-    channel: 201,
-    id: 'esp8266-01-0',
-    url: 'http://192.168.1.23/read',
-    display: true,
-    locationId: 'loc-outside',
-    type: constants.DEVICETYPE_ESP_THERMOMETER,
-    subType: constants.SUBTYPE_THERMOMETER,
-    settings: {
-      jsonPath: 'temperature_sensors',
-      jsonPathId: { local_id: 0 },
-      jsonPathKey: 'tempC',
-      trends: {
-        short: {
-          label: 'short',
-          avg_calc_history_length: 15 * MINUTE,
-          avg_calc_data_window: 3 * MINUTE,    
-        },
-        mid: {
-          label: 'mid',
-          avg_calc_history_length: 30 * MINUTE,
-          avg_calc_data_window: 6 * MINUTE,    
-        },
-        long: {
-          label: 'long',
-          avg_calc_history_length: 60 * MINUTE,
-          avg_calc_data_window: 10 * MINUTE,    
-        },
-      },
-      
-    }
-  },
-  {
-    alias: 'Living Room',
-    channel: 202,
-    id: 'esp8266-01-1',
-    url: 'http://192.168.1.23/read',
-    display: true,
-    locationId: 'loc-livingRoom',
-    type: constants.DEVICETYPE_ESP_THERMOMETER,
-    subType: constants.SUBTYPE_THERMOMETER,
-    settings: {
-      jsonPath: 'temperature_sensors',
-      jsonPathId: { local_id: 1 },
-      jsonPathKey: 'tempC',
-      trends: {
-        short: {
-          label: 'short',
-          avg_calc_history_length: 15 * MINUTE,
-          avg_calc_data_window: 1 * MINUTE,    
-        },
-        mid: {
-          label: 'mid',
-          avg_calc_history_length: 45 * MINUTE,
-          avg_calc_data_window: 5 * MINUTE,    
-        },
-        long: {
-          label: 'long',
-          avg_calc_history_length: 90 * MINUTE,
-          avg_calc_data_window: 10 * MINUTE,    
-        },
-      },      
-    }
-  },
-  {
-    alias: 'Bedroom',
-    channel: 203,
-    id: 'esp8266-02-0',
-    url: 'http://192.168.1.22/read',
-    display: true,
-    locationId: 'loc-bedroom',
-    type: constants.DEVICETYPE_ESP_THERMOMETER,
-    subType: constants.SUBTYPE_THERMOMETER,
-    settings: {
-      jsonPath: 'ds18b20',
-      jsonPathId: { local_id: 0 },
-      jsonPathKey: 'temperature',
-      trends: {
-        short: {
-          label: 'short',
-          avg_calc_history_length: 15 * MINUTE,
-          avg_calc_data_window: 1 * MINUTE,    
-        },
-        mid: {
-          label: 'mid',
-          avg_calc_history_length: 45 * MINUTE,
-          avg_calc_data_window: 5 * MINUTE,    
-        },
-        long: {
-          label: 'long',
-          avg_calc_history_length: 90 * MINUTE,
-          avg_calc_data_window: 10 * MINUTE,    
-        },
-      },      
-    }
-  },
-  {
-    alias: 'Bathroom',
-    channel: 204,
-    id: 'esp8266-02-1',
-    url: 'http://192.168.1.22/read',
-    display: true,
-    locationId: 'loc-bathroom',
-    type: constants.DEVICETYPE_ESP_THERMOMETER,
-    subType: constants.SUBTYPE_THERMOMETER,
-    settings: {
-      jsonPath: 'ds18b20',
-      jsonPathId: { local_id: 1 },
-      jsonPathKey: 'temperature',
-      trends: {
-        short: {
-          label: 'short',
-          avg_calc_history_length: 5 * MINUTE,
-          avg_calc_data_window: 1 * MINUTE,    
-        },
-        mid: {
-          label: 'mid',
-          avg_calc_history_length: 20 * MINUTE,
-          avg_calc_data_window: 5 * MINUTE,    
-        },
-        long: {
-          label: 'long',
-          avg_calc_history_length: 60 * MINUTE,
-          avg_calc_data_window: 10 * MINUTE,    
-        },
-      },      
+        ],
     },
-  },
-  {
-    alias: 'Mailbox Lights',
-    channel: 205,
-    id: 'esp32-01-0',
-    url: 'http://192.168.1.25/read',
-    display: true,
-    displayLabel: 'Mailbox',    
-    locationId: 'loc-outside',
-    type: constants.DEVICETYPE_ESP_RELAY,
-    subType: constants.SUBTYPE_BULB,
-    settings: {
-      jsonPath: null, // Top level      
-      jsonPathKey: 'lights_on',
-      engageUrl: 'http://192.168.1.25/write?lights=on',
-      disengageUrl: 'http://192.168.1.25/write?lights=off',
-    }
-  },
-  {
-    alias: 'Mailbox Lock',
-    channel: 206,
-    id: 'esp32-01-1',
-    url: 'http://192.168.1.25/read',
-    display: true,
-    displayLabel: 'Mailbox',
-    displayType: constants.SUBTYPE_MAIL_COMPARTMENT,
-    locationId: 'loc-outside',
-    type: constants.DEVICETYPE_ESP_RELAY,
-    subType: constants.SUBTYPE_MAIL_COMPARTMENT,
-    settings: {
-      jsonPath: null, // Top level      
-      jsonPathKey: 'door_locked',
-      engageUrl: 'http://192.168.1.25/write?door=lock',
-      disengageUrl: 'http://192.168.1.25/write?door=unlock',
-    }
-  },
-  {
-    alias: 'Bathroom Thermostat',
-    channel: 207,
-    id: 'thermostat-bathroom',
-    display: true,
-    displayLabel: 'Thermostat',
-    displayType: constants.SUBTYPE_THERMOSTAT,
-    locationId: 'loc-bathroom',
-    type: constants.DEVICETYPE_VIRTUAL,
-    subType: constants.SUBTYPE_THERMOSTAT,    
-    settings: {
-      hysteresis: 1,  // Hysteresis in degrees Celsius
-      checkInterval: 1 * MINUTE,
-      target: 25,   // Will initialize to default if not set
-      heat: true,     // Should the room be heated?
-      cool: false,    // Should the room be cooled?
-    }
-  },
-  {
-    alias: 'Bedroom Thermostat',
-    channel: 208,
-    id: 'thermostat-bedroom',
-    display: true,
-    displayLabel: 'Thermostat',
-    displayType: constants.SUBTYPE_THERMOSTAT,
-    locationId: 'loc-bedroom',
-    type: constants.DEVICETYPE_VIRTUAL,
-    subType: constants.SUBTYPE_THERMOSTAT,    
-    settings: {
-      hysteresis: 0.5,  // Hysteresis in degrees Celsius
-      checkInterval: 30 * SECOND,
-      heat: true,     // Should the room be heated?
-      cool: false,    // Should the room be cooled?
-    }
-  },
-  {
-    alias: 'Kitchen Timer',
-    channel: 209,
-    id: 'timer-kitchen',
-    display: true,
-    displayLabel: 'Timer',
-    displayType: constants.SUBTYPE_TIMER,
-    locationId: 'loc-kitchen',
-    type: constants.DEVICETYPE_VIRTUAL,
-    subType: constants.SUBTYPE_TIMER,
-    settings: {
-      timers: [
-        {
-          id: '3m',
-          label: null, // will be set to id if undefined or null
-          subLabel: 'Tea',
-          length: 3 * MINUTE,
-          ttl: 3 * MINUTE,
-          repeatAlarmEvery: 30 * SECOND, // will default to a minute if undefined or null
-          audiofile: null,
+    {
+        alias: "Bedroom Desk Strip top",
+        channel: 3,
+        id: "80121CF5373D56F7C62278B4C0FE88A01F53DD26",
+        locationId: "loc-bedroom",
+        subType: SUBTYPE_LED_STRIP,
+        filters: [{ refId: "naturalLight" }],
+    },
+    {
+        alias: "Bedroom Heater",
+        channel: 4,
+        id: "80065A4E60A835C49695A74DA7FAE76520436E9C01",
+        displayType: SUBTYPE_AIR_HEAT,
+        displayLabel: "Heater",
+        locationId: "loc-bedroom",
+        subType: SUBTYPE_PLUG,
+        hvacType: SUBTYPE_AIR_HEAT,
+    },
+    {
+        alias: "Bedroom Fan",
+        channel: 5,
+        id: "80065A4E60A835C49695A74DA7FAE76520436E9C02",
+        locationId: "loc-bedroom",
+        displayType: SUBTYPE_AIR_FAN,
+        displayLabel: "Fan",
+        subType: SUBTYPE_PLUG,
+    },
+    {
+        alias: "Bedroom Ceiling 1",
+        channel: 6,
+        class: "class-bedroomLights",
+        id: "8012C3A3B58B58E8081EDBCF694C8CBC1F790A02",
+        locationId: "loc-bedroom",
+        subType: SUBTYPE_BULB,
+        filters: [{ refId: "naturalLight" }],
+    },
+    {
+        alias: "Bedroom Ceiling 2",
+        channel: 7,
+        class: "class-bedroomLights",
+        id: "8012511ABF75C811DB47A833DD2EDAED1F791417",
+        locationId: "loc-bedroom",
+        subType: SUBTYPE_BULB,
+        filters: [{ refId: "naturalLight" }],
+    },
+
+    //Hallway
+    {
+        alias: "Hallway Ceiling 1", //Hallway ceiling 2?
+        channel: 8,
+        class: "class-hallwayLights",
+        id: "80121D6F58ADDCAC185363C01347F5EA1F752B55",
+        locationId: "loc-kitchen",
+        subType: SUBTYPE_BULB,
+    },
+    {
+        alias: "Hallway Ceiling 2",
+        channel: 9,
+        class: "class-hallwayLights",
+        id: "8012DA57516B98CCFFE6467D8F4F01691F73C975",
+        locationId: "loc-kitchen",
+        subType: SUBTYPE_BULB,
+    },
+
+    //Bathroom
+    //***** ***pp pp***
+    {
+        alias: "Bathroom 1",
+        channel: 10,
+        id: "8012D32B889FD9CE23C825CEB1C2EFD41F73D8E2",
+        locationId: "loc-bathroom",
+        subType: SUBTYPE_BULB,
+        filters: [{ refId: "naturalLight" }],
+    },
+    {
+        alias: "Bathroom 2",
+        channel: 11,
+        id: "8012F65B8543DA7FFFC8A3F756D1EBE61F742CDF",
+        locationId: "loc-bathroom",
+        subType: SUBTYPE_BULB,
+        filters: [{ refId: "naturalLight" }],
+    },
+    {
+        alias: "Bathroom 3",
+        channel: 12,
+        id: "80128096836910A62F80A6B532C1461E1F79D295",
+        locationId: "loc-bathroom",
+        subType: SUBTYPE_BULB,
+        filters: [{ refId: "naturalLight" }],
+    },
+    {
+        alias: "Bathroom 4",
+        channel: 13,
+        id: "8012EE37548E3F0F48405DECC13D0B801F779B2B",
+        locationId: "loc-bathroom",
+        subType: SUBTYPE_BULB,
+        filters: [{ refId: "naturalLight" }],
+    },
+    {
+        alias: "Bedroom Desk Switch",
+        channel: 14,
+        id: "8006E7EB4A66E3687708A7ABF93FB237200DCDA4",
+        locationId: "loc-bedroom",
+        display: false,
+        subType: SUBTYPE_SWITCH,
+        targets: {
+            on: [
+                { channel: 8, stateData: true },
+                {
+                    channel: 9,
+                    stateData: {
+                        on_off: 1,
+                        brightness: 20,
+                        hue: 30,
+                        saturation: 100,
+                    },
+                },
+                { channel: 5, stateData: true }, // Turn fan on
+                { channel: 4, stateData: false }, // Turn heater off
+                { channel: 39, stateData: true }, // Turn audio amp on both ways
+                {
+                    channel: 2,
+                    stateData: {
+                        on_off: 1,
+                        brightness: 95,
+                    },
+                },
+                {
+                    channel: 3,
+                    stateData: {
+                        on_off: 1,
+                        brightness: 95,
+                    },
+                },
+                {
+                    channel: 16,
+                    stateData: {
+                        on_off: 1,
+                        brightness: 20,
+                        hue: 240,
+                        saturation: 100,
+                    },
+                },
+                {
+                    channel: 37,
+                    stateData: {
+                        on_off: 1,
+                        brightness: 20,
+                        hue: 240,
+                        saturation: 100,
+                    },
+                },
+            ],
+            off: [
+                { channel: 8, stateData: false },
+                {
+                    channel: 9,
+                    stateData: {
+                        on_off: 1,
+                        brightness: 100,
+                        hue: 120,
+                        saturation: 100,
+                    },
+                },
+
+                { channel: 5, stateData: false }, // Turn fan off
+                { channel: 4, stateData: true }, // Turn heater on
+                { channel: 39, stateData: true }, // Turn audio amp on both ways
+                {
+                    channel: 2,
+                    stateData: {
+                        on_off: 1,
+                        brightness: 95,
+                    },
+                },
+                {
+                    channel: 3,
+                    stateData: {
+                        on_off: 1,
+                        brightness: 95,
+                    },
+                },
+                {
+                    channel: 16,
+                    stateData: {
+                        on_off: 1,
+                        brightness: 20,
+                        hue: 277,
+                        saturation: 100,
+                    },
+                },
+                {
+                    channel: 37,
+                    stateData: {
+                        on_off: 1,
+                        brightness: 20,
+                        hue: 277,
+                        saturation: 100,
+                    },
+                },
+            ],
         },
-        {
-          id: '4m',          
-          subLabel: 'Coffee',
-          length: 4 * MINUTE,
-          ttl: 3 * MINUTE,
-          audiofile: null,
+    },
+    {
+        alias: "Bathroom Heater",
+        channel: 15,
+        id: "80061465B741F3D278857FD2F8E09CD020C3200A",
+        locationId: "loc-bathroom",
+        subType: SUBTYPE_PLUG,
+        displayLabel: "Heater",
+        displayType: SUBTYPE_AIR_HEAT,
+        hvacType: SUBTYPE_AIR_HEAT,
+    },
+    {
+        alias: "Bedroom Desk Strip bottom",
+        channel: 16,
+        id: "8012ACE65E9CFF19DBAB8CAF5A2BBD942014A9B1",
+        locationId: "loc-bedroom",
+        subType: SUBTYPE_LED_STRIP,
+    },
+
+    //Living Room
+    //***** ***** ***** ***** ***** **ppp p****
+    {
+        alias: "Kitchen Ikea 1",
+        channel: 28,
+        id: "801217E95EAD46CF3A6E6C5F9D70E22020F2079F",
+        locationId: "loc-kitchen",
+        subType: SUBTYPE_BULB,
+        filters: [
+            {
+                refId: "naturalLight",
+                periodicallyActive: true,
+                applyPartially: 0.125,
+            },
+        ],
+    },
+    {
+        alias: "Living Room Ikea 1",
+        channel: 29,
+        id: "801264A4EC3F66CAC02D4FF78712E6D11F992564",
+        locationId: "loc-livingRoom",
+        subType: SUBTYPE_BULB,
+        filters: [
+            {
+                refId: "naturalLight",
+                periodicallyActive: true,
+                applyPartially: 0.3,
+            },
+        ],
+    },
+    {
+        alias: "Living Room Ikea 2",
+        channel: 30,
+        id: "80124378042EF9B324B75F639D993F9F20F23759",
+        locationId: "loc-livingRoom",
+        subType: SUBTYPE_BULB,
+        filters: [
+            {
+                refId: "naturalLight",
+                periodicallyActive: true,
+                applyPartially: 0.5,
+            },
+        ],
+    },
+    {
+        alias: "Living Room Ikea 3",
+        channel: 31,
+        id: "8012DEFBED48C05561BF6C2F5D8A490D1F77A75D",
+        locationId: "loc-livingRoom",
+        subType: SUBTYPE_BULB,
+        filters: [{ refId: "naturalLight" }],
+    },
+    {
+        alias: "Living Room Ikea 4",
+        channel: 32,
+        id: "8012D9195E6D17B426B7F74DE432D6A21F9BD8BE",
+        locationId: "loc-livingRoom",
+        subType: SUBTYPE_BULB,
+        filters: [{ refId: "naturalLight" }],
+    },
+    {
+        alias: "Jess' Desk Lamp",
+        channel: 33,
+        id: "8012D2D5067A0F9AE37075A3FA816E341F9D35A9",
+        locationId: "loc-livingRoom",
+        subType: SUBTYPE_BULB,
+        filters: [{ refId: "naturalLight" }],
+    },
+    {
+        alias: "Switch in Jess' desk",
+        channel: 34,
+        id: "800686BE89C5D37A63B4E70AB37689212066F343",
+        displayLabel: "Jess Desk",
+        displayType: constants.SUBTYPE_LIGHT,
+        locationId: "loc-livingRoom",
+        subType: SUBTYPE_SWITCH,
+        targets: {
+            on: [
+                {
+                    channel: 31,
+                    stateData: {
+                        on_off: 1,
+                    },
+                    delay: 2000,
+                },
+                {
+                    channel: 32,
+                    stateData: {
+                        on_off: 1,
+                    },
+                    delay: 2000,
+                },
+                {
+                    channel: 33,
+                    stateData: {
+                        on_off: 1,
+                    },
+                    delay: 1000,
+                },
+                { channel: 36, stateData: true },
+                {
+                    channel: 40,
+                    stateData: {
+                        brightness: 95,
+                        on_off: 1,
+                    },
+                },
+            ],
+            off: [
+                { channel: 31, stateData: false },
+                { channel: 32, stateData: false },
+                { channel: 33, stateData: false },
+                { channel: 36, stateData: false },
+                { channel: 40, stateData: false },
+            ],
         },
-        {
-          id: '6m30',
-          subLabel: 'Eggs',
-          length: 6 * MINUTE + 30 * SECOND,
-          ttl: 3 * MINUTE,
-          audiofile: null,
+    },
+    {
+        alias: "Front Door Lamp",
+        channel: 35,
+        class: "class-outdoorLights",
+        id: "801277C3769ADD0BA769504AAB6B233E1F77F11C",
+        displayLabel: "Entrance",
+        locationId: "loc-outside",
+        subType: SUBTYPE_BULB,
+        filters: [
+            { refId: "sunEvents-outdoorLights" },
+            {
+                refId: "naturalLight",
+                settings: {
+                    offset: {
+                        sunset: 0,
+                        sunrise: 0,
+                    },
+                },
+            },
+            { refId: "schedule-outdoorLights" },
+        ],
+    },
+    {
+        alias: "Jess Storage Shelves",
+        channel: 36,
+        id: "80120A8622D026338547E3D7E88D70931F9E81A8",
+        locationId: "loc-livingRoom",
+        subType: SUBTYPE_LED_STRIP,
+    },
+    {
+        alias: "Bedroom Desk Strip Shelving",
+        channel: 37,
+        id: "80125B9CDD55CE105CC76F0CA2F6C8CC1F5426D8",
+        locationId: "loc-bedroom",
+        subType: SUBTYPE_LED_STRIP,
+    },
+    {
+        alias: "Bed Shelf Strip",
+        channel: 38,
+        id: "8012D0E9DD82CBC61A864D093BF05E911F53B1E8",
+        locationId: "loc-bedroom",
+        subType: SUBTYPE_LED_STRIP,
+        filters: [
+            {
+                /**
+                 * Optionally reference a globally defined filter by its id.
+                 *
+                 * If set, additional parameters may be defined which will override the
+                 * defaults of the global filter.
+                 *
+                 * refId:
+                 */
+                refId: "sunEvents-nightlights",
+
+                /**
+                 * Label for the filter. If not provided it will:
+                 * - default to the referenced global filters label if one is specified
+                 * - default to pluginName if no global filter is referenced
+                 *
+                 * label:
+                 */
+                label: "Led-strip bed",
+
+                /**
+                 * Name of the filter plugin (maps to 'filters/name.js' )
+                 *
+                 * pluginName:
+                 */
+
+                /**
+                 * State data for the filter. Properties must be valid IOT.SMARTBULB parameters.
+                 *
+                 * Example for sunEvents:
+                 *
+                 * stateDate: {
+                 *  brightness: {
+                 *    value: 90,
+                 *    altValue: 10,
+                 *  }
+                 * }
+                 *
+                 */
+                stateData: {
+                    brightness: {
+                        value: 85,
+                        altValue: 1,
+                    },
+                    saturation: {
+                        value: 15,
+                        altValue: 100,
+                    },
+                    hue: {
+                        value: 24,
+                        altValue: 24,
+                    },
+                },
+
+                // Should this filter be invoked when a switch is turned on or off?
+                switchPosition: true,
+
+                /**
+                 * Populate this to add the filter to the periodic filter service runs.
+                 *
+                 * Example:
+                 *
+                 * periodicallyActive: {
+                 *  interval: 1 * MINUTE,
+                 *  restriction: 'duskToDawn'
+                 * }
+                 */
+
+                settings: {
+                    // Settings specific to the sunEvents filter
+                    /**
+                     * Specify across what time window the transition should occur.
+                     * If not set or 0, it will be instant.
+                     */
+                    transitionTime: 1 * HOUR,
+
+                    /**
+                     * Specify an optional offset at which the transition should occur.
+                     * The offset shifts the transition to before or after the sun event.
+                     */
+                    offset: 0 * HOUR,
+
+                    /**
+                     * If atDawnAndDuskOnly is set, apply optional padding on both sides of the time window
+                     * resulting from the above parameters.
+                     */
+                    padding: 5 * MINUTE,
+                },
+            },
+        ],
+        //   linkedDevices: [
+        //     {
+        //       channel: 101,
+        //       // Sync the switch to the powerstate of this device or just toggle it?
+        //       sync: true,
+        //       // Only has effect if sync === true: should the device be inversely synced
+        //       inverse: false,
+        //       // Sync/toggle when this device is set to the on position
+        //       onPosition: true,
+        //       // Sync/toggle when this device is set to the off position
+        //       offPosition: true,
+        //       // NOT YET IMPLEMENTED: Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
+        //       onlyWhenSameStateAs: []
+        //     },
+        //     // When this light goes off, take channel 2 with.
+        //     { channel: 2, sync: true, onPosition: false, offPosition: true },
+        //   ],
+    },
+    {
+        alias: "Jess Bed Switch",
+        channel: 101,
+        id: "8006000F366B7DD70835CBF38A51040620662083",
+        displayLabel: "Bed Shelf",
+        displayType: SUBTYPE_LIGHT,
+        locationId: "loc-bedroom",
+        subType: SUBTYPE_SWITCH,
+        targets: {
+            on: [
+                {
+                    channel: 38,
+                    stateData: {
+                        brightness: 80,
+                        on_off: 1,
+                        saturation: 0,
+                    },
+                },
+            ],
+            off: [
+                {
+                    channel: 38,
+                    stateData: {
+                        on_off: 0,
+                        transition: 20000,
+                    },
+                },
+            ],
         },
+    },
+    {
+        alias: "Bedroom Audio Amp",
+        channel: 39,
+        id: "80065A4E60A835C49695A74DA7FAE76520436E9C00",
+        locationId: "loc-bedroom",
+        displayType: SUBTYPE_ENTERTAINMENT,
+        displayLabel: "Amp",
+        subType: SUBTYPE_PLUG,
+    },
+    {
+        alias: "Jess Desk Strip",
+        channel: 40,
+        id: "8012984E9F504FC4AEC384A012A6BEE01F54FA11",
+        locationId: "loc-livingRoom",
+        subType: SUBTYPE_LED_STRIP,
+        filters: [
+            {
+                refId: "nighttimeGlim",
+            },
+            {
+                refId: "naturalLight",
+                settings: {
+                    /**
+                     * This is a filter specific setting.
+                     * naturalLight taps into externalFlags to execute conditionally.
+                     */
+                    restrictions: [
+                        {
+                            type: "externalFlags",
+                            url: "http://lifelog.wnet.wn/ajax.php?action=getFlags",
+                            flagName: "sleep_wake",
+                            flagState: true, // Block the filter when flag is set to true
+                        },
+                    ],
+                },
+                stateData: {
+                    color_temp: 0,
+                },
+            },
+        ],
+    },
+    {
+        alias: "Kitchen Counter Main",
+        channel: 42,
+        id: "8006DE7EE2F73CBEA4629F293A1684A52042804800",
+        locationId: "loc-kitchen",
+        subType: SUBTYPE_PLUG,
+    },
+    {
+        alias: "Kitchen Counter Sink",
+        channel: 43,
+        id: "8006DE7EE2F73CBEA4629F293A1684A52042804801",
+        locationId: "loc-kitchen",
+        subType: SUBTYPE_PLUG,
+    },
+    {
+        alias: "Kitchen Cabinets Aleds",
+        channel: 44,
+        id: "8006DE7EE2F73CBEA4629F293A1684A52042804802",
+        display: false,
+        locationId: "loc-kitchen",
+        subType: SUBTYPE_PLUG,
+    },
+    {
+        alias: "Outside",
+        channel: 201,
+        id: "esp8266-01-0",
+        url: "http://192.168.1.23/read",
+        display: true,
+        locationId: "loc-outside",
+        type: constants.DEVICETYPE_ESP_THERMOMETER,
+        subType: constants.SUBTYPE_THERMOMETER,
+        settings: {
+            jsonPath: "temperature_sensors",
+            jsonPathId: { local_id: 0 },
+            jsonPathKey: "tempC",
+            trends: {
+                short: {
+                    label: "short",
+                    avg_calc_history_length: 15 * MINUTE,
+                    avg_calc_data_window: 3 * MINUTE,
+                },
+                mid: {
+                    label: "mid",
+                    avg_calc_history_length: 30 * MINUTE,
+                    avg_calc_data_window: 6 * MINUTE,
+                },
+                long: {
+                    label: "long",
+                    avg_calc_history_length: 60 * MINUTE,
+                    avg_calc_data_window: 10 * MINUTE,
+                },
+            },
+        },
+    },
+    {
+        alias: "Living Room",
+        channel: 202,
+        id: "esp8266-01-1",
+        url: "http://192.168.1.23/read",
+        display: true,
+        locationId: "loc-livingRoom",
+        type: constants.DEVICETYPE_ESP_THERMOMETER,
+        subType: constants.SUBTYPE_THERMOMETER,
+        settings: {
+            jsonPath: "temperature_sensors",
+            jsonPathId: { local_id: 1 },
+            jsonPathKey: "tempC",
+            trends: {
+                short: {
+                    label: "short",
+                    avg_calc_history_length: 15 * MINUTE,
+                    avg_calc_data_window: 1 * MINUTE,
+                },
+                mid: {
+                    label: "mid",
+                    avg_calc_history_length: 45 * MINUTE,
+                    avg_calc_data_window: 5 * MINUTE,
+                },
+                long: {
+                    label: "long",
+                    avg_calc_history_length: 90 * MINUTE,
+                    avg_calc_data_window: 10 * MINUTE,
+                },
+            },
+        },
+    },
+    {
+        alias: "Bedroom",
+        channel: 203,
+        id: "esp8266-02-0",
+        url: "http://192.168.1.22/read",
+        display: true,
+        locationId: "loc-bedroom",
+        type: constants.DEVICETYPE_ESP_THERMOMETER,
+        subType: constants.SUBTYPE_THERMOMETER,
+        settings: {
+            jsonPath: "ds18b20",
+            jsonPathId: { local_id: 0 },
+            jsonPathKey: "temperature",
+            trends: {
+                short: {
+                    label: "short",
+                    avg_calc_history_length: 15 * MINUTE,
+                    avg_calc_data_window: 1 * MINUTE,
+                },
+                mid: {
+                    label: "mid",
+                    avg_calc_history_length: 45 * MINUTE,
+                    avg_calc_data_window: 5 * MINUTE,
+                },
+                long: {
+                    label: "long",
+                    avg_calc_history_length: 90 * MINUTE,
+                    avg_calc_data_window: 10 * MINUTE,
+                },
+            },
+        },
+    },
+    {
+        alias: "Bathroom",
+        channel: 204,
+        id: "esp8266-02-1",
+        url: "http://192.168.1.22/read",
+        display: true,
+        locationId: "loc-bathroom",
+        type: constants.DEVICETYPE_ESP_THERMOMETER,
+        subType: constants.SUBTYPE_THERMOMETER,
+        settings: {
+            jsonPath: "ds18b20",
+            jsonPathId: { local_id: 1 },
+            jsonPathKey: "temperature",
+            trends: {
+                short: {
+                    label: "short",
+                    avg_calc_history_length: 5 * MINUTE,
+                    avg_calc_data_window: 1 * MINUTE,
+                },
+                mid: {
+                    label: "mid",
+                    avg_calc_history_length: 20 * MINUTE,
+                    avg_calc_data_window: 5 * MINUTE,
+                },
+                long: {
+                    label: "long",
+                    avg_calc_history_length: 60 * MINUTE,
+                    avg_calc_data_window: 10 * MINUTE,
+                },
+            },
+        },
+    },
+    {
+        alias: "Mailbox Lights",
+        channel: 205,
+        id: "esp32-01-0",
+        url: "http://192.168.1.25/read",
+        display: true,
+        displayLabel: "Mailbox",
+        locationId: "loc-outside",
+        type: constants.DEVICETYPE_ESP_RELAY,
+        subType: constants.SUBTYPE_BULB,
+        settings: {
+            jsonPath: null, // Top level
+            jsonPathKey: "lights_on",
+            engageUrl: "http://192.168.1.25/write?lights=on",
+            disengageUrl: "http://192.168.1.25/write?lights=off",
+        },
+    },
+    {
+        alias: "Mailbox Lock",
+        channel: 206,
+        id: "esp32-01-1",
+        url: "http://192.168.1.25/read",
+        display: true,
+        displayLabel: "Mailbox",
+        displayType: constants.SUBTYPE_MAIL_COMPARTMENT,
+        locationId: "loc-outside",
+        type: constants.DEVICETYPE_ESP_RELAY,
+        subType: constants.SUBTYPE_MAIL_COMPARTMENT,
+        settings: {
+            jsonPath: null, // Top level
+            jsonPathKey: "door_locked",
+            engageUrl: "http://192.168.1.25/write?door=lock",
+            disengageUrl: "http://192.168.1.25/write?door=unlock",
+        },
+    },
+    {
+        alias: "Bathroom Thermostat",
+        channel: 207,
+        id: "thermostat-bathroom",
+        display: true,
+        displayLabel: "Thermostat",
+        displayType: constants.SUBTYPE_THERMOSTAT,
+        locationId: "loc-bathroom",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_THERMOSTAT,
+        settings: {
+            hysteresis: 1, // Hysteresis in degrees Celsius
+            checkInterval: 1 * MINUTE,
+            target: 25, // Will initialize to default if not set
+            heat: true, // Should the room be heated?
+            cool: false, // Should the room be cooled?
+        },
+    },
+    {
+        alias: "Bedroom Thermostat",
+        channel: 208,
+        id: "thermostat-bedroom",
+        display: true,
+        displayLabel: "Thermostat",
+        displayType: constants.SUBTYPE_THERMOSTAT,
+        locationId: "loc-bedroom",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_THERMOSTAT,
+        settings: {
+            hysteresis: 0.5, // Hysteresis in degrees Celsius
+            checkInterval: 30 * SECOND,
+            heat: true, // Should the room be heated?
+            cool: false, // Should the room be cooled?
+        },
+    },
+    {
+        alias: "Kitchen Timer",
+        channel: 209,
+        id: "timer-kitchen",
+        display: true,
+        displayLabel: "Timer",
+        displayType: constants.SUBTYPE_TIMER,
+        locationId: "loc-kitchen",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_TIMER,
+        settings: {
+            timers: [
+                {
+                    id: "3m",
+                    label: null, // will be set to id if undefined or null
+                    subLabel: "Tea",
+                    length: 3 * MINUTE,
+                    ttl: 3 * MINUTE,
+                    repeatAlarmEvery: 60 * SECOND, // will default to a minute if undefined or null
+                    audiofile: null,
+                },
+                {
+                    id: "4m",
+                    subLabel: "Coffee",
+                    length: 4 * MINUTE,
+                    ttl: 3 * MINUTE,
+                    audiofile: null,
+                },
+                {
+                    id: "6m30",
+                    subLabel: "Eggs",
+                    length: 6 * MINUTE + 30 * SECOND,
+                    ttl: 3 * MINUTE,
+                    audiofile: null,
+                },
+                {
+                    id: "10m",
+                    length: 10 * MINUTE,
+                    ttl: 3 * MINUTE,
+                    audiofile: null,
+                },
+                {
+                    id: "20m",
+                    length: 20 * MINUTE,
+                    ttl: 3 * MINUTE,
+                    audiofile: null,
+                },
+            ],
+        },
+    },
 
-      ],
-    }
-  },
-
-  
-
-
-
-  
-//Kitchen and living room all: ***** ***** ***** *p*p* pp*p* ppppp **
-//Full on: **1** ***** ****1 11*1* 11*1* 11111 111
-//Blackout: 000** 00000 00**0 00000 00000 00000 000
-//Desk work: **p** ***** ****p p
-//Bedroom ceil: ***** pp***
-//Bedroom all: *pp** pp*** ***** p**** ***** ***** ***** *pp**
-//Bathroom: ***** ****pp pp***
-//Jess' desk: ***** ***** ***** ***** ***** ***** *ppp**
-
+    //Kitchen and living room all: ***** ***** ***** *p*p* pp*p* ppppp **
+    //Full on: **1** ***** ****1 11*1* 11*1* 11111 111
+    //Blackout: 000** 00000 00**0 00000 00000 00000 000
+    //Desk work: **p** ***** ****p p
+    //Bedroom ceil: ***** pp***
+    //Bedroom all: *pp** pp*** ***** p**** ***** ***** ***** *pp**
+    //Bathroom: ***** ****pp pp***
+    //Jess' desk: ***** ***** ***** ***** ***** ***** *ppp**
 ];
 
 

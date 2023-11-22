@@ -97,7 +97,7 @@ constants.photos = {
 }
 
 constants.touchPanel = {
-  thermometerChannels: [ 201, 204 ]
+  thermometerChannels: [ 201, 202 ]
 }
 
 export default constants;

@@ -43,7 +43,6 @@ function TimerPanel() {
   const selectTimer = (event) => {
     const timerId = event.currentTarget.dataset.id;
     const selectedTimerId = event.currentTarget.dataset.selected;
-    console.log('selecttimer', timerId, selectedTimerId);
 
     // Select, or remove the selection if it is already selected.
     setSelectedTimer(selectedTimerId == timerId ? null : timerId);

@@ -13,8 +13,9 @@ function Temperature(props: any) {
 
     const thermometers = getThermometers(devices);
 
-    const primaryThermometer = thermometers.length ? thermometers[0] : null;
-    const secondaryThermometer = thermometers.length > 1 ? thermometers[1] : null;
+    const thermometer = props.type === 'secondary' ?
+      thermometers.length > 1 ? thermometers[1] : null :
+      thermometers.length ? thermometers[0] : null;
 
     const getDisplayData = (thermometer: any, useTrend = 'long') => {
       const data = {
@@ -82,7 +83,7 @@ function Temperature(props: any) {
       return data;
     }
 
-    const primaryData = getDisplayData(primaryThermometer, 'long');
+    const primaryData = getDisplayData(thermometer, 'long');
 
     const styleTemp = {
         color: tempToColor(primaryData.tempC),
@@ -93,19 +94,17 @@ function Temperature(props: any) {
     };
 
     return (
-        <>
-            <div className="fullscreen-panel-temperature">
-                <div className="primary-thermometer">
-                    <div className="thermometer-temp" style={styleTemp}>
-                      {primaryData.tempC}
-                    </div>
-                    <div className="thermometer-trend" style={styleTrend}>
-                      {primaryData.trend}
-                    </div>
-                </div>
-                {/* <div className="secondary-thermometer">{secondaryData.tempC}</div> */}
-            </div>
-        </>
+      <div className="fullscreen-panel-temperature">
+          <div className="thermometer-label">
+              {thermometer?.location}
+          </div>
+          <div className="thermometer-temp" style={styleTemp}>
+              {primaryData.tempC}
+          </div>
+          <div className="thermometer-trend" style={styleTrend}>
+              {primaryData.trend}
+          </div>
+      </div>
     );
 }
 
@@ -113,19 +112,19 @@ function tempToColor(tempC) {
   tempC = parseFloat(tempC);
 
   let color = '6666FF';
-  if (tempC > 0) {
+  if (tempC >= 0) {
     color = '9999FF';
   }
 
-  if (tempC > 20) {
+  if (tempC >= 20) {
     color = '99FF99';
   }
 
-  if (tempC > 25) {
+  if (tempC >= 25) {
     color = 'FFAAAA';
   }
 
-  if (tempC > 30) {
+  if (tempC >= 30) {
       color = "FF7777";
   }
 

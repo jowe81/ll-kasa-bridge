@@ -23,7 +23,10 @@ function LiveTimer(props) {
 
   const subLabelJsx = timer.subLabel ?
     <span>{timer.subLabel}, ready { timer.expiresIn >= 0 ? `at ${formatClockTime(timer.expires)}` : `now!` }</span> :
-    <span>{timer.expiresIn >= 0 ? `Expires at ${formatClockTime(timer.expires)}` : `Expired!` }</span>;
+    <span>{timer.expiresIn >= 0 ? 
+      `${timer.id ? `${timer.id}, expires` : `Custom, expires`} ${formatClockTime(timer.expires)}` :
+      timer.id ? `${timer.id} expired!` : `Custom timer expired!` }
+    </span>;
 
 
   return (
