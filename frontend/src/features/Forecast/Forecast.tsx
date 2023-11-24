@@ -60,7 +60,7 @@ function getDisplayData(state, n) {
     if  (extractedData.weatherMain = state.list && state.list[n] && state.list[n].weather && state.list[n].weather.length) {
       extractedData.cityName = state.city?.name;
       extractedData.weatherMain = state.list[n].weather[0].main;
-      extractedData.tempC = (state.list[n].main.temp - 273).toFixed(1) + "°C"; // Comes in Kelvin
+      extractedData.tempC = (state.list[n].main.temp - 273).toFixed() + "°C"; // Comes in Kelvin
     }
 
     
