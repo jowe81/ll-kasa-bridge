@@ -48,7 +48,7 @@ const VirtualDeviceWrapper = {
     return this.state.powerState;    
   },
 
-  init(mapItem, globalConfig, deviceEventCallback, devicePool, socketHandler) {
+  init(cache, mapItem, globalConfig, deviceEventCallback, devicePool, socketHandler) {
     this.globalConfig = globalConfig;
     this.deviceEventCallback = deviceEventCallback;
     this.devicePool = devicePool;
@@ -85,6 +85,15 @@ const VirtualDeviceWrapper = {
       }
     });
         
+    // Initialize the cache for all Virtual devices
+    if (!this.cache) {
+      this.cache = cache;
+    }
+
+    // Initialize the cache for this device
+    this.cache[mapItem.channel] = {};
+    const cacheForThisDevice = this.cache[mapItem.channel];
+
     this.deviceHandler = {};         
 
     // Device-specific initialization (using plugin)
@@ -93,8 +102,8 @@ const VirtualDeviceWrapper = {
 
     if (handlerGenerator) {
       log(`Instantiating handler for device of type: ${this.type}/${this.subType}`, this);
-      const getHandlerInstance = deviceHandlerPlugins[`${this.subType}Handler`].default;    
-      this.deviceHandler = getHandlerInstance(devicePool, this);  
+      const getHandlerInstance = deviceHandlerPlugins[`${this.subType}Handler`].default;
+      this.deviceHandler = getHandlerInstance(devicePool, this, cacheForThisDevice);  
     }
   },
 
@@ -191,10 +200,9 @@ const VirtualDeviceWrapper = {
     }      
   },
 
-  _updateState(payload) {
+  _updateState(payload, force) {
     this.lastSeenAt = Date.now();
-
-    if (!_.isEqual(this.state, payload)) {
+    if (force || !_.isEqual(this.state, payload)) {
       const changeInfo = this.deviceHandler.analyzeStateChange ?
        this.deviceHandler.analyzeStateChange(this.state, payload) :
        undefined;

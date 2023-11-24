@@ -1451,6 +1451,32 @@ const deviceMap = [
             ],
         },
     },
+    {
+        //api.openweathermap.org/data/2.5/forecast?lat=49.2762&lon=-123.0402&appid=aa4de02d63792ab0d52f35085261c36d
+        alias: "Weather Service",
+        channel: 501,
+        id: "weather-service",
+        display: true,
+        displayLabel: "Weather Service",
+        displayType: null,
+        locationId: '__internal',
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_WEATHER_SERVICE,
+        settings: {
+          api: {
+            baseUrl: "https://api.openweathermap.org",
+            path: "/data/2.5/forecast",
+            queryParams: {
+              // 3048 Venables St Vancouver BC
+              lat: 49.2762,
+              lon: -123.0402,
+              // API Key
+              appid: 'aa4de02d63792ab0d52f35085261c36d', 
+            }
+          },
+          checkInterval: 1 * HOUR,
+        },
+    },
 
     //Kitchen and living room all: ***** ***** ***** *p*p* pp*p* ppppp **
     //Full on: **1** ***** ****1 11*1* 11*1* 11111 111

@@ -51,6 +51,7 @@ const constants = {
 
   SUBTYPE_THERMOSTAT: 'thermostat',
   SUBTYPE_TIMER: 'timer',
+  SUBTYPE_WEATHER_SERVICE: 'weatherService',
 
   // Service names
   SERVICE_PERIODIC_FILTER: 'Periodic Filter Service',
@@ -80,6 +81,7 @@ constants.SUBTYPES = [
   constants.SUBTYPE_THERMOMETER,
   constants.SUBTYPE_THERMOSTAT,
   constants.SUBTYPE_TIMER,
+  constants.SUBTYPE_WEATHER_SERVICE,
 ]
 
 constants.DEVICETYPES_LIGHTING = [

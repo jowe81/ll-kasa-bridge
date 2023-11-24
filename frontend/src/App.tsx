@@ -55,6 +55,9 @@ function App() {
     });
 
     socket.on('auto/device/state', (data: DeviceStateUpdate) => {
+      if (data?.data?.channel === 501) {
+        console.log(data);
+      }
       dispatch(deviceStateUpdated(data));
     });
 

@@ -1,9 +1,8 @@
 import "./temperature.css";
-import { Device, Group } from "../devices/dataSlice.ts";
+import { Device } from "../devices/dataSlice.ts";
 import constants from "../../constants.ts";
 
 import { useAppSelector } from "../../app/hooks.ts";
-import { useState, useEffect } from "react";
 
 function Temperature(props: any) {
     const devices = useAppSelector((state) => state.data.devices);

@@ -868,7 +868,7 @@ const cmdFailPrefix = '[FAIL]';
         if (this.isOnline) {
           log("Polling error. Device probably went offline.", this, null, err?.message);
         }
-        console.log(err);
+
       });
   
       const pollInterval = this.config?.pollInterval ?? 10000;

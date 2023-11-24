@@ -345,7 +345,8 @@ const devicePool = {
     const deviceMap = await this.getDeviceMapFromDb();
 
     if (Array.isArray(deviceMap)) {
-      const EspCache = {};
+      const espCache = {};
+      const virtualCache = {};
 
       deviceMap.forEach(mapItem => {
         if (!mapItem.id) {
@@ -361,13 +362,13 @@ const devicePool = {
           case constants.DEVICETYPE_ESP_THERMOMETER:
           case constants.DEVICETYPE_ESP_RELAY:
             deviceWrapper = Object.create(EspDeviceWrapper);
-            deviceWrapper.init(EspCache, mapItem, globalConfig, null, this, socketHandler);
+            deviceWrapper.init(espCache, mapItem, globalConfig, null, this, socketHandler);
             this.devices.push(deviceWrapper);
             break;
 
           case constants.DEVICETYPE_VIRTUAL:
             deviceWrapper = Object.create(VirtualDeviceWrapper);
-            deviceWrapper.init(mapItem, globalConfig, null, this, socketHandler);
+            deviceWrapper.init(virtualCache, mapItem, globalConfig, null, this, socketHandler);
             this.devices.push(deviceWrapper);
             break;
 

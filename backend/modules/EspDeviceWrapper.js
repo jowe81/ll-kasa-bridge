@@ -247,7 +247,6 @@ const EspDeviceWrapper = {
 
       } catch(err) {
         log(`Polling error: ${err.message}`, this);
-        console.log(err)
       }
       
     }, pollInterval);
