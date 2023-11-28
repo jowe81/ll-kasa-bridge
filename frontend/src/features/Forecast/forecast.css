@@ -1,0 +1,41 @@
+.forecast-display-data-container {
+  font-size: 15px;
+  height: 90px;
+  display: flex;
+  flex-direction: row-reverse;
+  flex-flow: wrap;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.forecast-item-container {
+  display: flex;
+  height: 43px;
+  width: 80px;  
+  /* border: 1px solid yellow */
+}
+
+.forecast-icon-container {
+
+}
+
+.forecast-icon {
+  position: relative;
+  top: -2px;
+  height: 47px;
+}
+
+.forecast-text-time {
+  font-size: 12px;
+}
+
+.forecast-text-temp {
+  font-size: 15px;
+}
+
+.forecast-label {
+  padding-top:14px;
+  max-height: 25px;  
+  border-bottom: 1px solid #333;
+  color: #999;
+}
