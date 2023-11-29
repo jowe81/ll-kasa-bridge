@@ -44,6 +44,7 @@
 
 .thermometer-extradata-container .thermometer-trend img {
   width: 40px;
+  min-height: 12px;
 }
 
 .thermometer-temp {
