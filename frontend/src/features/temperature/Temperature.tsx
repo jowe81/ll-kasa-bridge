@@ -12,6 +12,8 @@ function Temperature(props: any) {
 
     const thermometers = getThermometers(devices);
 
+    const baseUrlToFrontend = window.location.origin;
+    
     const thermometer = props.type === 'secondary' ?
       thermometers.length > 1 ? thermometers[1] : null :
       thermometers.length ? thermometers[0] : null;
@@ -23,6 +25,8 @@ function Temperature(props: any) {
           trend: "",
           trendDirection: "",
           trendColor: "",
+          trendIconUrl: "",
+          trendIconCount: 0,
       };
 
       if (!thermometer || !thermometer.state?.trends) {
@@ -31,7 +35,7 @@ function Temperature(props: any) {
 
       const { state } = thermometer;
 
-      data.tempC = state.tempC?.toFixed(1) + "°C";
+      data.tempC = state.tempC?.toFixed(1);
 
       let diff:(null|number) = null;
 
@@ -52,17 +56,21 @@ function Temperature(props: any) {
       if (absDiff > minorTrendThreshold) {
           if (diff > 0) {
               data.trendDirection = "warming";
+              data.trendIconUrl = `${baseUrlToFrontend}/public/icons/warming-arrow-up.png`;
               data.trendColor = "#FF7777DD";
           } else {
               data.trendDirection = "cooling";
+              data.trendIconUrl = `${baseUrlToFrontend}/public/icons/cooling-arrow-down.png`;
               data.trendColor = "#9999FFDD";
           }
       } else {
         data.trendDirection = "steady";
+        data.trendIconUrl = `${baseUrlToFrontend}/public/icons/steady-arrow-none.png`;
         data.trendColor = "#DDDDDD";
       }
 
       let modifier: (string) = '';
+      let multiplier: number = 1;
 
       if (absDiff > minorTrendThreshold) {
           modifier = "a little";
@@ -74,16 +82,22 @@ function Temperature(props: any) {
 
       if (absDiff > majorTrendThreshold) {
           modifier = "quickly";
+          multiplier = 2;
       }
 
       data.trend = modifier !== null ? `${data.trendDirection} ${modifier}` : `steady`;
       data.trend = `${data.trendDirection} ${modifier}`;
-      
+      data.trendIconCount = multiplier;
       return data;
     }
 
     const primaryData = getDisplayData(thermometer, 'long');
-
+    let location = thermometer?.location;
+    if (location && location.length > 10) {
+      if (location.includes('Room')) {
+        location = location.replace('Room', 'Rm');
+      }
+    }
     const styleTemp = {
         color: tempToColor(primaryData.tempC),
     };
@@ -92,20 +106,27 @@ function Temperature(props: any) {
         color: primaryData.trendColor,
     };
 
+    const trendIcons = Array.from({ length: primaryData.trendIconCount }, (_, index) => (
+        <img key={index} src={primaryData.trendIconUrl}/>
+    ));
+
+
     return (
-      <div className="fullscreen-panel-temperature">
-          <div className="thermometer-label">
-              {thermometer?.location}
-          </div>
-          <div className="thermometer-temp" style={styleTemp}>
-              {primaryData.tempC}
-          </div>
-          <div className="thermometer-trend" style={styleTrend}>
-              {primaryData.trend}
-          </div>
-      </div>
+        <div className="temperature-subpanel">
+            <div className="thermometer-extradata-container">
+                <div className="thermometer-label">
+                  {location}
+                </div>
+                <div className="thermometer-trend" style={styleTrend}>
+                    {trendIcons}
+                </div>
+            </div>
+            <div className="thermometer-temp" style={styleTemp}>
+                {primaryData.tempC}
+            </div>
+        </div>
     );
-}
+  }
 
 function tempToColor(tempC) {
   tempC = parseFloat(tempC);

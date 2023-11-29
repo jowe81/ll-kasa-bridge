@@ -5,11 +5,9 @@ import Temperature from "./features/temperature/Temperature";
 function TouchUiPanel() {
   return (
       <>
-          <div className="touch-ui-panel-item">
-              <Temperature type="secondary" />
-          </div>
-          <div className="touch-ui-panel-item">
+          <div className="touch-ui-panel-item fullscreen-panel-temperature">
               <Temperature type="primary" />
+              <Temperature type="secondary" />
           </div>
           <div className="touch-ui-panel-item">
               <Forecast />

@@ -133,8 +133,8 @@ class WeatherServiceHandler {
         }
       
         try {
-          //const data = await axios.get(this.weatherService.fullUrl);
-          const data = getMockData();
+          const data = await axios.get(this.weatherService.fullUrl);
+          //const data = getMockData();
           const responseData = data.data;
 
           // Cache the response.
@@ -143,7 +143,7 @@ class WeatherServiceHandler {
           log(`Received API data from ${this.weatherService.settings.api?.baseUrl}`, this);
 
           const displayData = getDisplayDataFromApiResponse(responseData);
-          console.log('DisplayData: ',displayData);
+
           this.weatherService._updateState(
             displayData, 
             true

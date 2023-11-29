@@ -1,8 +1,11 @@
 .fullscreen-panel-clock {
   margin-top: -25px;
-  min-width: 300px;
+  margin-right: 20px;
+  min-width: 320px;
+  max-width: 320px;
   text-align: center;
   font-size: 120px;
   color: rgb(197, 197, 197);
-  padding: 0px 20px;
+  padding: 0px 0px;
+  
 }

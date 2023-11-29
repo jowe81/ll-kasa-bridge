@@ -50,7 +50,7 @@ function Forecast() {
     
 
     return (
-        <div className="fullscreen-panel-temperature">
+        <div className="fullscreen-panel-forecast">
             <div className="forecast-label">Forecast</div>
             <div className="forecast-display-data-container">
                 {displayDataJsx}

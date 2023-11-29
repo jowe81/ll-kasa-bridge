@@ -41,3 +41,9 @@
   border-bottom: 1px solid #333;
   color: #999;
 }
+
+.fullscreen-panel-forecast {
+  width: 160px; 
+  padding: 0px 20px 0px 25px;
+  height: 100%; 
+}
