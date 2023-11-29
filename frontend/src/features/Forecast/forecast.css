@@ -15,14 +15,15 @@
   /* border: 1px solid yellow */
 }
 
-.forecast-icon-container {
-
-}
-
 .forecast-icon {
   position: relative;
   top: -2px;
+  left: -2px;
   height: 47px;
+}
+
+.forecast-text-container {
+  width: 35px;
 }
 
 .forecast-text-time {
@@ -31,6 +32,7 @@
 
 .forecast-text-temp {
   font-size: 15px;
+  font-weight:500
 }
 
 .forecast-label {
