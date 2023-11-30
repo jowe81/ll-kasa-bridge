@@ -1,17 +1,21 @@
+.touch-ui-container {
+  overflow: hidden;
+}
+
 .touch-ui-columns-container {
   border: 1px solid rgb(84, 84, 84);
+  border-radius: 3px;
   width: 1900px;
-  height: 1070px;
-  margin: 0px;
-  margin-left: 2px;
-  margin-top: 2px;
+  height: 930px;
+  margin: 2px;
   display: flex;
   transform: scale(1s);
+  position: relative;
 }
 
 .touch-ui-panel-container {
   border: 1px solid rgb(84, 84, 84);
-  border-radius: 5px;
+  border-radius: 3px;
   width: 1900px;
   height: 135px;
   margin: 0px;
@@ -32,9 +36,12 @@
 }
 
 .touch-ui-main-column {
-  padding: 5px 5px;
+  padding: 0px;
   /* border: 1px solid yellow; */
   width: 100%;
+  min-width: 315px;
+  height: 100%;
+  max-height: 100%;
 }
 
 .touch-ui-sub-panel-header {

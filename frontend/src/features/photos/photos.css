@@ -1,15 +1,13 @@
 .photo-container {
   position: relative;
-  border-radius: 5px;
-  padding: 0px;  
+  padding: 0px; 
 }
 
 .photo-container-embedded {
-  margin: 0px;
-  margin-top: 5px;
+  margin: -1px;
+  
   width: 1250px;
   height: 100%;
-  border: 1px solid rgb(32, 32, 32);
 }
 
 .photo-container-full-screen {
@@ -17,7 +15,8 @@
   width: 1900px;
   height: 930px;
   /* border: 1px solid yellow; */
-  /* border: 1px solid rgb(84, 84, 84); */
+  border: 1px solid rgb(84, 84, 84);
+  border-radius: 3px;
 }
 
 .photo-container .photo { 

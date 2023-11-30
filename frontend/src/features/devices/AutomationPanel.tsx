@@ -81,20 +81,23 @@ function AutomationPanel() {
       if (thermostats.length) {
         thermostat = thermostats[0];
       }
-      
-      locationsData.push({
-        id: location.id,
-        name: location.name,
-        devices: devicesInLocation,
-        ungroupedDevices,
-        ungroupedLights,
-        ungroupedOtherDevices,
-        groupedDevices,
-        switches,
-        thermometers,
-        thermostat,
-        liveGroupData,
-      });
+
+      // Only include configured locations.
+      if (location.id !== 'loc-default') {
+        locationsData.push({
+            id: location.id,
+            name: location.name,
+            devices: devicesInLocation,
+            ungroupedDevices,
+            ungroupedLights,
+            ungroupedOtherDevices,
+            groupedDevices,
+            switches,
+            thermometers,
+            thermostat,
+            liveGroupData,
+        });
+      }
     });
 
     return locationsData;
