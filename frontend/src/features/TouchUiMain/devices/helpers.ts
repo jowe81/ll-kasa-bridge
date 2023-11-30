@@ -1,7 +1,7 @@
-import constants from '../../constants.ts';
+import constants from '../../../constants.ts';
 
-import { Device, Group } from './dataSlice';
-import { LiveGroup } from './dataSlice';
+import { Device, Group } from './dataSlice.ts';
+import { LiveGroup } from './dataSlice.ts';
 
 const getPowerStateClass = (device: Device): string => {
   const powerStatePresent = device.isOnline && typeof device.powerState === 'boolean';

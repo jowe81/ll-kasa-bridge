@@ -1,4 +1,4 @@
-import constants from '../../constants.ts';
+import constants from '../../../constants.ts';
 import { Device } from './dataSlice.ts';
 
 const Thermometer = (props) => {

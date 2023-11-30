@@ -1,4 +1,4 @@
-import constants from '../../constants.ts';
+import constants from '../../../constants.ts';
 
 import NumPad from './NumPad.tsx';
 import InputField from './InputField.tsx';

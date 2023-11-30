@@ -1,7 +1,7 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import dataSliceReducer from '../features/devices/dataSlice';
-import configSliceReducer from '../features/devices/configSlice';
-import { apiSlice } from '../features/devices/jjautoApiSlice';
+import dataSliceReducer from '../features/TouchUiMain/devices/dataSlice';
+import configSliceReducer from '../features/TouchUiMain/devices/configSlice';
+import { apiSlice } from '../features/TouchUiMain/devices/jjautoApiSlice';
 
 export const store = configureStore({
     //calls combineReducers

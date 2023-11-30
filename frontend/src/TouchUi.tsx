@@ -1,6 +1,6 @@
 
-import TouchUiMainColumn from "./TouchUiMainColumn";
-import TouchUiPanel from "./TouchUiPanel";
+import TouchUiMainColumn from "./features/TouchUiMain/TouchUiMainColumn";
+import TouchUiPanel from "./features/TouchUiPanel/TouchUiPanel";
 import Photos from "./features/photos/Photos";
 import './touch.css';
 import { useState } from "react";

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Device } from './dataSlice.ts';
-import constants from '../../constants.ts';
+import constants from '../../../constants.ts';
 
 const TouchButtonDevice = ({device, onClick}) => {
 

@@ -1,6 +1,6 @@
-import AutomationPanel from "./features/devices/AutomationPanel";
-import TimerPanel from "./features/timer/TimerPanel";
-import Photos from "./features/photos/Photos";
+import AutomationPanel from "./devices/AutomationPanel";
+import TimerPanel from "./timer/TimerPanel";
+import Photos from "../photos/Photos";
 
 function TouchUiMainColumn(props) {
   const { columnId, style } = props; 

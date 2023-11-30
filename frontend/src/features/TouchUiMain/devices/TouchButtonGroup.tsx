@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Group } from './dataSlice.ts';
-import constants from '../../constants.ts';
+import constants from '../../../constants.ts';
 
 const setPowerStateTimeout = constants.SECOND * 5;
 

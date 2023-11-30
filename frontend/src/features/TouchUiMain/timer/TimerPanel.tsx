@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from 'react';
 
-import { useAppSelector } from '../../app/hooks.ts';
-import { socket } from '../websockets/socket.tsx';
+import { useAppSelector } from '../../../app/hooks.ts';
+import { socket } from '../../websockets/socket.tsx';
 import { getDeviceByChannel } from '../devices/helpers.ts';
-import constants from '../../constants.ts';
+import constants from '../../../constants.ts';
 
 import './timer.css';
 

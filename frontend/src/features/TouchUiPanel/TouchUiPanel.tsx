@@ -1,6 +1,6 @@
-import Forecast from "./features/Forecast/Forecast";
-import Clock from "./features/clock/Clock";
-import Temperature from "./features/temperature/Temperature";
+import Forecast from "./forecast/Forecast";
+import Clock from "./clock/Clock";
+import Temperature from "./temperature/Temperature";
 
 function TouchUiPanel() {
   return (

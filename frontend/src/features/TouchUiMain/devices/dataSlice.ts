@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import constants from "../../constants.js";
+import constants from "../../../constants.js";
 
 
 export interface BaseDevice {

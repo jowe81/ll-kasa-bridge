@@ -6,8 +6,6 @@ import { socket } from './features/websockets/socket';
 
 import Home from "./Home";
 import TouchUi from "./TouchUi";
-import TableView from "./features/devices/TableView";
-import AutomationPanel from "./features/devices/AutomationPanel";
 
 import {
   // Action methods
@@ -19,7 +17,7 @@ import {
   Device, 
   DeviceStateUpdate,
   DeviceOnlineStateUpdate,
-} from './features/devices/dataSlice';
+} from './features/TouchUiMain/devices/dataSlice';
 
 import {
   // Action methods
@@ -29,7 +27,7 @@ import {
   // Types
   Group,
   Location,
-} from './features/devices/configSlice';
+} from './features/TouchUiMain/devices/configSlice';
 
 function App() {
   
@@ -94,9 +92,6 @@ return (
       <Routes>
         <Route path="/" element={ <Home /> } />
         <Route path="touch" element = { <TouchUi />} />
-        <Route path="table" element={ <TableView /> } />
-        <Route path="automation-panel" element={ <AutomationPanel /> } />
-
         <Route path="*" element={<Navigate to="/" replace/>}/>
       </Routes>
     </div>

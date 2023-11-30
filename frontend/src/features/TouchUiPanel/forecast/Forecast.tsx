@@ -1,9 +1,9 @@
 import './forecast.css';
 
-import { Device } from "../devices/dataSlice.ts";
-import constants from "../../constants.ts";
+import { Device } from "../../TouchUiMain/devices/dataSlice.ts";
+import constants from "../../../constants.ts";
 
-import { useAppSelector } from "../../app/hooks.ts";
+import { useAppSelector } from "../../../app/hooks.ts";
 
 function Forecast() {
     const devices = useAppSelector((state) => state.data.devices);

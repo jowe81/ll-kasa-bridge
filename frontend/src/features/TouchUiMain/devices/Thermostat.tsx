@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import constants from '../../constants.ts';
+import constants from '../../../constants.ts';
 import { Device } from './dataSlice.ts';
 
 const Thermostat = (props) => {

@@ -1,5 +1,5 @@
 import { formatTimerTime, formatClockTime } from '../devices/helpers.ts';
-import constants from '../../constants.ts';
+import constants from '../../../constants.ts';
 
 function LiveTimer(props) {
 
