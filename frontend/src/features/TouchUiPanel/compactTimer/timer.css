@@ -1,0 +1,54 @@
+.compact-timer-container {
+  width: 170px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  text-align: left;
+  height: 100%;
+  overflow: hidden;
+  overflow-y: auto;
+  padding: 0px 0px;
+  position: relative;
+}
+
+
+
+
+.compact-base-button {
+  width: 70px; 
+  height: 47px;
+  border-radius: 5px;
+  border: 1px solid gray;
+  padding: 5px 0px;
+  margin: 5px 5px;
+  margin-bottom: 0px;
+  border: 1px solid gray;
+  background-size: 20%;
+  background-position: bottom left;
+  background-repeat: no-repeat;
+  text-align: center;
+}
+
+/*
+  Scrollbar (see https://www.w3schools.com/howto/howto_css_custom_scrollbar.asp)
+*/
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #555; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #f1f1f1; 
+}

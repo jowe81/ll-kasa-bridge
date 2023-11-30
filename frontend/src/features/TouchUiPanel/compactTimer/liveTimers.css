@@ -1,0 +1,58 @@
+.compact-live-timers {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.compact-live-timer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 150%;
+  height: 53px;
+  width: 95%;
+  margin-top: 8px;
+  padding: 0px 0px;
+  border: 1px solid rgba(210, 101, 101, 0.656);
+  border-radius: 5px;
+  position: relative;
+  background-color: rgb(50, 23, 23);
+}
+
+.compact-live-timer-display {
+  position: absolute;
+  padding: 3px;
+  padding-top: 15px;
+  width: 100%;
+  text-align: center;
+}
+
+.compact-sub-label-container {
+  position:absolute;
+  width:100%;
+  font-size: 50%;
+  color:rgb(176, 175, 175);
+  padding: 3px;
+  text-align: center;
+  /* font-weight: bold; */
+}
+
+.compact-live-timer-normal {
+  color:rgb(212, 175, 183);
+}
+
+.compact-live-timer-close {
+  color: rgb(190, 169, 83);
+}
+
+.compact-live-timer-closer {
+  color: rgb(250, 153, 42);
+}
+
+.compact-live-timer-expired {
+  color: red;
+}
+
+/* .compact-selected-timer {
+  border: 1px solid rgba(159, 99, 15, .5);
+  background-color: rgb(58, 8, 8);  
+} */

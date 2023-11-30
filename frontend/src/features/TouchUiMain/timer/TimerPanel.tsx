@@ -1,14 +1,13 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import { useAppSelector } from '../../../app/hooks.ts';
 import { socket } from '../../websockets/socket.tsx';
-import { getDeviceByChannel } from '../devices/helpers.ts';
 import constants from '../../../constants.ts';
 
 import './timer.css';
 
-import { Device, Group, VirtualDevice } from '../devices/dataSlice.ts';
+import { VirtualDevice } from '../devices/dataSlice.ts';
 
 import LiveTimers from './LiveTimers.tsx';
 import NudgePanel from './NudgePanel.tsx';
