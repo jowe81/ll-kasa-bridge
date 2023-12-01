@@ -133,8 +133,8 @@ class WeatherServiceHandler {
         }
       
         try {
-          const data = await axios.get(this.weatherService.fullUrl);
-          //const data = getMockData();
+          //const data = await axios.get(this.weatherService.fullUrl);
+          const data = getMockData();
           const responseData = data.data;
 
           // Cache the response.

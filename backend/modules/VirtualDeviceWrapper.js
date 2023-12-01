@@ -104,6 +104,8 @@ const VirtualDeviceWrapper = {
       log(`Instantiating handler for device of type: ${this.type}/${this.subType}`, this);
       const getHandlerInstance = deviceHandlerPlugins[`${this.subType}Handler`].default;
       this.deviceHandler = getHandlerInstance(devicePool, this, cacheForThisDevice);  
+    } else {
+      log(`Warning: No device handler for virtual device of subtype ${this.subType} found. The device will be ignored.`, this, 'yellow');
     }
   },
 
