@@ -56,16 +56,16 @@ function Temperature(props: any) {
       if (absDiff > minorTrendThreshold) {
           if (diff > 0) {
               data.trendDirection = "warming";
-              data.trendIconUrl = `${baseUrlToFrontend}/public/icons/warming-arrow-up.png`;
+              data.trendIconUrl = `${baseUrlToFrontend}/icons/warming-arrow-up.png`;
               data.trendColor = "#FF7777DD";
           } else {
               data.trendDirection = "cooling";
-              data.trendIconUrl = `${baseUrlToFrontend}/public/icons/cooling-arrow-down.png`;
+              data.trendIconUrl = `${baseUrlToFrontend}/icons/cooling-arrow-down.png`;
               data.trendColor = "#9999FFDD";
           }
       } else {
         data.trendDirection = "steady";
-        data.trendIconUrl = `${baseUrlToFrontend}/public/icons/steady-arrow-none.png`;
+        data.trendIconUrl = `${baseUrlToFrontend}/icons/steady-arrow-none.png`;
         data.trendColor = "#DDDDDD";
       }
 
