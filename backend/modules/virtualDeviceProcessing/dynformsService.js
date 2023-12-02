@@ -3,7 +3,7 @@ import axios from "axios";
 import { makeLiveDeviceObject } from "../TargetDataProcessor.js";
 import constants from "../../constants.js";
 import { log, debug } from "../Log.js";
-import { getDisplayDataFromApiResponse } from "../../helpers/dynformsData.js";
+import { getDisplayDataFromApiResponse, dynformsDbFilters, requestShouldRun } from "../../helpers/dynformsData.js";
 
 const localConstants =
     constants.DEVICETYPE_DEFAULTS[constants.DEVICETYPE_VIRTUAL][
@@ -27,8 +27,7 @@ class DynformsServiceHandler {
 
         let changeInfo = {};
         changeInfo.changed = !_.isEqual(oldState, newState);
-        changeInfo.on_off = oldState?.powerState !== newState.powerState;
-        changeInfo.target = newState?.target !== oldState?.target;
+        changeInfo.on_off = oldState?.powerState !== newState?.powerState;
 
         return changeInfo;
     }
@@ -56,30 +55,94 @@ class DynformsServiceHandler {
         return liveDevice;
     }
 
-    getFullUrl() {
+    _constructFullUrl() {
         if (!this.dynformsService) {
-            return false;
+            return null;
         }
 
-        const { baseUrl, path, queryParams } = this.dynformsService.settings.api;
+        let { baseUrl, path } = this.dynformsService.settings.api;
 
-        if (!baseUrl) {
-            return false;
-        }
+        let fullUrl;
 
-        let queryString = "";
-        Object.keys(queryParams).forEach(
-            (key) => (queryString += `&${key}=${queryParams[key]}`)
-        );
+        if (baseUrl) {
+            // Use device configuration.
+            fullUrl = baseUrl + path;
+        } else {
+            // Use .env instead.
+            if (!path) {
+                // Use .env or fallback to default.
+                path = process.env.DYNFORMS_PATH ?? "/db/m2m/pull";
+            }
 
-        let fullUrl = `${baseUrl}${path}`;
+            const protocol = process.env.DYNFORMS_PROTOCOL ?? "http";
 
-        if (queryString) {
-            fullUrl += "?" + queryString.substring(1);
+            fullUrl = `${protocol}://${process.env.DYNFORMS_HOST}:${process.env.DYNFORMS_PORT}${path}`;
         }
 
         return fullUrl;
     }
+
+    _constructRequests() {
+        if (!this.dynformsService) {
+            return null;
+        }
+
+        const requestInfo = this.dynformsService.settings?.requests;
+
+        if (!(Array.isArray(requestInfo) && requestInfo.length)) {
+            // No requests configured.
+            return null;
+        }
+
+        const requests = [];
+
+        requestInfo.forEach((info, index) => {
+            const request = {
+                connectionName: info.connectionName ?? localConstants.connectionName,
+                collectionName: info.collectionName,
+                sessionId: null,
+                settings: {},
+                orderBy: info.retrieve.orderBy ?? {},
+                filter: this.resolveFilters(info.retrieve?.filters) ?? {},
+            };
+
+            requests.push(request);
+        });
+
+        return requests;
+    }
+
+    resolveFilters(filtersInfo) {      
+      const resultFilter = {};
+
+      if (!Array.isArray(filtersInfo)) {
+        return resultFilter;
+      }
+      
+      filtersInfo.forEach(info => {
+        const { field, type, match } = info;
+        const { filterName } = match;
+
+        if (type === "dynamic") {
+
+          switch (filterName) {
+              case "__CURRENT_DATE":
+                  /**
+                   * Matching today's date, optionally with a range before/after.
+                   */
+                  resultFilter[field] = dynformsDbFilters.applyCurrentDateFilter(match);
+                  break;
+
+              default:
+                  break;
+          }
+        }        
+      });
+
+      return resultFilter;
+    }
+
+    
 
     init(cache) {
         if (
@@ -101,8 +164,10 @@ class DynformsServiceHandler {
         }
         // Store the cache reference.
         this.cache = cache;
+        this.cache.data = [];
 
-        this.dynformsService.fullUrl = this.getFullUrl();
+        this.dynformsService.fullUrl = this._constructFullUrl();
+        this.dynformsService.requests = this._constructRequests();
 
         // Turn on when first starting.
         this.dynformsService.setPowerState(true);
@@ -115,7 +180,7 @@ class DynformsServiceHandler {
         );
 
         log(
-            `Initialized ${this.dynformsService.subType} with ${this.dynformsService.fullUrl}`,
+            `Initialized ${this.dynformsService.subType} "${this.dynformsService.alias}" with ${this.dynformsService.fullUrl}`,
             this.dynformsService
         );
         log(
@@ -130,9 +195,11 @@ class DynformsServiceHandler {
             clearInterval(this._checkingIntervalHandler);
         }
 
+        const interval = this.dynformsService.settings.checkInterval ?? localConstants.CHECKING_INTERVAL_DEFAULT;
+
         this._checkingIntervalHandler = setInterval(
             () => this.dynformsServiceIntervalHandler(),
-            this.dynformsService.settings.checkInterval ?? 3600000
+            interval
         );
 
         this.initialized = true;
@@ -146,26 +213,40 @@ class DynformsServiceHandler {
             return false;
         }
 
-        try {
-            //const data = await axios.get(this.dynformsService.fullUrl);
-            const data = { data: {}};
-            const responseData = data?.data;
+        // Get those requests that are due to run.
+        const requestsReadyToRun = this.dynformsService.requests?.filter((requestInfo, requestIndex) => {
+          const requestConfig = this.dynformsService.settings.requests[requestIndex];
+          return requestShouldRun(requestConfig, requestInfo._lastExecuted) ? true : false;
+        });
 
-            // Cache the response.
-            this.cache.data = responseData;
-
-            log(
-                `Received API data from ${this.dynformsService.settings.api?.baseUrl}`,
-                this
-            );
-
-            const displayData = getDisplayDataFromApiResponse(responseData);
-
-            this.dynformsService._updateState(displayData, true);
-        } catch (err) {
-            console.log("Error when fetching dynforms data.");
-            console.log(err);
+        if (!requestsReadyToRun.length) {
+          // Nothing to do
+          return;
         }
+
+        log(`${this.dynformsService.alias} has ${requestsReadyToRun.length} request(s) ready to run.`, this.dynformsService);
+
+        // Add the current timestamp to each of the requests that are about to be executed.
+        const now = new Date();
+
+        const promises = requestsReadyToRun.map((requestInfo, requestIndex) => {
+            requestInfo._lastExecuted = now;
+            return axios.post(this.dynformsService.fullUrl, requestInfo);
+        });
+
+        Promise.all(promises)
+          .then((allResponseData) => {
+              // Cache the responses.
+              this.cache.data = allResponseData.map((data, requestIndex) => data?.data);
+              const displayData = getDisplayDataFromApiResponse(this.cache.data, this.dynformsService.settings);
+
+              this.dynformsService._updateState(displayData, true);
+
+              log(`${this.dynformsService.alias} received API data from ${this.dynformsService.fullUrl}`, this.dynformsService);
+          })
+          .catch(err => {
+            console.log(err.message, err);
+          })
     }
 }
 

@@ -157,7 +157,7 @@ const VirtualDeviceWrapper = {
     const state = this._getState();
     const data = {
       state,
-      powerState: state.powerState,
+      powerState: state?.powerState,
       channel: this.channel,
       isOnline: this.isOnline,      
     };
@@ -210,7 +210,7 @@ const VirtualDeviceWrapper = {
        undefined;
       
       this.state = _.cloneDeep(payload);
-      this.powerState = this.state.powerState;
+      this.powerState = this.state?.powerState;
 
       if (changeInfo?.on_off) {
         this._trigger('powerState', this.powerState);

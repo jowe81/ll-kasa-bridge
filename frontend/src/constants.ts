@@ -6,56 +6,56 @@ const DAY = 24 * HOUR;
 const WEEK = 7 * DAY;
 
 const constants: any = {
+    DEBUG: {
+        debug: false,
+        channels: [40],
+    },
 
-  DEBUG: {
-    debug: false,
-    channels: [40],
-  },
+    // Time
+    SECOND,
+    MINUTE,
+    HOUR,
+    DAY,
+    WEEK,
 
-  // Time
-  SECOND, 
-  MINUTE, 
-  HOUR,
-  DAY,
-  WEEK,
+    // Device types
+    DEVICETYPE_KASA_SMARTPLUGSWITCH: "IOT.SMARTPLUGSWITCH",
+    DEVICETYPE_KASA_SMARTBULB: "IOT.SMARTBULB",
 
-  // Device types
-  DEVICETYPE_KASA_SMARTPLUGSWITCH: 'IOT.SMARTPLUGSWITCH',
-  DEVICETYPE_KASA_SMARTBULB: 'IOT.SMARTBULB',
+    DEVICETYPE_ESP_THERMOMETER: "ESP Thermometer",
+    DEVICETYPE_ESP_RELAY: "ESP_RELAY",
+    DEVICETYPE_ESP_MAILBOX: "ESP_MAILBOX",
 
-  DEVICETYPE_ESP_THERMOMETER: 'ESP Thermometer',
-  DEVICETYPE_ESP_RELAY: 'ESP_RELAY',
-  DEVICETYPE_ESP_MAILBOX: 'ESP_MAILBOX',
+    DEVICETYPE_VIRTUAL: "Virtual",
 
-  DEVICETYPE_VIRTUAL: 'Virtual',
+    // Subtypes
+    SUBTYPE_BULB: "bulb",
+    SUBTYPE_LED_STRIP: "led-strip",
+    SUBTYPE_PLUG: "plug",
+    SUBTYPE_SWITCH: "switch",
 
-  // Subtypes
-  SUBTYPE_BULB: 'bulb',
-  SUBTYPE_LED_STRIP: 'led-strip',
-  SUBTYPE_PLUG: 'plug',
-  SUBTYPE_SWITCH: 'switch',  
+    SUBTYPE_THERMOMETER: "thermometer",
+    SUBTYPE_MAIL_COMPARTMENT: "mailbox",
 
-  SUBTYPE_THERMOMETER: 'thermometer',
-  SUBTYPE_MAIL_COMPARTMENT: 'mailbox',
+    SUBTYPE_AIR_FAN: "fan",
+    SUBTYPE_AIR_HEAT: "heater",
+    SUBTYPE_AIR_AC: "a/c",
+    SUBTYPE_LIGHT: "light", // A non-smart plug-in-light
+    SUBTYPE_ENTERTAINMENT: "entertainment",
 
-  SUBTYPE_AIR_FAN: 'fan',
-  SUBTYPE_AIR_HEAT: 'heater',
-  SUBTYPE_AIR_AC: 'a/c',
-  SUBTYPE_LIGHT: 'light', // A non-smart plug-in-light
-  SUBTYPE_ENTERTAINMENT: 'entertainment',
-
-  SUBTYPE_THERMOSTAT: 'thermostat',
-  SUBTYPE_TIMER: 'timer',
-
-  // Service names
-  SERVICE_PERIODIC_FILTER: 'Periodic Filter Service',
-  SERVICE_BACKEND: 'backend',
-  SERVICE_BACKEND_FLIP: 'backend (flip)',
-  SERVICE_COMMAND_CACHE: 'Command Cache Service',
-
-  // Default Location
-  DEVICE_DEFAULT_LOCATION_ID: 'loc-default',
+    SUBTYPE_THERMOSTAT: "thermostat",
+    SUBTYPE_TIMER: "timer",
+    SUBTYPE_WEATHER_SERVICE: "weatherService",
+    SUBTYPE_DYNFORMS_SERVICE: "dynformsService",
   
+    // Service names
+    SERVICE_PERIODIC_FILTER: "Periodic Filter Service",
+    SERVICE_BACKEND: "backend",
+    SERVICE_BACKEND_FLIP: "backend (flip)",
+    SERVICE_COMMAND_CACHE: "Command Cache Service",
+
+    // Default Location
+    DEVICE_DEFAULT_LOCATION_ID: "loc-default",
 };
 
 constants.DEVICETYPES_LIGHTING = [
@@ -99,6 +99,10 @@ constants.photos = {
 constants.touchPanel = {
   thermometerChannels: [ 201, 202 ],
   forecastChannels: [ 501 ],
+}
+
+constants.birthdays = {
+  birthdayServiceChannel: 502,
 }
 
 export default constants;

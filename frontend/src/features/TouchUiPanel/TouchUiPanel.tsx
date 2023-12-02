@@ -3,7 +3,6 @@ import Clock from "./clock/Clock";
 import Temperature from "./temperature/Temperature";
 import CompactTimer from "./compactTimer/CompactTimer";
 
-
 function TouchUiPanel() {
   return (
       <>

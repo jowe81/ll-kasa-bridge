@@ -106,35 +106,41 @@ constants.DEVICETYPES_WITH_POWERSTATE = [
 ];
 
 constants.DEVICETYPE_DEFAULTS = {
-  [constants.DEVICETYPE_VIRTUAL]: {
-    [constants.SUBTYPE_THERMOSTAT]: {
-      // Do not check more often than the minimum set here.
-      CHECKING_INTERVAL_MIN: 10 * constants.SECOND,
-      CHECKING_INTERVAL_DEFAULT: 1 * MINUTE,
-      // Boundaries for target temperature settings.
-      TARGET_MAX: 28,
-      TARGET_MIN: 15,
-      TARGET_DEFAULT: 22,
-  
-      // If we haven't had a room temperature update during this time, shut off HVAC devices.
-      SAFETY_SHUTOFF_DELAY: 2 * constants.MINUTE,
+    [constants.DEVICETYPE_VIRTUAL]: {
+        [constants.SUBTYPE_THERMOSTAT]: {
+            // Do not check more often than the minimum set here.
+            CHECKING_INTERVAL_MIN: 10 * constants.SECOND,
+            CHECKING_INTERVAL_DEFAULT: 1 * MINUTE,
+            // Boundaries for target temperature settings.
+            TARGET_MAX: 28,
+            TARGET_MIN: 15,
+            TARGET_DEFAULT: 22,
 
-      // Shut off room heating if this temperature is exceeded (including when thermostat is off)
-      SAFETY_SHUTOFF_HIGH_TEMP: 30,
+            // If we haven't had a room temperature update during this time, shut off HVAC devices.
+            SAFETY_SHUTOFF_DELAY: 2 * constants.MINUTE,
 
-      // Shut off airconditioning if it gets colder (including when thermostat is off)
-      SAFETY_SHUTOFF_LOW_TEMP: 13,
+            // Shut off room heating if this temperature is exceeded (including when thermostat is off)
+            SAFETY_SHUTOFF_HIGH_TEMP: 30,
+
+            // Shut off airconditioning if it gets colder (including when thermostat is off)
+            SAFETY_SHUTOFF_LOW_TEMP: 13,
+        },
+
+        [constants.SUBTYPE_TIMER]: {
+            CHECKING_INTERVAL_MIN: 1 * constants.SECOND,
+            CHECKING_INTERVAL_DEFAULT: 1 * constants.SECOND,
+
+            AUDIO_PATH: "./media-files/",
+            AUDIO_FILE_EXPIRED_TIMER_DEFAULT: "alert_default.mp3",
+        },
+
+        [constants.SUBTYPE_DYNFORMS_SERVICE]: {
+            // Default database to target on Dynforms backend.
+            connectionName: "test",
+            // How often the handler will go out and check whether a request should actually be run.
+            CHECKING_INTERVAL_DEFAULT: 1 * constants.HOUR,
+        },
     },
-
-    [constants.SUBTYPE_TIMER]: {
-      CHECKING_INTERVAL_MIN: 1 * constants.SECOND,
-      CHECKING_INTERVAL_DEFAULT: 1 * constants.SECOND,
-
-      AUDIO_PATH: './media-files/',
-      AUDIO_FILE_EXPIRED_TIMER_DEFAULT: 'alert_default.mp3',
-    },  
-  },
-
 };
 
 export default constants;

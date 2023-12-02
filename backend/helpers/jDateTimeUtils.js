@@ -21,6 +21,24 @@ const _getCoords = (coords) => {
   }
 }
 
+function formatDate(formatString, currentDate) {
+    if (!currentDate) {
+        currentDate = new Date();
+    }
+
+    var year = currentDate.getFullYear().toString();
+    var month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+    var day = currentDate.getDate().toString().padStart(2, "0");
+
+    // Replace placeholders in the format string with actual values
+    formatString = formatString.replace("YYYY", year);
+    formatString = formatString.replace("YY", year.slice(-2));
+    formatString = formatString.replace("MM", month);
+    formatString = formatString.replace("DD", day);
+
+    return formatString;
+}
+
 /**
  * Get today's sunset from the library
  */
@@ -279,6 +297,20 @@ const isFullyDaytime = (transitionTime = null, date = null) => getDaytimePercent
   return paramValue;
 };
 
+const isToday = (date) => {
+  if (!date) {
+    return false;
+  }
+
+  const today = new Date();
+
+  return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+  );
+} 
+
 const logDates = (dates, label) => {
   if (!Array.isArray(dates)) {
     dates = [ dates ];
@@ -290,6 +322,7 @@ const logDates = (dates, label) => {
 }
 
 export {
+  formatDate,
   getSunrise,
   getSunset,
   getDaytimePercent,
@@ -304,6 +337,7 @@ export {
   isDaytime,  
   isFullyDaytime,
   isNighttime,
+  isToday,
   getFromSettingsForNextSunEvent,
   logDates,
 }

@@ -27,7 +27,7 @@ function Forecast() {
 
     const forecast = weatherService.state?.forecast;
 
-    const displayDataJsx = forecast.map((item, index) => {
+    const displayDataJsx = forecast?.map((item, index) => {
 
       const styleTemp = {
           color: tempToColor(item.tempC),

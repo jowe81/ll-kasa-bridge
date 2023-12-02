@@ -1485,30 +1485,49 @@ const deviceMap = [
                 path: null, // will use .env DYNFORMS_PATH or default instead
                 queryParams: {},
             },
-            data: [
+            requests: [
                 {
-                    collection: "address_book",
+                    connectionName: "test", // Database name. Will fall back to default constant if absent.
+                    collectionName: "address_book",
                     retrieve: {
                         time: {
                             frequency: "daily",
-                            time: "4:00 am",
+                            hours: 3,
+                            minutes: 15,
                         },
                         filters: [
+                            // {
+                            //     type: "dynamic",
+                            //     field: "date_of_birth",
+                            //     match: {
+                            //         filterName: "__CURRENT_DATE",
+                            //         daysAfter: 0, // include n days after the current date
+                            //         daysBefore: 0, // include n days preceding the current date
+                            //         format: "YYYY-MM-DD",
+                            //     },
+                            // },
                             {
-                                field: "birthday",
-                                match: "__CURRENT_DATE",
+                                type: "dynamic",
+                                field: "date_of_birth_MMDD",
+                                match: {
+                                    filterName: "__CURRENT_DATE",
+                                    daysAfter: 20, // include n days after the current date
+                                    daysBefore: 0, // include n days preceding the current date
+                                    format: "MM-DD",
+                                },
                             },
                         ],
-                        orderBy: [
-                            {
-                                firstName: 1,
-                                lastName: 1,
-                            },
-                        ],
+                        orderBy: {
+                            date_of_birth_MMDD: 1,
+                            first_name: 1,
+                            last_name: 1,
+                        },
                     },
                 },
             ],
-            retrieval: {},
+            // If set causes the backend to return the results for the first request only; as a single object and not as an array.
+            useSingleRequest: true,
+            // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 1 * HOUR,
         },
     },

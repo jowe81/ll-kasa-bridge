@@ -1,6 +1,7 @@
 import AutomationPanel from "./devices/AutomationPanel";
 import TimerPanel from "./timer/TimerPanel";
 import Photos from "../photos/Photos";
+import Birthdays from "./birthdays/Birthdays";
 
 function TouchUiMainColumn(props) {
   const { columnId, style } = props; 
@@ -14,6 +15,7 @@ function TouchUiMainColumn(props) {
       break;
     case '2':
       content = <>
+        <Birthdays />
         <TimerPanel />
       </>
       break;

@@ -101,7 +101,7 @@ class WeatherServiceHandler {
         });
 
         log(
-            `Initialized ${this.weatherService.subType} with ${this.weatherService.fullUrl}`,
+            `Initialized ${this.weatherService.subType} "${this.weatherService.alias}" with ${this.weatherService.settings.api.baseUrl}`,
             this.weatherService
         );
         log(
