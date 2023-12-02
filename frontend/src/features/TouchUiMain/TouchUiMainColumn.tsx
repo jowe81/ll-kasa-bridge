@@ -15,8 +15,8 @@ function TouchUiMainColumn(props) {
       break;
     case '2':
       content = <>
-        <Birthdays />
         <TimerPanel />
+        <Birthdays />
       </>
       break;
 

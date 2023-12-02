@@ -133,7 +133,7 @@ constants.DEVICETYPE_DEFAULTS = {
             AUDIO_PATH: "./media-files/",
             AUDIO_FILE_EXPIRED_TIMER_DEFAULT: "alert_default.mp3",
         },
-
+        
         [constants.SUBTYPE_DYNFORMS_SERVICE]: {
             // Default database to target on Dynforms backend.
             connectionName: "test",

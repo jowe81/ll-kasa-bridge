@@ -1,0 +1,64 @@
+.birthdays-container {
+  background-color: rgb(66, 90, 142);
+  width: 300px;
+  border-radius: 5px;
+  padding-top: 5px;
+  margin-top: 5px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  text-align: left;
+}
+
+.birthdays-items-container{
+  width: 280px;  
+  background-color: rgb(24, 20, 41);
+  margin: 5px auto;
+  padding: 3px;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.birthday-item-container{
+  /* border: 1px solid yellow; */
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 3px;
+  border-radius: 5px;
+  margin: 2px;
+}
+
+.birthday-item-container-today {
+  color:aliceblue;  
+  background: rgba(100,0,0,1);
+}
+
+.birthday-item-container-today .birthday-item-date{
+  color:red;
+}
+
+.birthday-item-container-tomorrow {
+  color:aliceblue; 
+  background: rgba(100,50,0,1);
+}
+
+.birthday-item-container-tomorrow .birthday-item-date{
+  color:rgb(255, 166, 0);
+}
+
+.birthday-item-container-later {
+  color:rgb(187, 194, 204);
+}
+
+.birthday-item-container-later .birthday-item-date{
+  color:rgb(187, 194, 204);
+}
+
+.birthday-item-date-tomorrow {
+  color: rgb(255, 187, 0);
+}
+
+.birthday-item-name {
+  font-size: 100%;
+}

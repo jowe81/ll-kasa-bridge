@@ -173,7 +173,7 @@ const VirtualDeviceWrapper = {
   },
 
   _emitDeviceStateUpdate(changeInfo) {
-    this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo);
+    this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo, this);
   },
 
   /**
@@ -206,9 +206,9 @@ const VirtualDeviceWrapper = {
     this.lastSeenAt = Date.now();
     if (force || !_.isEqual(this.state, payload)) {
       const changeInfo = this.deviceHandler.analyzeStateChange ?
-       this.deviceHandler.analyzeStateChange(this.state, payload) :
-       undefined;
-      
+        this.deviceHandler.analyzeStateChange(this.state, payload) :
+        undefined;
+
       this.state = _.cloneDeep(payload);
       this.powerState = this.state?.powerState;
 

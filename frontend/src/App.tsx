@@ -49,12 +49,14 @@ function App() {
 
     // Handle socket events
     socket.on('auto/devices', (devices: Device[]) => {
+      console.log(`Socket: auto/devices, got ${devices.length} devices.`);
       dispatch(devicesAdded(devices));
     });
 
     socket.on('auto/device/state', (data: DeviceStateUpdate) => {
-      if (data?.data?.channel === 501) {
-        console.log(data);
+      console.log(`Socket: auto/device/state (${data?.data?.channel})`, data?.data?.state);
+      if (data?.data?.channel === 502) {
+        console.log('RECEIVED UPDATE 502:', data);
       }
       dispatch(deviceStateUpdated(data));
     });

@@ -143,7 +143,7 @@ const socketHandler = {
   },
 
   // Push device state update
-  emitDeviceStateUpdate(data, changeInfo) {
+  emitDeviceStateUpdate(data, changeInfo, device = null) {
     const payload = {
       changeInfo,
       data,

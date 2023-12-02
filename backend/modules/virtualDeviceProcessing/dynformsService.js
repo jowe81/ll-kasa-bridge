@@ -26,8 +26,9 @@ class DynformsServiceHandler {
         }
 
         let changeInfo = {};
-        changeInfo.changed = !_.isEqual(oldState, newState);
         changeInfo.on_off = oldState?.powerState !== newState?.powerState;
+        changeInfo.api = !_.isEqual(oldState?.api?.data?.records, newState?.api?.data?.records);
+        changeInfo.changed = changeInfo.on_off || changeInfo.api;
 
         return changeInfo;
     }
@@ -204,8 +205,8 @@ class DynformsServiceHandler {
 
         this.initialized = true;
 
-        // Trigger an initial API call.
-        this.dynformsServiceIntervalHandler();
+        // Trigger an initial API call. THERES A TIMINIG ISSUE HERE - WITHOUT THE DELAY THE FRONTEND WONT GET THE UPDATE
+        setTimeout(() => { this.dynformsServiceIntervalHandler() }, 5000);
     }
 
     async dynformsServiceIntervalHandler() {
@@ -240,7 +241,10 @@ class DynformsServiceHandler {
               this.cache.data = allResponseData.map((data, requestIndex) => data?.data);
               const displayData = getDisplayDataFromApiResponse(this.cache.data, this.dynformsService.settings);
 
-              this.dynformsService._updateState(displayData, true);
+              this.dynformsService._updateState({
+                powerState: this.dynformsService.getPowerState(),
+                api: displayData
+              }, true);
 
               log(`${this.dynformsService.alias} received API data from ${this.dynformsService.fullUrl}`, this.dynformsService);
           })

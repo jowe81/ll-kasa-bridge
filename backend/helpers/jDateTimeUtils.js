@@ -39,6 +39,23 @@ function formatDate(formatString, currentDate) {
     return formatString;
 }
 
+function formatTime(formatString, currentDate) {
+  if (!currentDate) {
+    currentDate = new Date();
+  }
+
+  const hours = currentDate.getHours();
+  const minutes = currentDate.getMinutes();
+  const seconds = currentDate.getSeconds();
+
+  const formattedTime = formatString
+      .replace("HH", hours.toString().padStart(2, "0"))
+      .replace("MM", minutes.toString().padStart(2, "0"))
+      .replace("SS", seconds.toString().padStart(2, "0"));
+
+  return formattedTime;    
+}
+
 /**
  * Get today's sunset from the library
  */
@@ -323,6 +340,7 @@ const logDates = (dates, label) => {
 
 export {
   formatDate,
+  formatTime,
   getSunrise,
   getSunset,
   getDaytimePercent,

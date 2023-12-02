@@ -3,6 +3,7 @@ import _ from "lodash";
 import constants from "../../constants.js";
 import { log, debug } from '..//Log.js';
 import { findByField, findById } from "../../helpers/jUtils.js";
+import { formatTime } from "../../helpers/jDateTimeUtils.js";
 import { makeLiveDeviceObject } from '../TargetDataProcessor.js';
 import { spawn } from 'child_process';
 
@@ -247,7 +248,7 @@ class TimerHandler {
       return false;
     }
 
-    this.state.clock = Date.now();
+    this.state.clock = formatTime('HH:MM');
 
     const now = Date.now();
 
@@ -288,21 +289,31 @@ class TimerHandler {
 
     const currentLiveTimers = this.state.liveTimers;
 
-    const changeInfo = {
-      on_off: false,
-      timers: _.isEqual(
-        this._previousliveTimers, 
-        this.state.liveTimers
-      ) ? false : true,
+
+    // Assume timers changed, unless there are no timers present.
+    let timersChanged = true;
+    if (Array.isArray(this._previousLiveTimers) && Array.isArray(this.state.liveTimers)) {
+      if (!(this._previousLiveTimers.length || this.state.liveTimers.length)) {
+        timersChanged = false
+      }
     }
 
-    if (changeInfo.timers) {
+    const changeInfo = {
+      on_off: false,
+      timers: timersChanged,
+      clock: this._previousClock !== this.state.clock,
+    }
+
+    changeInfo.changed = changeInfo.on_off || changeInfo.timers || changeInfo.clock;
+
+    if (changeInfo.changed) {
       // Sort the timers by remaining length
       this.state.liveTimers.sort((a, b) => a.expires > b.expires ? 1 : -1);
       this.deviceWrapper.socketHandler.emitDeviceStateUpdate(this.deviceWrapper.getLiveDeviceStateUpdate(), changeInfo);
     }
 
     this._previousLiveTimers = _.cloneDeep(currentLiveTimers);
+    this._previousClock = this.state.clock;
   };
 
   /**
