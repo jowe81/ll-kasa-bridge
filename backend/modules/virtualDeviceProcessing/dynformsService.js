@@ -168,7 +168,6 @@ class DynformsServiceHandler {
         this.cache.data = [];
 
         this.dynformsService.fullUrl = this._constructFullUrl();
-        this.dynformsService.requests = this._constructRequests();
 
         // Turn on when first starting.
         this.dynformsService.setPowerState(true);
@@ -214,8 +213,8 @@ class DynformsServiceHandler {
             return false;
         }
 
-        // Get those requests that are due to run.
-        const requestsReadyToRun = this.dynformsService.requests?.filter((requestInfo, requestIndex) => {
+        // Get those requests that are due to run. Construct them now, as they may contain a reference to the current date.
+        const requestsReadyToRun = this._constructRequests().filter((requestInfo, requestIndex) => {
           const requestConfig = this.dynformsService.settings.requests[requestIndex];
           return requestShouldRun(requestConfig, requestInfo._lastExecuted) ? true : false;
         });

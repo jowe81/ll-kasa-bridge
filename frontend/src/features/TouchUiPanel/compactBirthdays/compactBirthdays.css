@@ -38,6 +38,23 @@
   height: 25px;
 }
 
+.birthday-compact-item-container-yesterday {
+  color:aliceblue;  
+  background: rgb(89, 67, 67);
+  position: relative;
+}
+
+.birthday-compact-item-container-yesterday .birthday-compact-item-date{
+  color:rgb(255, 184, 184);
+  font-size: 10px;
+  width: 100%;
+  text-align: right;
+  position:  absolute;
+  right: 2px;
+  top: 0px;
+  padding-right: 2px;
+}
+
 .birthday-compact-item-container-today {
   color:aliceblue;  
   background: rgba(100,0,0,1);

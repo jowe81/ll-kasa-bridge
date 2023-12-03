@@ -71,6 +71,11 @@ function getJsx(record, key, fullSize = true) {
     let displayClasses = `${baseClassName}-container`;
 
     switch (difference) {
+        case -1:
+            displayDate = "yesterday";
+            displayClasses += ` ${baseClassName}-container-yesterday`;
+            break;
+
         case 0:
             displayDate = "today";
             displayClasses += ` ${baseClassName}-container-today`;

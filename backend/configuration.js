@@ -1508,20 +1508,10 @@ const deviceMap = [
                     retrieve: {
                         time: {
                             frequency: "daily",
-                            hours: 3,
+                            hours: 0,
                             minutes: 15,
                         },
                         filters: [
-                            // {
-                            //     type: "dynamic",
-                            //     field: "date_of_birth",
-                            //     match: {
-                            //         filterName: "__CURRENT_DATE",
-                            //         daysAfter: 0, // include n days after the current date
-                            //         daysBefore: 0, // include n days preceding the current date
-                            //         format: "YYYY-MM-DD",
-                            //     },
-                            // },
                             {
                                 type: "dynamic",
                                 field: "date_of_birth_MMDD",
