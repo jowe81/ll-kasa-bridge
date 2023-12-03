@@ -1,11 +1,28 @@
 .fullscreen-panel-clock {
-  margin-top: -25px;
-  margin-right: 20px;
-  min-width: 320px;
-  max-width: 320px;
+  position: relative;
+  max-height: 100%;
+  margin-right: 10px;
+  margin-left: 10px;
+  
+}
+
+
+.fullscreen-panel-clock-time {
+  position: relative;
+  margin-top: -35px;
+  min-width: 290px;
+  max-width: 290px;
   text-align: center;
-  font-size: 120px;
+  font-size: 114px;
   color: rgb(197, 197, 197);
   padding: 0px 0px;
   
+}
+
+.fullscreen-panel-clock-bottom {
+  position: absolute;
+  top: 140px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }

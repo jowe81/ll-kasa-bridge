@@ -19,6 +19,10 @@ const constants = {
   DAY,
   WEEK,
 
+  // 3048 Venables St
+  DEFAULT_LAT: 49.27631,
+  DEFAULT_LON: -123.04020,
+
   // When a device goes offline the saved powerstate for its wrapper will be discarded after this timeout.
   DEVICE_POWERSTATE_TIMEOUT: 30 * SECOND,
 
@@ -53,6 +57,7 @@ const constants = {
   SUBTYPE_TIMER: 'timer',
   SUBTYPE_WEATHER_SERVICE: 'weatherService',
   SUBTYPE_DYNFORMS_SERVICE: 'dynformsService',
+  SUBTYPE_CLOCK: 'clock',
 
   // Service names
   SERVICE_PERIODIC_FILTER: 'Periodic Filter Service',
@@ -84,6 +89,7 @@ constants.SUBTYPES = [
   constants.SUBTYPE_TIMER,
   constants.SUBTYPE_WEATHER_SERVICE,
   constants.SUBTYPE_DYNFORMS_SERVICE,
+  constants.SUBTYPE_CLOCK,
 ]
 
 constants.DEVICETYPES_LIGHTING = [
@@ -133,12 +139,17 @@ constants.DEVICETYPE_DEFAULTS = {
             AUDIO_PATH: "./media-files/",
             AUDIO_FILE_EXPIRED_TIMER_DEFAULT: "alert_default.mp3",
         },
-        
+
         [constants.SUBTYPE_DYNFORMS_SERVICE]: {
             // Default database to target on Dynforms backend.
             connectionName: "test",
             // How often the handler will go out and check whether a request should actually be run.
             CHECKING_INTERVAL_DEFAULT: 1 * constants.HOUR,
+        },
+
+        [constants.SUBTYPE_CLOCK]: {
+            CHECKING_INTERVAL_DEFAULT: 1 * constants.SECOND,
+            DEFAULT_TIME_FORMAT: 'HH:MM',
         },
     },
 };

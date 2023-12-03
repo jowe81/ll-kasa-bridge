@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import { useAppDispatch } from './app/hooks';
 import { socket } from './features/websockets/socket';
+import constants from "./constants";
 
 import Home from "./Home";
 import TouchUi from "./TouchUi";
@@ -53,10 +54,10 @@ function App() {
       dispatch(devicesAdded(devices));
     });
 
-    socket.on('auto/device/state', (data: DeviceStateUpdate) => {
-      console.log(`Socket: auto/device/state (${data?.data?.channel})`, data?.data?.state);
-      if (data?.data?.channel === 502) {
-        console.log('RECEIVED UPDATE 502:', data);
+    socket.on('auto/device/state', (data: DeviceStateUpdate) => {      
+      if (!(data?.data?.channel === constants.clock.clockChannel)) {
+        // Ignore the clock updates which come every second.        
+        console.log(`Socket: auto/device/state (${data?.data?.channel})`, data?.data?.state);
       }
       dispatch(deviceStateUpdated(data));
     });

@@ -1443,6 +1443,24 @@ const deviceMap = [
         },
     },
     {
+        alias: "Main Clock",
+        channel: 500,
+        id: "clock",
+        display: true,
+        displayLabel: "Clock",
+        displayType: null,
+        locationId: "__internal",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_CLOCK,
+        settings: {
+            coordinates: {
+              lat: constants.DEFAULT_LAT,
+              lon: constants.DEFAULT_LON,
+            },
+            timeFormat: 'HH:MM',
+        },
+    },
+    {
         //api.openweathermap.org/data/2.5/forecast?lat=49.2762&lon=-123.0402&appid=aa4de02d63792ab0d52f35085261c36d
         alias: "Weather Service",
         channel: 501,
@@ -1458,9 +1476,8 @@ const deviceMap = [
                 baseUrl: "https://api.openweathermap.org",
                 path: "/data/2.5/forecast",
                 queryParams: {
-                    // 3048 Venables St Vancouver BC
-                    lat: 49.2762,
-                    lon: -123.0402,
+                    lat: constants.DEFAULT_LAT,
+                    lon: constants.DEFAULT_LON,
                     // API Key
                     appid: "aa4de02d63792ab0d52f35085261c36d",
                 },
@@ -1469,7 +1486,6 @@ const deviceMap = [
         },
     },
     {
-        //api.openweathermap.org/data/2.5/forecast?lat=49.2762&lon=-123.0402&appid=aa4de02d63792ab0d52f35085261c36d
         alias: "Birthday Service",
         channel: 502,
         id: "birthday-service",

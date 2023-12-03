@@ -1,42 +1,43 @@
-import './clock.css';
+import { useAppSelector } from "../../../app/hooks.ts";
 
-import { useState, useEffect } from "react";
+import constants from "../../../constants.ts";
 
-function Clock(props: any) {
-  const [time, setTime] = useState(Date.now());
+import { VirtualDevice } from "../../TouchUiMain/devices/dataSlice.ts";
 
-  useEffect(() => {
-    setInterval(() => {
-      setTime(Date.now())      
-    }, 1000);
-  }, []);
+import "./clock.css";
 
-    
-  return <><div className="fullscreen-panel-clock">{currentTime(time, false)}</div></>;
+function Clock() {
+    const devices: VirtualDevice[] = useAppSelector(state => state.data.devices);
+    const clock = devices.find(device => device.subType === constants.SUBTYPE_CLOCK && device.channel === constants.clock?.clockChannel);
+    const clockData = clock?.state?.clock;
+
+    return (
+        <div className="fullscreen-panel-clock">
+            <div className="fullscreen-panel-clock-time">
+                {clockData?.displayTime ?? "N/A"}
+            </div>
+            <div className="fullscreen-panel-clock-bottom">
+                <div>{currentDate(parseInt(clockData?.ms)) ?? "N/A"}</div>
+                <div>Sunrise: {clockData?.sunrise ?? "N/A"}</div>
+                <div>Sunset: {clockData?.sunset ?? "N/A"}</div>
+            </div>
+        </div>
+    );
 }
 
-function currentTime(ms, showSeconds = false) {
-    // Create a new Date object
-    var currentTime = new Date(ms ? ms : null);
-
-    // Get hours, minutes, and seconds
-    var hours = currentTime.getHours();
-    var minutes = currentTime.getMinutes();
-    var seconds = currentTime.getSeconds();
-
-    // Add leading zero if needed
-    const h = hours < 10 ? "0" + hours : hours;
-    const m = minutes < 10 ? "0" + minutes : minutes;
-    const s = seconds < 10 ? "0" + seconds : seconds;
-
-    // Format the time as hh:mm:ss
-    var formattedTime = h + ":" + m;
-    if (showSeconds) {
-        formattedTime += ":" + s;
+function currentDate(ms?: number) {
+    if (!ms) {
+        return null;        
     }
 
-    // Display the result
-    return formattedTime;
+    const date = new Date(ms);
+
+    const options: any = {
+        month: "short",
+        day: "numeric",
+    };
+
+    return date.toLocaleDateString("en-CA", options);
 }
 
 export default Clock;

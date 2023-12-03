@@ -47,6 +47,7 @@ const constants: any = {
     SUBTYPE_TIMER: "timer",
     SUBTYPE_WEATHER_SERVICE: "weatherService",
     SUBTYPE_DYNFORMS_SERVICE: "dynformsService",
+    SUBTYPE_CLOCK: "clock",
   
     // Service names
     SERVICE_PERIODIC_FILTER: "Periodic Filter Service",
@@ -103,6 +104,10 @@ constants.touchPanel = {
 
 constants.birthdays = {
   birthdayServiceChannel: 502,
+}
+
+constants.clock = {
+  clockChannel: 500,
 }
 
 export default constants;

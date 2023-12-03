@@ -1,5 +1,5 @@
 .timer-panel-container {
-  background-color: brown;
+  background-color: rgba(110, 80, 80, .7);
   width: 300px;
   border-radius: 5px;
   padding-top: 5px;
@@ -47,15 +47,17 @@
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #555; 
+  background-color: rgba(55, 40, 40, .7);
+
 }
  
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888; 
+  background: #553333;
+  /* background-color: rgba(55, 40, 40, 1); */
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #f1f1f1; 
+  background: #744;
 }

@@ -44,15 +44,27 @@ function formatTime(formatString, currentDate) {
     currentDate = new Date();
   }
 
+  if (!formatString) {
+    formatString = 'H:MM'; // Default
+  }
+
   const hours = currentDate.getHours();
   const minutes = currentDate.getMinutes();
   const seconds = currentDate.getSeconds();
 
-  const formattedTime = formatString
-      .replace("HH", hours.toString().padStart(2, "0"))
-      .replace("MM", minutes.toString().padStart(2, "0"))
-      .replace("SS", seconds.toString().padStart(2, "0"));
+  let formattedTime;
 
+  if (formatString.includes("HH")) {
+    formattedTime = formatString
+        .replace("HH", hours.toString().padStart(2, "0"))
+        .replace("MM", minutes.toString().padStart(2, "0"))
+        .replace("SS", seconds.toString().padStart(2, "0"));
+  } else {
+    formattedTime = formatString
+        .replace("H", hours.toString())
+        .replace("MM", minutes.toString().padStart(2, "0"))
+        .replace("SS", seconds.toString().padStart(2, "0"));
+  }
   return formattedTime;    
 }
 
