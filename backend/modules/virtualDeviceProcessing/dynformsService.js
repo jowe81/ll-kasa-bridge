@@ -97,15 +97,48 @@ class DynformsServiceHandler {
 
         const requests = [];
 
-        requestInfo.forEach((info, index) => {
+        requestInfo.forEach((info, requestIndex) => {          
             const request = {
                 connectionName: info.connectionName ?? localConstants.connectionName,
                 collectionName: info.collectionName,
                 sessionId: null,
                 settings: {},
                 orderBy: info.retrieve.orderBy ?? {},
-                filter: this.resolveFilters(info.retrieve?.filters) ?? {},
             };
+
+            if (info.retrieve?.filters) {
+              request.filter = this.resolveFilters(info.retrieve?.filters) ?? {};
+            }
+
+            if (info.retrieve?.singleRecord) {
+              request.settings.singleRecord = info.retrieve.singleRecord;
+
+              switch (info.retrieve.singleRecord.type) {
+                case '__INDEX':
+                  
+                  // Find out what the last requested index was.
+                  let lastIndex = -1;
+
+                  if (this.dynformsService.settings.useSingleRequest) {
+                      lastIndex = this.dynformsService.state.api?.data?.index ?? -1;
+                  } else {
+                      const allData = this.dynformsService.state.api;
+
+                      if (Array.isArray(allData) && allData.length > requestIndex) {
+                          lastIndex = allData[requestIndex].data?.index ?? -1;
+                      }
+                  }
+
+                  // Add one to get the next record.
+                  request.settings.singleRecord.index = lastIndex + 1;
+
+                  break;
+
+                default:
+                  log(`Error: cannot construct request. Unkown single-record request type ${info.retrieve.singleRecord.type},`, this.dynformsService, 'red');
+                  return;
+              }
+            }
 
             requests.push(request);
         });
@@ -216,7 +249,7 @@ class DynformsServiceHandler {
         // Get those requests that are due to run. Construct them now, as they may contain a reference to the current date.
         const requestsReadyToRun = this._constructRequests().filter((requestInfo, requestIndex) => {
           const requestConfig = this.dynformsService.settings.requests[requestIndex];
-          return requestShouldRun(requestConfig, requestInfo._lastExecuted) ? true : false;
+          return requestShouldRun(requestConfig, requestConfig._lastExecuted) ? true : false;
         });
 
         if (!requestsReadyToRun.length) {
@@ -230,7 +263,8 @@ class DynformsServiceHandler {
         const now = new Date();
 
         const promises = requestsReadyToRun.map((requestInfo, requestIndex) => {
-            requestInfo._lastExecuted = now;
+            const requestConfig = this.dynformsService.settings.requests[requestIndex];
+            requestConfig._lastExecuted = now;
             return axios.post(this.dynformsService.fullUrl, requestInfo);
         });
 

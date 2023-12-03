@@ -226,6 +226,36 @@ const getNextSunEvent = (date = null, coords = null) => {
 }
 
 /**
+ * Get 12:00 on the given day.
+ * @returns Date
+ */
+const getNoon = (date = null) => {
+  if (!date) {
+    date = new Date();
+  }
+
+  date.setHours(12, 0, 0, 0);
+
+  return date;
+}
+
+/**
+ * Get the first timestamp of the next day.
+ * @returns Date
+ */
+const getNextDay = (date = null) => {
+  if (!date) {
+    date = new Date();
+  }
+
+  const nextDay = new Date(date.getTime() + constants.DAY)
+  nextDay.setHours(0, 0, 0, 0);
+  return nextDay;
+}
+
+const getTomorrow = () => getNextDay();
+
+/**
  * Is it dark out (are we before sunrise or after sunset)?
  * @returns bool
  */
@@ -358,6 +388,9 @@ export {
   getDaytimePercent,
   getNighttimePercent,
   getNextSunEvent,
+  getNoon,
+  getNextDay,
+  getTomorrow,
   isBetweenDuskAndDawn,
   isDawnOrDusk,
   isDawn,

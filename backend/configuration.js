@@ -1454,10 +1454,10 @@ const deviceMap = [
         subType: constants.SUBTYPE_CLOCK,
         settings: {
             coordinates: {
-              lat: constants.DEFAULT_LAT,
-              lon: constants.DEFAULT_LON,
+                lat: constants.DEFAULT_LAT,
+                lon: constants.DEFAULT_LON,
             },
-            timeFormat: 'HH:MM',
+            timeFormat: "HH:MM",
         },
     },
     {
@@ -1535,6 +1535,45 @@ const deviceMap = [
             useSingleRequest: true,
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 1 * HOUR,
+        },
+    },
+    {
+        alias: "Scriptures Service",
+        channel: 503,
+        id: "scriptures-service",
+        display: true,
+        displayLabel: "Scriptures",
+        displayType: null,
+        locationId: "__internal",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_DYNFORMS_SERVICE,
+        settings: {
+            api: {
+                baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
+                path: null, // will use .env DYNFORMS_PATH or default instead
+                queryParams: {},
+            },
+            requests: [
+                {
+                    connectionName: "test",
+                    collectionName: "scriptures",
+                    retrieve: {
+                        time: {
+                            frequency: "daily",
+                            hours: 0,
+                            minutes: 15,
+                        },
+                        singleRecord: { 
+                          type: "__INDEX",
+                          // index: n (will be inserted dynamically when requesting from dynforms)
+                        },
+                    },
+                },
+            ],
+            // If set causes the backend to return the results for the first request only; as a single object and not as an array.
+            useSingleRequest: true,
+            // This is how often the handler will go out and check whether a request should actually be run.
+            checkInterval: 30 * SECOND,
         },
     },
 

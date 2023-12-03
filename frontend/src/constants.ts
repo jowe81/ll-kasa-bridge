@@ -110,4 +110,8 @@ constants.clock = {
   clockChannel: 500,
 }
 
+constants.scripture = {
+  scripturesServiceChannel: 503,
+}
+
 export default constants;

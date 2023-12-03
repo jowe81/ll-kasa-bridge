@@ -3,10 +3,14 @@ import Clock from "./clock/Clock";
 import Temperature from "./temperature/Temperature";
 import CompactTimer from "./compactTimer/CompactTimer";
 import CompactBirthdays from "./compactBirthdays/CompactBirthdays";
+import Scripture from "./scripture/Scripture";
 
 function TouchUiPanel() {
   return (
       <>
+          <div className="touch-ui-panel-item touch-ui-panel-item-remaining-space">
+            <Scripture />
+          </div>
           <div className="touch-ui-panel-item">
             <CompactBirthdays />
           </div>

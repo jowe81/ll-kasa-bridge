@@ -35,6 +35,10 @@
   position: relative;  
 }
 
+.touch-ui-panel-item-remaining-space {
+  flex-grow: 1;
+}
+
 .touch-ui-pannel-item-nopad {
   height: 100%;
   max-height: 100%;

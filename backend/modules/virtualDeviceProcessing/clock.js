@@ -1,7 +1,7 @@
 import _ from "lodash";
 import axios from "axios";
 import { makeLiveDeviceObject } from "../TargetDataProcessor.js";
-import { formatTime, getSunrise, getSunset } from "../../helpers/jDateTimeUtils.js";
+import { formatTime, getSunrise, getSunset, getNoon, isDaytime, getTomorrow } from "../../helpers/jDateTimeUtils.js";
 import constants from "../../constants.js";
 import { log, debug } from "../Log.js";
 
@@ -108,15 +108,46 @@ class ClockHandler {
         }
 
         const { settings } = this.clock;
+        
+        const coordinates = {
+          lat: settings.coordinates.lat,
+          long: settings.coordinates.lon,
+        }
 
-        const sunrise = getSunrise(new Date(), settings.coordinates);
-        const sunset = getSunset(new Date(), settings.coordinates);
+        const tomorrow = getTomorrow();
+
+        // The sun library appears to consider the first millisecond part of the previous day, so add one.
+        tomorrow.setHours(0, 0, 0, 1);
+
+        let sunset, sunrise, nextSunEvent;
+
+        if (isDaytime(null, coordinates)) {
+          // Middle of day: need today's sunset and tomorrow's sunrise.
+          nextSunEvent = "sunset";
+          sunset = getSunset(null, coordinates);
+          sunrise = getSunrise(tomorrow, coordinates);
+        } else {
+          // It's dark out.
+          const now = new Date();
+
+          nextSunEvent = "sunrise";
+          if (now.getHours < 12) {
+            // Morning of the current day; need today's sunrise and sunset.
+            sunrise = getSunrise(null, coordinates);
+            sunset = getSunset(null, coordinates);
+          } else {
+            // Evening of the current day; need tomorrow's sunrise and sunset.
+            sunrise = getSunrise(tomorrow, coordinates);
+            sunset = getSunset(tomorrow, coordinates);
+          }
+        }
 
         const clockData = {
           ms: Date.now(),
           displayTime: formatTime(settings.timeFormat ?? localConstants.DEFAULT_TIME_FORMAT),
           sunrise: formatTime('H:MM', sunrise),
           sunset: formatTime('H:MM', sunset),
+          nextSunEvent,
         }
 
         this.clock._updateState(

@@ -11,6 +11,23 @@ function Clock() {
     const clock = devices.find(device => device.subType === constants.SUBTYPE_CLOCK && device.channel === constants.clock?.clockChannel);
     const clockData = clock?.state?.clock;
 
+    const sunrise = <div>Sunrise: <span>{clockData?.sunrise ?? "N/A"}</span></div>
+    const sunset = <div>Sunset: <span>{clockData?.sunset ?? "N/A"}</span></div>
+
+    let sunEvents;
+
+    if (clockData?.nextSunEvent === 'sunset') {
+      sunEvents = <>
+        <div>Sunset: <span>{clockData?.sunset ?? "N/A"}</span></div>
+        <div>Sunrise: <span>{clockData?.sunrise ?? "N/A"}+</span></div>
+      </>
+    } else if(clockData?.nextSunEvent ==='sunrise') {
+      sunEvents = <>
+        <div>Sunrise: <span>{clockData?.sunrise ?? "N/A"}</span></div>
+        <div>Sunset: <span>{clockData?.sunset ?? "N/A"}</span></div>
+      </>
+    }
+
     return (
         <div className="fullscreen-panel-clock">
             <div className="fullscreen-panel-clock-time">
@@ -18,8 +35,7 @@ function Clock() {
             </div>
             <div className="fullscreen-panel-clock-bottom">
                 <div><span>{currentDate(parseInt(clockData?.ms)) ?? "N/A"}</span></div>
-                <div>Sunrise: <span>{clockData?.sunrise ?? "N/A"}</span></div>
-                <div>Sunset: <span>{clockData?.sunset ?? "N/A"}</span></div>
+                {sunEvents}
             </div>
         </div>
     );

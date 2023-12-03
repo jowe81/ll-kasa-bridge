@@ -1,5 +1,6 @@
 import { log } from "./jUtils.js";
 import { formatDate, isToday } from "./jDateTimeUtils.js";
+import constants from "../constants.js";
 
 function getDisplayDataFromApiResponse(responseData, settings) {
     // Currently not doing any processing here.
@@ -9,7 +10,7 @@ function getDisplayDataFromApiResponse(responseData, settings) {
       // Return the results for the first request only; as a single object and not as an array.
       displayData = responseData.length ? responseData[0] : null;  
     }
-    console.log(displayData)
+
     return displayData;
 }
 
@@ -19,6 +20,15 @@ function requestShouldRun(requestConfig, lastExecuted) {
   const timeInfo = requestConfig.retrieve?.time;  
 
   switch (timeInfo.frequency) {
+
+    case 'hourly':
+      if (!lastExecuted || lastExecuted.getTime() < Date.now() - constants.HOUR) {
+        // Either has never run, or not in more than an hour.
+        return true;
+      };
+
+      break;
+
     case 'daily':
       const scheduledFor = new Date();
       scheduledFor.setHours(
@@ -76,9 +86,8 @@ function applyCurrentDateFilter(match) {
     };
 }
 
-
 const dynformsDbFilters = {
-    applyCurrentDateFilter,
+    applyCurrentDateFilter,    
 };
 
 export { 
