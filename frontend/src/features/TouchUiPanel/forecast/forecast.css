@@ -12,6 +12,7 @@
   display: flex;
   height: 43px;
   width: 80px;  
+  margin: 5px 0px;
   /* border: 1px solid yellow */
 }
 
@@ -36,7 +37,8 @@
 }
 
 .forecast-label {
-  padding-top:14px;
+  padding-top:5px;
+  margin-bottom: 2px;  
   max-height: 25px;  
   border-bottom: 1px solid #333;
   color: #999;
