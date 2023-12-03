@@ -123,8 +123,9 @@ class WeatherServiceHandler {
 
         this.initialized = true;
 
-        // Trigger an initial API call.
-        this.weatherServiceIntervalHandler();
+        // Trigger an initial API call. THERES A TIMINIG ISSUE HERE - WITHOUT THE DELAY THE FRONTEND WONT GET THE UPDATE
+        setTimeout(() => { this.weatherServiceIntervalHandler(); }, 5000);
+
     }
 
     async weatherServiceIntervalHandler() {
@@ -133,14 +134,14 @@ class WeatherServiceHandler {
         }
       
         try {
-          //const data = await axios.get(this.weatherService.fullUrl);
-          const data = getMockData();
+          const data = await axios.get(this.weatherService.fullUrl);
+          //const data = getMockData();
           const responseData = data.data;
 
           // Cache the response.
           this.cache.data = responseData;
 
-          log(`Received API data from ${this.weatherService.settings.api?.baseUrl}`, this);
+          log(`${this.weatherService.alias} received API data from ${this.weatherService.settings.api?.baseUrl}`, this.weatherService);
 
           const displayData = getDisplayDataFromApiResponse(responseData);
 
