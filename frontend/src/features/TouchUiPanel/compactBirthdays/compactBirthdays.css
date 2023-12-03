@@ -1,0 +1,113 @@
+.birthdays-compact-container {
+  width: 150px;
+  border-radius: 5px;
+  padding-top: 5px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  text-align: left;
+}
+
+.birthdays-label {
+  max-height: 25px;  
+  color: #999;
+  font-size: 15px;
+  border-bottom: 1px solid #333;
+  width: 100%;
+}
+
+.birthdays-compact-items-container{
+  width: 150px;  
+  margin: 5px auto;
+  padding: 0px;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.birthday-compact-item-container{
+  /* border: 1px solid yellow; */
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 3px;
+  border-radius: 3px;
+  margin: 2px 0px;
+  font-size: 90%;
+  flex-direction: column-reverse;
+  height: 25px;
+
+}
+
+.birthday-compact-item-container-today {
+  color:aliceblue;  
+  background: rgba(100,0,0,1);
+  position: relative;
+}
+
+.birthday-compact-item-container-today .birthday-compact-item-date{
+  color:red;
+  font-size: 10px;
+  width: 100%;
+  text-align: right;
+  position:  absolute;
+  right: 2px;
+  top: 0px;
+}
+
+.birthday-compact-item-container-tomorrow {
+  color:aliceblue; 
+  background: rgba(100,50,0,1);
+  position: relative;
+}
+
+.birthday-compact-item-container-tomorrow .birthday-compact-item-date{
+  color:rgb(255, 166, 0);
+  font-size: 10px;
+  width: 100%;
+  text-align: right;
+  position:  absolute;
+  right: 2px;
+  top: 0px;
+}
+
+.birthday-compact-item-container-later {
+  color:rgb(187, 194, 204);  
+  position: relative;
+}
+
+.birthday-compact-item-container-later .birthday-compact-item-date{
+  color:rgb(187, 194, 204);
+  font-size: 10px;
+  width: 100%;
+  text-align: right;
+  position:  absolute;
+  right: 2px;
+  top: 0px;
+}
+
+.birthday-compact-item-date-tomorrow {
+  color: rgb(255, 187, 0);
+}
+
+.birthday-compact-item-name {
+  position: relative;
+  top: 2px;
+  font-size: 100%;
+}
+
+.hidden-birthdays {
+  float: right;
+  font-size: 13px;
+  padding: 0px 3px;
+  border-radius: 3px;
+}
+
+.hidden-birthdays-tomorrow {
+  background: rgba(100,50,0,1);
+  color: rgb(255, 187, 0);
+}
+
+.hidden-birthdays-today {
+  background: rgba(100,0,0,1);
+  color:red;
+}

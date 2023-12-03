@@ -10,6 +10,15 @@
   text-align: left;
 }
 
+.timer-main-label {
+  text-align: center;
+  color:rgb(213, 158, 158);
+  font-size: 140%;
+  font-weight: lighter;
+  padding-top: 8px;
+  width: 100%;  
+}
+
 
 .timer-panel-item {
   width: 280px;  

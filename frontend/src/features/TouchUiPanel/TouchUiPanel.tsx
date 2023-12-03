@@ -20,7 +20,7 @@ function TouchUiPanel() {
           <div className="touch-ui-panel-item">
               <Forecast />
           </div>
-          <div className="touch-ui-panel-item">
+          <div className="touch-ui-panel-item-nopad">
               <Clock />
           </div>
       </>

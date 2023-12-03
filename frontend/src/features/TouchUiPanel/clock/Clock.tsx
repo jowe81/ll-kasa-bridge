@@ -17,9 +17,9 @@ function Clock() {
                 {clockData?.displayTime ?? "N/A"}
             </div>
             <div className="fullscreen-panel-clock-bottom">
-                <div>{currentDate(parseInt(clockData?.ms)) ?? "N/A"}</div>
-                <div>Sunrise: {clockData?.sunrise ?? "N/A"}</div>
-                <div>Sunset: {clockData?.sunset ?? "N/A"}</div>
+                <div><span>{currentDate(parseInt(clockData?.ms)) ?? "N/A"}</span></div>
+                <div>Sunrise: <span>{clockData?.sunrise ?? "N/A"}</span></div>
+                <div>Sunset: <span>{clockData?.sunset ?? "N/A"}</span></div>
             </div>
         </div>
     );

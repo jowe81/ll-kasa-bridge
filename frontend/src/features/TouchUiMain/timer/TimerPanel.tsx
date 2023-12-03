@@ -95,7 +95,7 @@ function TimerPanel() {
 
   return (
     <div className='timer-panel-container'>
-      <div className='touch-ui-sub-panel-header'>Clock</div>
+      <div className='touch-ui-sub-panel-header'>Timer</div>
       { liveTimers.length > 0 && <LiveTimers {...props}/>}
       { !liveTimers.length && <Clock clockTime={timer.state.clock}/>}
       <NudgePanel {...props}/>      

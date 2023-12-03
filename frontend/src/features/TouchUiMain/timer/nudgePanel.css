@@ -2,15 +2,6 @@
   height: 55px;
 }
 
-.timer-main-label {
-  text-align: center;
-  color:rgb(201, 87, 87);
-  font-size: 140%;
-  font-weight: lighter;
-  padding-top: 8px;
-  width: 100%;  
-}
-
 .nudge-button {
   width: 52px;
   padding-top: 3px;

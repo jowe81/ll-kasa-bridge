@@ -14,7 +14,7 @@
 }
 
 .touch-ui-panel-container {
-  border: 1px solid rgb(84, 84, 84);
+  border: 1px solid rgb(64, 64, 64);
   border-radius: 3px;
   width: 1900px;
   height: 135px;
@@ -32,8 +32,14 @@
   height: 100%;
   max-height: 100%;
   padding: 0px 5px;
-  position: relative;
-  
+  position: relative;  
+}
+
+.touch-ui-pannel-item-nopad {
+  height: 100%;
+  max-height: 100%;
+  padding: 0px 0px;
+  position: relative;  
 }
 
 .touch-ui-main-column {
