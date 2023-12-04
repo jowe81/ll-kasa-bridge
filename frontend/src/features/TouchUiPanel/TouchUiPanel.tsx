@@ -8,7 +8,7 @@ import Scripture from "./scripture/Scripture";
 function TouchUiPanel() {
   return (
       <>
-          <div className="touch-ui-panel-item touch-ui-panel-item-remaining-space">
+          <div className="touch-ui-panel-item">
             <Scripture />
           </div>
           <div className="touch-ui-panel-item">

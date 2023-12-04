@@ -1,16 +1,16 @@
 .scripture-container {
   padding: 5px 10px;
-  height: 105px;
+  height: 124px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   background-color: rgb(77, 77, 69);
   border-radius: 5px;
-  margin: 3px;
-  margin-top: 10px;
+  
+  margin-top: 7px;
   overflow: hidden;
   position: relative;
-  max-width: 600px;
+  max-width: 700px;
 }
 
 .scripture-text {

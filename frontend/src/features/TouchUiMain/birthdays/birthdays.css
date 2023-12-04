@@ -32,7 +32,7 @@
 }
 
 .birthday-item-container-today {
-  color:aliceblue;  
+  color:rgb(229, 211, 211);  
   background: rgba(100,0,0,1);
 }
 
@@ -41,7 +41,7 @@
 }
 
 .birthday-item-container-tomorrow {
-  color:aliceblue; 
+  color:rgb(229, 220, 211);  
   background: rgba(100,50,0,1);
 }
 
@@ -62,5 +62,5 @@
 }
 
 .birthday-item-name {
-  font-size: 100%;
+  font-size: 17px;
 }

@@ -1,11 +1,14 @@
 .nudge-panel {
   height: 55px;
+  padding: 0px 0px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .nudge-button {
-  width: 52px;
-  padding-top: 3px;
-  height: 30px;
+  width: 58px;
+  padding-top: 4px;
+  height: 36px;
   border-color: rgb(159, 119, 119);
   color:rgb(184, 140, 140)
 

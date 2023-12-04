@@ -1,5 +1,5 @@
 .live-timers {
-  height: 95px;
+  height: 101px;
   overflow-y: scroll;  
 }
 
@@ -8,7 +8,7 @@
   justify-content: space-between;
   width: 280px;
   font-size: 150%;
-  height: 48px;
+  height: 54px;
   padding: 3px 3px 1px 15px;
   margin-left: 5px;
   margin-right: 5px;
@@ -54,14 +54,14 @@
   float: right;
   border: 1px solid rgb(94, 50, 50);
   border-radius: 5px;
-  height: 35px;
+  height: 45px;
   margin-right: 5px;
   width: 80px;
   text-align: center;
   color: rgb(144, 53, 53);
   font-size: 80%;
   margin-top: 0px;
-  padding-top: 8px;
+  padding-top: 6px;
   cursor: pointer;
 
 }

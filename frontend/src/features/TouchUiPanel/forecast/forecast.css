@@ -38,14 +38,15 @@
 
 .forecast-label {
   padding-top:5px;
+  padding-bottom:0px;
   margin-bottom: 2px;  
-  max-height: 25px;  
+  
   border-bottom: 1px solid #333;
   color: #999;
 }
 
 .fullscreen-panel-forecast {
-  width: 160px; 
+  width: 220px; 
   padding: 0px 20px 0px 25px;
   height: 100%; 
 }

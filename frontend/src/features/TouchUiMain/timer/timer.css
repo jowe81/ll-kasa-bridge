@@ -30,12 +30,11 @@
 }
 
 .base-button {
-  width: 70px; 
-  height: 60px;
+  width: 76px; 
   border-radius: 5px;
   border: 1px solid gray;
-  height: 60px;
-  padding: 0px 3px;
+  height: 66px;
+  padding: 4px 3px;
   margin: 10px 5px;
   margin-bottom: 0px;
   border: 1px solid gray;

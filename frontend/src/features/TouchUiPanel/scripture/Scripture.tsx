@@ -13,10 +13,10 @@ function Scripture() {
       const { text, reference, translation } = record;
 
       // Adjust the font size if needed.
-      let fontSizePx = 15;
+      let fontSizePx = 16;
 
       if (text.length < 200) {
-        fontSizePx = 17;
+        fontSizePx = 18;
       }
 
       if (text.length > 300) {
