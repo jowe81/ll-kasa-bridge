@@ -1,5 +1,5 @@
 .compact-timer-container {
-  width: 180px;
+  width: 160px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -15,12 +15,12 @@
 
 
 .compact-base-button {
-  width: 70px; 
+  width: 75px; 
   height: 57px;
   border-radius: 5px;
   border: 1px solid gray;
   padding: 5px 0px;
-  margin: 5px 5px;
+  /* margin: 5px 5px; */
   margin-bottom: 0px;
   border: 1px solid gray;
   background-size: 20%;

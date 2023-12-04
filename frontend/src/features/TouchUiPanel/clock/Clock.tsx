@@ -23,8 +23,8 @@ function Clock() {
       </>
     } else if(clockData?.nextSunEvent ==='sunrise') {
       sunEvents = <>
-        <div>Sunrise: <span>{clockData?.sunrise ?? "N/A"}</span></div>
-        <div>Sunset: <span>{clockData?.sunset ?? "N/A"}</span></div>
+        <div>Sunrise: <span>{clockData?.sunrise ?? "N/A"}{clockData?.am ? '' : '+'}</span></div>
+        <div>Sunset: <span>{clockData?.sunset ?? "N/A"}{clockData?.am ? '' : '+'}</span></div>
       </>
     }
 

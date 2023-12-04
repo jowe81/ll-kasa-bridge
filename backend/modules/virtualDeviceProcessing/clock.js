@@ -114,6 +114,7 @@ class ClockHandler {
           long: settings.coordinates.lon,
         }
 
+        const now = new Date();
         const tomorrow = getTomorrow();
 
         // The sun library appears to consider the first millisecond part of the previous day, so add one.
@@ -128,7 +129,6 @@ class ClockHandler {
           sunrise = getSunrise(tomorrow, coordinates);
         } else {
           // It's dark out.
-          const now = new Date();
 
           nextSunEvent = "sunrise";
           if (now.getHours < 12) {
@@ -143,7 +143,8 @@ class ClockHandler {
         }
 
         const clockData = {
-          ms: Date.now(),
+          ms: now.getTime(),
+          am: now.getHours() < 12,
           displayTime: formatTime(settings.timeFormat ?? localConstants.DEFAULT_TIME_FORMAT),
           sunrise: formatTime('H:MM', sunrise),
           sunset: formatTime('H:MM', sunset),
