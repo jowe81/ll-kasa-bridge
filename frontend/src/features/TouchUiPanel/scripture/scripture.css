@@ -13,15 +13,40 @@
   max-width: 700px;
 }
 
+.scripture-text-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: rgb(77, 77, 69);
+  height: 100%;
+}
+
 .scripture-text {
   font-size: 17px;
-  width: 100%;
-  
+  width: 100%;  
   color:rgb(240, 240, 218);
 }
 
 .scripture-reference {
-  font-size: 15px;
-  text-align: right;
-  color:rgba(240, 240, 218, .6);
 }
+
+
+.scripture-bottom {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.scripture-user {
+  color:rgba(240, 240, 218, 0.394);
+  height: 21px;
+  overflow: hidden;  
+  font-size: 14px;
+  font-style: italic;
+}
+
+.scripture-user-name {
+  font-style: italic;
+}
+

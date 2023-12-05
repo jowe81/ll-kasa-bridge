@@ -1,4 +1,5 @@
 import { log } from "./jUtils.js";
+import { isToday } from './jDateTimeUtils.js';
 
 function getForecastBlock(responseData, n) {
     const extractedData = {};
@@ -50,13 +51,12 @@ function formatForecastDate(unixTimestamp) {
     // Create a new Date object using the timestamp (multiply by 1000 to convert seconds to milliseconds)
     const date = new Date(unixTimestamp * 1000);
 
-    // Get the hour and minute
     const hour = date.getHours();
 
     // Format the result
     const formattedDate = `${hour % 12 === 0 ? 12 : hour % 12}${
         hour >= 12 ? "pm" : "am"
-    }`;
+    }${isToday(date) ? "" : "+"}`; // Add the plus sign for dates after midnight tonight.
 
     return formattedDate;
 }
