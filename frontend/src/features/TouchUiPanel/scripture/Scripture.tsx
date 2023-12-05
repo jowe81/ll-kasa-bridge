@@ -7,6 +7,10 @@ function Scripture() {
     
     const record = Array.isArray(records) && records.length ? records[0] : null;
 
+    if (!record) {
+      return;
+    }
+    
     let addedJsx;
 
     // See about adding user info
