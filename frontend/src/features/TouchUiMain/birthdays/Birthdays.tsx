@@ -7,7 +7,7 @@ function Birthdays() {
   const fullSize = true;
   const records = getRecords();
 
-  const birthdaysJsx = records.length > 5 ? 
+  const birthdaysJsx = records.length ? 
     records.map((record, index) => getJsx(record, index, fullSize)) :
     <div className="birthday-item-none">none upcoming</div>;
 
