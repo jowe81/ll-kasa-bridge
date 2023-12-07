@@ -94,14 +94,16 @@ function CompactTimer() {
   };
 
   return (
-      <div className="compact-timer-container">
-          {liveTimers.length > 0 && <LiveTimers {...props} />}
-          {!liveTimers.length && (
-              <Presets
-                  configuredTimers={configuredTimers}
-                  onPresetTimerClick={schedulePresetTimer}
-              />
-          )}
+      <div className="touch-ui-panel-item">
+          <div className="compact-timer-container">
+              {liveTimers.length > 0 && <LiveTimers {...props} />}
+              {!liveTimers.length && (
+                  <Presets
+                      configuredTimers={configuredTimers}
+                      onPresetTimerClick={schedulePresetTimer}
+                  />
+              )}
+          </div>
       </div>
   );
 

@@ -41,8 +41,10 @@ tr {
   text-align: left;
   /* height: 965px; */
   height: 100%;
-  align-items: stretch;
+  align-items: stretch;  
+  padding-left: 1px;
   
+
 }
 
 .group-container {
@@ -284,13 +286,13 @@ tr {
   margin: 5px;
   background-color: rgb(58, 53, 53);
   border-radius: 5px;
+  max-width: 298px;
 }
 
 .location-buttons-container {
-  width: 294px;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: wrap;  
 }
 
 .location-label {

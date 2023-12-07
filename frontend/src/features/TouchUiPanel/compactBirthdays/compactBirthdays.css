@@ -1,8 +1,8 @@
 .birthdays-compact-container {
-  width: 150px;
+  width: 180px;
   border-radius: 5px;
   padding-top: 5px;
-  margin: 0px 8px;
+  margin: 0px 0px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -18,11 +18,12 @@
 }
 
 .birthdays-compact-items-container{
-  width: 150px;  
+  width: 100%;  
   margin: 5px auto;
   padding: 0px;
   display: flex;
   flex-flow: row wrap;
+  height: 100%;
 }
 
 .birthday-compact-item-container{
@@ -45,7 +46,7 @@
 
 .birthday-compact-item-container-yesterday .birthday-compact-item-date{
   color:rgb(255, 184, 184);
-  font-size: 10px;
+  font-size: 11px;
   width: 100%;
   text-align: right;
   position:  absolute;
@@ -62,7 +63,7 @@
 
 .birthday-compact-item-container-today .birthday-compact-item-date{
   color:red;
-  font-size: 10px;
+  font-size: 11px;
   width: 100%;
   text-align: right;
   position:  absolute;
@@ -79,7 +80,7 @@
 
 .birthday-compact-item-container-tomorrow .birthday-compact-item-date{
   color:rgb(255, 166, 0);
-  font-size: 10px;
+  font-size: 11px;
   width: 100%;
   text-align: right;
   position:  absolute;
@@ -95,7 +96,7 @@
 
 .birthday-compact-item-container-later .birthday-compact-item-date{
   color:rgb(187, 194, 204);
-  font-size: 10px;
+  font-size: 11px;
   width: 100%;
   text-align: right;
   position:  absolute;

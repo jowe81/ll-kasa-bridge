@@ -1,3 +1,5 @@
+import { getSelectedRecordsInfo } from "../TouchUiMain/birthdays/birthdayHelpers.tsx";
+
 import Forecast from "./forecast/Forecast";
 import Clock from "./clock/Clock";
 import Temperature from "./temperature/Temperature";
@@ -5,28 +7,21 @@ import CompactTimer from "./compactTimer/CompactTimer";
 import CompactBirthdays from "./compactBirthdays/CompactBirthdays";
 import Scripture from "./scripture/Scripture";
 
+
+
 function TouchUiPanel() {
+  const birthdayRangeToDisplay = 1;
+  const { recordsSelected } = getSelectedRecordsInfo(birthdayRangeToDisplay);
+  const showBirthdays = recordsSelected.length > 0;
   return (
       <>
-          <div className="touch-ui-panel-item">
-            <Scripture />
-          </div>
-          <div className="touch-ui-panel-item">
-            <CompactBirthdays />
-          </div>
-          <div className="touch-ui-panel-item">
-            <CompactTimer />
-          </div>
-          <div className="touch-ui-panel-item fullscreen-panel-temperature">
-              <Temperature type="primary" />
-              <Temperature type="secondary" />
-          </div>
-          <div className="touch-ui-panel-item">
-              <Forecast />
-          </div>
-          <div className="touch-ui-panel-item-nopad">
-              <Clock />
-          </div>
+          <Scripture />
+          <CompactTimer />
+          { showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay}/> }
+          { !showBirthdays && <Temperature thermometersStartIndex={2} /> }
+          <Temperature thermometersStartIndex={0} />
+          <Forecast />
+          <Clock />
       </>
   );
 }

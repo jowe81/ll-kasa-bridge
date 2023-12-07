@@ -98,7 +98,7 @@ constants.photos = {
 }
 
 constants.touchPanel = {
-  thermometerChannels: [ 201, 202 ],
+  thermometerChannels: [ 201, 202, 203, 204 ],
   forecastChannels: [ 501 ],
 }
 

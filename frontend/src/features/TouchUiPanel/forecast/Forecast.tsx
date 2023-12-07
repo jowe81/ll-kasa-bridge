@@ -48,12 +48,13 @@ function Forecast() {
       );
     })
     
-
     return (
-        <div className="fullscreen-panel-forecast">
-            <div className="forecast-label">Forecast</div>
-            <div className="forecast-display-data-container">
-                {displayDataJsx}
+        <div className="touch-ui-panel-item">
+            <div className="fullscreen-panel-forecast">
+                <div className="forecast-label">Forecast</div>
+                <div className="forecast-display-data-container">
+                    {displayDataJsx}
+                </div>
             </div>
         </div>
     );

@@ -10,7 +10,7 @@ function Scripture() {
     if (!record) {
       return;
     }
-    
+
     let addedJsx;
 
     // See about adding user info
@@ -51,16 +51,24 @@ function Scripture() {
       }
 
       jsx = (
-          <div className="scripture-container">
-              {/* <div className="scripture-header">Verse of the Day</div> */}
-              <div className="scripture-text-container">
-                <div className="scripture-text" style={style}>{ record.text }</div>
+          <div className="touch-ui-panel-item">
+              <div className="scripture-container">
+                  {/* <div className="scripture-header">Verse of the Day</div> */}
+                  <div className="scripture-text-container">
+                      <div className="scripture-text" style={style}>
+                          {record.text}
+                      </div>
+                  </div>
+                  <div className="scripture-bottom">
+                      <div className="scripture-user">
+                          {addedJsx && addedJsx}
+                      </div>
+                      <div className="scripture-reference">
+                          {record.reference} ({record.translation.toUpperCase()}
+                          )
+                      </div>
+                  </div>
               </div>
-              <div className="scripture-bottom">
-                  <div className="scripture-user">{addedJsx && addedJsx}</div>
-                  <div className="scripture-reference">{ record.reference } ({record.translation.toUpperCase()})</div>
-              </div>
-              
           </div>
       );
     }

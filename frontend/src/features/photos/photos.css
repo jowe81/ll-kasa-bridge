@@ -1,13 +1,17 @@
 .photo-container {
   position: relative;
-  padding: 0px; 
+  padding: 0px;
+  overflow: hidden; /* Otherwise the blur spills out... */ 
 }
 
 .photo-container-embedded {
-  margin: -1px;
   
-  width: 1250px;
   height: 100%;
+  flex-grow: 1;
+
+  border-right: 1px solid rgb(55, 55, 55); 
+  border-left: 1px solid rgb(55, 55, 55); 
+  margin: 0px 0px;
 }
 
 .photo-container-full-screen {
@@ -38,7 +42,7 @@
   filter: blur(8px);
   -webkit-filter: blur(8px);
 
-  opacity: 50%;
+  opacity: 50%;  
 }
 
 

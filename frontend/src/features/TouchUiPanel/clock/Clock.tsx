@@ -29,13 +29,19 @@ function Clock() {
     }
 
     return (
-        <div className="fullscreen-panel-clock">
-            <div className="fullscreen-panel-clock-time">
-                {clockData?.displayTime ?? "N/A"}
-            </div>
-            <div className="fullscreen-panel-clock-bottom">
-                <div><span>{currentDate(parseInt(clockData?.ms)) ?? "N/A"}</span></div>
-                {sunEvents}
+        <div className="touch-ui-panel-item-nopad">
+            <div className="fullscreen-panel-clock">
+                <div className="fullscreen-panel-clock-time">
+                    {clockData?.displayTime ?? "N/A"}
+                </div>
+                <div className="fullscreen-panel-clock-bottom">
+                    <div>
+                        <span>
+                            {currentDate(parseInt(clockData?.ms)) ?? "N/A"}
+                        </span>
+                    </div>
+                    {sunEvents}
+                </div>
             </div>
         </div>
     );

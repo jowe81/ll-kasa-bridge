@@ -3,7 +3,7 @@
 }
 
 .touch-ui-columns-container {
-  border: 1px solid rgb(84, 84, 84);
+  border: 1px solid rgb(64, 64, 64);
   border-radius: 3px;
   width: 1900px;
   height: 930px;
@@ -49,12 +49,11 @@
 }
 
 .touch-ui-main-column {
-  padding: 0px;
-  /* border: 1px solid yellow; */
-  width: 100%;
-  min-width: 315px;
-  height: 100%;
-  max-height: 100%;
+  width: 310px;
+}
+
+.touch-ui-main-column-remaining-space {
+  flex-grow: 1;  
 }
 
 .touch-ui-sub-panel-header {

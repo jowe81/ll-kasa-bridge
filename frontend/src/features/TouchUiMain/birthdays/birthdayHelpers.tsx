@@ -23,6 +23,37 @@ function getRecords(maxDifference: number = 0) {
     return records;
 }
 
+function getSelectedRecordsInfo(birthdayRangeToDisplay: number = 0) {
+    const records = getRecords(birthdayRangeToDisplay);
+
+    const recordsSelected: any[] = [];
+    const maxRecords = 3;
+    let hiddenBirthdaysToday = 0;
+    let hiddenBirthdaysTomorrow = 0;
+
+    records.forEach((record: any) => {
+        const difference = getDifference(record);
+
+        if (recordsSelected.length < maxRecords) {
+            recordsSelected.push(record);
+        } else {
+            // No room, but there's more birthdays today
+            if (difference === 0) {
+                hiddenBirthdaysToday++;
+            }
+            if (difference > 0) {
+                hiddenBirthdaysTomorrow++;
+            }
+        }
+    });
+
+    return {
+        recordsSelected,
+        hiddenBirthdaysToday,
+        hiddenBirthdaysTomorrow,
+    };
+}
+
 function getDifference(record) {
     const [month, day] = record.date_of_birth_MMDD?.split("-");
     const birthdayDate = new Date();
@@ -102,6 +133,7 @@ function getJsx(record, key, fullSize = true) {
 
 export {
   getRecords,
+  getSelectedRecordsInfo,
   getDifference,
   getDisplayName,
   getJsx,

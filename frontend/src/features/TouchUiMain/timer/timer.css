@@ -8,6 +8,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   text-align: left;
+  margin-left: 5px;
 }
 
 .timer-main-label {
