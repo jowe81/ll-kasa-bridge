@@ -58,6 +58,7 @@ const constants = {
   SUBTYPE_WEATHER_SERVICE: 'weatherService',
   SUBTYPE_DYNFORMS_SERVICE: 'dynformsService',
   SUBTYPE_CLOCK: 'clock',
+  SUBTYPE_MASTER_SWITCH: 'masterSwitch',
 
   // Service names
   SERVICE_PERIODIC_FILTER: 'Periodic Filter Service',
@@ -90,6 +91,7 @@ constants.SUBTYPES = [
   constants.SUBTYPE_WEATHER_SERVICE,
   constants.SUBTYPE_DYNFORMS_SERVICE,
   constants.SUBTYPE_CLOCK,
+  constants.SUBTYPE_MASTER_SWITCH,
 ]
 
 constants.DEVICETYPES_LIGHTING = [

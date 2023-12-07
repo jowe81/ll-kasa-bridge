@@ -6,7 +6,7 @@ import Temperature from "./temperature/Temperature";
 import CompactTimer from "./compactTimer/CompactTimer";
 import CompactBirthdays from "./compactBirthdays/CompactBirthdays";
 import Scripture from "./scripture/Scripture";
-
+import MasterSwitches from "./masterSwitches/MasterSwitches.tsx";
 
 
 function TouchUiPanel() {
@@ -15,6 +15,7 @@ function TouchUiPanel() {
   const showBirthdays = recordsSelected.length > 0;
   return (
       <>
+          <MasterSwitches />
           <Scripture />
           <CompactTimer />
           { showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay}/> }

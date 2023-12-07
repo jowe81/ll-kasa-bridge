@@ -6,56 +6,92 @@
   padding-top: 5px;
   margin-top: 5px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
   text-align: left;
   margin: 10px 0px;
   margin-left: 5px;
+  height: 250px;  
+  align-items: flex-start;
 }
 
 .birthdays-items-container{
-  width: 280px;  
+  width: 280px;
   background-color: rgb(24, 20, 41);
   margin: 5px auto;
   padding: 3px;
+  padding-right: 7px;
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: column;
+  justify-items: flex-start;
+  flex-grow: 1;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .birthday-item-container{
   /* border: 1px solid yellow; */
   width: 100%;
-  display: flex;
+  display: flex;  
   justify-content: space-between;
   padding: 3px;
   border-radius: 5px;
-  margin: 2px;
+  margin: 2px;  
+  position: relative;  
+}
+
+.birthday-item-none { 
+  background-image: url('/icons/birthday.png');
+  background-repeat: no-repeat;
+  background-position: 58px 10px;  
+  width: 100%;
+  flex-grow: 1;
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 18px;
+  padding-top: 168px;
+  padding-left: 77px;  
 }
 
 .birthday-item-container-today {
   color:rgb(229, 211, 211);  
   background: rgba(100,0,0,1);
+  font-size: 90%;
 }
 
 .birthday-item-container-today .birthday-item-date{
   color:red;
+  text-align: center; 
+  width: 60px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 0, 0, .5);
 }
 
 .birthday-item-container-tomorrow {
   color:rgb(229, 220, 211);  
   background: rgba(100,50,0,1);
+  font-size: 70%;  
 }
 
 .birthday-item-container-tomorrow .birthday-item-date{
   color:rgb(255, 166, 0);
+  text-align: center; 
+  width: 60px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 166, 0, .5);
+  padding-top: 3px;
 }
 
 .birthday-item-container-later {
   color:rgb(187, 194, 204);
+  font-size: 90%;
 }
 
 .birthday-item-container-later .birthday-item-date{
-  color:rgb(187, 194, 204);
+  color:rgba(187, 194, 204, 0.719);
+  text-align: center; 
+  width: 60px;
+  border-radius: 3px;
+  border: 1px solid rgba(187, 194, 204, 0.219);
 }
 
 .birthday-item-date-tomorrow {
