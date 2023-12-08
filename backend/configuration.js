@@ -1517,7 +1517,7 @@ const deviceMap = [
                                 field: "date_of_birth_MMDD",
                                 match: {
                                     filterName: "__CURRENT_DATE",
-                                    daysAfter: 20, // include n days after the current date
+                                    daysAfter: 10, // include n days after the current date
                                     daysBefore: 0, // include n days preceding the current date
                                     format: "MM-DD",
                                 },
