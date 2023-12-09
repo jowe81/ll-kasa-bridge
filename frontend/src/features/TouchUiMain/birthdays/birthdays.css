@@ -56,7 +56,9 @@
   background-image: url('/icons/birthday.png');
   background-repeat: no-repeat;
   background-size: 50%;
-  background-position: 70px 0px;
+  background-position: bottom;
+  margin-left: 8px;
+  margin-bottom: 10px;
   width: 100%;
   flex-grow: 1;
   color: rgba(255, 255, 255, 0.2);
