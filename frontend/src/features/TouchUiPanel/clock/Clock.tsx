@@ -11,9 +11,6 @@ function Clock() {
     const clock = devices.find(device => device.subType === constants.SUBTYPE_CLOCK && device.channel === constants.clock?.clockChannel);
     const clockData = clock?.state?.clock;
 
-    const sunrise = <div>Sunrise: <span>{clockData?.sunrise ?? "N/A"}</span></div>
-    const sunset = <div>Sunset: <span>{clockData?.sunset ?? "N/A"}</span></div>
-
     let sunEvents;
 
     if (clockData?.nextSunEvent === 'sunset') {

@@ -8,18 +8,19 @@ import "./masterSwitches.css";
 
 
 
-function MasterSwitches() {
+function MasterSwitches(props) {
+    console.log(props);
     const devices = useAppSelector((state) => state.data.devices);
     const masterSwitches = getMasterSwitches(devices);
 
     if (!masterSwitches || !masterSwitches.length) {
-      return;
+      //return;
     }
 
     return (
         <div className="touch-ui-panel-item">
             <div className="master-switches-container">
-              MASTER SWITCHES
+              {props.fullScreenButton}
             </div>
         </div>
     );

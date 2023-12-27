@@ -276,7 +276,8 @@ class DynformsServiceHandler {
 
               this.dynformsService._updateState({
                 powerState: this.dynformsService.getPowerState(),
-                api: displayData
+                api: displayData,
+                settings: this.dynformsService.settings,
               }, true);
 
               log(`${this.dynformsService.alias} received API data from ${this.dynformsService.fullUrl}`, this.dynformsService);

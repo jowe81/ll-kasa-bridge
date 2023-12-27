@@ -4,14 +4,15 @@ import constants from "./constants.ts";
 
 import { VirtualDevice } from "./features/TouchUiMain/devices/dataSlice.ts";
 
+import { getDeviceByChannel } from './devicesHelpers.tsx';
+
 function getDynformsServiceRecords(channel) {
-    const devices: VirtualDevice[] = useAppSelector((state) => state.data.devices);
-    const dynformsService = devices.find(
-        (device) =>
-            device.subType === constants.SUBTYPE_DYNFORMS_SERVICE &&
-            device.channel === channel
-    );
-    
+    const dynformsService: VirtualDevice = getDeviceByChannel(channel);
+
+    if (!dynformsService) {
+      return [];
+    }    
+
     const records = dynformsService?.state?.api?.data?.records ?? [];
     return records;
 }

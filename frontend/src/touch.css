@@ -1,7 +1,12 @@
 .touch-ui-container {
   overflow: hidden;
+  width: 1902px;
 }
 
+.touch-ui-fullscreen-container {
+  height: 930px;
+  width: 1900px;
+}
 .touch-ui-columns-container {
   border: 1px solid rgb(64, 64, 64);
   border-radius: 3px;

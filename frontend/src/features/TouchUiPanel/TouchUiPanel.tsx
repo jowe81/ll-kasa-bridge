@@ -9,17 +9,21 @@ import Scripture from "./scripture/Scripture";
 import MasterSwitches from "./masterSwitches/MasterSwitches.tsx";
 
 
-function TouchUiPanel() {
+function TouchUiPanel(props: any) {  
   const birthdayRangeToDisplay = 1;
   const { recordsSelected } = getSelectedRecordsInfo(birthdayRangeToDisplay);
   const showBirthdays = recordsSelected.length > 0;
   return (
       <>
-          <MasterSwitches />
-          <Scripture />
+          <MasterSwitches {...props} />
           <CompactTimer />
-          { showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay}/> }
-          { !showBirthdays && <Temperature thermometersStartIndex={2} /> }
+          <Scripture {...props} />
+          {showBirthdays && (
+              <CompactBirthdays
+                  birthdayRangeToDisplay={birthdayRangeToDisplay}
+              />
+          )}
+          {!showBirthdays && <Temperature thermometersStartIndex={2} />}
           <Temperature thermometersStartIndex={0} />
           <Forecast />
           <Clock />

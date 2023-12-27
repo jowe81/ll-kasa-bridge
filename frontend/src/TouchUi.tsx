@@ -5,64 +5,141 @@ import Photos from "./features/photos/Photos";
 import Birthdays from "./features/TouchUiMain/birthdays/Birthdays";
 
 import TouchUiPanel from "./features/TouchUiPanel/TouchUiPanel";
-
+import Scripture from "./features/TouchUiPanel/scripture/Scripture.tsx";
 import './touch.css';
 import { useState } from "react";
 
-
+import { getAllDevices, getDeviceByChannel, getClock } from "./devicesHelpers.tsx";
 
 function TouchUi() {
+    const [fullScreen, setFullScreen] = useState<boolean>(true);
 
-  const [fullScreen, setFullScreen] = useState<boolean>(true);
+    function toggleFullScreen() {
+        setFullScreen(!fullScreen);
+    }
 
-  function toggleFullScreen() {
-    setFullScreen(!fullScreen);
-  }
+    const devices = getAllDevices();
+    const clock = getClock();
+   
+    let fullScreenButtonClassName = "compact-base-button toggle-fullscreen-button";
 
-  const fullScreenButton = <button onClick={toggleFullScreen}>{fullScreen ? `Close` : `Expand`}</button>;
-
-  const photoProps = {
-      fullScreen,
-      fullScreenButton,
-  };
-
-  let content;
-
-  if (fullScreen) {
-    content = (
-        <>
-            <Photos {...photoProps} />
-            <div className="touch-ui-panel-container">
-                <TouchUiPanel />
-            </div>
-        </>
+    if (fullScreen) {
+      fullScreenButtonClassName += " "
+    }
+    const fullScreenButton = (
+        <button className="compact-base-button toggle-fullscreen-button" onClick={toggleFullScreen}>
+            {fullScreen ? `All Controls` : `Full Screen`}
+        </button>
     );
-  } else {
-    content = (
-        <>
-            <div className="touch-ui-columns-container">
-                <div className="touch-ui-main-column">
-                    <TimerPanel />
-                    <Birthdays />
+
+    const props = {
+        fullScreen,
+        fullScreenButton,
+        renderForMainViewingArea: false,
+    };
+    
+    let content;
+
+    // Default to photos, but may be overridden
+    let mainViewingAreaJsx = <Photos {...props} />;
+
+    const overrideChannels = [ 503 ];
+
+    const overrideDevice = getMainViewingAreaOverrideDevice(overrideChannels, clock, devices);    
+  
+    if (overrideDevice) {
+        const overrideProps = { ...props };
+        overrideProps.renderForMainViewingArea = true;
+
+        switch (overrideDevice?.id) {
+            case "scriptures-service":
+                mainViewingAreaJsx = <Scripture {...overrideProps} />;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
+    if (fullScreen) {
+        content = (
+            <>
+                <div className="touch-ui-fullscreen-container">
+                    {mainViewingAreaJsx}
                 </div>
-                <div className="touch-ui-main-column-remaining-space">
-                  <Photos {...photoProps} />
+                <div className="touch-ui-panel-container">
+                    <TouchUiPanel {...props}/>
                 </div>
-                <div className="touch-ui-main-column">
-                    <AutomationPanel />
+            </>
+        );
+    } else {
+        content = (
+            <>
+                <div className="touch-ui-columns-container">
+                    <div className="touch-ui-main-column">
+                        <TimerPanel />
+                        <Birthdays />
+                    </div>
+                    <div className="touch-ui-main-column-remaining-space">
+                        {mainViewingAreaJsx}
+                    </div>
+                    <div className="touch-ui-main-column">
+                        <AutomationPanel />
+                    </div>
                 </div>
-            </div>
-            <div className="touch-ui-panel-container">
-                <TouchUiPanel />
-            </div>
-        </>
-    );
-  }
-  return (
-    <div className='touch-ui-container'>
-      {content}
-    </div>
-  )
+                <div className="touch-ui-panel-container">
+                    <TouchUiPanel {...props}/>
+                </div>
+            </>
+        );
+    }
+    return <div className="touch-ui-container">{content}</div>;
+}
+
+function getMainViewingAreaOverrideDevice(overrideChannels, clock, devices) {
+    if (!clock) {
+      return null;
+    }
+
+
+    if (!(devices && devices.length)) {
+      return null;
+    }
+    
+    const ms = clock.state?.clock?.ms;
+    const now = new Date(ms);
+    const startTime = new Date(ms);
+    const endTime = new Date(ms);
+
+
+    const foundDevices = devices.filter((device, index) => {
+        if (!overrideChannels.includes(device.channel)) {
+          return false;
+        }
+        const showInMainViewingArea = device.state?.settings?.ui?.showInMainViewingArea;
+
+        if (!showInMainViewingArea) {
+          return false;
+        }
+
+        startTime.setHours(showInMainViewingArea.startTime.hours);
+        startTime.setMinutes(showInMainViewingArea.startTime.minutes);
+        endTime.setHours(showInMainViewingArea.endTime.hours);
+        endTime.setMinutes(showInMainViewingArea.endTime.minutes);
+
+        if (now >= startTime && now <= endTime) {
+          return true;
+        }
+
+        return false;
+    });
+
+    if (!(foundDevices && foundDevices.length)) {
+      return null;
+    }
+    
+    return foundDevices[0];
 }
 
 export default TouchUi;

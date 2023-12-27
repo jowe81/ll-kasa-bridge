@@ -26,7 +26,7 @@ const constants: any = {
     DEVICETYPE_ESP_RELAY: "ESP_RELAY",
     DEVICETYPE_ESP_MAILBOX: "ESP_MAILBOX",
 
-    DEVICETYPE_VIRTUAL: "Virtual",
+    DEVICETYPE_VIRTUAL: "Virtual Device",
 
     // Subtypes
     SUBTYPE_BULB: "bulb",

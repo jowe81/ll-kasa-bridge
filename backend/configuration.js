@@ -1574,6 +1574,20 @@ const deviceMap = [
             useSingleRequest: true,
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 30 * SECOND,
+            ui: {
+              // Show large version in the mornings
+              showInMainViewingArea: {
+                frequency: "daily",
+                startTime: {
+                  hours: 1,
+                  minutes: 0,
+                },
+                endTime: {
+                  hours: 9,
+                  minutes: 30,
+                }
+              }
+            },
         },
     },
 

@@ -2,11 +2,9 @@ import { ReactNode } from "react";
 import { getDynformsServiceRecords } from "../../../dynformsHelpers";
 import constants from "../../../constants.ts";
 import './scripture.css';
-import { text } from "node:stream/consumers";
-import { inflate } from "node:zlib";
 
-function Scripture() {
-    const records = getDynformsServiceRecords(constants.scripture.scripturesServiceChannel);
+function Scripture({renderForMainViewingArea}) {
+    const records = getDynformsServiceRecords(constants.scripture?.scripturesServiceChannel);
     
     const record = Array.isArray(records) && records.length ? records[0] : null;
 
@@ -35,18 +33,18 @@ function Scripture() {
       const { text, reference, translation } = record;
 
       // Adjust the font size if needed.
-      let fontSizePx = 16;
+      let fontSizePx = renderForMainViewingArea ? 40 : 16;
 
       if (text.length < 200) {
-        fontSizePx = 18;
+        fontSizePx = renderForMainViewingArea ? 50 : 18;
       }
 
       if (text.length > 300) {
-        fontSizePx = 13;
+        fontSizePx = renderForMainViewingArea ? 32 : 13;
       }
 
       if (text.length > 400) {
-        fontSizePx = 12;
+        fontSizePx = renderForMainViewingArea ? 30 : 12;
       }
 
       const style = {
@@ -55,15 +53,15 @@ function Scripture() {
 
       jsx = (
           <div className="touch-ui-panel-item">
-              <div className="scripture-container">
+              <div className={renderForMainViewingArea ? "large-scripture-container" : "scripture-container"}>
                   {/* <div className="scripture-header">Verse of the Day</div> */}
-                  <div className="scripture-text-container">
-                      <div className="scripture-text" style={style}>
-                          {processRawText(record.text)}
+                  <div className={renderForMainViewingArea ? "large-scripture-text-container" : "scripture-text-container"}>
+                      <div className={renderForMainViewingArea ? "large-scripture-text" : "scripture-text"} style={style}>
+                          {processRawText(record.text, renderForMainViewingArea)}
                       </div>
                   </div>
-                  <div className="scripture-bottom">
-                      <div className="scripture-user">
+                  <div className={renderForMainViewingArea ? "large-scripture-bottom" : "scripture-bottom"}>
+                      <div className={renderForMainViewingArea ? "large-scripture-user" : "scripture-user"}>
                           {addedJsx && addedJsx}
                       </div>
                       <div className="scripture-reference">
@@ -79,7 +77,7 @@ function Scripture() {
     return jsx;
 }
 
-function processRawText(raw) {
+function processRawText(raw, renderForMainViewingArea) {
   // Split on anything that indicates a break: .,;
   let lines = raw.trim().split(/(\r|\r\n|\n|\, |\. |\; )/);
 
@@ -96,16 +94,16 @@ function processRawText(raw) {
 
     if (verseNo) {
       jsxLine = (
-          <>
-              <sup className="scripture-text-verse-number">{verseNo}</sup>
+          <span key={index}>
+              <sup className={renderForMainViewingArea ? "large-scripture-text-verse-number" : "scripture-text-verse-number"}>{verseNo}</sup>
               <span className="">{lineText}</span>
-          </>
+          </span>
       );
     } else {
       jsxLine = (
-          <>
+          <span key={index}>
               <span className="">{lineText}</span>
-          </>
+          </span>
       );
     }
 

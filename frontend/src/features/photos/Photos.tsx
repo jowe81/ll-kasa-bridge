@@ -65,9 +65,9 @@ function Photos(props: any) {
         <div>
           <button onClick={nextBtnClick}>Next</button>
         </div>
-        <div>
+        {/* <div>
           {fullScreenButton}
-        </div>
+        </div> */}
       </div>
     </div>
     

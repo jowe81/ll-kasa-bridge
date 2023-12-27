@@ -145,6 +145,8 @@ class ClockHandler {
         const clockData = {
           ms: now.getTime(),
           am: now.getHours() < 12,
+          hours: now.getHours(),
+          minutes: now.getMinutes(),
           displayTime: formatTime(settings.timeFormat ?? localConstants.DEFAULT_TIME_FORMAT),
           sunrise: formatTime('H:MM', sunrise),
           sunset: formatTime('H:MM', sunset),

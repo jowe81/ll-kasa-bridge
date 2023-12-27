@@ -1,0 +1,16 @@
+.master-switches-container {
+  padding: 7px; 
+  padding-left: 4px;
+  padding-right: 10px;
+  border-right: 1px solid rgb(64, 64, 64);
+  height: 100%;
+  width: 125px;
+}
+
+.master-switches-container .toggle-fullscreen-button {
+  background-color: rgba(135, 110, 77, 0.3);
+  color:rgb(135, 110, 77);
+  border-color: rgba(135, 110, 77, 0.5);
+  width: 111px;
+}
+
