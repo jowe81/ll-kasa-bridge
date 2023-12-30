@@ -89,10 +89,11 @@ class TimerHandler {
 
 
   /**
-   * Find a live timer by id
+   * Find a live timer by id (only returns first instances it finds)
    */
   _getLiveTimer(timerId) {
     const liveTimer = findById(timerId, this.state.liveTimers);
+    return liveTimer; 
   };
 
   /**
@@ -228,15 +229,10 @@ class TimerHandler {
       // Timer with id timerId doesn't exist on device configuration
     }
 
-    let liveTimer = this._getLiveTimer(timerId);
-
-    if (!liveTimer) {
-      // This timer isn't currently set, initialize it.
-      liveTimer = { 
-        ...timer,
-      };
-    }
-
+    let liveTimer = { 
+      ...timer,
+    };
+    
     // If the timer was currently set, reset it (reapply the length from current timestamp)
     liveTimer.expires = Date.now() + timer.length;
 

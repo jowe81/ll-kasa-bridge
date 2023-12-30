@@ -7,6 +7,7 @@ import { devicePool } from './modules/DevicePool.js';
 import utils from './helpers/ll-bridge-utils.js';
 import { initRouter } from './routers/kasaRouter.js';
 import devicesRouter from './routers/devices.js';
+import remoteRouter from './routers/remoteRouter.js';
 import getDevicePoolRouter from './routers/devicePool.js';
 import { socketHandler } from './modules/SocketHandler.js';
 import { log } from './helpers/jUtils.js';
@@ -71,6 +72,9 @@ mongoConnect().then(db => {
 
       const devicePoolRouter = getDevicePoolRouter(express, devicePool);
       app.use('/auto/devicePool', devicePoolRouter);
+
+      const remote = remoteRouter(express, devicePool, utils.processRemoteRequest);
+      app.use('/auto/remote', remote);
 
       socketHandler.initialize(io, devicePool);
       socketHandler.startSocketServer();

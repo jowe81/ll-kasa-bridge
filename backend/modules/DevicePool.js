@@ -246,6 +246,15 @@ const devicePool = {
     return deviceWrappers;
   },
 
+  getTimerDeviceWrapper() {
+    const deviceWrappers = devicePool.getDeviceWrappersByType(
+        constants.DEVICETYPE_VIRTUAL,
+        constants.SUBTYPE_TIMER
+    );
+    const timerDeviceWrapper = deviceWrappers.length && deviceWrappers[0];
+    return timerDeviceWrapper;
+  },
+
   /**
    * Return an array of group ids that this channel belongs to
    */

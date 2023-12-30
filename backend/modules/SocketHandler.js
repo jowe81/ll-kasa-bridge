@@ -105,26 +105,22 @@ const socketHandler = {
       });      
 
       socket.on('auto/command/setTimerFor', (ms) => {
-        const deviceWrappers = this.devicePool.getDeviceWrappersByType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_TIMER);
-        const timerDeviceWrapper = deviceWrappers.length && deviceWrappers[0];
+        const timerDeviceWrapper = this.devicePool.getTimerDeviceWrapper();
         timerDeviceWrapper._deviceHandlers.setTimerFor(ms);
       })
 
       socket.on('auto/command/setTimer', (timer) => {
-        const deviceWrappers = this.devicePool.getDeviceWrappersByType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_TIMER);
-        const timerDeviceWrapper = deviceWrappers.length && deviceWrappers[0];
-        timerDeviceWrapper._deviceHandlers.setTimer(timer.id);
+        const timerDeviceWrapper = this.devicePool.getTimerDeviceWrapper();
+        timerDeviceWrapper?._deviceHandlers.setTimer(timer.id);
       })
 
       socket.on('auto/command/cancelTimer', (liveTimerId) => {
-        const deviceWrappers = this.devicePool.getDeviceWrappersByType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_TIMER);
-        const timerDeviceWrapper = deviceWrappers.length && deviceWrappers[0];
+        const timerDeviceWrapper = this.devicePool.getTimerDeviceWrapper();
         timerDeviceWrapper._deviceHandlers.killLiveTimerByLiveId(liveTimerId);
       });
 
       socket.on('auto/command/nudgeTimer', ({liveTimerId, step}) => {
-        const deviceWrappers = this.devicePool.getDeviceWrappersByType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_TIMER);
-        const timerDeviceWrapper = deviceWrappers.length && deviceWrappers[0];
+        const timerDeviceWrapper = this.devicePool.getTimerDeviceWrapper();
         timerDeviceWrapper._deviceHandlers.nudgeLiveTimerByLiveId(liveTimerId, step);
       });
     
