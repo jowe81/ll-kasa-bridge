@@ -104,6 +104,7 @@ const devicePool = {
     log(`Global offline tolerance is ${options.offlineTolerance} attempts.`, null, 'white');
     client.startDiscovery(options).on('device-new', (device) => {
       device.getSysInfo().then(info => {
+        device.mic_mac = info.mic_mac;
         addDevice(device);
       });
     });
@@ -406,7 +407,10 @@ const devicePool = {
         id: device?.id,
       }
     }
-    
+
+    // Store the mac address retrieved from sysInfo
+    mapItem.mic_mac = device?.mic_mac;
+
     // Store a backreference to the pool and to the socket deviceHandler in each wrapper
     deviceWrapper.devicePool = this;
     deviceWrapper.socketHandler = this.socketHandler;

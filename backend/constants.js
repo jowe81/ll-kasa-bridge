@@ -50,6 +50,7 @@ const constants = {
   SUBTYPE_AIR_FAN: 'fan',
   SUBTYPE_AIR_HEAT: 'heater',
   SUBTYPE_AIR_AC: 'a/c',
+  SUBTYPE_CHRISTMAS_TREE: 'christmas-tree',
   SUBTYPE_LIGHT: 'light', // A non-smart plug-in-light
   SUBTYPE_ENTERTAINMENT: 'entertainment',  
 
@@ -75,24 +76,25 @@ const constants = {
 };
 
 constants.SUBTYPES = [
-  constants.SUBTYPE_AIR_AC,
-  constants.SUBTYPE_AIR_FAN,
-  constants.SUBTYPE_AIR_HEAT,
-  constants.SUBTYPE_BULB,
-  constants.SUBTYPE_ENTERTAINMENT,
-  constants.SUBTYPE_LED_STRIP,
-  constants.SUBTYPE_LIGHT,
-  constants.SUBTYPE_MAIL_COMPARTMENT,
-  constants.SUBTYPE_PLUG,
-  constants.SUBTYPE_SWITCH,
-  constants.SUBTYPE_THERMOMETER,
-  constants.SUBTYPE_THERMOSTAT,
-  constants.SUBTYPE_TIMER,
-  constants.SUBTYPE_WEATHER_SERVICE,
-  constants.SUBTYPE_DYNFORMS_SERVICE,
-  constants.SUBTYPE_CLOCK,
-  constants.SUBTYPE_MASTER_SWITCH,
-]
+    constants.SUBTYPE_AIR_AC,
+    constants.SUBTYPE_AIR_FAN,
+    constants.SUBTYPE_AIR_HEAT,
+    constants.SUBTYPE_BULB,
+    constants.SUBTYPE_ENTERTAINMENT,
+    constants.SUBTYPE_LED_STRIP,
+    constants.SUBTYPE_LIGHT,
+    constants.SUBTYPE_MAIL_COMPARTMENT,
+    constants.SUBTYPE_PLUG,
+    constants.SUBTYPE_CHRISTMAS_TREE,
+    constants.SUBTYPE_SWITCH,
+    constants.SUBTYPE_THERMOMETER,
+    constants.SUBTYPE_THERMOSTAT,
+    constants.SUBTYPE_TIMER,
+    constants.SUBTYPE_WEATHER_SERVICE,
+    constants.SUBTYPE_DYNFORMS_SERVICE,
+    constants.SUBTYPE_CLOCK,
+    constants.SUBTYPE_MASTER_SWITCH,
+];
 
 constants.DEVICETYPES_LIGHTING = [
   constants.SUBTYPE_LIGHT,

@@ -99,25 +99,51 @@ const processRemoteRequest = (query, devicePool) => {
 const remoteKitchen = (btn, devicePool) => {
   const tag = `Remote Kitchen (#${btn}):`;
 
-  if (btn === 4) {
-    devicePool.toggleGroup("group-kitchenCounterLights");
-  }
+  if ([4, 5].includes(btn)) {
+    let groupId;
 
-  if (btn === 5) {
-    devicePool.toggleGroup("group-livingroomLights");
-  }
+    switch (btn) {
+      case 4:
+        groupId = "group-kitchenCounterLights";
+        break;
 
-  if (btn === 6) {
-    const channel = 34; //Jess desk switch
-    const deviceWrapper = devicePool.getDeviceWrapperByChannel(channel);
-
-    if (!deviceWrapper) {
-      log(`${tag} Device Wrapper for Jess' Desk not found`, `bgRed`)
-      // Error - no wrapper.
-      return null;
+      case 5:
+        groupId = "group-livingroomLights";
+        break;
     }
 
-    deviceWrapper.toggle('Remote Kitchen');
+    if (groupId) {
+      log(`${tag} Toggling group "${groupId}"`, "yellow");
+      devicePool.toggleGroup(groupId);
+    }
+    
+  }
+  
+  if ([6, 8].includes(btn)) {
+    let channel;
+
+    switch (btn) {
+      case 6:
+        channel = 34; // Jess desk switch
+        break;
+
+      case 8:
+        channel = 206; // Mailbox lock
+        break;
+    }
+
+    if (channel) {
+      const deviceWrapper = devicePool.getDeviceWrapperByChannel(channel);
+
+      if (!deviceWrapper) {
+          log(`${tag} Device Wrapper for channel ${channel} not found`, `bgRed`);
+          // Error - no wrapper.
+          return null;
+      }
+
+      log(`${tag} Toggling channel ${channel}`, "yellow");
+      deviceWrapper.toggle("Remote Kitchen");
+    }
   }
 
   // Timers
@@ -168,8 +194,16 @@ const remoteKitchen = (btn, devicePool) => {
   }
 };
 
-const remoteBed = (btn) => {
+const remoteBed = (btn, devicePool) => {
   // To implement...
+  const tag = `Remote Kitchen (#${btn}):`;
+
+  if (btn === 1) {
+    const groupId = "group-bedroomDeskLights";
+    // Bedroom desk switch
+    log(`${tag} Toggling group "${groupId}"`, "yellow");
+    devicePool.toggleGroup(groupId);
+  }
 }
 
 export default {

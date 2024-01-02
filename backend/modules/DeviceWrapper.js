@@ -584,7 +584,7 @@ const cmdFailPrefix = '[FAIL]';
             });
         }
 
-        log(`Discovered device at ${device.host}`, this, 'yellow');
+        log(`Discovered device at ${device.host}, mac: ${device.mic_mac ?? `unknown`}`, this, 'yellow');
         this.addListeners();
         this.lastSeenAt = Date.now();
         this.setOnline();

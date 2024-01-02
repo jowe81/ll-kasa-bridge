@@ -12,6 +12,7 @@ const {
     SUBTYPE_ENTERTAINMENT,
     SUBTYPE_LIGHT,
     SUBTYPE_THERMOMETER,
+    SUBTYPE_CHRISTMAS_TREE,
 
     DEVICETYPE_ESP_THERMOMETER,
     DEVICETYPE_ESP_RELAY,
@@ -457,7 +458,7 @@ const globalConfig = {
         {
             id: "group-jessDeskLights",
             name: "Jess Desk Lights",
-            channels: [31, 32, 33, 36, 40],
+            channels: [32, 33, 36, 40],
             class: "class-jessDeskLights",
             displayLabel: "Desk",
             display: false,
@@ -546,7 +547,7 @@ const globalConfig = {
             name: "Living Room Lights",
             displayLabel: "Main",
             displayType: constants.SUBTYPE_LIGHT,
-            channels: [29, 30],
+            channels: [29, 30, 31],
             class: "class-livingroomLights",
         },
     ],
@@ -866,7 +867,7 @@ const deviceMap = [
     {
         alias: "Living Room Ikea 2",
         channel: 30,
-        id: "80124378042EF9B324B75F639D993F9F20F23759",
+        id: "801261D1846E3508D7801279357BB1A820F2B6D1",
         locationId: "loc-livingRoom",
         subType: SUBTYPE_BULB,
         filters: [
@@ -880,7 +881,7 @@ const deviceMap = [
     {
         alias: "Living Room Ikea 3",
         channel: 31,
-        id: "8012DEFBED48C05561BF6C2F5D8A490D1F77A75D",
+        id: "80124378042EF9B324B75F639D993F9F20F23759",
         locationId: "loc-livingRoom",
         subType: SUBTYPE_BULB,
         filters: [{ refId: "naturalLight" }],
@@ -892,6 +893,14 @@ const deviceMap = [
         locationId: "loc-livingRoom",
         subType: SUBTYPE_BULB,
         filters: [{ refId: "naturalLight" }],
+    },
+    {
+        alias: "Tree",
+        channel: 45,
+        id: "80069F21DB5B0BBF07AEC07F6485B19320C3751C",
+        locationId: "loc-livingRoom",
+        displayType: SUBTYPE_CHRISTMAS_TREE,
+        subType: SUBTYPE_PLUG,
     },
     {
         alias: "Jess' Desk Lamp",
@@ -911,13 +920,13 @@ const deviceMap = [
         subType: SUBTYPE_SWITCH,
         targets: {
             on: [
-                {
-                    channel: 31,
-                    stateData: {
-                        on_off: 1,
-                    },
-                    delay: 2000,
-                },
+                // {
+                //     channel: 31,
+                //     stateData: {
+                //         on_off: 1,
+                //     },
+                //     delay: 2000,
+                // },
                 {
                     channel: 32,
                     stateData: {
@@ -942,7 +951,7 @@ const deviceMap = [
                 },
             ],
             off: [
-                { channel: 31, stateData: false },
+                // { channel: 31, stateData: false },
                 { channel: 32, stateData: false },
                 { channel: 33, stateData: false },
                 { channel: 36, stateData: false },
@@ -1563,9 +1572,9 @@ const deviceMap = [
                             hours: 0,
                             minutes: 15,
                         },
-                        singleRecord: { 
-                          type: "__INDEX",
-                          // index: n (will be inserted dynamically when requesting from dynforms)
+                        singleRecord: {
+                            type: "__INDEX",
+                            // index: n (will be inserted dynamically when requesting from dynforms)
                         },
                     },
                 },
@@ -1575,18 +1584,18 @@ const deviceMap = [
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 30 * SECOND,
             ui: {
-              // Show large version in the mornings
-              showInMainViewingArea: {
-                frequency: "daily",
-                startTime: {
-                  hours: 1,
-                  minutes: 0,
+                // Show large version in the mornings
+                showInMainViewingArea: {
+                    frequency: "daily",
+                    startTime: {
+                        hours: 6,
+                        minutes: 0,
+                    },
+                    endTime: {
+                        hours: 9,
+                        minutes: 0,
+                    },
                 },
-                endTime: {
-                  hours: 9,
-                  minutes: 30,
-                }
-              }
             },
         },
     },

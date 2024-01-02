@@ -12,7 +12,8 @@
 .power-on-light, 
 .power-on-bulb, 
 .power-on-led-strip,
-.power-on-thermostat {
+.power-on-thermostat,
+.power-on-christmas-tree {
   background-color: rgb(0, 95, 0);
 }
 
@@ -243,6 +244,10 @@ tr {
 
 .icon-bulb, .icon-light {
   background-image: url('/icons/bulb.png');
+}
+
+.icon-christmas-tree {
+  background-image: url('/icons/christmas-tree.png');
 }
 
 .icon-heater {
