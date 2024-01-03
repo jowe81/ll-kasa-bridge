@@ -856,13 +856,13 @@ const deviceMap = [
         id: "801264A4EC3F66CAC02D4FF78712E6D11F992564",
         locationId: "loc-livingRoom",
         subType: SUBTYPE_BULB,
-        filters: [
-            {
-                refId: "naturalLight",
-                periodicallyActive: true,
-                applyPartially: 0.3,
-            },
-        ],
+        // filters: [
+        //     {
+        //         refId: "naturalLight",
+        //         periodicallyActive: true,
+        //         applyPartially: 0.3,
+        //     },
+        // ],
     },
     {
         alias: "Living Room Ikea 2",
@@ -870,13 +870,13 @@ const deviceMap = [
         id: "801261D1846E3508D7801279357BB1A820F2B6D1",
         locationId: "loc-livingRoom",
         subType: SUBTYPE_BULB,
-        filters: [
-            {
-                refId: "naturalLight",
-                periodicallyActive: true,
-                applyPartially: 0.5,
-            },
-        ],
+        // filters: [
+        //     {
+        //         refId: "naturalLight",
+        //         periodicallyActive: true,
+        //         applyPartially: 0.5,
+        //     },
+        // ],
     },
     {
         alias: "Living Room Ikea 3",
@@ -884,7 +884,7 @@ const deviceMap = [
         id: "80124378042EF9B324B75F639D993F9F20F23759",
         locationId: "loc-livingRoom",
         subType: SUBTYPE_BULB,
-        filters: [{ refId: "naturalLight" }],
+        // filters: [{ refId: "naturalLight" }],
     },
     {
         alias: "Living Room Ikea 4",

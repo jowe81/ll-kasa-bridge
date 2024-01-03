@@ -14,8 +14,10 @@ function getRecords(maxDifference: number = 0) {
             device.channel === constants.birthdays?.birthdayServiceChannel
     );
 
-    const records = birthdayService?.state?.api?.data?.records ?? [];
+    const allRecords = birthdayService?.state?.api?.data?.records ?? [];
 
+    const records = allRecords.filter((record) => record.show_birthday);
+    
     if (maxDifference) {
       return records.filter(record => getDifference(record) <= maxDifference);
     }
