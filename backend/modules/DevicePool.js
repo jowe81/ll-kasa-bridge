@@ -491,8 +491,12 @@ const devicePool = {
         const filtersToRun = this._getCurrentlyActivePeriodicFilters(deviceWrapper.filters);
 
         if (Array.isArray(filtersToRun) && filtersToRun.length) {        
-          if (!deviceWrapper.periodicFiltersSuspended) {
-            deviceWrapper.setLightState({}, null, serviceName, filtersToRun);
+          if (!deviceWrapper.periodicFiltersSuspended) {            
+            if ([constants.SUBTYPE_PLUG, constants.SUBTYPE_SWITCH].includes(deviceWrapper.subType)) {
+              deviceWrapper.runPowerStateFilters({}, null, serviceName, filtersToRun);
+            } else {
+              deviceWrapper.setLightState({}, null, serviceName, filtersToRun);
+            }
             filtersProcessed += filtersToRun.length;
             devicesProcessed++;
           } else {

@@ -417,6 +417,52 @@ const globalConfig = {
                 },
             ],
         },
+        {
+            id: "schedule-christmasTree",
+            pluginName: "schedule",
+            periodicallyActive: true,
+            schedule: [
+                /**
+                 * This is a plain schedule item - specify a time and stateData.
+                 */
+                {
+                    trigger: {
+                        hours: 8,
+                        minutes: 30,
+                    },
+                    stateData: {
+                        on_off: 1,
+                    },
+                },
+                {
+                    trigger: {
+                        hours: 8,
+                        minutes: 31,
+                    },
+                    stateData: {
+                        // None. Now it can be manually switched.
+                    },
+                },
+                {
+                    trigger: {
+                        hours: 23,
+                        minutes: 30,
+                    },
+                    stateData: {
+                        on_off: 0,
+                    },
+                },
+                {
+                    trigger: {
+                        hours: 23,
+                        minutes: 31,
+                    },
+                    stateData: {
+                        // None. Now it can be manually switched.
+                    },
+                },
+            ],
+        },
     ],
 
     /**
@@ -901,6 +947,7 @@ const deviceMap = [
         locationId: "loc-livingRoom",
         displayType: SUBTYPE_CHRISTMAS_TREE,
         subType: SUBTYPE_PLUG,
+        filters: [{ refId: "schedule-christmasTree" }],
     },
     {
         alias: "Jess' Desk Lamp",

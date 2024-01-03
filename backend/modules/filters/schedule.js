@@ -51,12 +51,22 @@ const schedule = () => {
       getDateFromItem(itemA).getTime() >= getDateFromItem(itemB).getTime() ? 1 : -1
     );
 
-    const itemCount = allItems.length;
-
     // Special case - only one item:
-    if (itemCount === 1) {
-      return allItems[0];
+    if (allItems.length === 1) {
+        return allItems[0];
     }
+
+    allItems.push({
+          trigger: {
+              hours: 23,
+              minutes: 59,
+          },
+          stateData: {
+            // None. This is just to make sure the last item before midnight will be processed.              
+          },
+    })
+
+    const itemCount = allItems.length;
 
     let currentlyActiveItem;
 

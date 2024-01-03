@@ -822,6 +822,58 @@ const cmdFailPrefix = '[FAIL]';
     }
   },
 
+  async runPowerStateFilters(commandObject, triggerSwitchPosition, origin, filters = null, skipAllFilters = false) {
+    if (!skipAllFilters) {
+        // Apply filters
+        if (filters === null) {
+            // No filters were passed in; use filters configured on this device.
+            filters = this.filters;
+        }
+
+        if (Array.isArray(filters) && filters.length) {
+            filters.forEach((filterObject) => {
+                const switchPositionSetting = filterObject.switchPosition;
+
+                // Execute the filter if:
+                if (
+                    // the origin of the request the periodic filter service, or
+                    origin === constants.SERVICE_PERIODIC_FILTER ||
+                    // a switchPosition setting has not been defined for the filter, or
+                    typeof switchPositionSetting !== "boolean" ||
+                    // the trigger switch position matches the switchPosition setting.
+                    (switchPositionSetting !== null &&
+                        switchPositionSetting === triggerSwitchPosition)
+                ) {
+                    // switchPosition either is not set on the filter, or it matches the trigger switch position.
+                    commandObject = this.filter(
+                        filterObject,
+                        commandObject,
+                        true
+                    );
+                }
+            });
+        }
+    } else {
+        console.log(
+            `${this.alias}: no filtering for command ${JSON.stringify(
+                commandObject
+            )}`
+        );
+    }
+
+    if (!Object.keys(commandObject).length) {
+        // No point in sending an empty command object.
+        return;
+    }
+
+    if (commandMatchesCurrentState(this, commandObject)) {
+        // No point in issuing a command that would change nothing.
+        return;
+    }
+
+    this.setPowerState(!!commandObject.on_off, triggerSwitchPosition, origin);
+  },
+
   async toggle(origin) {
     this.setPowerState(!this.getPowerState(), null, origin);
   },
