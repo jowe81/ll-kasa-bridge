@@ -591,7 +591,7 @@ const globalConfig = {
         {
             id: "group-livingroomLights",
             name: "Living Room Lights",
-            displayLabel: "Main",
+            displayLabel: "Living",
             displayType: constants.SUBTYPE_LIGHT,
             channels: [29, 30, 31],
             class: "class-livingroomLights",
@@ -1495,6 +1495,14 @@ const deviceMap = [
                     ttl: 3 * MINUTE,
                     audiofile: null,
                 },
+                {
+                    id: "pomodoro",
+                    subLabel: "P'doro",
+                    displayButton: false,
+                    length: 25 * MINUTE,
+                    ttl: 0,
+                    audiofile: null,
+                },
             ],
         },
     },
@@ -1644,6 +1652,108 @@ const deviceMap = [
                     },
                 },
             },
+        },
+    },
+    {
+        alias: "Master Switch Service",
+        channel: 999,
+        id: "master-switch-service",
+        display: true,
+        displayLabel: "Master",
+        displayType: null,
+        locationId: "__internal",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_MASTER_SWITCH,
+        settings: {
+            buttons: [
+                {
+                    alias: "On",
+                    buttonId: "master-on",
+                    switch: [
+                        {
+                            groupId: "group-livingroomLights",
+                            stateData: true,
+                        },
+                        {
+                            groupId: "group-kitchenCounterLights",
+                            stateData: true,
+                        },
+                        {
+                            // Kitchen table
+                            channel: 28,
+                            stateData: {
+                                // Can configure detailed state, but don't need to
+                                lightState: {
+                                    on_off: 1,
+                                    brightness: 100,
+                                },
+                            },
+                        },
+                        {
+                            // Kitchen Aleds
+                            channel: 44,
+                            stateData: false,
+                        },
+                        {
+                            groupId: "group-bedShelfLights",
+                            stateData: true,
+                        },
+                    ],
+                },
+                {
+                    alias: "Off",
+                    buttonId: "master-off",
+                    switch: [
+                        {
+                            groupId: "group-jessDeskLights",
+                            stateData: false,
+                        },
+                        {
+                            groupId: "group-livingroomLights",
+                            stateData: false,
+                        },
+                        {
+                            groupId: "group-kitchenCounterLights",
+                            stateData: false,
+                        },
+                        {
+                            // Kitchen table
+                            channel: 28,
+                            stateData: {
+                                // Can configure detailed state, but don't need to
+                                lightState: {
+                                    on_off: 0,
+                                },
+                            },
+                        },
+                        {
+                            // Kitchen Aleds
+                            channel: 44,
+                            stateData: true,
+                        },
+                        {
+                            groupId: "group-hallwayCeiling",
+                            stateData: false,
+                        },
+                        {
+                            groupId: "group-bathroomLights",
+                            stateData: false,
+                        },
+                        {
+                            groupId: "group-bedroomCeilingLights",
+                            stateData: false,
+                        },
+                        {
+                            groupId: "group-bedroomDeskLights",
+                            stateData: false,
+                        },
+                        {
+                            groupId: "group-bedShelfLights",
+                            stateData: false,
+                        },
+                    ],
+                },
+            ],
         },
     },
 

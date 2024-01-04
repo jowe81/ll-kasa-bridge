@@ -61,7 +61,7 @@ mongoConnect().then(db => {
     .allSettled(promises)
     .then(() => {
       // Initialize the device pool with a callback to update the LL db on device events.
-      devicePool.initialize(db, io, utils.updateLL);
+      devicePool.initialize(db);
 
       // Initialize the routers.
       const kasaRouter = initRouter(express, devicePool, utils.processRequest);

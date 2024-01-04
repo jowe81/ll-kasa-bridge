@@ -37,6 +37,7 @@ class MasterSwitchHandler {
             [
                 // Include
                 "powerState",
+                "settings",
             ],
             {
                 // Default
@@ -79,47 +80,61 @@ class MasterSwitchHandler {
             `Initialized ${this.masterSwitch.subType} "${this.masterSwitch.alias}".`,
             this.masterSwitch
         );
-        log(
-            `Check-Interval: ${Math.ceil(
-                this.masterSwitch.settings.checkInterval / constants.MINUTE
-            )} minutes.`,
-            this.masterSwitch
-        );
-
-        // Start the interval check
-        if (this._checkingIntervalHandler) {
-            clearInterval(this._checkingIntervalHandler);
-        }
-
-        const interval =
-            this.masterSwitch.settings.checkInterval ??
-            localConstants.CHECKING_INTERVAL_DEFAULT;
-
-        this._checkingIntervalHandler = setInterval(
-            () => this.masterSwitchIntervalHandler(),
-            interval
-        );
 
         this.initialized = true;
-
-        // Trigger an initial API call. THERES A TIMINIG ISSUE HERE - WITHOUT THE DELAY THE FRONTEND WONT GET THE UPDATE
-        setTimeout(() => {
-            this.masterSwitchIntervalHandler();
-        }, 5000);
     }
 
-    async masterSwitchIntervalHandler() {
-        if (!this.initialized) {
-            return false;
+    execute(buttonId, origin) {
+      if (!Array.isArray(this.masterSwitch.settings.buttons)) {
+        return null;
+      }
+
+      const button = this.masterSwitch.settings.buttons.find((button) => button.buttonId === buttonId);
+
+      if (!button || !button.switch?.length) {
+        return null;
+      }
+
+      // Have the button; process it.
+
+      let logItems = [];
+
+      button.switch.forEach(item => {
+        let logId;
+        let switchingThisItem = true;
+
+        if (item.channel) {
+          // Channel
+          logId = item.channel;          
+          const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(item.channel);
+          
+          if (deviceWrapper) {
+            switchingThisItem = true;
+            if (typeof item.stateData === 'boolean') {
+              deviceWrapper.setPowerState(item.stateData, null, origin);              
+            } else {
+              deviceWrapper.setLightState(item.stateData?.lightState, null, origin, null, true);            
+            }
+            
+          } else {
+            switchingThisItem = false;
+          }
+
+        } else if (item.groupId) {
+          // Group
+          logId = item.groupId;
+          this.devicePool.switchGroup(item.groupId, item.stateData);          
         }
 
-        this.masterSwitch._updateState(
-            {
-                powerState: this.masterSwitch.getPowerState(),
-                masterSwitch: displayData,
-            },
-            true
-        );
+        if (switchingThisItem) {
+          logItems.push(`${logId}/${JSON.stringify(item.stateData)}`);        
+        }
+        
+      });
+
+      let logText = `MasterSwitch ${buttonId}: ${logItems.join(', ')}`;
+
+      log(logText, this.masterSwitch, "greenBright");
     }
 }
 

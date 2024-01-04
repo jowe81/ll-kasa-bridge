@@ -183,7 +183,7 @@ const externalFlags = () => {
         storeDataAndFlagLatestChangesGlobally(data.data, urlInfo);
         flagChangesForDevices();
       }).catch((e) => {
-        console.log('Axios error');
+        // console.log('Axios error');
       });
     });
   };

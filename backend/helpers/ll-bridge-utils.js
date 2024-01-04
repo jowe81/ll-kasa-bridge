@@ -164,32 +164,8 @@ const remoteKitchen = (btn, devicePool) => {
         break;
     }
 
-    if (timerId) {      
-      const timerDeviceWrapper = devicePool.getTimerDeviceWrapper();
-      if (!timerDeviceWrapper) {
-        log(`${tag} Cannot find timer device.`, 'red');
-        return null;
-      }
-
-      // Get live instances for this timer.
-      const liveTimers = timerDeviceWrapper._deviceHandlers.getState()?.liveTimers ?? [];
-      const allInstances = liveTimers.filter((liveTimer) => liveTimer.id === timerId);
-      const expiredInstances = allInstances.filter((liveTimer) => liveTimer.expiresIn <= 0);
-
-      // Currently killing all instances, so you can cancel a timer if accidentally set.
-      const instancesToKill = allInstances;
-
-      if (instancesToKill.length) {
-        // Remove existing instances.
-        instancesToKill.forEach((liveTimer) => {
-          log(`${tag} Killing timer with ID/LiveId "${timerId}"/${liveTimer.liveId}`, 'yellow');
-          timerDeviceWrapper._deviceHandlers.killLiveTimerByLiveId(liveTimer.liveId);      
-        })
-      } else {
-        // No instances of this timer are currently present; instantiate it.
-        log(`${tag} Instantiating timer with ID "${timerId}"`, 'yellow');
-        timerDeviceWrapper._deviceHandlers.setTimer(timerId);
-      }
+    if (timerId) {
+      timerButton(tag, timerId, devicePool);
     }
   }
 };
@@ -204,6 +180,50 @@ const remoteBed = (btn, devicePool) => {
     log(`${tag} Toggling group "${groupId}"`, "yellow");
     devicePool.toggleGroup(groupId);
   }
+
+  if (btn === 5) {
+    timerButton(tag, "pomodoro", devicePool);
+  }
+}
+
+function timerButton(logTag, timerId, devicePool) {
+    if (timerId) {
+        const timerDeviceWrapper = devicePool.getTimerDeviceWrapper();
+        if (!timerDeviceWrapper) {
+            log(`${logTag} Cannot find timer device.`, "red");
+            return null;
+        }
+
+        // Get live instances for this timer.
+        const liveTimers =
+            timerDeviceWrapper._deviceHandlers.getState()?.liveTimers ?? [];
+        const allInstances = liveTimers.filter(
+            (liveTimer) => liveTimer.id === timerId
+        );
+        const expiredInstances = allInstances.filter(
+            (liveTimer) => liveTimer.expiresIn <= 0
+        );
+
+        // Currently killing all instances, so you can cancel a timer if accidentally set.
+        const instancesToKill = allInstances;
+
+        if (instancesToKill.length) {
+            // Remove existing instances.
+            instancesToKill.forEach((liveTimer) => {
+                log(
+                    `${logTag} Killing timer with ID/LiveId "${timerId}"/${liveTimer.liveId}`,
+                    "yellow"
+                );
+                timerDeviceWrapper._deviceHandlers.killLiveTimerByLiveId(
+                    liveTimer.liveId
+                );
+            });
+        } else {
+            // No instances of this timer are currently present; instantiate it.
+            log(`${logTag} Instantiating timer with ID "${timerId}"`, "yellow");
+            timerDeviceWrapper._deviceHandlers.setTimer(timerId);
+        }
+    }
 }
 
 export default {

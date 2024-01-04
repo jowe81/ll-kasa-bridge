@@ -21,6 +21,8 @@ const socketHandler = {
     this.io.on('connection', (socket) => {
 
       const address = socket.handshake.address;
+      const origin = "ws:" + address;
+
       log(`Socket connection from ${address}`, `bgBlue`);
 
       // Clients request the full map when connecting
@@ -123,6 +125,11 @@ const socketHandler = {
         const timerDeviceWrapper = this.devicePool.getTimerDeviceWrapper();
         timerDeviceWrapper._deviceHandlers.nudgeLiveTimerByLiveId(liveTimerId, step);
       });
+      
+      socket.on('auto/command/masterSwitch', ({buttonId}) => {
+        const masterSwitchDeviceWrapper = this.devicePool.getMasterSwitchDeviceWrapper();
+        masterSwitchDeviceWrapper._deviceHandlers.execute(buttonId, origin);
+      })
     
     });
   },

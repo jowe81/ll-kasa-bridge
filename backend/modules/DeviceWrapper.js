@@ -764,7 +764,7 @@ const cmdFailPrefix = '[FAIL]';
         });  
       }
     } else {
-      console.log(`${this.alias}: no filtering for command ${JSON.stringify(commandObject)}`);
+      // console.log(`${this.alias}: no filtering for command ${JSON.stringify(commandObject)}`);
     }
     
     if (!Object.keys(commandObject).length) {

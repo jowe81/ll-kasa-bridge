@@ -27,7 +27,7 @@ import { socketHandler } from './SocketHandler.js';
 
 const devicePool = {
 
-  async initialize(db, io, deviceEventCallback) {
+  async initialize(db, deviceEventCallback) {
     this.db = db;
     this.dbDeviceMap = db.collection('DeviceMap');
     this.dbConfig = this.db.collection('Config');
@@ -245,6 +245,15 @@ const devicePool = {
     });
 
     return deviceWrappers;
+  },
+
+  getMasterSwitchDeviceWrapper() {
+    const deviceWrappers = devicePool.getDeviceWrappersByType(
+        constants.DEVICETYPE_VIRTUAL,
+        constants.SUBTYPE_MASTER_SWITCH
+    );
+
+    return deviceWrappers.length && deviceWrappers[0];
   },
 
   getTimerDeviceWrapper() {
@@ -472,6 +481,44 @@ const devicePool = {
 
       deviceWrappers.forEach(deviceWrapper => deviceWrapper.setPowerState(targetState));
     }
+  },
+
+  switchGroup(groupId, powerState) {
+    const deviceWrappers = this.getDeviceWrappersByGroup(groupId);
+
+    if (!deviceWrappers) {
+      log(`Error: Cannot switch group ${groupId}: it does not exist.`, null, 'red');
+      return null;
+    }
+
+    deviceWrappers.forEach(deviceWrapper => deviceWrapper.setPowerState(powerState));
+  },
+
+  getDeviceWrappersByGroup(groupId) {
+    const group = this.globalConfig.groups.find(group => group.id === groupId);
+    
+    if (!group) {
+      return null;
+    }
+
+    let deviceWrappers = [];
+    let naCount = 0;
+
+    group.channels.forEach(channel => {
+      const deviceWrapper = this.getDeviceWrapperByChannel(channel);
+
+      if (!deviceWrapper) {
+        naCount++;
+      } else {
+        deviceWrappers.push(deviceWrapper);
+      }
+    });
+    
+    if (naCount) {
+      log(`Warning: ${naCount} devices in group ${groupId} appear to be offline.`, null, 'yellow');
+    }
+    
+    return deviceWrappers;
   },
 
   // Internal
