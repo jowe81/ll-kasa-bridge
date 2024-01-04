@@ -14,3 +14,46 @@
   width: 111px;
 }
 
+.master-switches-buttons-container {
+  width: 111px;
+  display: flex;
+  justify-content: space-between;
+  padding-top: 10px;
+}
+
+.master-switch-button {
+  width: 50px;
+  height: 55px;
+  margin: 0px;
+  text-align: center;
+
+  padding: 0px 3px;
+  border: 1px solid gray;
+  border-radius:5px;
+}
+
+.master-switch-button-background-master-on {
+  border-color: rgb(81, 106, 81);
+}
+
+.master-switch-button-background-master-off {
+  border-color: rgb(129, 65, 65);
+}
+
+.master-switch-button-meta-master-on {
+  color: rgb(127, 167, 127);
+  font-size: 80%;
+}
+
+.master-switch-button-meta-master-off {
+  color: rgba(187, 122, 122, 1);
+  font-size: 80%;
+}
+
+.master-switch-button-top-text {
+  font-size: 89%;
+}
+
+.master-switch-button-label {
+  
+}
