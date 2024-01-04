@@ -33,20 +33,20 @@
 }
 
 .master-switch-button-background-master-on {
-  border-color: rgb(81, 106, 81);
+  border-color: rgb(124, 160, 124);
 }
 
 .master-switch-button-background-master-off {
-  border-color: rgb(129, 65, 65);
+  border-color: rgb(196, 99, 99);
 }
 
 .master-switch-button-meta-master-on {
-  color: rgb(127, 167, 127);
+  color: rgb(178, 236, 178);
   font-size: 80%;
 }
 
 .master-switch-button-meta-master-off {
-  color: rgba(187, 122, 122, 1);
+  color: rgb(246, 141, 141);
   font-size: 80%;
 }
 
