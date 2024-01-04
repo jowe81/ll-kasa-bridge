@@ -9,8 +9,8 @@
 
 .master-switches-container .toggle-fullscreen-button {
   background-color: rgba(135, 110, 77, 0.3);
-  color:rgb(135, 110, 77);
-  border-color: rgba(135, 110, 77, 0.5);
+  color:rgb(206, 167, 117);
+  border-color: rgba(135, 110, 77, 1);
   width: 111px;
 }
 
