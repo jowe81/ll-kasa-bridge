@@ -1748,7 +1748,33 @@ const deviceMap = [
                             stateData: false,
                         },
                         {
-                            groupId: "group-bedShelfLights",
+                            // Thermostat Bathroom
+                            channel: 207,
+                            stateData: false,
+                        },
+                        {
+                            // Heater Bathroom
+                            channel: 15,
+                            stateData: false,
+                        },
+                        {
+                            // Thermostat Bedroom
+                            channel: 208,
+                            stateData: false,
+                        },
+                        {
+                            // Heater Bedroom
+                            channel: 4,
+                            stateData: false,
+                        },
+                        {
+                            // Fan Bedroom
+                            channel: 5,
+                            stateData: true,
+                        },
+                        {
+                            // Amp Bedroom
+                            channel: 39,
                             stateData: false,
                         },
                     ],
