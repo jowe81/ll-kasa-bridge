@@ -8,7 +8,9 @@ function Presets(props) {
   const presetButtons: any = [];
 
   Object.keys(timers).forEach(key => {
-    presetButtons.push(timers[key]);
+    if (!(timers[key].displayButton === false)) {
+      presetButtons.push(timers[key]);
+    }    
   })
 
   // Put this as the last button
