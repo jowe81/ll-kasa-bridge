@@ -427,8 +427,8 @@ const globalConfig = {
                  */
                 {
                     trigger: {
-                        hours: 8,
-                        minutes: 30,
+                        hours: 6,
+                        minutes: 15,
                     },
                     stateData: {
                         on_off: 1,
@@ -436,8 +436,8 @@ const globalConfig = {
                 },
                 {
                     trigger: {
-                        hours: 8,
-                        minutes: 31,
+                        hours: 6,
+                        minutes: 16,
                     },
                     stateData: {
                         // None. Now it can be manually switched.
@@ -1501,7 +1501,7 @@ const deviceMap = [
                     displayButton: false,
                     length: 25 * MINUTE,
                     ttl: 0,
-                    audiofile: null,
+                    audiofile: "timer-pomodoro.mp3",
                 },
             ],
         },

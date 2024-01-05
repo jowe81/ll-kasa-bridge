@@ -119,7 +119,7 @@ const remoteKitchen = (btn, devicePool) => {
     
   }
   
-  if ([6, 8].includes(btn)) {
+  if ([6, 9].includes(btn)) {
     let channel;
 
     switch (btn) {
@@ -127,7 +127,7 @@ const remoteKitchen = (btn, devicePool) => {
         channel = 34; // Jess desk switch
         break;
 
-      case 8:
+      case 9:
         channel = 206; // Mailbox lock
         break;
     }
@@ -166,6 +166,26 @@ const remoteKitchen = (btn, devicePool) => {
 
     if (timerId) {
       timerButton(tag, timerId, devicePool);
+    }
+  }
+
+  if ([8, 7].includes(btn)) {
+    let masterSwitchButtonId;
+
+    switch (btn) {
+      case 7:
+        masterSwitchButtonId = "master-off";
+        break;
+      
+      case 8:
+        masterSwitchButtonId = "master-on";
+        break;
+    }
+
+    const masterSwitchDeviceWrapper = devicePool.getMasterSwitchDeviceWrapper();
+
+    if (masterSwitchButtonId && masterSwitchDeviceWrapper) {
+      masterSwitchDeviceWrapper._deviceHandlers.execute(masterSwitchButtonId, tag);
     }
   }
 };
