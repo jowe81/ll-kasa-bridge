@@ -8,6 +8,10 @@
   background-color: rgba(118, 25, 39, 0.522);
 }
 
+.preset-button:active {
+  background-color: rgb(136, 27, 43);  
+}
+
 .preset-button-sub-label {
   color:rgb(229, 174, 174);
   font-size: 120%;

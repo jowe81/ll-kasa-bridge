@@ -14,13 +14,17 @@
   height: 30px;
   margin: 2px 5px;
   padding-top: 4px;
-  
+  font-size: 80%;
+  background-color: rgb(96, 48, 48);
 }
 
 .input-field-display {
   display: block !important;
   text-align: right;
   padding-right: 10px;
+  margin-top: -4px;
   font-size: 160%;
+  color: rgb(225, 208, 188);
+
 }
 

@@ -9,9 +9,14 @@
   
   justify-content: space-between;
 }
+
 .compact-preset-button {
   border-color: rgb(159, 119, 119);
   background-color: rgba(118, 25, 39, 0.522);
+}
+
+.compact-preset-button:active {
+  background-color: rgb(136, 27, 43);  
 }
 
 .compact-timer-preset-button-sub-label {

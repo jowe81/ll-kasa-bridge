@@ -33,16 +33,21 @@
 .base-button {
   width: 76px; 
   border-radius: 5px;
-  border: 1px solid gray;
+  border: 1px solid rgb(159, 119, 119);
   height: 66px;
   padding: 4px 3px;
   margin: 10px 5px;
   margin-bottom: 0px;
-  border: 1px solid gray;
+  
   background-size: 20%;
   background-position: bottom left;
   background-repeat: no-repeat;
   text-align: center;
+  color:rgb(244, 201, 201);
+}
+
+.base-button:active {
+  background-color: rgb(97, 42, 42)  
 }
 
 /*
