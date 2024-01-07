@@ -1,12 +1,11 @@
 .presets {
-  height: 236px;
+  height: 160px;
   overflow-y: scroll;
   display: flex;
   flex-flow: row wrap;
   align-content: flex-start;
   padding-top: 0px;
   padding-bottom: 0px;
-
 }
 
 .preset-button {
