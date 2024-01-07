@@ -2,15 +2,24 @@ function PresetButton(props) {
 
   const { button } = props;
 
+  if (!button.topLabel) {
+    button.topLabel = button.id;
+  }
 
-  let topLabelText = button.topLabel ?? button.id;
+  let topLabelText = button.topLabel;
   let subLabelText = button.subLabel;
 
-  const classNames = `base-button ${button.id === '__custom' ? 'preset-button-custom' : 'preset-button' }`;
+  if (!subLabelText) {
+    subLabelText = topLabelText;
+    topLabelText = null;
+  }
+
+  const classNamesButton = `base-button ${button.id === '__custom' ? 'preset-button-custom' : 'preset-button' }`;
+  const classNameSubLabel = (!button.subLabel || button.subLabel === button.id) ? `preset-button-sub-label-muted` : `preset-button-sub-label`;
 
   return (
       <div
-          className={classNames}
+          className={classNamesButton}
           data-id={button.id}
           onClick={button.onClick}
       >

@@ -25,7 +25,12 @@
 }
 
 .preset-button-sub-label {
-  color:rgb(229, 174, 174);
+  color:rgba(229, 174, 174, 1);
+  font-size: 120%;
+}
+
+.preset-button-sub-label-muted {
+  color:rgba(229, 174, 174, .7);
   font-size: 120%;
 }
 

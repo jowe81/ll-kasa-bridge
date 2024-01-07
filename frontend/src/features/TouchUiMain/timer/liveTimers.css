@@ -58,10 +58,13 @@
   margin-right: 5px;
   width: 80px;
   text-align: center;
-  color: rgb(144, 53, 53);
+  color: rgb(190, 87, 87);
   font-size: 80%;
   margin-top: 0px;
   padding-top: 6px;
   cursor: pointer;
+}
 
+.live-timer-cancel-button:active {
+  background-color: rgba(255, 0, 0, 0.261);
 }
