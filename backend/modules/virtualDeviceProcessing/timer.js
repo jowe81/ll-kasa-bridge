@@ -125,7 +125,7 @@ class TimerHandler {
     }
 
     if (!timer.ttl) {
-      timer.ttl = constants.MINUTE * 5;
+      timer.ttl = 30 * constants.SECOND;
     }  
 
     if (!timer.audiofile) {

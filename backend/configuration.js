@@ -1461,8 +1461,14 @@ const deviceMap = [
         settings: {
             timers: [
                 {
+                    id: "1m",
+                    length: 1 * MINUTE,
+                    ttl: 0,
+                    audiofile: null,
+                },
+                {
                     id: "3m",
-                    label: null, // will be set to id if undefined or null
+                    topLabel: null, // will be set to id if undefined or null
                     subLabel: "Tea",
                     length: 3 * MINUTE,
                     ttl: 3 * MINUTE,
@@ -1496,9 +1502,9 @@ const deviceMap = [
                     audiofile: null,
                 },
                 {
-                    id: "pomodoro",
+                    id: "25m",
                     subLabel: "P'doro",
-                    displayButton: false,
+                    displayButton: true,
                     length: 25 * MINUTE,
                     ttl: 0,
                     audiofile: "timer-pomodoro.mp3",

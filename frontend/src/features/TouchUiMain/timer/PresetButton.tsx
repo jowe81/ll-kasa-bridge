@@ -3,16 +3,18 @@ function PresetButton(props) {
   const { button } = props;
 
 
-  let labelText = button.subLabel ? button.label : '';
-  let subLabelText = button.subLabel ?? button.id;
+  let topLabelText = button.topLabel ?? button.id;
+  let subLabelText = button.subLabel;
+
+  const classNames = `base-button ${button.id === '__custom' ? 'preset-button-custom' : 'preset-button' }`;
 
   return (
       <div
-          className="base-button preset-button"
+          className={classNames}
           data-id={button.id}
           onClick={button.onClick}
       >
-          <div className="preset-button-label">{labelText}</div>
+          <div className="preset-button-label">{topLabelText}</div>
           <div className="preset-button-sub-label">{subLabelText}</div>
       </div>
   );

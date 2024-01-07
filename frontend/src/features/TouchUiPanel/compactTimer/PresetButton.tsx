@@ -3,8 +3,8 @@ function PresetButton(props) {
   const { button } = props;
 
 
-  let labelText = button.subLabel ? button.label : '';
-  let subLabelText = button.subLabel ?? button.id;
+  let topLabelText = button.topLabel ?? button.id;
+  let subLabelText = button.subLabel;
 
   return (
       <div
@@ -12,7 +12,7 @@ function PresetButton(props) {
           data-id={button.id}
           onClick={button.onClick}
       >
-          <div className="compact-timer-preset-button-label">{labelText}</div>
+          <div className="compact-timer-preset-button-label">{topLabelText}</div>
           <div className="compact-timer-preset-button-sub-label">
               {subLabelText}
           </div>

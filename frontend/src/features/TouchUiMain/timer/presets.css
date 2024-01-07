@@ -1,11 +1,23 @@
 .presets {
-  height: 165px;
+  height: 236px;
   overflow-y: scroll;
+  display: flex;
+  flex-flow: row wrap;
+  align-content: flex-start;
+  padding-top: 0px;
+  padding-bottom: 0px;
+
 }
 
 .preset-button {
   border-color: rgb(159, 119, 119);
   background-color: rgba(118, 25, 39, 0.522);
+}
+
+.preset-button-custom {
+  border-color: rgb(159, 119, 119);
+  background-color: rgba(165, 126, 29, 0.155);
+  background-color: rgba(118, 25, 39, 0.172);
 }
 
 .preset-button:active {
