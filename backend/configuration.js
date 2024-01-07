@@ -1634,8 +1634,12 @@ const deviceMap = [
                             minutes: 15,
                         },
                         singleRecord: {
-                            type: "__INDEX",
                             // index: n (will be inserted dynamically when requesting from dynforms)
+                            // type: "__INDEX",
+
+                            // Have dynforms pick the item
+                            type: "__SEMI_RANDOM",
+
                         },
                     },
                 },

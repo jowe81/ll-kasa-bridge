@@ -114,8 +114,7 @@ class DynformsServiceHandler {
               request.settings.singleRecord = info.retrieve.singleRecord;
 
               switch (info.retrieve.singleRecord.type) {
-                case '__INDEX':
-                  
+                case '__INDEX':                  
                   // Find out what the last requested index was.
                   let lastIndex = -1;
 
@@ -131,9 +130,13 @@ class DynformsServiceHandler {
 
                   // Add one to get the next record.
                   request.settings.singleRecord.index = lastIndex + 1;
-
                   break;
-
+                
+                case '__SEMI_RANDOM':
+                  // Use the dynforms semi-random algorithm
+                  request.settings.singleRecord.semiRandom = true;
+                  break;
+                  
                 default:
                   log(`Error: cannot construct request. Unkown single-record request type ${info.retrieve.singleRecord.type},`, this.dynformsService, 'red');
                   return;
