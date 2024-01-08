@@ -1502,7 +1502,8 @@ const deviceMap = [
                     audiofile: null,
                 },
                 {
-                    id: "25m",
+                    id: "pomodoro",
+                    topLabel: "25m",
                     subLabel: "P'doro",
                     displayButton: true,
                     length: 25 * MINUTE,

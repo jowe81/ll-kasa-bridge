@@ -227,6 +227,8 @@ class TimerHandler {
 
     if (!timer) {
       // Timer with id timerId doesn't exist on device configuration
+      log(`Error: Timer with id ${timerId} does not exist, can't set it.`, this.deviceWrapper, 'red');
+      return;
     }
 
     let liveTimer = { 
