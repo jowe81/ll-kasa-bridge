@@ -1640,7 +1640,6 @@ const deviceMap = [
 
                             // Have dynforms pick the item
                             type: "__SEMI_RANDOM",
-
                         },
                     },
                 },
@@ -1662,6 +1661,45 @@ const deviceMap = [
                         minutes: 0,
                     },
                 },
+            },
+        },
+    },
+    {
+        alias: "Photos Service",
+        channel: 504,
+        id: "photos-service",
+        display: true,
+        displayLabel: "Photos",
+        displayType: null,
+        locationId: "__internal",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_DYNFORMS_SERVICE,
+        settings: {
+            api: {
+                baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
+                path: "/db/getItem?collectionName=photosFileInfo",
+                queryParams: {},
+            },
+            requests: [
+                {
+                    connectionName: "test",
+                    collectionName: "photosFileInfo",
+                    retrieve: {
+                        time: {
+                            frequency: "minutes",
+                            minutes: 1,
+                        },
+                        singleRecord: {
+                            type: "__SEMI_RANDOM",
+                        },
+                    },
+                },
+            ],
+            // If set causes the backend to return the results for the first request only; as a single object and not as an array.
+            useSingleRequest: true,
+            // This is how often the handler will go out and check whether a request should actually be run.
+            checkInterval: 30 * SECOND,
+            ui: {
             },
         },
     },

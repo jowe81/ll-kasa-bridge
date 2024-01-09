@@ -21,6 +21,18 @@ function requestShouldRun(requestConfig, lastExecuted) {
 
   switch (timeInfo.frequency) {
 
+    case 'minutes':
+      if (!timeInfo.minutes) {
+        // Expect a minimum of 1 minute to execute at all.
+        return false;
+      }
+
+      if (!lastExecuted || lastExecuted.getTime() < Date.now() - (timeInfo.minutes * constants.MINUTE)) {
+        return true;
+      }
+      
+      break;
+
     case 'hourly':
       if (!lastExecuted || lastExecuted.getTime() < Date.now() - constants.HOUR) {
         // Either has never run, or not in more than an hour.

@@ -93,10 +93,11 @@ constants.services = {
 
 // Other components
 constants.photos = {
-  //url: `http://johannes-mb.wnet.wn:3020/db/randomUrl`,
-  url: `${constants.services.PHOTOS_BACKEND_HOST}:${constants.services.PHOTOS_BACKEND_PORT}/db/randomUrl`,
-  refreshInterval: 30 * MINUTE,
-}
+    //url: `http://johannes-mb.wnet.wn:3020/db/randomUrl`,
+    url: `${constants.services.PHOTOS_BACKEND_HOST}:${constants.services.PHOTOS_BACKEND_PORT}/db/randomUrl`,
+    refreshInterval: 30 * MINUTE,
+    photosServiceChannel: 504,
+};
 
 constants.touchPanel = {
   thermometerChannels: [ 201, 202, 203, 204 ],

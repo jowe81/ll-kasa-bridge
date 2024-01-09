@@ -61,26 +61,21 @@ class DynformsServiceHandler {
             return null;
         }
 
-        let { baseUrl, path } = this.dynformsService.settings.api;
+        let { protocol, baseUrl, path } = this.dynformsService.settings.api;
 
-        let fullUrl;
-
-        if (baseUrl) {
-            // Use device configuration.
-            fullUrl = baseUrl + path;
-        } else {
-            // Use .env instead.
-            if (!path) {
-                // Use .env or fallback to default.
-                path = process.env.DYNFORMS_PATH ?? "/db/m2m/pull";
-            }
-
-            const protocol = process.env.DYNFORMS_PROTOCOL ?? "http";
-
-            fullUrl = `${protocol}://${process.env.DYNFORMS_HOST}:${process.env.DYNFORMS_PORT}${path}`;
+        if (!protocol) {
+          protocol = "http";
         }
 
-        return fullUrl;
+        if (!baseUrl) {
+          baseUrl = `${protocol}://${process.env.DYNFORMS_HOST}:${process.env.DYNFORMS_PORT}`;
+        }
+
+        if (!path) {
+          path = process.env.DYNFORMS_PATH ?? "/db/m2m/pull";          
+        }
+
+        return baseUrl + path;
     }
 
     _constructRequests() {
