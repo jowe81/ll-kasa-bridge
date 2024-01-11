@@ -56,10 +56,11 @@ const socketHandler = {
 
       // Clients may execute macros
       socket.on('auto/command/macro', (props) => {
+        const logTag = `${address} auto/command/macro: `;
         const { targetType, targetId, macroName, commandObject } = props;
         
 
-        log(`${address}: Macro ${macroName}, ${targetType} ${targetId}`, `bgBlue`);
+        log(`${logTag}Macro ${macroName}, ${targetType} ${targetId}`, `bgBlue`);
 
         switch (targetType) {
           case 'channel':
@@ -96,13 +97,7 @@ const socketHandler = {
             }
 
             break;
-              
-
-
-          case 'toggle':
-
-          case 'toggleGroup':
-            console.log('Toggle Group');
+            
         }
       });      
 
@@ -130,6 +125,38 @@ const socketHandler = {
         const masterSwitchDeviceWrapper = this.devicePool.getMasterSwitchDeviceWrapper();
         masterSwitchDeviceWrapper._deviceHandlers.execute(buttonId, origin);
       })
+
+      /**
+       * Execeute a generic command on a channel. This method should be the way forward.
+       */
+      socket.on('auto/command/channel', (command) => {
+          const logTag = `${address} auto/command/channel: `;
+          const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(command.channel);
+          if (!deviceWrapper) {
+              log(
+                  `${logTag}Received command "${command.id}" for channel ${command.channel}, but no live device found.`,
+                  "red"
+              );
+              return;
+          }
+          
+          const commandHandler = deviceWrapper.getCommandHandler(command.id);
+          if (!(commandHandler && typeof commandHandler === 'function')) {
+              log(
+                  `${logTag}Received command "${command.id}" for channel ${command.channel}, but device does not have a handler for it.`,
+                  "red"
+              );
+              return;            
+          }
+
+          log(
+              `${logTag}Received command "${command.id}" for channel ${command.channel}`,
+              `bgBlue`
+          );
+          
+          // Wrapper supports the command; execute it.
+          commandHandler(command);
+      });
     
     });
   },

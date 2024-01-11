@@ -1677,8 +1677,9 @@ const deviceMap = [
         settings: {
             api: {
                 baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
-                path: "/db/getItem?collectionName=photosFileInfo",
+                path: null, // will use .env DYNFORMS_PATH or default instead
                 queryParams: {},
+                pathToResponseData: "", //The path in the response data to the actual data (optional)
             },
             requests: [
                 {
@@ -1687,7 +1688,7 @@ const deviceMap = [
                     retrieve: {
                         time: {
                             frequency: "minutes",
-                            minutes: 1,
+                            minutes: 30,
                         },
                         singleRecord: {
                             type: "__SEMI_RANDOM",
@@ -1699,8 +1700,7 @@ const deviceMap = [
             useSingleRequest: true,
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 30 * SECOND,
-            ui: {
-            },
+            ui: {},
         },
     },
     {

@@ -48,6 +48,11 @@ const VirtualDeviceWrapper = {
     return this.state.powerState;    
   },
 
+  getCommandHandler(commandId) {
+    log(`Looking for command handler ${commandId}`, this, 'yellow');
+    //
+  },
+
   init(cache, mapItem, globalConfig, deviceEventCallback, devicePool, socketHandler) {
     this.globalConfig = globalConfig;
     this.deviceEventCallback = deviceEventCallback;

@@ -11,11 +11,11 @@ const localConstants =
     ];
 
 class DynformsServiceHandler {
-    constructor(devicePool, dynformsService, cache) {
+    constructor(devicePool, service, cache) {
         this.initialized = false;
 
         this.devicePool = devicePool;
-        this.dynformsService = dynformsService;
+        this.service = service;
         this.init(cache);
     }
 
@@ -35,7 +35,7 @@ class DynformsServiceHandler {
 
     getLiveDevice() {
         const liveDevice = makeLiveDeviceObject(
-            this.dynformsService,
+            this.service,
             [
                 // Include
                 "powerState",
@@ -57,11 +57,11 @@ class DynformsServiceHandler {
     }
 
     _constructFullUrl() {
-        if (!this.dynformsService) {
+        if (!this.service) {
             return null;
         }
 
-        let { protocol, baseUrl, path } = this.dynformsService.settings.api;
+        let { protocol, baseUrl, path } = this.service.settings.api;
 
         if (!protocol) {
           protocol = "http";
@@ -78,12 +78,12 @@ class DynformsServiceHandler {
         return baseUrl + path;
     }
 
-    _constructRequests() {
-        if (!this.dynformsService) {
+    _constructRequests(requestIndexes = null) {
+        if (!this.service) {
             return null;
         }
 
-        const requestInfo = this.dynformsService.settings?.requests;
+        const requestInfo = this.service.settings?.requests;
 
         if (!(Array.isArray(requestInfo) && requestInfo.length)) {
             // No requests configured.
@@ -92,7 +92,11 @@ class DynformsServiceHandler {
 
         const requests = [];
 
-        requestInfo.forEach((info, requestIndex) => {          
+        requestInfo.forEach((info, requestIndex) => {
+            if (!(requestIndexes === null || Array.isArray(requestIndexes) && requestIndexes.includes(requestIndex))) {
+                return;
+            }
+
             const request = {
                 connectionName: info.connectionName ?? localConstants.connectionName,
                 collectionName: info.collectionName,
@@ -113,10 +117,10 @@ class DynformsServiceHandler {
                   // Find out what the last requested index was.
                   let lastIndex = -1;
 
-                  if (this.dynformsService.settings.useSingleRequest) {
-                      lastIndex = this.dynformsService.state.api?.data?.index ?? -1;
+                  if (this.service.settings.useSingleRequest) {
+                      lastIndex = this.service.state.api?.data?.index ?? -1;
                   } else {
-                      const allData = this.dynformsService.state.api;
+                      const allData = this.service.state.api;
 
                       if (Array.isArray(allData) && allData.length > requestIndex) {
                           lastIndex = allData[requestIndex].data?.index ?? -1;
@@ -133,7 +137,7 @@ class DynformsServiceHandler {
                   break;
                   
                 default:
-                  log(`Error: cannot construct request. Unkown single-record request type ${info.retrieve.singleRecord.type},`, this.dynformsService, 'red');
+                  log(`Error: cannot construct request. Unkown single-record request type ${info.retrieve.singleRecord.type},`, this.service, 'red');
                   return;
               }
             }
@@ -179,9 +183,9 @@ class DynformsServiceHandler {
     init(cache) {
         if (
             !(
-                this.dynformsService &&
+                this.service &&
                 this.devicePool &&
-                this.dynformsService.settings?.api
+                this.service.settings?.api
             )
         ) {
             log(`Failed to initialize Dynforms service.`, this, "red");
@@ -198,27 +202,27 @@ class DynformsServiceHandler {
         this.cache = cache;
         this.cache.data = [];
 
-        this.dynformsService.fullUrl = this._constructFullUrl();
+        this.service.fullUrl = this._constructFullUrl();
 
         // Turn on when first starting.
-        this.dynformsService.setPowerState(true);
+        this.service.setPowerState(true);
 
-        this.dynformsService._deviceHandlers = this;
+        this.service._deviceHandlers = this;
 
-        this.dynformsService.subscribeListener(
+        this.service.subscribeListener(
             "powerState",
             (newPowerState) => {}
         );
 
         log(
-            `Initialized ${this.dynformsService.subType} "${this.dynformsService.alias}" with ${this.dynformsService.fullUrl}`,
-            this.dynformsService
+            `Initialized ${this.service.subType} "${this.service.alias}" with ${this.service.fullUrl}`,
+            this.service
         );
         log(
             `Check-Interval: ${Math.ceil(
-                this.dynformsService.settings.checkInterval / constants.MINUTE
+                this.service.settings.checkInterval / constants.MINUTE
             )} minutes.`,
-            this.dynformsService
+            this.service
         );
 
         // Start the interval check
@@ -226,7 +230,7 @@ class DynformsServiceHandler {
             clearInterval(this._checkingIntervalHandler);
         }
 
-        const interval = this.dynformsService.settings.checkInterval ?? localConstants.CHECKING_INTERVAL_DEFAULT;
+        const interval = this.service.settings.checkInterval ?? localConstants.CHECKING_INTERVAL_DEFAULT;
 
         this._checkingIntervalHandler = setInterval(
             () => this.dynformsServiceIntervalHandler(),
@@ -239,6 +243,28 @@ class DynformsServiceHandler {
         setTimeout(() => { this.dynformsServiceIntervalHandler() }, 5000);
     }
 
+    async runRequestNow(requestIndex) {
+        if (!this.initialized) {
+            return false;
+        }
+
+        const requests = this._constructRequests([requestIndex]);
+        const request = Array.isArray(requests) && requests.length ? requests[0] : null;
+
+        this._executeRequest(request)
+          .then(data => {
+
+          }).catch(err => {
+
+          })
+    }
+
+    async _executeRequest(requestInfo, requestIndex) {
+        const requestConfig = this.service.settings.requests[requestIndex];
+        requestConfig._lastExecuted = new Date();
+        return axios.post(this.service.fullUrl, requestInfo);
+    }
+    
     async dynformsServiceIntervalHandler() {
         if (!this.initialized) {
             return false;
@@ -246,7 +272,7 @@ class DynformsServiceHandler {
 
         // Get those requests that are due to run. Construct them now, as they may contain a reference to the current date.
         const requestsReadyToRun = this._constructRequests().filter((requestInfo, requestIndex) => {
-          const requestConfig = this.dynformsService.settings.requests[requestIndex];
+          const requestConfig = this.service.settings.requests[requestIndex];
           return requestShouldRun(requestConfig, requestConfig._lastExecuted) ? true : false;
         });
 
@@ -255,30 +281,30 @@ class DynformsServiceHandler {
           return;
         }
 
-        log(`${this.dynformsService.alias} has ${requestsReadyToRun.length} request(s) ready to run.`, this.dynformsService);
+        log(`${this.service.alias} has ${requestsReadyToRun.length} request(s) ready to run.`, this.service);
 
         // Add the current timestamp to each of the requests that are about to be executed.
         const now = new Date();
 
         const promises = requestsReadyToRun.map((requestInfo, requestIndex) => {
-            const requestConfig = this.dynformsService.settings.requests[requestIndex];
+            const requestConfig = this.service.settings.requests[requestIndex];
             requestConfig._lastExecuted = now;
-            return axios.post(this.dynformsService.fullUrl, requestInfo);
+            return axios.post(this.service.fullUrl, requestInfo);
         });
 
         Promise.all(promises)
           .then((allResponseData) => {
               // Cache the responses.
               this.cache.data = allResponseData.map((data, requestIndex) => data?.data);
-              const displayData = getDisplayDataFromApiResponse(this.cache.data, this.dynformsService.settings);
+              const displayData = getDisplayDataFromApiResponse(this.cache.data, this.service.settings);
 
-              this.dynformsService._updateState({
-                powerState: this.dynformsService.getPowerState(),
+              this.service._updateState({
+                powerState: this.service.getPowerState(),
                 api: displayData,
-                settings: this.dynformsService.settings,
+                settings: this.service.settings,
               }, true);
 
-              log(`${this.dynformsService.alias} received API data from ${this.dynformsService.fullUrl}`, this.dynformsService);
+              log(`${this.service.alias} received API data from ${this.service.fullUrl}`, this.service);
           })
           .catch(err => {
             console.log(err.message, err);
@@ -286,8 +312,8 @@ class DynformsServiceHandler {
     }
 }
 
-function dynformsServiceHandler(devicePool, dynformsService, cache) {
-    return new DynformsServiceHandler(devicePool, dynformsService, cache);
+function dynformsServiceHandler(devicePool, service, cache) {
+    return new DynformsServiceHandler(devicePool, service, cache);
 }
 
 export default dynformsServiceHandler;
