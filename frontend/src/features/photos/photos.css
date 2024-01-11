@@ -4,11 +4,9 @@
   overflow: hidden; /* Otherwise the blur spills out... */ 
 }
 
-.photo-container-embedded {
-  
+.photo-container-embedded {  
   height: 100%;
   flex-grow: 1;
-
   border-right: 1px solid rgb(55, 55, 55); 
   border-left: 1px solid rgb(55, 55, 55); 
   margin: 0px 0px;
@@ -47,31 +45,16 @@
   opacity: 50%;  
 }
 
-
 .photo-meta {
   position: absolute;
-  background-color: rgba(50,50,50,.5);
+  /* background-color: rgba(50,50,50,.5); */
   width: 100%;
   display:flex;
   justify-content:space-between;
 }
 
-.photo-meta div {
-  padding: 10px;
-}
-
-.photos-time-controls {
-  display: flex;
-}
-
-.photos-time-controls div {
-  margin: 0px;
-  padding: 0px 5px;
-}
-.photos-time-controls button {
-  height: 30px;
-  width: 100px;
-  margin-top: -5px;
-  background-color: rgba(152, 152, 152, .7);
-  color:rgb(225, 225, 225);
+.photo-button-next {
+  width: 200px;
+  height: 200px;
+  /* background-color: red; */
 }

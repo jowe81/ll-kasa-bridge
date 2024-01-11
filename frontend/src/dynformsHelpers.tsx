@@ -13,10 +13,19 @@ function getDynformsServiceRecords(channel) {
       return [];
     }    
 
+    // This path should be a backend parameter in configuration.js
     const records = dynformsService?.state?.api?.data?.records ?? [];
     return records;
 }
 
+// Return the first record.
+function getDynformsServiceRecord(channel) {
+    const records = getDynformsServiceRecords(channel);
+
+    return Array.isArray(records) && records.length ? records[0] : null;
+}
+
 export {
   getDynformsServiceRecords,
+  getDynformsServiceRecord,
 }

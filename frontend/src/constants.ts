@@ -94,7 +94,7 @@ constants.services = {
 // Other components
 constants.photos = {
     //url: `http://johannes-mb.wnet.wn:3020/db/randomUrl`,
-    url: `${constants.services.PHOTOS_BACKEND_HOST}:${constants.services.PHOTOS_BACKEND_PORT}/db/randomUrl`,
+    url: `${constants.services.PHOTOS_BACKEND_HOST}:${constants.services.PHOTOS_BACKEND_PORT}`,
     refreshInterval: 30 * MINUTE,
     photosServiceChannel: 504,
 };

@@ -1,12 +1,10 @@
 import { ReactNode } from "react";
-import { getDynformsServiceRecords } from "../../../dynformsHelpers";
+import { getDynformsServiceRecord } from "../../../dynformsHelpers";
 import constants from "../../../constants.ts";
 import './scripture.css';
 
 function Scripture({renderForMainViewingArea}) {
-    const records = getDynformsServiceRecords(constants.scripture?.scripturesServiceChannel);
-    
-    const record = Array.isArray(records) && records.length ? records[0] : null;
+    const record = getDynformsServiceRecord(constants.scripture?.scripturesServiceChannel);
 
     if (!record) {
       return;

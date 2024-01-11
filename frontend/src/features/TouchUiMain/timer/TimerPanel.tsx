@@ -13,7 +13,6 @@ import LiveTimers from './LiveTimers.tsx';
 import NudgePanel from './NudgePanel.tsx';
 import Presets from './Presets.tsx';
 import NumPadAssembly from './NumPadAssembly.tsx';
-import Clock from './Clock.tsx';
 
 function TimerPanel() {
   const [ numPadOpen, setNumPadOpen ] = useState(false);

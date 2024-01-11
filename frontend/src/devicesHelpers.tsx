@@ -1,8 +1,7 @@
 import { useAppSelector } from "./app/hooks.ts";
-
 import constants from "./constants.ts";
-
 import { VirtualDevice } from "./features/TouchUiMain/devices/dataSlice.ts";
+import { socket } from "./features/websockets/socket.tsx";
 
 function getAllDevices() {
     const devices: VirtualDevice[] = useAppSelector(
@@ -49,7 +48,6 @@ function getDevicesByType(type: string|null, subType:string|null) {
 }
 
 function getClock() {
-    return getDeviceByChannel(500);
     const clocks: VirtualDevice[] = getDevicesByType(
         constants.DEVICETYPE_VIRTUAL,
         constants.SUBTYPE_CLOCK
@@ -62,9 +60,20 @@ function getClock() {
     return clocks[0];
 }
 
-export { 
-  getAllDevices,
-  getDeviceByChannel,
-  getDevicesByType,
-  getClock,
+function runChannelCommand(channel, commandId, body = {}) {
+    console.log(`Emitting command '${commandId}' to channel ${channel}:`, Object.keys(body).length ? body : `<no body>`);
+    socket.emit(`auto/command/channel`, {
+        channel,
+        id: commandId,
+        body,
+    });
+}
+
+
+export {
+    getAllDevices,
+    getDeviceByChannel,
+    getDevicesByType,
+    getClock,
+    runChannelCommand,
 };
