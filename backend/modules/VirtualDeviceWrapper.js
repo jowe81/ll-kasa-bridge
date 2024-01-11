@@ -5,7 +5,7 @@ import { log, debug } from './Log.js';
 import { globalConfig } from '../configuration.js';
 import { resolveDeviceDependencies } from './DependencyResolver.js';
 import { makeLiveDeviceObject } from './TargetDataProcessor.js';
-import { getDeviceHandlerPlugins } from './VirtualDeviceHandlers.js';
+import { getDeviceHandlerPlugins, getCommandHandlerPlugins } from './Plugins.js';
 
 const cmdPrefix = '[CMD]';
 const cmdFailPrefix = '[FAIL]';
@@ -49,7 +49,12 @@ const VirtualDeviceWrapper = {
   },
 
   getCommandHandler(commandId) {
-    log(`Looking for command handler ${commandId}`, this, 'yellow');
+    log(`Looking for command handler ${commandId}/${this.subType}`, this, 'yellow');
+    const commandHandlers = getCommandHandlerPlugins(this.subType);
+    
+    if (commandHandlers && commandHandlers[commandId]) {
+      return commandHandlers[commandId];
+    }
     //
   },
 

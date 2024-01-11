@@ -12,7 +12,7 @@ import { log } from './Log.js';
 
 import { isBetweenDuskAndDawn, isDawnOrDusk, isDawn, isDusk, getFromSettingsForNextSunEvent } from '../helpers/jDateTimeUtils.js';
 import { loadFilterPlugins } from './Filters.js';
-import { loadDeviceHandlerPlugins } from './VirtualDeviceHandlers.js';
+import { loadDeviceHandlerPlugins, loadCommandHandlerPlugins } from './Plugins.js';
 
 import { globalConfig } from '../configuration.js';
 import { socketHandler } from './SocketHandler.js';
@@ -56,6 +56,7 @@ const devicePool = {
 
     await loadFilterPlugins();
     await loadDeviceHandlerPlugins();
+    await loadCommandHandlerPlugins();
     await this.initDeviceWrappers();
     
     this.startPeriodicServices();
