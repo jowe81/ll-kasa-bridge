@@ -1,0 +1,34 @@
+.touch-ui-panel-mailbox {
+  width: 180px; 
+  padding: 0px;
+  margin-top: 0px;
+  height: 100%; 
+  overflow: hidden;
+  padding-top: 5px;
+}
+
+.mailbox-label {
+  color: #999;
+  font-size: 16px;
+  /* border-bottom: 1px solid rgba(0,0,0,0); */
+}
+
+.mailbox-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid red;
+  border-radius: 3px;
+  background-color: rgba(67, 46, 46, 1);
+}
+
+.mailbox-image {
+  margin-top: 5px;
+  height:95px;  
+}
+
+.mailbox-desaturate {
+  filter: saturate(0%);  
+  border-color:rgb(66, 66, 66);
+  background-color: rgb(30, 21, 21);
+}
