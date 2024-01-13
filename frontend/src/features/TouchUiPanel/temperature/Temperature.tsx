@@ -12,98 +12,136 @@ function Temperature(props: any) {
 
     const getThermometers = (devices: Device[]): Device[] => {
         const allThermometers = devices
-            .filter((device) =>
-                constants.touchPanel.thermometerChannels.includes(
-                    device.channel
-                )
-            )
+            .filter((device) => constants.touchPanel.thermometerChannels.includes(device.channel))
             .sort((a, b) => (a.channel > b.channel ? 1 : -1));
-        
+
         return allThermometers.slice(thermometersStartIndex, thermometersStartIndex + 2);
     };
 
-    const getThermostat = (devices: Device[], thermometer) => {
-      const thermostats = devices.filter(
-          (device) => device.subType === constants.SUBTYPE_THERMOSTAT && device.location === thermometer.location
-      );
+    const getHeaters = (devices: Device[], thermometer): Device[] => {
+        const heaters = devices.filter(
+            (device) => device.hvacType === constants.SUBTYPE_AIR_HEAT && device.location === thermometer.location
+        );
 
-      if (!thermostats.length) {
-        return null;
-      }
-      return thermostats[0];
-    }
+        return heaters;
+    };
+
+    const locationHasRunningHeaters = (devices: Device[], thermometer): boolean => {
+        let result = false;
+
+        const heaters = getHeaters(devices, thermometer);
+        heaters.every((heater) => {
+            if (heater.powerState) {
+                result = true;
+                return false;
+            }
+
+            return true;
+        });
+
+        return result;
+    };
+
+    const getThermostat = (devices: Device[], thermometer) => {
+        const thermostats = devices.filter(
+            (device) => device.subType === constants.SUBTYPE_THERMOSTAT && device.location === thermometer.location
+        );
+
+        if (!thermostats.length) {
+            return null;
+        }
+        return thermostats[0];
+    };
 
     const handleThermostatClick = (event) => {
-      const thermostatChannel = event.target.dataset.thermostatChannel;
-      toggleChannel(thermostatChannel);
-    }
+        const thermostatChannel = event.target.dataset.thermostatChannel;
+        toggleChannel(thermostatChannel);
+    };
 
     const thermometers = getThermometers(devices);
-    
+
     if (!thermometers.length) {
-      return;
+        return;
     }
 
     const thermometersJsx = thermometers.map((thermometer, index) => {
-      const displayData = getDisplayData(thermometer, "long");
-      let location = thermometer?.location;
-      if (location && location.length > 10) {
-          if (location.includes("Room")) {
-              location = location.replace("Room", "Rm");
-          }
-      }
-      const styleTemp = {
-          color: tempToColor(displayData.tempC),
-      };
+        const displayData = getDisplayData(thermometer, "long");
+        let location = thermometer?.location;
+        if (location && location.length > 10) {
+            if (location.includes("Room")) {
+                location = location.replace("Room", "Rm");
+            }
+        }
+        const styleTemp = {
+            color: tempToColor(displayData.tempC),
+        };
 
-      const styleTrend = {
-          color: displayData.trendColor,
-      };
+        const styleTrend = {
+            color: displayData.trendColor,
+        };
 
-      let iconsJsx;
+        let iconsJsx;
 
-      // If the thermostat for this room exists and is on, indicate that with an icon (overwrite the second trend icon if there are two)
-      const thermostat = getThermostat(devices, thermometer)
-      const showThermostatIcon = thermostat?.powerState;
-      
-      
+        // If the thermostat for this room exists and is on, indicate that with an icon (overwrite the second trend icon if there are two)
+        const thermostat = getThermostat(devices, thermometer);
+        const showThermostatIcon = thermostat?.powerState;
+        const hasRunningHeaters = locationHasRunningHeaters(devices, thermometer);
 
-      if (thermostat) {
-          const className = showThermostatIcon ? `` : `thermometer-grey-out`;
-          iconsJsx = (
-              <>
-                  <img key={0} src={"/icons/thermostat-small.png"} className={className} data-thermostat-channel={thermostat.channel} onClick={handleThermostatClick} />
-                  <img key={1} src={displayData.trendIconUrl} />
-              </>
-          );
-      } else {
-          iconsJsx = Array.from({ length: displayData.trendIconCount }, (_, index) => (
-              <img key={index} src={displayData.trendIconUrl} />
-          ));
-      }
+        if (thermostat) {
+            if (!thermostat.powerState && hasRunningHeaters) {
+                // Thermostat is off but heaters are running. Show warning.
+                if (hasRunningHeaters) {
+                    iconsJsx = (
+                        <>
+                            <img
+                                key={0}
+                                src={"/icons/thermostat-small-warning.png"}                                
+                                data-thermostat-channel={thermostat.channel}
+                                onClick={handleThermostatClick}
+                            />
+                            <img key={1} src={displayData.trendIconUrl} />
+                        </>
+                    );
+                }
+            } else {
+                const className = showThermostatIcon ? `` : `thermometer-grey-out`;
+                iconsJsx = (
+                    <>
+                        <img
+                            key={0}
+                            src={"/icons/thermostat-small.png"}
+                            className={className}
+                            data-thermostat-channel={thermostat.channel}
+                            onClick={handleThermostatClick}
+                        />
+                        <img key={1} src={displayData.trendIconUrl} />
+                    </>
+                );
+            }
+        } else {
+            iconsJsx = Array.from({ length: displayData.trendIconCount }, (_, index) => (
+                <img key={index} src={displayData.trendIconUrl} />
+            ));
+        }
 
-
-
-      return (
-          <div key={index} className="temperature-subpanel">
-              <div className="thermometer-extradata-container">
-                  <div className="thermometer-label">{location}</div>
-                  <div className="thermometer-trend" style={styleTrend}>
-                      {iconsJsx}
-                  </div>
-              </div>
-              <div className="thermometer-temp" style={styleTemp}>
-                  {displayData.tempC}
-              </div>
-          </div>
-      );
+        return (
+            <div key={index} className="temperature-subpanel">
+                <div className="thermometer-extradata-container">
+                    <div className="thermometer-label">{location}</div>
+                    <div className="thermometer-trend" style={styleTrend}>
+                        {iconsJsx}
+                    </div>
+                </div>
+                <div className="thermometer-temp" style={styleTemp}>
+                    {displayData.tempC}
+                </div>
+            </div>
+        );
     });
 
     return (
         <div className="touch-ui-panel-item">
-            <div className="fullscreen-panel-temperature">
-                {thermometersJsx}
-            </div>
+            <div className="fullscreen-panel-temperature">{thermometersJsx}</div>
         </div>
     );
 }
@@ -131,10 +169,7 @@ function getDisplayData(thermometer: any, useTrend = "long") {
 
     let diff: null | number = null;
 
-    if (
-        state.trends[useTrend] &&
-        typeof state.trends[useTrend].diff === "number"
-    ) {
+    if (state.trends[useTrend] && typeof state.trends[useTrend].diff === "number") {
         diff = state.trends[useTrend].diff;
     }
 
@@ -180,34 +215,33 @@ function getDisplayData(thermometer: any, useTrend = "long") {
         multiplier = 2;
     }
 
-    data.trend =
-        modifier !== null ? `${data.trendDirection} ${modifier}` : `steady`;
+    data.trend = modifier !== null ? `${data.trendDirection} ${modifier}` : `steady`;
     data.trend = `${data.trendDirection} ${modifier}`;
     data.trendIconCount = multiplier;
     return data;
-};
+}
 
 function tempToColor(tempC) {
-  tempC = parseFloat(tempC);
+    tempC = parseFloat(tempC);
 
-  let color = '6666FF';
-  if (tempC >= 0) {
-    color = '9999FF';
-  }
+    let color = "6666FF";
+    if (tempC >= 0) {
+        color = "9999FF";
+    }
 
-  if (tempC >= 20) {
-    color = '99FF99';
-  }
+    if (tempC >= 20) {
+        color = "99FF99";
+    }
 
-  if (tempC >= 25) {
-    color = 'FFAAAA';
-  }
+    if (tempC >= 25) {
+        color = "FFAAAA";
+    }
 
-  if (tempC >= 30) {
-      color = "FF7777";
-  }
+    if (tempC >= 30) {
+        color = "FF7777";
+    }
 
-  return `#${color}`;
+    return `#${color}`;
 }
 
 export default Temperature;
