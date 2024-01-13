@@ -82,12 +82,11 @@ function Temperature(props: any) {
 
         let iconsJsx;
 
-        // If the thermostat for this room exists and is on, indicate that with an icon (overwrite the second trend icon if there are two)
+        // If the thermostat for this room exists, indicate its status with an icon (overwrite the second trend icon if there are two)
         const thermostat = getThermostat(devices, thermometer);
-        const showThermostatIcon = thermostat?.powerState;
         const hasRunningHeaters = locationHasRunningHeaters(devices, thermometer);
 
-        if (thermostat) {
+        if (thermostat) {            
             if (!thermostat.powerState && hasRunningHeaters) {
                 // Thermostat is off but heaters are running. Show warning.
                 if (hasRunningHeaters) {
@@ -104,13 +103,18 @@ function Temperature(props: any) {
                     );
                 }
             } else {
-                const className = showThermostatIcon ? `` : `thermometer-grey-out`;
+                let src = "/icons/thermostat-small-grey.png";
+                if (thermostat.powerState) {                    
+                    src =
+                        thermostat.state.target < 25
+                            ? "/icons/thermostat-small-green.png"
+                            : "/icons/thermostat-small-orange.png";
+                }
                 iconsJsx = (
                     <>
                         <img
                             key={0}
-                            src={"/icons/thermostat-small.png"}
-                            className={className}
+                            src={src}                            
                             data-thermostat-channel={thermostat.channel}
                             onClick={handleThermostatClick}
                         />

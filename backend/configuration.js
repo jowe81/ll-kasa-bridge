@@ -1744,10 +1744,6 @@ const deviceMap = [
                             channel: 44,
                             stateData: false,
                         },
-                        {
-                            groupId: "group-bedShelfLights",
-                            stateData: true,
-                        },
                     ],
                 },
                 {
