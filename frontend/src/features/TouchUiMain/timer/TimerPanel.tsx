@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 import { useAppSelector } from '../../../app/hooks.ts';
-import { socket } from '../../websockets/socket.tsx';
+import { socket, setTimer, cancelTimer, setTimerFor, nudgeLiveTimer } from '../../websockets/socket.tsx';
 import constants from '../../../constants.ts';
 
 import './timer.css';
@@ -47,30 +47,26 @@ function TimerPanel() {
   };
 
   const nudgeTimer = (event) => {
-    const step = event.currentTarget.dataset.step;
-    console.log(`Nudging ${selectedTimer} with by ${step}`);
-    socket.emit('auto/command/nudgeTimer', { liveTimerId: selectedTimer, step });
+    const step = event.currentTarget.dataset.step;    
+    nudgeLiveTimer(selectedTimer, step);    
   }
 
   const schedulePresetTimer = (event) => {
     const timerId = event.currentTarget.dataset.id;
-
     const timerToSchedule = timer.settings.timers.find((timer) => timer.id === timerId);
-    console.log('Scheduling timer:', timerToSchedule);
-    socket.emit('auto/command/setTimer', timerToSchedule);
+    setTimer(timerToSchedule);    
   };
 
   const cancelLiveTimer = (event) => {
     event.stopPropagation();
     const timerId = event.currentTarget.dataset.liveId;
-    console.log('canceling', timerId);
-    socket.emit('auto/command/cancelTimer', timerId);
+    cancelTimer(timerId);
   }
   
   const closeNumPad = (ms) => {
     setNumPadOpen(false);
     if (ms) {
-      socket.emit('auto/command/setTimerFor', ms);
+      setTimerFor(ms);
     }
   }
 

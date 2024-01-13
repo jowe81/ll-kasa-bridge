@@ -1,5 +1,5 @@
 import { useAppSelector } from '../../../app/hooks.ts';
-import { socket } from '../../websockets/socket.tsx';
+import { socket, toggleChannel, toggleGroup } from '../../websockets/socket.tsx';
 import { getDeviceByChannel } from './helpers.ts';
 import constants from '../../../constants.ts';
 
@@ -153,29 +153,9 @@ function AutomationPanel() {
     return liveGroupData;
   }
 
-  const handleClick = (e) => {
-    const channel = e.currentTarget.dataset.deviceChannel;
-    if (channel) {
-      socket.emit('auto/command/macro', {
-        targetType: 'channel',
-        targetId: parseInt(channel),
-        macroName: 'toggleChannel'
-      });    
-    }
-  }
-
-  const handleGroupClick = (e) => {
-    const groupId = e.currentTarget.dataset.deviceGroupId;
-    console.log(`handling group click ${e.target}`);
-    if (groupId) {
-      socket.emit('auto/command/macro', {
-        targetType: 'group',
-        targetId: groupId,
-        macroName: 'toggleGroup'
-      });
-    }
-  }
-
+  const handleChannelClick = (e) => toggleChannel(e.currentTarget.dataset.deviceChannel);
+  const handleGroupClick = (e) => toggleGroup(e.currentTarget.dataset.deviceGroupId);
+  
   const handleThermostatClick = (e) => {
     const channel = e.currentTarget.dataset.deviceChannel;
     const { action } = e.currentTarget.dataset;
@@ -229,7 +209,7 @@ function AutomationPanel() {
           const ungroupedLightsFields = locationInfo.ungroupedLights.map(device => {
             const props = {
               device,
-              onClick: handleClick,
+              onClick: handleChannelClick,
             }
 
             return <TouchButtonDevice key={'device_' + device.channel} {...props}></TouchButtonDevice>;
@@ -238,18 +218,17 @@ function AutomationPanel() {
           const ungroupedOtherDeviceFields = locationInfo.ungroupedOtherDevices.map(device => {
             const props = {
               device,
-              onClick: handleClick,
+              onClick: handleChannelClick,
             };
 
             return <TouchButtonDevice key={'device_' + device.channel} {...props}></TouchButtonDevice>;
 
           });
 
-
           const switchFields = locationInfo.switches.map(device => {
             const props = {
               device,
-              onClick: handleClick,
+              onClick: handleChannelClick,
             };
   
             return <TouchButtonDevice key={'device_' + device.channel} {...props}></TouchButtonDevice>;
@@ -278,9 +257,7 @@ function AutomationPanel() {
           } else {
             locationLabelField = <div className="location-label">{ locationInfo.name }</div>
           }
-
-          
-
+        
           return(
               <div key={locationInfo.id} className="location-container">
                 { locationLabelField }

@@ -22,7 +22,7 @@
 }
 
 .thermometer-extradata-container {
-  width: 50%;
+width: 50%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -56,4 +56,9 @@
   margin-top: 0px;
   text-align: right;
   width: 50%;
+}
+
+.thermometer-grey-out {
+  filter: saturate(0%);
+  opacity: 30%;
 }

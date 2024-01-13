@@ -1,6 +1,7 @@
 import "./temperature.css";
 import { Device } from "../../TouchUiMain/devices/dataSlice.ts";
 import constants from "../../../constants.ts";
+import { toggleChannel } from "../../websockets/socket.tsx";
 
 import { useAppSelector } from "../../../app/hooks.ts";
 
@@ -20,6 +21,22 @@ function Temperature(props: any) {
         
         return allThermometers.slice(thermometersStartIndex, thermometersStartIndex + 2);
     };
+
+    const getThermostat = (devices: Device[], thermometer) => {
+      const thermostats = devices.filter(
+          (device) => device.subType === constants.SUBTYPE_THERMOSTAT && device.location === thermometer.location
+      );
+
+      if (!thermostats.length) {
+        return null;
+      }
+      return thermostats[0];
+    }
+
+    const handleThermostatClick = (event) => {
+      const thermostatChannel = event.target.dataset.thermostatChannel;
+      toggleChannel(thermostatChannel);
+    }
 
     const thermometers = getThermometers(devices);
     
@@ -43,17 +60,36 @@ function Temperature(props: any) {
           color: displayData.trendColor,
       };
 
-      const trendIcons = Array.from(
-          { length: displayData.trendIconCount },
-          (_, index) => <img key={index} src={displayData.trendIconUrl} />
-      );
+      let iconsJsx;
+
+      // If the thermostat for this room exists and is on, indicate that with an icon (overwrite the second trend icon if there are two)
+      const thermostat = getThermostat(devices, thermometer)
+      const showThermostatIcon = thermostat?.powerState;
+      
+      
+
+      if (thermostat) {
+          const className = showThermostatIcon ? `` : `thermometer-grey-out`;
+          iconsJsx = (
+              <>
+                  <img key={0} src={"/icons/thermostat-small.png"} className={className} data-thermostat-channel={thermostat.channel} onClick={handleThermostatClick} />
+                  <img key={1} src={displayData.trendIconUrl} />
+              </>
+          );
+      } else {
+          iconsJsx = Array.from({ length: displayData.trendIconCount }, (_, index) => (
+              <img key={index} src={displayData.trendIconUrl} />
+          ));
+      }
+
+
 
       return (
           <div key={index} className="temperature-subpanel">
               <div className="thermometer-extradata-container">
                   <div className="thermometer-label">{location}</div>
                   <div className="thermometer-trend" style={styleTrend}>
-                      {trendIcons}
+                      {iconsJsx}
                   </div>
               </div>
               <div className="thermometer-temp" style={styleTemp}>

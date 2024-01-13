@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useAppSelector } from "../../../app/hooks.ts";
-import { socket } from "../../websockets/socket.tsx";
+import { socket, setTimer, cancelTimer } from "../../websockets/socket.tsx";
 import constants from "../../../constants.ts";
 
 import { VirtualDevice } from "../../TouchUiMain/devices/dataSlice.ts";
@@ -49,30 +49,19 @@ function CompactTimer() {
       setSelectedTimer(selectedTimerId == timerId ? null : timerId);
   };
 
-  const nudgeTimer = (event) => {
-      const step = event.currentTarget.dataset.step;
-      console.log(`Nudging ${selectedTimer} with by ${step}`);
-      socket.emit("auto/command/nudgeTimer", {
-          liveTimerId: selectedTimer,
-          step,
-      });
-  };
-
   const schedulePresetTimer = (event) => {
       const timerId = event.currentTarget.dataset.id;
 
       const timerToSchedule = timer.settings.timers.find(
           (timer) => timer.id === timerId
-      );
-      console.log("Scheduling timer:", timerToSchedule);
-      socket.emit("auto/command/setTimer", timerToSchedule);
+      );      
+      setTimer(timerToSchedule);
   };
 
   const cancelLiveTimer = (event) => {
       event.stopPropagation();
-      const timerId = event.currentTarget.dataset.liveId;
-      console.log("canceling", timerId);
-      socket.emit("auto/command/cancelTimer", timerId);
+      const timerId = event.currentTarget.dataset.liveId;      
+      cancelTimer(timerId);
   };
 
   const configuredTimers = {};
@@ -89,7 +78,6 @@ function CompactTimer() {
       selectedTimer,
       selectTimer,
       cancelLiveTimer,
-      nudgeTimer,
       liveTimers,
   };
 
