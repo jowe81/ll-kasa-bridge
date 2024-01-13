@@ -1588,7 +1588,7 @@ const deviceMap = [
                                 field: "date_of_birth_MMDD",
                                 match: {
                                     filterName: "__CURRENT_DATE",
-                                    daysAfter: 10, // include n days after the current date
+                                    daysAfter: 14, // include n days after the current date
                                     daysBefore: 0, // include n days preceding the current date
                                     format: "MM-DD",
                                 },
@@ -1674,6 +1674,7 @@ const deviceMap = [
         locationId: "__internal",
         type: constants.DEVICETYPE_VIRTUAL,
         subType: constants.SUBTYPE_DYNFORMS_SERVICE,
+        commandHandlersExtension: "photosHandlers.js", 
         settings: {
             api: {
                 baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead

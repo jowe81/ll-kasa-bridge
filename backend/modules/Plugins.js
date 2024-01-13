@@ -52,7 +52,7 @@ const commandHandlerFiles = getFileNames('./commandProcessing', import.meta.url)
 
 let cachedCommandHandlerPlugins = {};
 
-const getCommandHandlerPlugins = (subType) => cachedCommandHandlerPlugins[subType];
+const getCommandHandlerPlugins = (fileName) => cachedCommandHandlerPlugins[fileName];
 
 const getAllCommandHandlerPlugins = () => cachedCommandHandlerPlugins;
 
@@ -62,7 +62,7 @@ const loadCommandHandlerPlugins = async () => {
         return Promise.resolve(cachedCommandHandlerPlugins);
     }
 
-    log(`Looking for command handler plugins...`);
+    log(`Looking for command handlers extensions plugins...`);
 
     const promises = [];
 
@@ -70,7 +70,7 @@ const loadCommandHandlerPlugins = async () => {
         commandHandlerFiles.forEach((fileName) => {
             const commandHandlerName = Path.parse(fileName).name;
 
-            log(`-> Loaded command handler plugin '${commandHandlerName}'`);
+            log(`-> Loaded command handlers extension plugin '${commandHandlerName}'`);
             if (fileName) {
                 promises.push(import(`./commandProcessing/${fileName}`));
             }
@@ -81,17 +81,16 @@ const loadCommandHandlerPlugins = async () => {
 
         commandHandlerPluginsArray.forEach((plugin, index) => {
             const fileName = commandHandlerFiles[index];                     
-            const subType = getCommandHandlerSubTypeFromFilename(fileName);
-            handlerPlugins[subType] = plugin;
+            handlerPlugins[fileName] = plugin;
         });
 
         log(`Loaded ${Object.keys(handlerPlugins).length} command handler(s).`);
 
-        Object.keys(handlerPlugins).forEach((subType) => {
-            const commandHandlerFunctions = handlerPlugins[subType].default;
+        Object.keys(handlerPlugins).forEach((fileName) => {
+            const commandHandlerFunctions = handlerPlugins[fileName].default;
 
-            if (subType && commandHandlerFunctions) {
-                cachedCommandHandlerPlugins[subType] = commandHandlerFunctions;
+            if (fileName && commandHandlerFunctions) {
+                cachedCommandHandlerPlugins[fileName] = commandHandlerFunctions;
             }
         });
         

@@ -49,8 +49,8 @@ const VirtualDeviceWrapper = {
   },
 
   getCommandHandler(commandId) {
-    log(`Looking for command handler ${commandId}/${this.subType}`, this, 'yellow');
-    const commandHandlers = getCommandHandlerPlugins(this.subType);
+    log(`Looking for command "${commandId}" in command handler extension ${this.commandHandlersExtension}`, this, "yellow");
+    const commandHandlers = getCommandHandlerPlugins(this.commandHandlersExtension);
     
     if (commandHandlers && commandHandlers[commandId]) {
       return commandHandlers[commandId];
@@ -85,6 +85,7 @@ const VirtualDeviceWrapper = {
       powerState: null,
     }
     this.powerState = false;
+    this.commandHandlersExtension = mapItem.commandHandlersExtension;
     this.isOnline = true; // Always online.
     
     resolveDeviceDependencies(this);

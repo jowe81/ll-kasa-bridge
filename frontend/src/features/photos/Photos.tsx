@@ -9,9 +9,9 @@ function Photos(props: any) {
         
     const { fullScreen } = props;
 
-    const nextBtnClick = () => runServiceCommand('next', {});
+    const nextBtnClick = () => runPhotosServiceCommand('nextPicture', {});
 
-    function runServiceCommand(commandId, body) {
+    function runPhotosServiceCommand(commandId, body) {
         runChannelCommand(photosServiceChannel, commandId, body)
     }
 

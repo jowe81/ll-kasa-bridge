@@ -251,11 +251,12 @@ class DynformsServiceHandler {
         const requests = this._constructRequests([requestIndex]);
         const request = Array.isArray(requests) && requests.length ? requests[0] : null;
 
-        this._executeRequest(request)
-          .then(data => {
-
+        this._executeRequest(request, requestIndex)
+          .then(data => {            
+              this.cache.data[requestIndex] = data.data;
+              this.processCachedApiResponse();
           }).catch(err => {
-
+              log(`${this.service.alias}: API request failed`, this.service, 'red');
           })
     }
 
@@ -296,20 +297,37 @@ class DynformsServiceHandler {
           .then((allResponseData) => {
               // Cache the responses.
               this.cache.data = allResponseData.map((data, requestIndex) => data?.data);
-              const displayData = getDisplayDataFromApiResponse(this.cache.data, this.service.settings);
-
-              this.service._updateState({
-                powerState: this.service.getPowerState(),
-                api: displayData,
-                settings: this.service.settings,
-              }, true);
-
-              log(`${this.service.alias} received API data from ${this.service.fullUrl}`, this.service);
+              this.processCachedApiResponse();
           })
           .catch(err => {
             console.log(err.message, err);
           })
     }
+
+    /**
+     * Update state after a request came back.
+     */
+    processCachedApiResponse() {
+          const displayData = getDisplayDataFromApiResponse(
+              this.cache.data,
+              this.service.settings
+          );
+
+          this.service._updateState(
+              {
+                  powerState: this.service.getPowerState(),
+                  api: displayData,
+                  settings: this.service.settings,
+              },
+              true
+          );
+
+          log(
+              `${this.service.alias} received API data from ${this.service.fullUrl}`,
+              this.service
+          );
+    }
+
 }
 
 function dynformsServiceHandler(devicePool, service, cache) {

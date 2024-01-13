@@ -155,7 +155,7 @@ const socketHandler = {
           );
           
           // Wrapper supports the command; execute it.
-          commandHandler(command);
+          commandHandler(command, deviceWrapper);
       });
     
     });
