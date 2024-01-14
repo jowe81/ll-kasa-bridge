@@ -7,9 +7,8 @@ import "./photos.css";
 function Photos(props: any) {
     const photosServiceChannel  = constants.photos?.photosServiceChannel;
     const photosService = getDeviceByChannel(photosServiceChannel);
-    console.log(photosService);
     const record = getDynformsServiceRecord(photosServiceChannel);
-        
+
     const { fullScreen } = props;
 
     const nextBtnClick = () => runPhotosServiceCommand('nextPicture', {});
@@ -24,6 +23,7 @@ function Photos(props: any) {
     if (!record) {
         return;
     }
+
     if (photosService?.state?.settings?.ui?.disabled) {
         return (
             <div className="photos-disabled-container">
