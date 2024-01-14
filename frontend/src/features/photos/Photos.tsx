@@ -1,10 +1,13 @@
 import constants from "../../constants";
 import { getDynformsServiceRecord } from "../../dynformsHelpers";
 import { runChannelCommand } from "../../devicesHelpers";
+import { getDeviceByChannel } from "../../devicesHelpers";
 import "./photos.css";
 
 function Photos(props: any) {
     const photosServiceChannel  = constants.photos?.photosServiceChannel;
+    const photosService = getDeviceByChannel(photosServiceChannel);
+    console.log(photosService);
     const record = getDynformsServiceRecord(photosServiceChannel);
         
     const { fullScreen } = props;
@@ -20,6 +23,13 @@ function Photos(props: any) {
     }`;
     if (!record) {
         return;
+    }
+    if (photosService?.state?.settings?.ui?.disabled) {
+        return (
+            <div className="photos-disabled-container">
+                <div className="photos-disabled">Photos are temporarily disabled</div>
+            </div>
+        );
     }
 
     const iUrl = constants.photos.url + "/" + record.fullname;

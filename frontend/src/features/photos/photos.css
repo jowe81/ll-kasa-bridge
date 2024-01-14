@@ -58,3 +58,15 @@
   height: 200px;
   /* background-color: red; */
 }
+
+.photos-disabled-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;    
+}
+
+.photos-disabled {
+    font-size: 50px;
+    color:rgb(47, 47, 47)
+}
