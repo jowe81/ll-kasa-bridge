@@ -131,7 +131,7 @@ class DynformsServiceHandler {
                   request.settings.singleRecord.index = lastIndex + 1;
                   break;
                 
-                case '__SEMI_RANDOM':
+                case '__RANDOMIZED_PREORDERED':
                   // Use the dynforms semi-random algorithm
                   request.settings.singleRecord.semiRandom = true;
                   break;
@@ -252,12 +252,18 @@ class DynformsServiceHandler {
         const request = Array.isArray(requests) && requests.length ? requests[0] : null;
 
         this._executeRequest(request, requestIndex)
-          .then(data => {            
-              this.cache.data[requestIndex] = data.data;
-              this.processCachedApiResponse();
-          }).catch(err => {
-              log(`${this.service.alias}: API request failed`, this.service, 'red');
-          })
+            .then((data) => {
+                this.cache.data[requestIndex] = data.data;
+            })
+            .catch((err) => {
+                log(`${this.service.alias}: API request failed`, this.service, "red");
+            })
+            .then((data) => {
+                this.processCachedApiResponse();
+            })
+            .catch((err) => {
+                log(`${this.service.alias}: Processing API response failed`, this.service, "red");
+            });
     }
 
     async _executeRequest(requestInfo, requestIndex) {
@@ -308,10 +314,14 @@ class DynformsServiceHandler {
      * Update state after a request came back.
      */
     processCachedApiResponse() {
-          const displayData = getDisplayDataFromApiResponse(
-              this.cache.data,
-              this.service.settings
-          );
+          let displayData = getDisplayDataFromApiResponse(this.cache.data, this.service.settings);
+
+          // See if a processApiResponse handler exists for this device.
+          const commandHandler = this.service.commandHandlersExtension ? this.service.getCommandHandler("processApiResponse") : null;
+
+          if (commandHandler) {
+              displayData = commandHandler(this.service, displayData);
+          }
 
           this.service._updateState(
               {
@@ -322,10 +332,7 @@ class DynformsServiceHandler {
               true
           );
 
-          log(
-              `${this.service.alias} received API data from ${this.service.fullUrl}`,
-              this.service
-          );
+          log(`${this.service.alias} received API data from ${this.service.fullUrl}`, this.service);
     }
 
 }

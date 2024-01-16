@@ -32,16 +32,16 @@ function Photos(props: any) {
         );
     }
 
-    const iUrl = constants.photos.url + "/" + record.fullname;
+
     return (
         <div className={containerClassNames}>
             <div
                 className="background"
-                style={{ backgroundImage: `url(${iUrl})` }}
+                style={{ backgroundImage: `url(${record.url})` }}
             />
             <div
                 className="photo"
-                style={{ backgroundImage: `url(${iUrl})` }}
+                style={{ backgroundImage: `url(${record.url})` }}
             />
             <div className="photo-meta">
                 <div className="photo-button-next" onClick={nextBtnClick}>

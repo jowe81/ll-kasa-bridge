@@ -1639,7 +1639,7 @@ const deviceMap = [
                             // type: "__INDEX",
 
                             // Have dynforms pick the item
-                            type: "__SEMI_RANDOM",
+                            type: "__RANDOMIZED_PREORDERED",
                         },
                     },
                 },
@@ -1692,7 +1692,7 @@ const deviceMap = [
                             minutes: 30,
                         },
                         singleRecord: {
-                            type: "__SEMI_RANDOM",
+                            type: "__RANDOMIZED_PREORDERED",
                         },
                     },
                 },
@@ -1702,8 +1702,11 @@ const deviceMap = [
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 30 * SECOND,
             ui: {
-                disabled: true,
+                disabled: false,
             },
+
+            // Specific to this service:
+            photosServiceBaseUrl: "http://jj-photos.wnet.wn:3021/db",
         },
     },
     {
