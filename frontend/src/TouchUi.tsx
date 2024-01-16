@@ -9,7 +9,7 @@ import Scripture from "./features/TouchUiPanel/scripture/Scripture.tsx";
 import './touch.css';
 import { useState } from "react";
 
-import { getAllDevices, getDeviceByChannel, getClock } from "./devicesHelpers.tsx";
+import { getAllDevices, getClock, getMasterSwitchDimInfo } from "./devicesHelpers.tsx";
 
 function TouchUi() {
     const [fullScreen, setFullScreen] = useState<boolean>(true);
@@ -20,6 +20,7 @@ function TouchUi() {
 
     const devices = getAllDevices();
     const clock = getClock();
+    const dimInfo = getMasterSwitchDimInfo();
    
     let fullScreenButtonClassName = "compact-base-button toggle-fullscreen-button";
 
@@ -94,7 +95,10 @@ function TouchUi() {
             </>
         );
     }
-    return <div className="touch-ui-container">{content}</div>;
+
+    let style = { opacity: dimInfo.opacity };    
+
+    return <div className="touch-ui-container" style={style}>{content}</div>;
 }
 
 function getMainViewingAreaOverrideDevice(overrideChannels, clock, devices) {

@@ -1702,7 +1702,7 @@ const deviceMap = [
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 30 * SECOND,
             ui: {
-                disabled: false,
+                disabled: true,
             },
 
             // Specific to this service:
@@ -1720,6 +1720,19 @@ const deviceMap = [
         type: constants.DEVICETYPE_VIRTUAL,
         subType: constants.SUBTYPE_MASTER_SWITCH,
         settings: {
+            uiMaster: {
+                nighttimeDimming: {
+                    start: {
+                        hours: 22,
+                        minutes: 30,
+                    },
+                    end: {
+                        hours: 6,
+                        minutes: 0,
+                    },
+                    uiOpacityPercent: 30,
+                }
+            },
             buttons: [
                 {
                     alias: "On",
