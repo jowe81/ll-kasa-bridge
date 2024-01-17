@@ -1674,7 +1674,7 @@ const deviceMap = [
         locationId: "__internal",
         type: constants.DEVICETYPE_VIRTUAL,
         subType: constants.SUBTYPE_DYNFORMS_SERVICE,
-        commandHandlersExtension: "photosHandlers.js", 
+        commandHandlersExtension: "photosHandlers.js",
         settings: {
             api: {
                 baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
@@ -1723,15 +1723,17 @@ const deviceMap = [
             uiMaster: {
                 nighttimeDimming: {
                     start: {
-                        hours: 22,
-                        minutes: 30,
+                        hours: 20,
+                        minutes: 0,
                     },
                     end: {
                         hours: 6,
                         minutes: 0,
                     },
                     uiOpacityPercent: 40,
-                }
+                    forceDim: false, // Default. This means it dims only as long as dimOnButton button is 'active'.
+                    dimOnButton: "master-off",
+                },
             },
             buttons: [
                 {
@@ -1761,6 +1763,7 @@ const deviceMap = [
                             // Kitchen Aleds
                             channel: 44,
                             stateData: false,
+                            ignoreForButtonState: true,
                         },
                     ],
                 },
@@ -1815,31 +1818,37 @@ const deviceMap = [
                             // Thermostat Bathroom
                             channel: 207,
                             stateData: false,
+                            ignoreForButtonState: true,
                         },
                         {
                             // Heater Bathroom
                             channel: 15,
                             stateData: false,
+                            ignoreForButtonState: true,
                         },
                         {
                             // Thermostat Bedroom
                             channel: 208,
                             stateData: false,
+                            ignoreForButtonState: true,
                         },
                         {
                             // Heater Bedroom
                             channel: 4,
                             stateData: false,
+                            ignoreForButtonState: true,
                         },
                         {
                             // Fan Bedroom
                             channel: 5,
                             stateData: true,
+                            ignoreForButtonState: true,
                         },
                         {
                             // Amp Bedroom
                             channel: 39,
                             stateData: false,
+                            ignoreForButtonState: true,
                         },
                     ],
                 },

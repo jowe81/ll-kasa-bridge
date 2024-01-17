@@ -155,6 +155,10 @@ constants.DEVICETYPE_DEFAULTS = {
             CHECKING_INTERVAL_DEFAULT: 1 * constants.SECOND,
             DEFAULT_TIME_FORMAT: 'HH:MM',
         },
+
+        [constants.SUBTYPE_MASTER_SWITCH]: {
+            CHECKING_INTERVAL_DEFAULT: 1 * constants.SECOND,
+        },
     },
 };
 

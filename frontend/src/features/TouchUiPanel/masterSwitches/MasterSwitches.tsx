@@ -18,6 +18,7 @@ function MasterSwitches(props) {
     const buttonsJsx = buttonsConfig.map((button, index) => {
       const props = {
           button,
+          powerState: masterSwitch.state.buttons[button.buttonId]
       };
 
       return <MasterSwitchButton key={index} {...props}/>

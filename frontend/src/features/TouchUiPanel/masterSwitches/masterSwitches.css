@@ -36,6 +36,13 @@
   border-radius:5px;
 }
 
+.master-switch-button-top-text {
+  font-size: 89%;
+}
+
+
+
+/************************ The Master on button *********************/
 .master-switch-button-background-master-on {
   border-color: rgb(124, 160, 124);
 }
@@ -44,6 +51,23 @@
   background-color: rgba(124, 160, 124, .5);
 }
 
+.master-switch-button-meta-master-on {
+  color: rgb(178, 236, 178);
+  font-size: 80%;
+}
+
+/* Power state classes, supported: on, off, none */
+.master-switch-button-power-state-master-on-on {
+    background-color: rgba(0, 128, 0, 0.5);
+}
+
+.master-switch-button-power-state-master-on-off {
+
+}
+
+
+
+/************************ The Master off button *********************/
 .master-switch-button-background-master-off {
   border-color: rgb(196, 99, 99);
 }
@@ -52,20 +76,20 @@
   background-color: rgba(196, 99, 99, .5);
 }
 
-.master-switch-button-meta-master-on {
-  color: rgb(178, 236, 178);
-  font-size: 80%;
-}
-
 .master-switch-button-meta-master-off {
   color: rgb(246, 141, 141);
   font-size: 80%;
 }
 
-.master-switch-button-top-text {
-  font-size: 89%;
+/* Power state classes, supported: on, off, none */
+.master-switch-button-power-state-master-off-on {
+    background-color: rgba(255, 0, 0, 0.375);
 }
 
-.master-switch-button-label {
-  
+.master-switch-button-power-state-master-off-off {
+
 }
+
+
+
+

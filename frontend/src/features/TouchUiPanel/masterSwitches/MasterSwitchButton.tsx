@@ -4,7 +4,7 @@ import constants from "../../../constants.ts";
 
 import { socket } from "../../websockets/socket.tsx";
 
-const MasterSwitchButton = ({ button }) => {
+const MasterSwitchButton = ({ button, powerState }) => {
 
     if (!button) {
       return;
@@ -20,6 +20,13 @@ const MasterSwitchButton = ({ button }) => {
     }
 
     const metaClass = `master-switch-button-meta-${button.buttonId}`;
+    console.log()
+    let powerStateString = 'none';
+    if (powerState === true) {
+        powerStateString = 'on';
+    } else if (powerState === false) {
+        powerStateString = 'off';
+    }
 
     let html = (
         <>
@@ -37,7 +44,7 @@ const MasterSwitchButton = ({ button }) => {
     
     return (
         <div
-            className={`master-switch-button master-switch-button-background-${button.buttonId}`}
+            className={`master-switch-button master-switch-button-background-${button.buttonId} master-switch-button-power-state-${button.buttonId}-${powerStateString}`}
             data-button-id={button?.buttonId}
             onClick={onClick}
         >

@@ -80,8 +80,10 @@ function getMasterSwitchDimInfo() {
 
     if (masterSwitch) {
         const { nighttimeDimming } = masterSwitch.settings?.uiMaster;
+        const dimOnButtonState = masterSwitch.state.buttons[nighttimeDimming.dimOnButton];
+
         const settingsStart = nighttimeDimming?.start;
-        const settingsEnd = nighttimeDimming?.end;
+        const settingsEnd = nighttimeDimming?.end;        
         if (Number.isInteger(settingsStart.hours) && Number.isInteger(settingsEnd.hours)) {            
             start = new Date();
             start.setHours(settingsStart.hours);
@@ -103,8 +105,10 @@ function getMasterSwitchDimInfo() {
                 end.setDate(end.getDate() + 1);
             }
 
-            if (start < now && now < end) {
-                opacity = `${nighttimeDimming?.uiOpacityPercent}%`;
+            if (true || start < now && now < end) {
+                if (nighttimeDimming.forceDim || dimOnButtonState) {
+                    opacity = `${nighttimeDimming?.uiOpacityPercent}%`;
+                }                
             }
         }        
     }

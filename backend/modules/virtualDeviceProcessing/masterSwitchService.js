@@ -80,8 +80,102 @@ class MasterSwitchHandler {
             `Initialized ${this.masterSwitch.subType} "${this.masterSwitch.alias}".`,
             this.masterSwitch
         );
+        log(
+            `Check-Interval: ${Math.ceil(
+                this.masterSwitch.settings.checkInterval / constants.MINUTE
+            )} minutes.`,
+            this.masterSwitch
+        );
+
+        // Start the interval check
+        if (this._checkingIntervalHandler) {
+            clearInterval(this._checkingIntervalHandler);
+        }
+
+        const interval =
+            this.masterSwitch.settings.checkInterval ??
+            localConstants.CHECKING_INTERVAL_DEFAULT;
+
+        this._checkingIntervalHandler = setInterval(
+            () => this.masterSwitchIntervalHandler(),
+            interval
+        );
 
         this.initialized = true;
+
+        // Trigger an initial API call. THERES A TIMINIG ISSUE HERE - WITHOUT THE DELAY THE FRONTEND WONT GET THE UPDATE
+        setTimeout(() => {
+            this.masterSwitchIntervalHandler();
+        }, 5000);
+    }
+
+    async masterSwitchIntervalHandler() {
+        if (!this.initialized) {
+            return false;
+        }
+
+        const buttons = this.getButtonsState();
+
+        this.masterSwitch._updateState(
+            {
+                powerState: this.masterSwitch.getPowerState(),
+                buttons,                
+            },
+            false
+        );
+    }
+
+    // Calculate if buttons have their conditions met (are 'active')
+    getButtonsState() {
+        let buttonsState = {};
+
+        this.masterSwitch.settings.buttons.forEach((button) => {
+
+            const conditions = button.switch;
+
+            if (conditions) {
+                const state = [];
+                
+                conditions.forEach((condition, index) => {
+                    let conditionState = {};
+
+                    conditionState.index = index;
+
+                    if (!condition.ignoreForButtonState) {
+                        if (condition.groupId) {
+                            conditionState.groupId = condition.groupId;
+                            conditionState.powerState = this.devicePool.getGroupPowerState(condition.groupId);
+                        } else if (condition.channel) {
+                            conditionState.channel = condition.channel;
+                            const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(condition.channel);
+                            conditionState.powerState = deviceWrapper.getPowerState();
+                        }
+                    }
+
+                    conditionState.targetPowerState = typeof condition.stateData === 'boolean' ? 
+                        condition.stateData : 
+                        !!condition.stateData?.lightState?.on_off;
+
+                    conditionState.fulfilled =
+                        (conditionState.targetPowerState === conditionState.powerState) || condition.ignoreForButtonState;
+
+                    state.push(conditionState);
+                })
+
+                const fullfilledConditions = state.filter((conditionState) => conditionState.fulfilled);
+
+                // Only set result if either all or none of the conditions are met.
+                if (fullfilledConditions.length === conditions.length) {
+                    buttonsState[button.buttonId] = true;
+                } else if (fullfilledConditions.length === 0) {
+                    buttonsState[button.buttonId] = false;
+                } else {
+                    buttonsState[button.buttonId] = null;
+                }
+            }                        
+        });
+
+        return buttonsState;
     }
 
     execute(buttonId, origin) {
