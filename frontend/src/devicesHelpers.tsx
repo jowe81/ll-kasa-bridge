@@ -82,7 +82,6 @@ function getMasterSwitchDimInfo() {
         const { nighttimeDimming } = masterSwitch.settings?.uiMaster;
         const settingsStart = nighttimeDimming?.start;
         const settingsEnd = nighttimeDimming?.end;
-        console.log(nighttimeDimming);
         if (Number.isInteger(settingsStart.hours) && Number.isInteger(settingsEnd.hours)) {            
             start = new Date();
             start.setHours(settingsStart.hours);
@@ -95,7 +94,8 @@ function getMasterSwitchDimInfo() {
             end.setSeconds(0);
 
             const now = new Date();
-            if (now.getHours() <= end.getHours() && now.getMinutes() < end.getMinutes()) {
+
+            if (now.getHours() <= end.getHours() || (now.getHours() === end.getHours() && now.getMinutes() < end.getMinutes())) {
                 // After midnight make sure the start date remains in the night before.
                 start.setDate(start.getDate() - 1);
             } else {
@@ -109,11 +109,13 @@ function getMasterSwitchDimInfo() {
         }        
     }
     
-    return {
+    const result = {
         start,
         end,
         opacity,
     };
+
+    return result;
 }
 
 
