@@ -11,32 +11,29 @@ import Mailbox from "./mailbox/Mailbox.tsx";
 
 import { getDeviceByChannel } from "../../devicesHelpers.tsx";
 
-function TouchUiPanel(props: any) {  
-  const birthdayRangeToDisplay = 1;
-  const { recordsSelected } = getSelectedRecordsInfo(birthdayRangeToDisplay);  
-  const showBirthdays = recordsSelected.length > 0;
-  
-  const mailbox = getDeviceByChannel(constants.touchPanel?.mailboxChannel);
-  const showMailbox = mailbox?.powerState;
-  
-  return (
-      <>
-          <MasterSwitches {...props} />
-          <CompactTimer />
-          <Scripture {...props} />
-              {showBirthdays && (
-                  <CompactBirthdays
-                      birthdayRangeToDisplay={birthdayRangeToDisplay}
-                  />
-              )}
-              {!showBirthdays && <Temperature thermometersStartIndex={2} />}
-              
-              {showMailbox && <Mailbox />}
-              {!showMailbox && <Temperature thermometersStartIndex={0} />}          
-          <Forecast />
-          <Clock />
-      </>
-  );
+function TouchUiPanel(props: any) {
+    const fullScreen = props.fullScreen;
+    const birthdayRangeToDisplay = 0;
+    const { recordsSelected } = getSelectedRecordsInfo(birthdayRangeToDisplay);
+    const showBirthdays = fullScreen && recordsSelected.length > 0;
+
+    const mailbox = getDeviceByChannel(constants.touchPanel?.mailboxChannel);
+    const showMailbox = mailbox?.powerState;
+
+    return (
+        <>
+            <MasterSwitches {...props} />
+            <CompactTimer />
+            <Scripture {...props} />
+            {showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay} />}
+            {!showBirthdays && <Temperature thermometersStartIndex={2} />}
+
+            {showMailbox && <Mailbox />}
+            {!showMailbox && <Temperature thermometersStartIndex={0} />}
+            <Forecast />
+            <Clock />
+        </>
+    );
 }
 
 export default TouchUiPanel;

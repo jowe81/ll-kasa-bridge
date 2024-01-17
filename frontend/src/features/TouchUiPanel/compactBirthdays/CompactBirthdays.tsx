@@ -12,7 +12,9 @@ function CompactBirthdays({birthdayRangeToDisplay}) {
     };
 
     const fullSize = false;
-    const birthdaysJsx = recordsSelected.map((record, index) => getJsx(record, index, fullSize));
+    const birthdaysJsx = recordsSelected
+        .slice(0, 3) // Show a max of 3.
+        .map((record, index) => getJsx(record, index, fullSize));
 
     let hiddenBirthdaysJsx;
 
@@ -20,7 +22,6 @@ function CompactBirthdays({birthdayRangeToDisplay}) {
       hiddenBirthdaysJsx = <div className="hidden-birthdays hidden-birthdays-today">{hiddenBirthdaysToday} more!</div>
     } else if (hiddenBirthdaysTomorrow) {
       hiddenBirthdaysJsx = <div className="hidden-birthdays hidden-birthdays-tomorrow">{hiddenBirthdaysTomorrow} more!</div>
-
     }
 
     return (

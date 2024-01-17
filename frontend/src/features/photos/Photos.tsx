@@ -26,7 +26,7 @@ function Photos(props: any) {
 
     if (photosService?.state?.settings?.ui?.disabled) {
         return (
-            <div className="photos-disabled-container">
+            <div className={`${containerClassNames} photos-disabled-container`}>
                 <div className="photos-disabled">Photos are temporarily disabled</div>
             </div>
         );

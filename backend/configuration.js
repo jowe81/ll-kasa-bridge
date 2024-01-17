@@ -1730,7 +1730,7 @@ const deviceMap = [
                         hours: 6,
                         minutes: 0,
                     },
-                    uiOpacityPercent: 30,
+                    uiOpacityPercent: 40,
                 }
             },
             buttons: [
