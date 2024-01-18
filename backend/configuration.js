@@ -1805,10 +1805,12 @@ const deviceMap = [
                         {
                             groupId: "group-bathroomLights",
                             stateData: false,
+                            ignoreForButtonState: true,
                         },
                         {
                             groupId: "group-bedroomCeilingLights",
                             stateData: false,
+                            ignoreForButtonState: true,
                         },
                         {
                             groupId: "group-bedroomDeskLights",

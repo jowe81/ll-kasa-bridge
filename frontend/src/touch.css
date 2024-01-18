@@ -1,6 +1,7 @@
 .touch-ui-container {
   overflow: hidden;
   width: 1902px;
+  user-select: none;
 }
 
 .touch-ui-fullscreen-container {

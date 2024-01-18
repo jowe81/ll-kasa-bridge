@@ -47,31 +47,21 @@ function getDevicesByType(type: string|null, subType:string|null) {
     return foundDevices;
 }
 
-function getClock() {
-    const clocks: VirtualDevice[] = getDevicesByType(
-        constants.DEVICETYPE_VIRTUAL,
-        constants.SUBTYPE_CLOCK
-    );  
+function getFirstDeviceOfType(type: string, subType: string | null) {
+    const devices: VirtualDevice[] = getDevicesByType(type, subType);
 
-    if (!clocks.length) {
-      return null;
+    if (!devices.length) {
+        return null;
     }
 
-    return clocks[0];
+    return devices[0];
 }
 
-function getMasterSwitch() {
-    const masterSwitches: VirtualDevice[] = getDevicesByType(
-        constants.DEVICETYPE_VIRTUAL,
-        constants.SUBTYPE_MASTER_SWITCH
-    );  
+const getClock = () => getFirstDeviceOfType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_CLOCK);
 
-    if (!masterSwitches.length) {
-      return null;
-    }
+const getPhotosService = () => getDeviceByChannel(constants.photos?.photosServiceChannel);
 
-    return masterSwitches[0];
-}
+const getMasterSwitch = () => getFirstDeviceOfType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_MASTER_SWITCH);
 
 function getMasterSwitchDimInfo() {
     let start, end, opacity = `100%`;
@@ -140,5 +130,6 @@ export {
     getClock,
     getMasterSwitch,
     getMasterSwitchDimInfo,
+    getPhotosService,
     runChannelCommand,
 };
