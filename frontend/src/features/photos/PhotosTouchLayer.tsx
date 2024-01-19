@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getPhotosService, runChannelCommand } from "../../devicesHelpers";
-
+import './photosTouchLayer.css';
 
 function PhotosTouchLayer() {
     const [showLayer, setShowLayer] = useState(false);
@@ -22,6 +22,7 @@ function PhotosTouchLayer() {
     }
 
     const photoButtonHidden = showLayer ? "" : "photo-button-hidden";
+    const isInFavorites = false;
 
     return (
         <div className="photo-touch-layer">
@@ -29,7 +30,7 @@ function PhotosTouchLayer() {
                 Previous Picture
             </div>
             <div className={`photo-button photo-button-top-row ${photoButtonHidden}`} onClick={setFilterBtnClick}>
-                Set A Filter
+                Change Filter
             </div>
             <div className={`photo-button photo-button-top-row ${photoButtonHidden}`} onClick={nextBtnClick}>
                 Next Picture
@@ -37,21 +38,22 @@ function PhotosTouchLayer() {
             <div className={`photo-button photo-button-show-ui ${photoButtonHidden}`} onClick={showUiBtnClick}>
                 Close
             </div>
+            <div className={`photo-button photo-button-pause ${photoButtonHidden}`} onClick={showUiBtnClick}>
+                Pause
+            </div>
             <div className={`photo-rating-outer-container ${photoButtonHidden}`}>
                 <div className="photo-rating-header-container">Rating Options</div>
                 <div className="photo-rating-buttons-container">
-                    <div className={`photo-button photo-button-rating ${photoButtonHidden}`} onClick={() => rateBtnClick(0)}>
+                    <div className={`photo-button photo-button-rating photo-button-rating-hide ${photoButtonHidden}`} onClick={() => rateBtnClick(0)}>
                         <p>Don't show<br/>this again</p>                    
                     </div>
                     <div className={`photo-button photo-button-rating ${photoButtonHidden}`} onClick={() => rateBtnClick(0)}>
-                        Show seldom
+                        Add to Collection
                     </div>
                     <div className={`photo-button photo-button-rating ${photoButtonHidden}`} onClick={() => rateBtnClick(0)}>
-                        Show normal
+                        {isInFavorites ? "Remove from" : "Add to"} Favorites
                     </div>
-                    <div className={`photo-button photo-button-rating ${photoButtonHidden}`} onClick={() => rateBtnClick(0)}>
-                        Show more often
-                    </div>
+
                 </div>
             </div>
 

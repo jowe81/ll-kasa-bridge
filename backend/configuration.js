@@ -766,16 +766,6 @@ const deviceMap = [
         subType: SUBTYPE_SWITCH,
         targets: {
             on: [
-                { channel: 8, stateData: true },
-                {
-                    channel: 9,
-                    stateData: {
-                        on_off: 1,
-                        brightness: 20,
-                        hue: 30,
-                        saturation: 100,
-                    },
-                },
                 { channel: 5, stateData: true }, // Turn fan on
                 { channel: 4, stateData: false }, // Turn heater off
                 { channel: 39, stateData: true }, // Turn audio amp on both ways
