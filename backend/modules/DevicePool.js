@@ -32,10 +32,17 @@ import { socketHandler } from "./SocketHandler.js";
  */
 
 const devicePool = {
-    async initialize(db, deviceEventCallback) {
+    /**
+     *
+     * @param {*} db
+     * @param boolean useUdpDiscovery  Whether to rely on udp discovery or use stored sysinfo.
+     * @param {*} deviceEventCallback
+     */
+    async initialize(db, useUdpDiscovery, deviceEventCallback) {
         this.db = db;
         this.dbDeviceMap = db.collection("DeviceMap");
         this.dbConfig = this.db.collection("Config");
+        this.dbSysInfo = db.collection("SysInfo");
         this.devices = [];
         this.locations = {};
 
@@ -63,7 +70,12 @@ const devicePool = {
 
         this.startPeriodicServices();
         this.initLocations();
-        this.startDiscovery();
+
+        if (useUdpDiscovery) {
+            this.startDiscovery();
+        } else {            
+            this.initDevicesFromStoredSysInfo();
+        }
     },
 
     startPeriodicServices() {
@@ -81,24 +93,6 @@ const devicePool = {
 
         const client = new TplinkSmarthomeApi.Client();
 
-        // Add a newly discovered device.
-        const addDevice = async (device) => {
-            let deviceWrapper;
-
-            const mapItem = await this.getDeviceMapItemById(device.id);
-
-            if (mapItem) {
-                // Device is in the map and therefore has an existing wrapper; inject the device.
-                deviceWrapper = this.getDeviceWrapperByChannel(mapItem.channel);
-                deviceWrapper.injectDevice(device, mapItem, this.globalConfig, this.deviceEventCallback);
-            } else {
-                // This device is not in the map (and therefore not in the pool and has no wrapper yet)
-                deviceWrapper = this.initDeviceWrapper(null, device);
-            }
-
-            deviceWrapper.startPolling();
-        };
-
         const options = {
             // Number of subsequent polling attempts before 'device-offline' is emitted.
             offlineTolerance: this.globalConfig.defaults.offlineTolerance,
@@ -108,7 +102,7 @@ const devicePool = {
         client.startDiscovery(options).on("device-new", (device) => {
             device.getSysInfo().then((info) => {
                 device.mic_mac = info.mic_mac;
-                addDevice(device);
+                this.addDevice(device);
             });
         });
 
@@ -130,6 +124,61 @@ const devicePool = {
                 deviceWrapper.setOnline();
             }
         });
+    },
+
+    // Add a newly discovered device.
+    async addDevice(device) {
+        let deviceWrapper;
+        const mapItem = await this.getDeviceMapItemById(device.id);
+
+        if (mapItem) {
+            // Device is in the map and therefore has an existing wrapper; inject the device.
+            deviceWrapper = this.getDeviceWrapperByChannel(mapItem.channel);
+            deviceWrapper.injectDevice(device, mapItem, this.globalConfig, this.deviceEventCallback);
+
+            // Create or update the sysInfo record.
+            const sysInfoRecord = await this.getSysInfoRecord(mapItem._id);
+
+            if (sysInfoRecord) {
+                const { acknowledged } = await this.dbSysInfo.updateOne({
+                    _id: sysInfoRecord._id}, 
+                    {
+                        $set: { 
+                            ...sysInfoRecord,
+                            host: device.host,
+                            port: device.port,
+                            updated_at: new Date()
+                        }
+                    }
+                );
+                if (acknowledged) { 
+                    log(`Updated sysInfo record.`, deviceWrapper);
+                }
+            } else {                    
+                if (typeof device._sysInfo === 'object') {                        
+                    // Create a new sysInfo record.
+                    const { acknowledged } = await this.dbSysInfo.insertOne({
+                        mapItemId: mapItem._id,
+                        _sysInfo: device._sysInfo,
+                        host: device.host,
+                        port: device.port,
+                        created_at: new Date(),
+                        updated_at: new Date(),
+                    });
+
+                    if (acknowledged) {
+                        log(`Created sysInfo record.`, deviceWrapper);
+                    }                         
+                } else {
+                    log(`Could not create sysInfo record: no data from device!`, deviceWrapper, 'red');
+                }                    
+            }
+        } else {
+            // This device is not in the map (and therefore not in the pool and has no wrapper yet)
+            deviceWrapper = this.initDeviceWrapper(null, device);
+        }
+
+        deviceWrapper.startPolling();
     },
 
     /**
@@ -293,7 +342,7 @@ const devicePool = {
     getGroupPowerState(groupId) {
         let result = null;
 
-        const group = this.globalConfig.groups.find((group) => group.id === groupId);        
+        const group = this.globalConfig.groups.find((group) => group.id === groupId);
 
         if (group) {
             let powerOnCount = 0;
@@ -320,10 +369,10 @@ const devicePool = {
             if (powerOnCount === deviceWrappers.length) {
                 result = true;
             } else if (powerOffCount === deviceWrappers.length) {
-                result = false;    
+                result = false;
             }
-        }    
-        
+        }
+
         return result;
     },
 
@@ -398,6 +447,41 @@ const devicePool = {
         }
     },
 
+    async getSysInfoRecord(mapItemId) {
+        if (!mapItemId) {
+            return;
+        }
+
+        const record = await this.dbSysInfo.findOne({ mapItemId });
+        return record;
+    },
+
+    // Read exisiting SysInfo for the devices on the map instead of waiting for discovery.
+    async initDevicesFromStoredSysInfo() {        
+        log(`Attempting to initialize devices from stored sysInfo records...`, "bgRed");
+
+        const client = new TplinkSmarthomeApi.Client();
+        const deviceMap = await this.getDeviceMapFromDb();
+
+        deviceMap.forEach(async (mapItem) =>  {
+            const sysInfoRecord = await this.getSysInfoRecord(mapItem._id);
+
+            if (sysInfoRecord) {                
+                const host = sysInfoRecord.host;
+                if (host) {
+                    log(`Initializing ${mapItem.alias ?? mapItem.id ?? mapItem.channel} at ${host}`);
+
+                    client
+                        .getDevice({ host })
+                        .catch((err) => {
+                            log(`Device at ${host} is not responding: ${err.message}`, null, 'bgRed');
+                        })
+                        .then((device) => this.addDevice(device));
+                }
+            }
+        });
+    },
+
     // Create deviceWrappers for all devices on the map.
     async initDeviceWrappers() {
         const deviceMap = await this.getDeviceMapFromDb();
@@ -446,6 +530,7 @@ const devicePool = {
 
         if (mapItem) {
             mapItem.groups = this.getGroupsForChannel(mapItem.channel);
+            deviceWrapper.mapItemId = mapItem._id;
         } else {
             mapItem = {
                 alias: "Unmapped device",

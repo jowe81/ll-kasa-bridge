@@ -37,6 +37,7 @@ const io = new Server({
 
 const appName = process.env.APP_NAME ?? "JJ-Auto";
 const port = process.env.PORT ?? 3000;
+const useUdpDiscovery = process.env.USE_UDP_DISCOVERY === '0' ? false : true;
 
 log(`Welcome to ${appName}. Backend is starting up...`);
 
@@ -60,8 +61,8 @@ mongoConnect().then(db => {
   Promise
     .allSettled(promises)
     .then(() => {
-      // Initialize the device pool with a callback to update the LL db on device events.
-      devicePool.initialize(db);
+      // Initialize the device pool from stored sysinfo or via udpDiscovery.
+      devicePool.initialize(db, useUdpDiscovery);
 
       // Initialize the routers.
       const kasaRouter = initRouter(express, devicePool, utils.processRequest);

@@ -1713,8 +1713,8 @@ const deviceMap = [
             uiMaster: {
                 nighttimeDimming: {
                     start: {
-                        hours: 20,
-                        minutes: 0,
+                        hours: 18,
+                        minutes: 30,
                     },
                     end: {
                         hours: 6,
