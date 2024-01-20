@@ -120,6 +120,11 @@ const VirtualDeviceWrapper = {
     }
   },
 
+  // Get a reference to the cache segment for this specific device.
+  getCache(data) {
+    return this.cache[this.channel];
+  },
+
   setPowerState(newPowerState, triggerSwitchPosition, origin) {
     let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
     log(`${cmdPrefix} [${originText}] setPowerState ${newPowerState ? 'on' : 'off'}`, this, 'cyan');  

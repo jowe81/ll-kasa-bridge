@@ -56,28 +56,51 @@ class DynformsServiceHandler {
         return liveDevice;
     }
 
-    _constructFullUrl() {
+    _getBaseUrl() {
         if (!this.service) {
             return null;
         }
 
-        let { protocol, baseUrl, path } = this.service.settings.api;
+        let { protocol, baseUrl } = this.service.settings.api;
 
         if (!protocol) {
-          protocol = "http";
+            protocol = "http";
         }
 
         if (!baseUrl) {
-          baseUrl = `${protocol}://${process.env.DYNFORMS_HOST}:${process.env.DYNFORMS_PORT}`;
+            baseUrl = `${protocol}://${process.env.DYNFORMS_HOST}:${process.env.DYNFORMS_PORT}`;
         }
 
+        return baseUrl;
+    }
+
+    _constructFullUrlToPullEndpoint() {
+        const baseUrl = this._getBaseUrl();
+        if (!baseUrl) {
+            return;
+        }
+
+        let path = this.service.settings.api?.pathToPullEndpoint;
         if (!path) {
-          path = process.env.DYNFORMS_PATH ?? "/db/m2m/pull";          
+          path = process.env.DYNFORMS_M2M_PATH_PULL ?? "/db/m2m/pull";          
         }
 
         return baseUrl + path;
     }
 
+    _constructFullUrlToPushEndpoint() {
+        const baseUrl = this._getBaseUrl();
+        if (!baseUrl) {
+            return;
+        }
+
+        let path = this.service.settings.api?.pathToPushEndpoint;
+        if (!path) {
+          path = process.env.DYNFORMS_M2M_PATH_PUSH ?? "/db/m2m/push";          
+        }
+
+        return baseUrl + path;
+    }
     _constructRequests(requestIndexes = null) {
         if (!this.service) {
             return null;
@@ -202,7 +225,8 @@ class DynformsServiceHandler {
         this.cache = cache;
         this.cache.data = [];
 
-        this.service.fullUrl = this._constructFullUrl();
+        this.service.fullUrlPull = this._constructFullUrlToPullEndpoint();
+        this.service.fullUrlPush = this._constructFullUrlToPushEndpoint();
 
         // Turn on when first starting.
         this.service.setPowerState(true);
@@ -215,7 +239,7 @@ class DynformsServiceHandler {
         );
 
         log(
-            `Initialized ${this.service.subType} "${this.service.alias}" with ${this.service.fullUrl}`,
+            `Initialized ${this.service.subType} "${this.service.alias}" with pull@${this.service.fullUrlPull ? this.service.fullUrlPull : "(not configured)"} and push@${this.service.fullUrlPush ? this.service.fullUrlPush : "(not configured)"}`,
             this.service
         );
         log(
@@ -241,6 +265,12 @@ class DynformsServiceHandler {
 
         // Trigger an initial API call. THERES A TIMINIG ISSUE HERE - WITHOUT THE DELAY THE FRONTEND WONT GET THE UPDATE
         setTimeout(() => { this.dynformsServiceIntervalHandler() }, 5000);
+    }
+
+    async runPushRequest(record) {
+        const url = this.service.fullUrlPush;
+        log(`Running post request: ${url}`, this.service);
+        return axios.post(url, { collectionName: 'photosFileInfo', record});
     }
 
     async runRequestNow(requestIndex) {
@@ -269,7 +299,7 @@ class DynformsServiceHandler {
     async _executeRequest(requestInfo, requestIndex) {
         const requestConfig = this.service.settings.requests[requestIndex];
         requestConfig._lastExecuted = new Date();
-        return axios.post(this.service.fullUrl, requestInfo);
+        return axios.post(this.service.fullUrlPull, requestInfo);
     }
     
     async dynformsServiceIntervalHandler() {
@@ -296,7 +326,7 @@ class DynformsServiceHandler {
         const promises = requestsReadyToRun.map((requestInfo, requestIndex) => {
             const requestConfig = this.service.settings.requests[requestIndex];
             requestConfig._lastExecuted = now;
-            return axios.post(this.service.fullUrl, requestInfo);
+            return axios.post(this.service.fullUrlPull, requestInfo);
         });
 
         Promise.all(promises)
@@ -316,8 +346,8 @@ class DynformsServiceHandler {
     processCachedApiResponse() {
           let displayData = getDisplayDataFromApiResponse(this.cache.data, this.service.settings);
 
-          // See if a processApiResponse handler exists for this device.
-          const commandHandler = this.service.commandHandlersExtension ? this.service.getCommandHandler("processApiResponse") : null;
+          // See if a _processApiResponse handler exists for this device.
+          const commandHandler = this.service.commandHandlersExtension ? this.service.getCommandHandler("_processApiResponse") : null;
 
           if (commandHandler) {
               displayData = commandHandler(this.service, displayData);
@@ -332,7 +362,7 @@ class DynformsServiceHandler {
               true
           );
 
-          log(`${this.service.alias} received API data from ${this.service.fullUrl}`, this.service);
+          log(`${this.service.alias} received API data from ${this.service.fullUrlPull}`, this.service);
     }
 
 }
