@@ -6,7 +6,7 @@
   flex-flow: row wrap;
   justify-content:space-between;
   
-  z-index: 999;
+  z-index: 900;
   height: 100%;
 }
 
@@ -26,6 +26,10 @@
 
 .photo-button:active {
     background-color: rgba(106, 106, 106, 0.803);
+}
+
+.photo-button-engaged {
+    background-color: rgba(72, 71, 15, 0.962);
 }
 
 .photo-button-hidden {

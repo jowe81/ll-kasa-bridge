@@ -4,6 +4,7 @@ import './App.css'
 import { useAppDispatch } from './app/hooks';
 import { socket } from './features/websockets/socket';
 import constants from "./constants";
+import { ScreenKeyboardProvider } from "./contexts/ScreenKeyboardContext";
 
 import Home from "./Home";
 import TouchUi from "./TouchUi";
@@ -91,14 +92,16 @@ function App() {
 }, []);
 
 return (
-    <div className="App">
-      <Routes>
-        <Route path="/" element={ <Home /> } />
-        <Route path="touch" element = { <TouchUi />} />
-        <Route path="*" element={<Navigate to="/" replace/>}/>
-      </Routes>
-    </div>
-  )
+    <ScreenKeyboardProvider>
+        <div className="App">
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="touch" element={<TouchUi />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+        </div>
+    </ScreenKeyboardProvider>
+);
 }
 
 export default App

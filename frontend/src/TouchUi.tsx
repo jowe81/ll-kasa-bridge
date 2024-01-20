@@ -3,16 +3,19 @@ import AutomationPanel from "./features/TouchUiMain/devices/AutomationPanel";
 import TimerPanel from "./features/TouchUiMain/timer/TimerPanel";
 import Photos from "./features/photos/Photos";
 import Birthdays from "./features/TouchUiMain/birthdays/Birthdays";
-
+import ScreenKeyboard from "./features/ScreenKeyboard/ScreenKeyboard.tsx";
 import TouchUiPanel from "./features/TouchUiPanel/TouchUiPanel";
 import Scripture from "./features/TouchUiPanel/scripture/Scripture.tsx";
 import './touch.css';
 import { useState } from "react";
+import { useScreenKeyboard } from "./contexts/ScreenKeyboardContext.tsx";
 
 import { getAllDevices, getClock, getMasterSwitchDimInfo } from "./devicesHelpers.tsx";
 
 function TouchUi() {
     const [fullScreen, setFullScreen] = useState<boolean>(true);
+    
+    const { isKeyboardVisible } = useScreenKeyboard();
 
     function toggleFullScreen() {
         setFullScreen(!fullScreen);
@@ -66,6 +69,7 @@ function TouchUi() {
     if (fullScreen) {
         content = (
             <>
+                {isKeyboardVisible && <ScreenKeyboard/>}
                 <div className="touch-ui-fullscreen-container">
                     {mainViewingAreaJsx}
                 </div>
