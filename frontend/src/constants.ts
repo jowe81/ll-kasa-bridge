@@ -46,6 +46,7 @@ const constants: any = {
     SUBTYPE_THERMOSTAT: "thermostat",
     SUBTYPE_TIMER: "timer",
     SUBTYPE_WEATHER_SERVICE: "weatherService",
+    SUBTYPE_DAV_SERVICE: "davService",
     SUBTYPE_DYNFORMS_SERVICE: "dynformsService",
     SUBTYPE_CLOCK: "clock",
     SUBTYPE_MASTER_SWITCH: "masterSwitch",

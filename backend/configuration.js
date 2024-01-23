@@ -1500,6 +1500,14 @@ const deviceMap = [
                     ttl: 0,
                     audiofile: "timer-pomodoro.mp3",
                 },
+                {
+                    id: "60m",
+                    topLabel: "1h",
+                    displayButton: true,
+                    length: 60 * MINUTE,
+                    ttl: 3 * MINUTE,
+                    audiofile: null,
+                },
             ],
         },
     },
@@ -1718,7 +1726,7 @@ const deviceMap = [
                     //serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/calendars/admin/calendar/",
                     serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/",
                     authMethod: "Basic",
-                    label: "Johannes' Calendar",
+                    label: "Johannes",
                     credentials: {
                         // These point to .env variables
                         username: "CALENDAR_SERVICE_CALDAV_JOHANNES_USERNAME",
@@ -1730,7 +1738,7 @@ const deviceMap = [
                     //serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/calendars/admin/calendar/",
                     serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/",
                     authMethod: "Basic",
-                    label: "Jess' Calendar",
+                    label: "Jess",
                     credentials: {
                         // These point to .env variables
                         username: "CALENDAR_SERVICE_CALDAV_JOHANNES_USERNAME",

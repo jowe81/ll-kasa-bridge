@@ -4,12 +4,11 @@
   width: 300px;
   border-radius: 5px;
   padding-top: 5px;
-  margin-top: 5px;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
   text-align: left;
-  margin: 10px 0px;
+  margin: 5px 0px;
   margin-left: 5px;
   height: 245px;  
   align-items: flex-start;

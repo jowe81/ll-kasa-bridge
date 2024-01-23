@@ -193,7 +193,8 @@ class DavServiceHandler {
         })
 
         let displayData = {
-            events: allItems,
+            allItems,
+            events: allItems.filter(item => item.type === 'VEVENT').sort((a, b) => a.start > b.start ? 1 : -1),
         };
 
         this.deviceHandler._updateState(
@@ -204,7 +205,10 @@ class DavServiceHandler {
             },
             true
         );
-        log(`${this.deviceHandler.alias} received API data from ${this.deviceHandler.settings.remotes.length} remote(s): ${displayData.events.length} events.`, this.deviceHandler);
+        log(
+            `${this.deviceHandler.alias} received API data from ${this.deviceHandler.settings.remotes.length} remote(s): ${displayData.events.length} items.`,
+            this.deviceHandler
+        );
     }
 
 }

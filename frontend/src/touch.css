@@ -2,6 +2,7 @@
   overflow: hidden;
   width: 1902px;
   user-select: none;
+  height: 100%;
 }
 
 .touch-ui-fullscreen-container {
@@ -17,6 +18,7 @@
   display: flex;
   transform: scale(1s);
   position: relative;
+  
 }
 
 .touch-ui-panel-container {
@@ -56,6 +58,7 @@
 
 .touch-ui-main-column {
   width: 310px;
+  height: 100%;
 }
 
 .touch-ui-main-column-remaining-space {

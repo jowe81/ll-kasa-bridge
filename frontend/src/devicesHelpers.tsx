@@ -63,6 +63,8 @@ const getPhotosService = () => getDeviceByChannel(constants.photos?.photosServic
 
 const getMasterSwitch = () => getFirstDeviceOfType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_MASTER_SWITCH);
 
+const getCalendar = (): VirtualDevice|null => getFirstDeviceOfType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_DAV_SERVICE);
+
 function getMasterSwitchDimInfo() {
     let start, end, opacity = `100%`;
 
@@ -127,6 +129,7 @@ export {
     getAllDevices,
     getDeviceByChannel,
     getDevicesByType,
+    getCalendar,
     getClock,
     getMasterSwitch,
     getMasterSwitchDimInfo,

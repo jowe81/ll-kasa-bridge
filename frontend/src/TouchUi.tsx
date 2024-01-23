@@ -3,6 +3,7 @@ import AutomationPanel from "./features/TouchUiMain/devices/AutomationPanel";
 import TimerPanel from "./features/TouchUiMain/timer/TimerPanel";
 import Photos from "./features/photos/Photos";
 import Birthdays from "./features/TouchUiMain/birthdays/Birthdays";
+import Calendar from "./features/TouchUiMain/calendar/Calendar.tsx";
 import ScreenKeyboard from "./features/ScreenKeyboard/ScreenKeyboard.tsx";
 import TouchUiPanel from "./features/TouchUiPanel/TouchUiPanel";
 import Scripture from "./features/TouchUiPanel/scripture/Scripture.tsx";
@@ -86,15 +87,16 @@ function TouchUi() {
                         <TimerPanel />
                         <Birthdays />
                     </div>
-                    <div className="touch-ui-main-column-remaining-space">
-                        {mainViewingAreaJsx}
+                    <div className="touch-ui-main-column">
+                        <Calendar />
                     </div>
+                    <div className="touch-ui-main-column-remaining-space">{mainViewingAreaJsx}</div>
                     <div className="touch-ui-main-column">
                         <AutomationPanel />
                     </div>
                 </div>
                 <div className="touch-ui-panel-container">
-                    <TouchUiPanel {...props}/>
+                    <TouchUiPanel {...props} />
                 </div>
             </>
         );
