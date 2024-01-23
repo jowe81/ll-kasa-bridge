@@ -59,11 +59,27 @@ class WeatherServiceHandler {
             return false;
         }
 
-        const { baseUrl, path, queryParams } = this.weatherService.settings.api;
+        const settings = this.weatherService.settings;
+        const { baseUrl, path, queryParams, apiKeyKey } = settings?.api;        
 
         if (!baseUrl) {
           return false;
         }
+
+        // Read the API key from .env
+        let apiKey = null;
+
+        if (apiKeyKey) {
+            apiKey = queryParams[apiKeyKey] ? process.env[queryParams[apiKeyKey]] : null;
+        }
+         
+
+        if (apiKeyKey && !apiKey) {
+            log(`Error: No value for "${apiKeyKey}" found in process.env (looking for key: "${queryParams[apiKeyKey]}")`, this.weatherService, 'red');
+            return;
+        }
+
+        queryParams[apiKeyKey] = apiKey;
 
         let queryString = '';
         Object.keys(queryParams).forEach(key => queryString += `&${key}=${queryParams[key]}`);
@@ -91,6 +107,10 @@ class WeatherServiceHandler {
         this.cache = cache;
 
         this.weatherService.fullUrl = this.getFullUrl();
+
+        if (!this.weatherService.fullUrl) {
+            log(`Failed to initialize weather service: incomplete url (verify secrets in .env).`, this.weatherService, 'red');
+        }
 
         // Turn on when first starting.
         this.weatherService.setPowerState(true);
