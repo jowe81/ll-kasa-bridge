@@ -1,16 +1,18 @@
 .live-timers {
-  height: 118px;
+  display: block;
+  height: 168px;
   overflow-y: scroll;  
+  overflow-x: hidden;
 }
 
 .live-timer {
   display: flex;
   justify-content: space-between;
-  width: 280px;
+  width: 259px;
   font-size: 150%;
   height: 54px;
   padding: 3px 3px 1px 15px;
-  margin-left: 5px;
+  margin-left: 2px;
   margin-right: 5px;
   border: 1px solid rgba(0,0,0,0);
   border-radius: 5px;

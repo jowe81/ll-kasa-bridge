@@ -91,7 +91,7 @@ function TimerPanel() {
   return (
     <div className='timer-panel-container'>
       <div className='touch-ui-sub-panel-header'>Timer</div>
-      { liveTimers.length > 0 && <LiveTimers {...props}/>}
+      { <LiveTimers {...props}/>}
       <NudgePanel {...props}/>      
       <Presets configuredTimers={configuredTimers} onPresetTimerClick={schedulePresetTimer} onCustomClick={setNumPadOpen}/>
       { numPadOpen && <NumPadAssembly close={closeNumPad} />}      
