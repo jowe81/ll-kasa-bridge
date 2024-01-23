@@ -1536,11 +1536,12 @@ const deviceMap = [
             api: {
                 baseUrl: "https://api.openweathermap.org",
                 path: "/data/2.5/forecast",
+                apiKeyKey: "appid",
                 queryParams: {
                     lat: constants.DEFAULT_LAT,
                     lon: constants.DEFAULT_LON,
                     // API Key
-                    appid: "aa4de02d63792ab0d52f35085261c36d",
+                    appid: "WEATHER_SERVICE_OPENWEATHERMAP_APP_ID",
                 },
             },
             checkInterval: 1 * HOUR,
@@ -1697,6 +1698,48 @@ const deviceMap = [
 
             // Specific to this service:
             photosServiceBaseUrl: "http://jj-photos.wnet.wn:3021/db",
+        },
+    },
+    {
+        alias: "Calendar Service",
+        channel: 505,
+        id: "calendar-service",
+        display: true,
+        displayLabel: "Calendar",
+        displayType: null,
+        locationId: "__internal",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_DAV_SERVICE,
+        commandHandlersExtension: null,
+        settings: {
+            remotes: [
+                {
+                    defaultAccountType: "caldav",
+                    //serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/calendars/admin/calendar/",
+                    serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/",
+                    authMethod: "Basic",
+                    label: "Johannes' Calendar",
+                    credentials: {
+                        // These point to .env variables
+                        username: "CALENDAR_SERVICE_CALDAV_JOHANNES_USERNAME",
+                        password: "CALENDAR_SERVICE_CALDAV_JOHANNES_PASSWORD",
+                    },
+                },
+                {
+                    defaultAccountType: "caldav",
+                    //serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/calendars/admin/calendar/",
+                    serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/",
+                    authMethod: "Basic",
+                    label: "Jess' Calendar",
+                    credentials: {
+                        // These point to .env variables
+                        username: "CALENDAR_SERVICE_CALDAV_JOHANNES_USERNAME",
+                        password: "CALENDAR_SERVICE_CALDAV_JOHANNES_PASSWORD",
+                    },
+                },
+            ],
+            // This is hoften the handler will retrieve updated calendar info
+            checkInterval: 10 * MINUTE,
         },
     },
     {

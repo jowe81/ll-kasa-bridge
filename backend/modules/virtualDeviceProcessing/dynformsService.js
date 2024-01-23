@@ -223,7 +223,7 @@ class DynformsServiceHandler {
         }
         // Store the cache reference.
         this.cache = cache;
-        this.cache.data = [];
+        this.cache.data = {};
 
         this.service.fullUrlPull = this._constructFullUrlToPullEndpoint();
         this.service.fullUrlPush = this._constructFullUrlToPushEndpoint();

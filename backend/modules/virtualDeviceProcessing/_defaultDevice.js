@@ -4,17 +4,14 @@ import { makeLiveDeviceObject } from "../TargetDataProcessor.js";
 import constants from "../../constants.js";
 import { log, debug } from "../Log.js";
 
-const localConstants =
-    constants.DEVICETYPE_DEFAULTS[constants.DEVICETYPE_VIRTUAL][
-        constants.SUBTYPE_CLOCK
-    ];
+const localConstants = constants.DEVICETYPE_DEFAULTS[constants.DEVICETYPE_VIRTUAL][constants.SUBTYPE_DAV_SERVICE];
 
-class ClockHandler {
-    constructor(devicePool, clock, cache) {
+class DavServiceHandler {
+    constructor(devicePool, deviceHandler, cache) {
         this.initialized = false;
 
         this.devicePool = devicePool;
-        this.clock = clock;
+        this.deviceHandler = deviceHandler;
         this.init(cache);
     }
 
@@ -26,14 +23,14 @@ class ClockHandler {
 
         let changeInfo = {};
         changeInfo.on_off = oldState?.powerState !== newState?.powerState;
-        changeInfo.changed = changeInfo.on_off || changeInfo.clock;
+        changeInfo.changed = changeInfo.on_off || changeInfo.deviceHandler;
 
         return changeInfo;
     }
 
     getLiveDevice() {
         const liveDevice = makeLiveDeviceObject(
-            this.clock,
+            this.deviceHandler,
             [
                 // Include
                 "powerState",
@@ -55,88 +52,68 @@ class ClockHandler {
     }
 
     init(cache) {
-        if (
-            !(
-                this.clock &&
-                this.devicePool &&
-                this.clock.settings
-            )
-        ) {
-            log(`Failed to initialize Clock.`, this, "red");
+        if (!(this.deviceHandler && this.devicePool && this.deviceHandler.settings)) {
+            log(`Failed to initialize Dav deviceHandler.`, this, "red");
             return false;
         }
 
         if (!cache) {
-            console.error(
-                "Clock init failed - did not get cache reference."
-            );
+            console.error("Dav init failed - did not get cache reference.");
             return false;
         }
         // Store the cache reference.
         this.cache = cache;
-        this.cache.data = [];
-
+        this.cache.data = {};
 
         // Turn on when first starting.
-        this.clock.setPowerState(true);
+        this.deviceHandler.setPowerState(true);
 
-        this.clock._deviceHandlers = this;
+        this.deviceHandler._deviceHandlers = this;
 
-        this.clock.subscribeListener(
-            "powerState",
-            (newPowerState) => {}
-        );
-
-        log(
-            `Initialized ${this.clock.subType} "${this.clock.alias}".`,
-            this.clock
-        );
-        log(
-            `Check-Interval: ${Math.ceil(
-                this.clock.settings.checkInterval / constants.MINUTE
-            )} minutes.`,
-            this.clock
-        );
+        this.deviceHandler.subscribeListener("powerState", (newPowerState) => {});
 
         // Start the interval check
         if (this._checkingIntervalHandler) {
             clearInterval(this._checkingIntervalHandler);
         }
 
-        const interval =
-            this.clock.settings.checkInterval ??
-            localConstants.CHECKING_INTERVAL_DEFAULT;
+        const interval = this.deviceHandler.settings.checkInterval ?? localConstants.CHECKING_INTERVAL_DEFAULT;
 
-        this._checkingIntervalHandler = setInterval(
-            () => this.clockIntervalHandler(),
-            interval
-        );
+        this._checkingIntervalHandler = setInterval(() => this.serviceIntervalHandler(), interval);
 
         this.initialized = true;
 
+        log(`Initialized ${this.deviceHandler.subType} "${this.deviceHandler.alias}".`, this.deviceHandler);
+        log(
+            `Check-Interval: ${Math.round(interval / constants.SECOND)} seconds (~ ${Math.round(
+                interval / constants.MINUTE
+            )} minutes).`,
+            this.deviceHandler
+        );
+
         // Trigger an initial API call. THERES A TIMINIG ISSUE HERE - WITHOUT THE DELAY THE FRONTEND WONT GET THE UPDATE
         setTimeout(() => {
-            this.clockIntervalHandler();
+            this.serviceIntervalHandler();
         }, 5000);
     }
 
-    async clockIntervalHandler() {
+    async serviceIntervalHandler() {
         if (!this.initialized) {
             return false;
         }
 
-        this.clock._updateState(
+        this.deviceHandler._updateState(
             {
-                powerState: this.clock.getPowerState(),
-                clock: displayData,
+                powerState: this.deviceHandler.getPowerState(),
+                api: null,
             },
             true
         );
     }
 }
 
-function clockHandler(devicePool, clock, cache) {
-    return new ClockHandler(devicePool, clock, cache);
+function davServiceHandler(devicePool, deviceHandler, cache) {
+    return new DavServiceHandler(devicePool, deviceHandler, cache);
 }
 
-export default clockHandler;
+export default davServiceHandler;

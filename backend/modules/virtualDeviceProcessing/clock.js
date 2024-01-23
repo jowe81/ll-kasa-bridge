@@ -68,7 +68,7 @@ class ClockHandler {
         }
         // Store the cache reference.
         this.cache = cache;
-        this.cache.data = [];
+        this.cache.data = {};
 
         // Turn on when first starting.
         this.clock.setPowerState(true);

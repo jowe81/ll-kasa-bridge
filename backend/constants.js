@@ -58,6 +58,7 @@ const constants = {
   SUBTYPE_TIMER: 'timer',
   SUBTYPE_WEATHER_SERVICE: 'weatherService',
   SUBTYPE_DYNFORMS_SERVICE: 'dynformsService',
+  SUBTYPE_DAV_SERVICE: 'davService',
   SUBTYPE_CLOCK: 'clock',
   SUBTYPE_MASTER_SWITCH: 'masterSwitch',
 
@@ -92,6 +93,7 @@ constants.SUBTYPES = [
     constants.SUBTYPE_TIMER,
     constants.SUBTYPE_WEATHER_SERVICE,
     constants.SUBTYPE_DYNFORMS_SERVICE,
+    constants.SUBTYPE_DAV_SERVICE,
     constants.SUBTYPE_CLOCK,
     constants.SUBTYPE_MASTER_SWITCH,
 ];
@@ -153,11 +155,14 @@ constants.DEVICETYPE_DEFAULTS = {
 
         [constants.SUBTYPE_CLOCK]: {
             CHECKING_INTERVAL_DEFAULT: 1 * constants.SECOND,
-            DEFAULT_TIME_FORMAT: 'HH:MM',
+            DEFAULT_TIME_FORMAT: "HH:MM",
         },
 
         [constants.SUBTYPE_MASTER_SWITCH]: {
             CHECKING_INTERVAL_DEFAULT: 1 * constants.SECOND,
+        },
+        [constants.SUBTYPE_DAV_SERVICE]: {
+            CHECKING_INTERVAL_DEFAULT: 10 * constants.MINUTE,
         },
     },
 };

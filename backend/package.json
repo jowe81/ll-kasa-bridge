@@ -19,9 +19,11 @@
     "express": "^4.18.2",
     "lodash": "^4.17.21",
     "mongodb": "^5.5.0",
+    "node-ical": "^0.17.1",
     "socket.io": "^4.6.1",
     "sunrise-sunset-js": "^2.2.1",
-    "tplink-smarthome-api": "^4.2.0"
+    "tplink-smarthome-api": "^4.2.0",
+    "tsdav": "^2.0.7"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"

@@ -67,7 +67,7 @@ class MasterSwitchHandler {
         }
         // Store the cache reference.
         this.cache = cache;
-        this.cache.data = [];
+        this.cache.data = {};
 
         // Turn on when first starting.
         this.masterSwitch.setPowerState(true);
