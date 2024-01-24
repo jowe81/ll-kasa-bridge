@@ -194,8 +194,13 @@ class DavServiceHandler {
 
         let displayData = {
             allItems,
-            events: allItems.filter(item => item.type === 'VEVENT').sort((a, b) => a.start > b.start ? 1 : -1),
+            events: allItems
+                .filter((item) => item.type === "VEVENT")
+                .filter((item) => new Date(new Date(item.start)) > new Date() || new Date(item.endDate) > new Date())
+                .sort((a, b) => (a.start > b.start ? 1 : -1)),
         };
+
+        console.log(displayData.events?.length)
 
         this.deviceHandler._updateState(
             {
