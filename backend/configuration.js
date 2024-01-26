@@ -1732,24 +1732,83 @@ const deviceMap = [
                         username: "CALENDAR_SERVICE_CALDAV_JOHANNES_USERNAME",
                         password: "CALENDAR_SERVICE_CALDAV_JOHANNES_PASSWORD",
                     },
+                    calendarsToDisplay: [
+                        {
+                            displayName: "Johannes",
+                            url: "https://nc.jessandjohannes.com/remote.php/dav/calendars/admin/personal/",
+                        },
+                    ],
                 },
                 {
                     defaultAccountType: "caldav",
                     //serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/calendars/admin/calendar/",
-                    serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/",
+                    serverUrl: "https://caldav.icloud.com",
                     authMethod: "Basic",
                     label: "Jess",
                     credentials: {
                         // These point to .env variables
-                        username: "CALENDAR_SERVICE_CALDAV_JOHANNES_USERNAME",
-                        password: "CALENDAR_SERVICE_CALDAV_JOHANNES_PASSWORD",
+                        username: "CALENDAR_SERVICE_CALDAV_JESS_ICLOUD_USERNAME",
+                        password: "CALENDAR_SERVICE_CALDAV_JESS_ICLOUD_PASSWORD",
                     },
+                    calendarsToDisplay: [
+                        {
+                            displayName: "Jess",
+                            url: "https://caldav.icloud.com/287697599/calendars/home/",
+                        },
+                    ],
                 },
             ],
             // This is hoften the handler will retrieve updated calendar info
             checkInterval: 10 * MINUTE,
         },
     },
+    {
+        alias: "Medical Data Service",
+        channel: 506,
+        id: "medical-service",
+        display: true,
+        displayLabel: "Medical Data",
+        displayType: null,
+        locationId: "__internal",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_DYNFORMS_SERVICE,
+        settings: {
+            api: {
+                baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
+                path: null, // will use .env DYNFORMS_PATH or default instead
+                queryParams: {},
+            },
+            requests: [
+                {
+                    connectionName: "dynforms",
+                    collectionName: "johannes_medical",
+                    retrieve: {
+                        time: {
+                            frequency: "minutes",
+                            minutes: 1,
+                        },
+                        filters: [
+                            {
+                                type: "static",
+                                match: {
+                                    created_at: { $lt: "__DATE_DAYS_AGO-30" } // Only get values up to 1 months ago                            
+                                },
+                            },
+                        ],
+                        orderBy: {
+                            created_at: 1
+                        },
+                    },
+                },
+            ],
+            // If set causes the backend to return the results for the first request only; as a single object and not as an array.
+            useSingleRequest: true,
+            // This is how often the handler will go out and check whether a request should actually be run.
+            checkInterval: 20 * SECOND,
+            ui: {},
+        },
+    },
+
     {
         alias: "Master Switch Service",
         channel: 999,

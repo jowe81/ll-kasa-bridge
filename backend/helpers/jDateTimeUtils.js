@@ -39,6 +39,57 @@ function formatDate(formatString, currentDate) {
     return formatString;
 }
 
+function formatDateLong(formatString, currentDate) {
+    if (!currentDate) {
+        currentDate = new Date();
+    }
+
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ];
+
+    const dayOfWeek = dayNames[currentDate.getDay()];
+    const month = monthNames[currentDate.getMonth()];
+    const dayOfMonth = currentDate.getDate();
+    const year = currentDate.getFullYear().toString();
+
+    const getOrdinalSuffix = (number) => {
+            switch (number) {
+                case 1:
+                    return "st";
+
+                case 2:
+                    return "nd";
+                
+                case 3:
+                    return "rd";
+
+                default:
+                    return "th"
+            }
+    };
+
+    formatString = formatString.replace("{dayOfWeek}", dayOfWeek);
+    formatString = formatString.replace("{month}", month);
+    formatString = formatString.replace("{dayOfMonth}", dayOfMonth);
+    formatString = formatString.replace("{daySuffix}", getOrdinalSuffix(dayOfMonth));
+    formatString = formatString.replace("{year}", year);
+    
+    return formatString;
+}
+
 function formatTime(formatString, currentDate) {
   if (!currentDate) {
     currentDate = new Date();
@@ -382,6 +433,7 @@ const logDates = (dates, label) => {
 
 export {
   formatDate,
+  formatDateLong,
   formatTime,
   getSunrise,
   getSunset,

@@ -98,8 +98,69 @@ function applyCurrentDateFilter(match) {
     };
 }
 
+function applyStaticFilter(match, filter = {}) {
+    const filterKeys = Object.keys(match);
+
+    filterKeys.forEach(key => {
+        switch (typeof match[key]) {
+            case 'object':
+                // Call recursively
+                filter[key] = applyStaticFilter(match[key], filter[key]);
+                break;
+
+            case 'string':
+                // Check for a placeholder
+                const placeholder = getPlaceholderFromString(match[key]);
+
+                console.log('Resolved placeholder from ', match[key], placeholder);
+                
+                filter[key] = placeholder ? 
+                    resolvePlaceholder(placeholder) :
+                    match[key]; // Copy the value
+                break;
+
+            default:
+                // Copy the value
+                filter[key] = match[key];
+                break;
+        }
+    });
+}
+
+function getPlaceholderFromString(string) {
+    if (!string || !(string.substring(0, 2) === '__')) {        
+        return string;
+    }
+
+    const values = string.split('-');
+    const key = values.shift();
+
+    return { 
+        key,
+        values,
+    }    
+}
+
+function resolvePlaceholder({key, values}) {
+    if (!key || !values) {
+        return null;
+    }
+
+    log(`Resolving placeholder ${key} with values: ${JSON.stringify(values)}`);
+
+    switch (key) {
+        case "__DATE_DAYS_AGO":
+            const date = new Date();
+            date.setDate(date.getDate() - values[0]);
+            return date;
+    }
+
+    return null;
+}
+
 const dynformsDbFilters = {
-    applyCurrentDateFilter,    
+    applyCurrentDateFilter,
+    applyStaticFilter,
 };
 
 export { 

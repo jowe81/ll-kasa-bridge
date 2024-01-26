@@ -1,7 +1,7 @@
 import _ from "lodash";
 import axios from "axios";
 import { makeLiveDeviceObject } from "../TargetDataProcessor.js";
-import { formatTime, getSunrise, getSunset, getNoon, isDaytime, getTomorrow } from "../../helpers/jDateTimeUtils.js";
+import { formatTime, formatDateLong, getSunrise, getSunset, getNoon, isDaytime, getTomorrow } from "../../helpers/jDateTimeUtils.js";
 import constants from "../../constants.js";
 import { log, debug } from "../Log.js";
 
@@ -148,6 +148,7 @@ class ClockHandler {
           hours: now.getHours(),
           minutes: now.getMinutes(),
           displayTime: formatTime(settings.timeFormat ?? localConstants.DEFAULT_TIME_FORMAT),
+          displayDate: formatDateLong(`{dayOfWeek}, {month} {dayOfMonth}{daySuffix}, {year}`, now),
           sunrise: formatTime('H:MM', sunrise),
           sunset: formatTime('H:MM', sunset),
           nextSunEvent,

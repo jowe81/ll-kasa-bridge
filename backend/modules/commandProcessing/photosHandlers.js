@@ -79,6 +79,57 @@ async function toggleFavorites(deviceWrapper, commandData) {
     return await updateRecord(deviceWrapper, record);
 }
 
+async function addTags(deviceWrapper, commandData) {
+    const record = getRecord(deviceWrapper);
+    if (!record || !deviceWrapper?.deviceHandler) {
+        return null;
+    }
+
+    const tagString = commandData?.body?.tagString;
+    
+    if (!tagString) {
+        return;
+    }
+
+    const separator = tagString.includes(',') ? ',' : ' ';
+    const newTags = tagString.trim().split(separator);
+    
+    const updatedTags = Array.isArray(record.tags) ? [...record.tags, ...newTags] : newTags;
+    
+    record.tags = filterTags(updatedTags);
+    return await updateRecord(deviceWrapper, record);
+
+    /**
+     * This is copied from Photos - should be solved differently.
+     */
+    function filterTags(tags) {
+        if (!(tags && tags.length)) {
+            return [];
+        }
+
+        const excludeTags = [
+            'and',
+            'at',
+            'edits',
+            'edit',
+            'for',
+            'from',
+            'in',
+            'on',
+            'the',
+            'to',
+            'with',
+        ]
+
+        return tags
+            .map((tag) => tag.toLowerCase())
+            .filter((tag) => {
+                const isAlpha = /^[a-zA-Z]+$/.test(tag);
+                return !excludeTags.includes(tag) && isAlpha;
+            });
+            
+    }
+}
 
 /**
  * Add Url field to actual picture in the api response data.
@@ -132,6 +183,7 @@ async function updateRecord(deviceWrapper, record) {
 
 const handlers = {
     _processApiResponse, // Not for frontend use!
+    addTags,
     hideRestorePicture,
     nextPicture,
     setFilter,
