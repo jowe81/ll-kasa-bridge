@@ -5,7 +5,7 @@ function Presets(props) {
 
   const timers = { ...props.configuredTimers } ?? {};
 
-  const maxPresets = 4;
+  const maxPresets = 8;
   const presetButtons: any = [];
 
   Object.keys(timers).every((key, index) => {

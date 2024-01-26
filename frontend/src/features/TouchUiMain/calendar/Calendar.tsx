@@ -37,23 +37,54 @@ function Calendar() {
         return (
             <div key={index} className="calendar-event-container">
                 <div className="header-container">
-                    <div className={`calendar-index-${event.calendarIndex}`}>{event.calendarLabel}</div>
+                    <div className={`calendar-index-${event.calendarIndex}`}>
+                        {event.location && <div className="event-location">@{event.location}</div>}
+                        {event.calendarLabel}
+                    </div>
                     <div className="event-start-end">{dateTimeStr}</div>
                 </div>
                 <div className="body-container">
                     <div className="event-summary">{event.summary}</div>
-                    <div className="event-description">{event.description}</div>
+                    <div className="event-description">{cutAtFirstWordAfterMaxChars(event.description ?? '', 120)}</div>
                 </div>
             </div>
         );
     } );
 
     return (
-        <div className="calendar-container">
-            <div className="touch-ui-sub-panel-header">Upcoming Events</div>
-            <div className="calendar-items-container">{calendarItemsJsx}</div>
+        <div className="calendar-outer-container">
+            <div className="calendar-container">
+                <div className="calendar-header">Upcoming Events</div>
+                <div className="calendar-items-container">{calendarItemsJsx}</div>
+            </div>
         </div>
     );
+}
+
+function cutAtFirstWordAfterMaxChars(text, maxChars) {
+    if (!(typeof maxChars === 'number') || !(maxChars > 0)) {
+        return text;
+    }
+
+    const tail = text.substring(maxChars - 1);
+    const tailWords = tail.split(' ');
+
+    if (tailWords.length < 5) {
+        // Don't bother shortening if there's only a few words left.
+        return text;
+    }
+    
+    const firstTailWordLength = tailWords[0].length;
+    const newTotalLength = maxChars + firstTailWordLength;
+    
+    let head = text.substring(0, newTotalLength - 1).trim();
+    
+    // If the last character was period, remove it so we don't get four periods in a row.
+    if (head[head.length - 1] === '.') {
+        head = head.substring(0, head.length - 1);
+    }
+
+    return head + '...';
 }
 
 export default Calendar;

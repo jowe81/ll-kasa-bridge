@@ -3,12 +3,10 @@ import KeyboardWrapper from "./KeyboardWrapper";
 import "./screenKeyboard.css";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
 
-const ScreenKeyboard: FunctionComponent = (props: any) => {
-    const { hideKeyboard, inputValue, setInputValue } = useScreenKeyboard();
+const ScreenKeyboard: FunctionComponent = () => {
+    const { closeKeyboard, inputValue, keyboardConfig, setInputValue } = useScreenKeyboard();
 
     const keyboard = useRef<any>(null);
-
-    const { fieldLabel, instructions } = props;
 
     // Manual change (typing with the regular keyboard)
     const onChangeInput = (event: ChangeEvent<HTMLInputElement>): void => {                        
@@ -16,15 +14,22 @@ const ScreenKeyboard: FunctionComponent = (props: any) => {
         setInputValue(value);
         keyboard.current?.setInput(value);
     };
+    
+    // Clear button
+    const handleClear = () => {
+        setInputValue("");
+        keyboard.current?.setInput("");
+    }
 
     return (
         <div className="keyboard-layer">
             <div className="keyboard-header">
                 <div className="keyboard-text-container">
-                    <div className="keyboard-close-button" onClick={hideKeyboard}>Close</div>
-                    <div className="keyboard-clear-button" onClick={() => setInputValue && setInputValue("")}>Clear</div>
-                    <div className="keyboard-field-label">{fieldLabel}</div>
-                    <div className="keyboard-instructions">{instructions}</div>
+                    <div className="keyboard-button" onClick={() => closeKeyboard(true)}>Save</div>
+                    <div className="keyboard-button" onClick={() => closeKeyboard(false)}>Cancel</div>                    
+                    <div className="keyboard-button" onClick={handleClear}>Clear</div>
+                    <div className="keyboard-field-label">{keyboardConfig.fieldLabel}</div>
+                    <div className="keyboard-instructions">{keyboardConfig.instructions}</div>
                 </div>
                 <input
                     value={inputValue}

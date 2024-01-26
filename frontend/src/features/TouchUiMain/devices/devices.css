@@ -288,7 +288,7 @@ tr {
 
 .location-container {
   padding: 5px;
-  margin: 5px;
+  margin: 5px 0px;
   background-color: rgb(58, 53, 53);
   border-radius: 5px;
   max-width: 298px;

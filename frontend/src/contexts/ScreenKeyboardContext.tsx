@@ -3,7 +3,7 @@ import React, { useState, createContext, useContext } from "react";
 interface ScreenKeyboardContextValue {
     isKeyboardVisible?: boolean;
     showKeyboard: (config?: any) => void;
-    hideKeyboard: () => void;
+    closeKeyboard: (submit) => void;
     keyboardConfig: any;
     inputValue: string;
     setInputValue: React.Dispatch<React.SetStateAction<string>>;
@@ -31,9 +31,9 @@ export const ScreenKeyboardProvider = ({ children }) => {
         setKeyboardVisible(true);
     };
 
-    const hideKeyboard = () => {
+    const closeKeyboard = (submit: boolean) => {
         setKeyboardVisible(false);
-        if (keyboardConfig.onClose) {
+        if (submit && keyboardConfig.onClose) {
             keyboardConfig.onClose(inputValue);
         }
         setKeyboardConfig({});
@@ -41,7 +41,7 @@ export const ScreenKeyboardProvider = ({ children }) => {
 
     return (
         <ScreenKeyboardContext.Provider
-            value={{ isKeyboardVisible, showKeyboard, hideKeyboard, keyboardConfig, inputValue, setInputValue }}
+            value={{ isKeyboardVisible, showKeyboard, closeKeyboard, keyboardConfig, inputValue, setInputValue }}
         >
             {children}
         </ScreenKeyboardContext.Provider>

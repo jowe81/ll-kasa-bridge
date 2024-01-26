@@ -43,7 +43,7 @@ function getSelectedRecordsInfo(birthdayRangeToDisplay: number = 0) {
             if (difference === 0) {
                 hiddenBirthdaysToday++;
             }
-            if (difference > 0) {
+            if (difference > 0 && difference < 2) {
                 hiddenBirthdaysTomorrow++;
             }
         }

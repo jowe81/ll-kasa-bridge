@@ -1,0 +1,65 @@
+
+.medical-container {
+  background-color: rgba(103, 81, 101, 0.785);
+  width: 300px;
+  border-radius: 5px;
+  padding-top: 5px;
+  margin-top: 5px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  text-align: left;
+  height: 138px;
+}
+
+.medical-items-container {
+  width: 280px;  
+  background-color: rgb(42, 31, 42);
+  margin: 5px auto;
+  padding: 3px;
+  display: flex;
+  flex-flow: row wrap;
+  height: 100px;
+  overflow-y: scroll;
+  color:rgba(209, 190, 212, 0.608);
+}
+ 
+/* Handle */
+.medical-items-container::-webkit-scrollbar-thumb {
+  background: #503d5389;
+}
+
+/* Handle on hover */
+.medical-items-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(114, 84, 113, 0.735);
+}
+
+.medical-header {
+  text-align: center;
+  width: 300px;
+  font-weight: bold;
+  color:rgba(255, 255, 255, .5)
+}
+
+.blood-pressure-table {
+    width: 100%;
+    border-collapse: separate;            
+}
+
+.blood-pressure-table tr{
+    height: 10px;     
+    padding: 0px;
+    margin: 0px;
+    font-size: 110%;    
+    
+}
+
+.blood-pressure-table td {
+    min-width: 80px;
+}
+
+.blood-pressure-table .right-align {
+    text-align: right;    
+}
+
+

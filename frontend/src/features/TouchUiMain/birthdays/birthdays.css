@@ -1,5 +1,4 @@
 .birthdays-container {
-  background-color: rgba(66, 90, 142, .5);
   background-color: rgba(100, 100, 110, .7);  
   width: 300px;
   border-radius: 5px;
@@ -9,8 +8,7 @@
   flex-wrap: wrap;
   text-align: left;
   margin: 5px 0px;
-  margin-left: 5px;
-  height: 245px;  
+  height: 250px;  
   align-items: flex-start;
 }
 

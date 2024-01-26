@@ -5,6 +5,12 @@
   overflow-x: hidden;
 }
 
+.timer-panel-bg {
+  background-image: url('/images/jess_cooking.png');
+  background-size: 100%;
+  background-position:50%;  
+}
+
 .live-timer {
   display: flex;
   justify-content: space-between;

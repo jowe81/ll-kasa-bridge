@@ -37,16 +37,25 @@
   justify-content: space-between;
 }
 
+.touch-ui-panel-container .placeholder-350 {
+    width: 335px;    
+}
+
+.touch-ui-panel-container .placeholder-200 {
+    width: 200px;    
+    background-color: #fff;
+}
+
 .touch-ui-panel-item {
   /* border: 1px solid yellow; */
   height: 100%;
   max-height: 100%;
-  padding: 0px 5px;
+  padding: 0px 5px;  
   position: relative;  
 }
 
 .touch-ui-panel-item-remaining-space {
-  flex-grow: 1;
+  flex-grow: 1;  
 }
 
 .touch-ui-pannel-item-nopad {
@@ -58,11 +67,40 @@
 
 .touch-ui-main-column {
   width: 310px;
-  height: 100%;
+  height: 100%;  
+  margin: 0px 5px;  
+}
+
+.touch-ui-left-column {
+    margin-right: 0px;
+}
+
+.touch-ui-right-column {
+    padding: 0px;    
+    margin: 0;
+    margin-right: 5px;
+    margin-left: 5px;
+    
 }
 
 .touch-ui-main-column-remaining-space {
-  flex-grow: 1;  
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgb(55, 55, 55); 
+  border-left: 1px solid rgb(55, 55, 55); 
+  height: 100%;
+  margin-left: 5px;
+}
+
+.touch-ui-main-column-remaining-space .remaining-main {
+    display:flex;   
+    height:84.5%;    
+    position: relative;
+}
+
+.touch-ui-main-column-remaining-space .remaining-panel {
+    border-top: 1px solid rgb(55, 55, 55);         
 }
 
 .touch-ui-sub-panel-header {
@@ -71,3 +109,4 @@
   font-weight: bold;
   color:rgba(255, 255, 255, .5)
 }
+

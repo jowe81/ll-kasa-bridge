@@ -9,11 +9,8 @@ function LiveTimers(props) {
     return <LiveTimer key={index} timer={timer} {...props}/>
   });
 
-  return (
-    <div className="timer-panel-item live-timers">
-      { liveTimersJsx }
-    </div>
-  )
+  let classes = `timer-panel-item live-timers ${liveTimers.length ? '' : 'timer-panel-bg'}`;
+  return <div className={classes}>{liveTimersJsx}</div>;
 }
 
 export default LiveTimers;

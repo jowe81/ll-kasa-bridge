@@ -31,18 +31,18 @@ function Scripture({renderForMainViewingArea}) {
       const { text, reference, translation } = record;
 
       // Adjust the font size if needed.
-      let fontSizePx = renderForMainViewingArea ? 40 : 16;
+      let fontSizePx = renderForMainViewingArea ? 40 : 19;
 
       if (text.length < 200) {
-        fontSizePx = renderForMainViewingArea ? 50 : 18;
+        fontSizePx = renderForMainViewingArea ? 50 : 24;
       }
 
       if (text.length > 300) {
-        fontSizePx = renderForMainViewingArea ? 32 : 13;
+        fontSizePx = renderForMainViewingArea ? 32 : 20;
       }
 
       if (text.length > 400) {
-        fontSizePx = renderForMainViewingArea ? 30 : 12;
+        fontSizePx = renderForMainViewingArea ? 30 : 16;
       }
 
       const style = {
@@ -50,11 +50,18 @@ function Scripture({renderForMainViewingArea}) {
       }
 
       jsx = (
-          <div className="touch-ui-panel-item">
+          <div className="scripture-outer-container">
               <div className={renderForMainViewingArea ? "large-scripture-container" : "scripture-container"}>
                   {/* <div className="scripture-header">Verse of the Day</div> */}
-                  <div className={renderForMainViewingArea ? "large-scripture-text-container" : "scripture-text-container"}>
-                      <div className={renderForMainViewingArea ? "large-scripture-text" : "scripture-text"} style={style}>
+                  <div
+                      className={
+                          renderForMainViewingArea ? "large-scripture-text-container" : "scripture-text-container"
+                      }
+                  >
+                      <div
+                          className={renderForMainViewingArea ? "large-scripture-text" : "scripture-text"}
+                          style={style}
+                      >
                           {processRawText(record.text, renderForMainViewingArea)}
                       </div>
                   </div>
@@ -63,8 +70,7 @@ function Scripture({renderForMainViewingArea}) {
                           {addedJsx && addedJsx}
                       </div>
                       <div className="scripture-reference">
-                          {reference} ({translation.toUpperCase()}
-                          )
+                          {reference} ({translation.toUpperCase()})
                       </div>
                   </div>
               </div>

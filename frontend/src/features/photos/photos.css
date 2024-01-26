@@ -6,10 +6,8 @@
 
 .photo-container-embedded {  
   height: 100%;
-  flex-grow: 1;
-  border-right: 1px solid rgb(55, 55, 55); 
-  border-left: 1px solid rgb(55, 55, 55); 
-  margin: 0px 0px;
+  flex-grow: 1;  
+  margin-right: 5px;    
 }
 
 .photo-container-full-screen {

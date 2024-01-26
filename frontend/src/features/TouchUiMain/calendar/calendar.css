@@ -1,22 +1,30 @@
-.calendar-container {
-  background-color: rgba(66, 90, 142, .5);
-  background-color: rgba(131, 97, 62, 0.464);  
+.calendar-outer-container {
+  margin: 0px;
+  padding: 5px 0px; 
+  margin-right: 5px;
+  border-right: 1px solid rgb(64, 64, 64);
+}
+
+.calendar-container {  
+  margin: 0px 5px;  
+  background-color: rgba(69, 92, 46, 0.5);
   width: 305px;
   border-radius: 5px;
   padding-top: 5px;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  text-align: left;
-  margin: 5px 0px;
-  margin-left: 0px;
-  height: 99%;  
-  align-items: flex-start;
-  box-sizing: border-box;
+  margin: 0px 5px;
+  height: 100%;  
+}
+
+.calendar-header {
+  text-align: center;
+  width: 100%;
+  font-weight: bold;
+  color:rgba(255, 255, 255, .5)
 }
 
 .calendar-items-container{
-  width: 280px;
+  height: 735px;
+  width: 290px;
   background-color: rgb(25, 19, 12);
   margin: 5px auto;
   padding-left: 0px;
@@ -24,9 +32,20 @@
   display: flex;
   flex-flow: column;
   justify-items: flex-start;
-  flex-grow: 1;
+    
   overflow-y: scroll;
   overflow-x: hidden;
+}
+
+/* Handle */
+.calendar-items-container::-webkit-scrollbar-thumb {
+  background: #45553370;
+  /* background-color: rgba(55, 40, 40, 1); */
+}
+
+/* Handle on hover */
+.calendar-items-container::-webkit-scrollbar-thumb:hover {
+  background: rgb(99, 119, 68);
 }
 
 .calendar-event-container {
@@ -46,6 +65,7 @@
 .calendar-event-container > .header-container > .event-start-end {
     text-align: right;
     padding-right: 5px;
+    margin-bottom: 2px;    
 }
 
 .calendar-event-container > .header-container > .calendar-index-0 {
@@ -55,6 +75,7 @@
     padding-right: 5px;
     color: rgba(143, 205, 224, 0.611);
     font-style: italic;
+    height: 23px;
 }
 
 .calendar-event-container > .header-container > .calendar-index-1 {
@@ -68,6 +89,7 @@
 
 .calendar-event-container > .body-container {
     padding: 5px;
+    padding-top: 0px;
 }
 
 .calendar-event-container > .body-container > .event-summary {
@@ -77,4 +99,18 @@
 
 .calendar-event-container > .body-container > .event-description {
     color: rgba(199, 193, 184, 0.636);
+    font-size: 90%;
+}
+
+.calendar-event-container  .event-location {
+    color: rgba(199, 193, 184, 0.636);
+    float: left;
+    font-size: 80%;
+    font-style: normal;
+    margin-left: 3px;
+    margin-top: 2px;
+    border-radius: 3px;
+    padding: 0px 3px;
+    text-align: right;;
+    background-color: rgba(27, 27, 27, 0.496);
 }

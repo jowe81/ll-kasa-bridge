@@ -98,5 +98,30 @@
 
 .photo-button-rating-hide {
     width: 15%;
-    margin-right: 35%;
+    margin-right: 15%;
+}
+
+.photo-button-rating-tag {
+    width: 15%;
+    display: block;
+}
+
+.photo-button-rating-tag .current-tags {
+    border-top: 1px solid rgba(168, 168, 168, .3);
+    width: 100%;
+    font-size: 60%;
+    color:rgb(209, 223, 182);
+    height: 100%;
+    padding: 3px;
+}
+
+.photo-button-rating-tag .current-tags .no-tags-yet {
+    color:rgba(168, 168, 168, 1);
+    font-style: italic;
+    height: 100%;
+    padding: 5% 0%;
+}
+
+.photo-button-rating-tag .button-label {
+    padding: 10px;
 }

@@ -23,10 +23,14 @@ function TouchUiPanel(props: any) {
     return (
         <>
             <MasterSwitches {...props} />
-            <CompactTimer />
-            <Scripture {...props} />
-            {showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay} />}
-            {!showBirthdays && <Temperature thermometersStartIndex={2} />}
+            <div className="placeholder-350">{fullScreen && <CompactTimer />}</div>
+
+            <div style={{width: '200px'}}>
+                {showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay} />}
+            </div>
+            <div className="placeholder-350">
+            </div>
+            <Temperature thermometersStartIndex={2} />
 
             {showMailbox && <Mailbox />}
             {!showMailbox && <Temperature thermometersStartIndex={0} />}
