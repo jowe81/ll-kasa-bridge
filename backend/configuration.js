@@ -1804,7 +1804,7 @@ const deviceMap = [
             // If set causes the backend to return the results for the first request only; as a single object and not as an array.
             useSingleRequest: true,
             // This is how often the handler will go out and check whether a request should actually be run.
-            checkInterval: 20 * SECOND,
+            checkInterval: 10 * MINUTE,
             ui: {},
         },
     },

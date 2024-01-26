@@ -55,7 +55,7 @@
 }
 
 .blood-pressure-table td {
-    min-width: 80px;
+    /* min-width: 80px; */
 }
 
 .blood-pressure-table .right-align {

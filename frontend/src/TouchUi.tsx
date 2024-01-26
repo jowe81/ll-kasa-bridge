@@ -53,7 +53,7 @@ function TouchUi() {
 
     const overrideDevice = getMainViewingAreaOverrideDevice(overrideChannels, clock, devices);    
   
-    if (overrideDevice) {
+    if (overrideDevice && fullScreen) {
         const overrideProps = { ...props };
         overrideProps.renderForMainViewingArea = true;
 

@@ -38,6 +38,9 @@ function Medical() {
             <td className="right-align">
                 {sample?.pulse}
             </td>
+            <td className="right-align">
+                {sample?.samples}x
+            </td>
         </tr>
     ));
 
@@ -83,6 +86,7 @@ function getAverageSysDiaPulse(records, startTime: Date, endTime: Date) {
         sys: Math.round(totalSys / samplesSysDia),
         dia: Math.round(totalDia / samplesSysDia),
         pulse: Math.round(totalPulse / samplesPulse),
+        samples: targetRecords.length,
     };
 }
 
