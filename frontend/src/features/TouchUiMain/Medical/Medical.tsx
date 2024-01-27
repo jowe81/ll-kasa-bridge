@@ -13,33 +13,28 @@ function Medical() {
     }
     const records = device.state?.api?.data?.records;
     
-    const sampleData = [
-        getAverageSysDiaPulse(records, getMidNight(), new Date()),
-        getAverageSysDiaPulse(records, getNDaysAgoMidnight(1), getMidNight()),
-        getAverageSysDiaPulse(records, getNDaysAgoMidnight(7), getMidNight()),
-        getAverageSysDiaPulse(records, getNDaysAgoMidnight(30), getMidNight()),
+    const sampleData = [        
+        getAverageSysDiaPulse(records, getMidNight(), new Date(), 'Today'),
+        getAverageSysDiaPulse(records, getNDaysAgoMidnight(1), getMidNight(), 'Yesterday'),
+        getAverageSysDiaPulse(records, getNDaysAgoMidnight(7), getMidNight(), '7 Days'),
+        getAverageSysDiaPulse(records, getNDaysAgoMidnight(30), getMidNight(), '30 Days'),
     ];
 
-    const labels = [
-        'Today', 
-        'Yesterday', 
-        '7 days', 
-        '30 days'
-    ]
-
-    const rowsJsx = sampleData.map((sample, index) => (
-        <tr>
+    const rowsJsx = sampleData
+        .filter(avgData => avgData) 
+        .map((avgData, index) => (
+        <tr key={index}>
             <td>
-                {labels[index]}
+                {avgData?.label}
             </td>
             <td className="right-align">
-                {sample?.sys}/{sample?.dia}
+                {avgData?.sys}/{avgData?.dia}
             </td>
             <td className="right-align">
-                {sample?.pulse}
+                {avgData?.pulse}
             </td>
-            <td className="right-align">
-                {sample?.samples}x
+            <td className="right-align muted">
+                {avgData?.samples}
             </td>
         </tr>
     ));
@@ -49,6 +44,12 @@ function Medical() {
             <div className="medical-header">Johannes Vitals</div>
             <div className="medical-items-container">
                 <table className="blood-pressure-table">
+                    <thead>
+                        <th><div className="left-align">Average for</div></th>
+                        <th><div>Sys/Dia</div></th>
+                        <th><div>Pulse</div></th>
+                        <th><div>#Samples</div></th>
+                    </thead>
                     <tbody>{rowsJsx}</tbody>
                 </table>
             </div>
@@ -56,7 +57,7 @@ function Medical() {
     );        
 }
 
-function getAverageSysDiaPulse(records, startTime: Date, endTime: Date) {
+function getAverageSysDiaPulse(records, startTime: Date, endTime: Date, label: string) {
     if (!records) {
         return null;
     }
@@ -83,6 +84,7 @@ function getAverageSysDiaPulse(records, startTime: Date, endTime: Date) {
     });
 
     return {
+        label,
         sys: Math.round(totalSys / samplesSysDia),
         dia: Math.round(totalDia / samplesSysDia),
         pulse: Math.round(totalPulse / samplesPulse),

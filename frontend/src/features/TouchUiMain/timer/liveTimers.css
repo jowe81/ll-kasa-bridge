@@ -9,6 +9,7 @@
   background-image: url('/images/jess_cooking.png');
   background-size: 100%;
   background-position:50%;  
+  overflow: hidden;
 }
 
 .live-timer {

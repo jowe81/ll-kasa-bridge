@@ -1,15 +1,15 @@
 
 .medical-container {
-  background-color: rgba(103, 81, 101, 0.785);
+  background-color: rgba(87, 71, 86, 0.785);
   width: 300px;
   border-radius: 5px;
-  padding-top: 5px;
+  padding-top: 5px;  
   margin-top: 5px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   text-align: left;
-  height: 138px;
+  height: 173px;
 }
 
 .medical-items-container {
@@ -18,15 +18,17 @@
   margin: 5px auto;
   padding: 3px;
   display: flex;
-  flex-flow: row wrap;
-  height: 100px;
+  align-items: flex-start;
+  flex-flow: row wrap;  
   overflow-y: scroll;
+  height: 130px;
   color:rgba(209, 190, 212, 0.608);
+
 }
  
 /* Handle */
 .medical-items-container::-webkit-scrollbar-thumb {
-  background: #503d5389;
+  background: #5f4e6289;
 }
 
 /* Handle on hover */
@@ -46,12 +48,28 @@
     border-collapse: separate;            
 }
 
+.blood-pressure-table th {    
+    height: 8px;
+}
+
+/* Acrobatics to fit the header row... */
+.blood-pressure-table thead th div{
+    position: relative;  
+    top: -6px;
+    font-size: 60%;
+    font-weight: normal;
+    max-height: 5px;
+    color:rgba(248, 215, 250, 0.343);
+    
+    width: 100%;
+    text-align: right; 
+}
+
 .blood-pressure-table tr{
     height: 10px;     
     padding: 0px;
     margin: 0px;
-    font-size: 110%;    
-    
+    font-size: 100%;    
 }
 
 .blood-pressure-table td {
@@ -62,4 +80,10 @@
     text-align: right;    
 }
 
+.left-align {
+    text-align: left !important;
+}
 
+.muted {
+    opacity: 60%;
+}
