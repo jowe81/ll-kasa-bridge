@@ -48,6 +48,20 @@
   background: rgb(99, 119, 68);
 }
 
+.calendar-event-divider-container {
+    color: rgb(117, 126, 109, .8);
+    padding: 3px;
+    padding-left: 5px;
+    font-style: italic;
+    
+    border-bottom: 1px solid rgba(69, 92, 46, 0.5);
+    margin-top: 10px;
+}
+
+.calendar-event-divider-container:first-child {    
+    margin-top: 0px;
+}
+
 .calendar-event-container {
     width: 100%;
     padding: 0px;
@@ -58,8 +72,16 @@
     border: 1px solid rgba(161, 121, 83, 0.449);
 }
 
+.calendar-event-container-today {
+    background-color: rgba(255, 213, 0, 0.185);
+}
+
+.calendar-event-container-now {
+    background-color: rgba(255, 0, 0, 0.273);
+}
+
 .calendar-event-container > .header-container {
-    color: rgba(255, 221, 174, 0.629);
+    color: rgba(209, 220, 213, 0.575);
 }
 
 .calendar-event-container > .header-container > .event-start-end {
@@ -73,8 +95,7 @@
     font-size: 90%;    
     background-color: rgba(192, 242, 255, 0.23);
     padding-right: 5px;
-    color: rgba(143, 205, 224, 0.611);
-    font-style: italic;
+    color: rgba(217, 227, 218, 0.425);    
     height: 23px;
 }
 
@@ -83,8 +104,7 @@
     font-size: 90%;
     background-color: rgba(242, 215, 255, 0.302);
     padding-right: 5px;
-    color: rgba(225, 199, 225, 0.614);
-    font-style: italic;
+    color: rgba(225, 199, 225, 0.614);    
 }
 
 .calendar-event-container > .body-container {
@@ -94,7 +114,7 @@
 
 .calendar-event-container > .body-container > .event-summary {
     font-size: 105%;
-    color: rgba(240, 222, 198, 0.882);
+    color: rgba(255, 255, 255, 0.463);
 }
 
 .calendar-event-container > .body-container > .event-description {

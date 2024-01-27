@@ -1,4 +1,5 @@
 import { getDeviceByChannel } from "../../../devicesHelpers";
+import { getMidNight, getNDaysAgoMidnight } from "../calendar/calendarHelpers";
 import constants from "../../../constants";
 
 import "./medical.css"
@@ -45,10 +46,12 @@ function Medical() {
             <div className="medical-items-container">
                 <table className="blood-pressure-table">
                     <thead>
-                        <th><div className="left-align">Average for</div></th>
-                        <th><div>Sys/Dia</div></th>
-                        <th><div>Pulse</div></th>
-                        <th><div>#Samples</div></th>
+                        <tr>
+                            <th><div className="left-align">Average for</div></th>
+                            <th><div>Sys/Dia</div></th>
+                            <th><div>Pulse</div></th>
+                            <th><div>#Samples</div></th>
+                        </tr>
                     </thead>
                     <tbody>{rowsJsx}</tbody>
                 </table>
@@ -90,24 +93,6 @@ function getAverageSysDiaPulse(records, startTime: Date, endTime: Date, label: s
         pulse: Math.round(totalPulse / samplesPulse),
         samples: targetRecords.length,
     };
-}
-
-function getMidNight() {
-    const midnight = new Date();
-    midnight.setHours(0);
-    midnight.setMinutes(0);
-    midnight.setSeconds(0);    
-    return midnight;
-}
-
-function getSecondsSinceMidnight() {
-    return Math.round((Date.now() - getMidNight().getTime()) / 1000)
-}
-
-function getNDaysAgoMidnight(n) {
-    const midnight = getMidNight();
-    midnight.setDate(midnight.getDate() - n);    
-    return midnight;
 }
 
 export default Medical;

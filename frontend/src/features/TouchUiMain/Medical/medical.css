@@ -48,12 +48,16 @@
     border-collapse: separate;            
 }
 
+.blood-pressure-table thead tr {
+    height: 0px;
+}
+
 .blood-pressure-table th {    
     height: 8px;
 }
 
 /* Acrobatics to fit the header row... */
-.blood-pressure-table thead th div{
+.blood-pressure-table thead tr th div{
     position: relative;  
     top: -6px;
     font-size: 60%;
