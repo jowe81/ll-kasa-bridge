@@ -54,7 +54,6 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
         min-height: 80px;
     }
 
-
     .options-groups-container {
         width: 95%;
         height: 80%;        
@@ -62,6 +61,7 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
         .header {
             border-bottom: 1px solid $border-gray;
             text-align: center;
+            font-size: 130%;
         }
 
         .options-group {

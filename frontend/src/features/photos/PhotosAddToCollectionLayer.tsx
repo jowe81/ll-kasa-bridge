@@ -50,13 +50,13 @@ function PhotosAddToCollectionLayer({ addToRemoveFromCollection, hideLayer, uiIn
     return (
         <div className="touch-layer-opaque photos-filter-layer">
             <div className="options-groups-container">
-                <div className="header">Add Picture to Collection</div>
+                <div className="header">Collections this picture belongs to</div>
                 <div className="options-group">
-                    <div className="label">Select an existing collection:</div>
+                    <div className="label">Tap a collection to add to/remove the picture from:</div>
                     <div className="touch-items-container">{collectionItemsJsx}</div>
                 </div>
                 <div className="options-group" onClick={() => showKeyboard(keyboardConfigTags)}>
-                    <div className="label">Collection Name to add to (tap to type):</div>
+                    <div className="label">Add the picture to a new collection (tap to type a collection name):</div>
                     <div className="touch-items-container">{collectionName}</div>
                 </div>
             </div>

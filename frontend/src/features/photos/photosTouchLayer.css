@@ -101,11 +101,10 @@
 }
 
 .photo-button-rating-tag {
-    width: 15%;
-    display: block;
+    /* display: block; */
 }
 
-.photo-button-rating-tag .current-tags {
+.photo-button-rating-tag .current-items {
     border-top: 1px solid rgba(168, 168, 168, .3);
     width: 100%;
     font-size: 60%;
@@ -114,7 +113,7 @@
     padding: 3px;
 }
 
-.photo-button-rating-tag .current-tags .no-tags-yet {
+.photo-button-rating-tag .current-items .no-items-yet {
     color:rgba(168, 168, 168, 1);
     font-style: italic;
     height: 100%;

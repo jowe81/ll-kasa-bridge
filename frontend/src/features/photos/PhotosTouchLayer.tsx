@@ -102,30 +102,33 @@ function PhotosTouchLayer() {
                             onClick={hideRestoreBtnClick}
                         >
                             {isHidden && <p>Restore</p>}
-                            {!isHidden && (
-                                <p>
-                                    Trash
-                                </p>
-                            )}
+                            {!isHidden && <p>Trash</p>}
                         </div>
                         <div
                             className={`photo-button photo-button-rating photo-button-rating-tag ${photoButtonHidden}`}
                             onClick={() => showKeyboard(keyboardConfigTags)}
                         >
                             <div className="button-label">Add Tags</div>
-                            <div className="current-tags">
+                            <div className="current-items">
                                 {record?.tags && record.tags.length ? (
                                     record.tags.join(", ")
                                 ) : (
-                                    <div className="no-tags-yet">no tags assigned</div>
+                                    <div className="no-items-yet">no tags assigned</div>
                                 )}
                             </div>
                         </div>
                         <div
-                            className={`photo-button photo-button-rating ${photoButtonHidden}`}
+                            className={`photo-button photo-button-rating photo-button-rating-tag ${photoButtonHidden}`}
                             onClick={() => setShowAddToCollectionLayer(true)}
                         >
-                            Other Collections
+                            <div className="button-label">Collections</div>
+                            <div className="current-items">
+                                {record?.tags && record.tags.length ? (
+                                    record.collections.join(", ").toLowerCase()
+                                ) : (
+                                    <div className="no-items-yet">no tags assigned</div>
+                                )}
+                            </div>
                         </div>
                         <div
                             className={`photo-button photo-button-rating ${photoButtonHidden} ${
