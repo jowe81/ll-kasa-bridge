@@ -2,6 +2,7 @@ $color-touch-layer: rgba(255, 255, 255, 0.753);
 
 $color-touch-layer-label: rgba(255, 255, 255, 0.74); 
 $color-touch-item: rgba(255, 255, 255, 0.812);
+$color-touch-item-info: rgba(255, 255, 255, 0.512);
 $border-gray: rgba(128, 128, 128, 0.282);
 $border-color-touch-item: rgba(128, 128, 128, 1);
 
@@ -27,6 +28,12 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
         padding: 5px;
         margin: 5px;
         color: $color-touch-item;
+        text-align: center;
+
+        .touch-item-info {
+            font-size: 80%;
+            color: $color-touch-item-info;
+        }
     }
 
     .touch-item:active {
@@ -47,6 +54,22 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
         min-height: 80px;
     }
 
+
+    .options-groups-container {
+        width: 95%;
+        height: 80%;        
+
+        .header {
+            border-bottom: 1px solid $border-gray;
+            text-align: center;
+        }
+
+        .options-group {
+            padding: 15px; 
+            margin-top: 10px;
+            border-bottom: 1px solid $border-gray;
+        }
+    }
     
     .actions-container {
         height:10%;
@@ -59,7 +82,7 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
             @extend .touch-item;
             max-height: 60px;          
         }
-    }    
+    }
 }
 
 .touch-layer-opaque {

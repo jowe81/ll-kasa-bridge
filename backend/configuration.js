@@ -1676,8 +1676,8 @@ const deviceMap = [
         commandHandlersExtension: "photosHandlers.js",
         settings: {
             api: {
-                baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
-                path: null, // will use .env DYNFORMS_PATH or default instead
+                baseUrl: "http://server.wnet.wn:3021", // default: use .env DYNFORMS_HOST, DYNFORMS_PORT instead
+                path: 3021,
                 queryParams: {},
                 pathToResponseData: "", //The path in the response data to the actual data (optional)
             },

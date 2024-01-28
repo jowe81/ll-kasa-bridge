@@ -1,4 +1,4 @@
-import { FunctionComponent, useRef, ChangeEvent } from "react";
+import { FunctionComponent, useRef, ChangeEvent, useEffect } from "react";
 import KeyboardWrapper from "./KeyboardWrapper";
 import "./screenKeyboard.css";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
@@ -7,6 +7,10 @@ const ScreenKeyboard: FunctionComponent = () => {
     const { closeKeyboard, inputValue, keyboardConfig, setInputValue } = useScreenKeyboard();
 
     const keyboard = useRef<any>(null);
+
+    useEffect(() => {
+        setInputValue(keyboardConfig.value);
+    }, []);
 
     // Manual change (typing with the regular keyboard)
     const onChangeInput = (event: ChangeEvent<HTMLInputElement>): void => {                        

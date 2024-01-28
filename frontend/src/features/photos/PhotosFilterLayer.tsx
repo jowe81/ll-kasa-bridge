@@ -2,7 +2,9 @@ import { useState } from "react";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
 import "./photosFilterLayer.scss";
 
-function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiInfo }) {
+function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiInfo, photosService }) {
+    const libraryInfo = photosService?.state?.api?.libraryInfo;
+
     const initialFilterState = {
         collection: null,
         tags: [],
@@ -20,23 +22,30 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
     const keyboardConfigTags = {
         fieldLabel: "Tags to filter by:",
         instructions: "Use commas or spaces to separate multiple tags.",
-        value: filter.tags,
+        value: filter.tags?.join(' '),
         onClose: (value) => setFilter({ ...filter, tags: splitTags(value) }),
     };
 
+    const collections = libraryInfo?.collections?.map((info) => info.collectionName);
 
-    const collections: string[] = [];
-    collections.push('general', 'favorites', 'trashed', 'unsorted');
+    const collectionItemsJsx = collections.map((collection, index) => {
+        const collectionInfo = libraryInfo?.collections?.find(info => info.collectionName === collection);
+        
+        if (collectionInfo) {
 
-    const collectionItemsJsx = collections.map((collection, index) => (
-        <div
-            key={index}
-            className={`touch-item ${filter.collection === collection ? "touch-item-selected" : ""}`}
-            onClick={() => setFilter({ ...filter, collection })}
-        >
-            {collection[0].toUpperCase() + collection.substring(1)}
-        </div>
-    ));
+        }
+
+        return (
+            <div
+                key={index}
+                className={`touch-item ${filter.collection === collection ? "touch-item-selected" : ""}`}
+                onClick={() => setFilter({ ...filter, collection })}
+            >
+                {collection[0].toUpperCase() + collection.substring(1)}
+                <div className="touch-item-info">{collectionInfo?.count} pictures</div>
+            </div>
+        );
+    });
 
     
     function handleTagClick(event) {
@@ -61,13 +70,11 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
 
     return (
         <div className="touch-layer-opaque photos-filter-layer">
-            <div className="filter-options-container">
-                <div className="header">Filtering Options:</div>
+            <div className="options-groups-container">
+                <div className="header">Filtering Options</div>
                 <div className="options-group">
-                    <div className="label">
-                        Collection:
-                        <div className="touch-items-container">{collectionItemsJsx}</div>
-                    </div>
+                    <div className="label">Collection:</div>
+                    <div className="touch-items-container">{collectionItemsJsx}</div>
                 </div>
                 <div className="options-group" onClick={() => showKeyboard(keyboardConfigTags)}>
                     <div className="label">
@@ -77,10 +84,13 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
                 </div>
             </div>
             <div className="actions-container">
-                <div className="action" onClick={hideChangeFilterLayer}>Cancel</div>
-                <div className="action" onClick={() => setPhotosServiceFilter(filter)}>Set New Filter</div>
+                <div className="action" onClick={hideChangeFilterLayer}>
+                    Cancel
+                </div>
+                <div className="action" onClick={() => setPhotosServiceFilter(filter)}>
+                    Set New Filter
+                </div>
             </div>
-
         </div>
     );
 }

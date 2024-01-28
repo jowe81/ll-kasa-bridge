@@ -45,6 +45,22 @@ async function addTags(deviceWrapper, commandData) {
     }
 }
 
+async function addToCollection(deviceWrapper, commandData) {
+    let record = getRecord(deviceWrapper);
+    if (!record || !deviceWrapper?.deviceHandler) {
+        return null;
+    }
+
+    const { collectionName } = commandData.body;
+    console.log('Adding to ', collectionName);
+
+    if (collectionName) {
+        record.collections.push(collectionName);
+    }
+
+    await updateRecord(deviceWrapper, record);
+}
+
 async function hideRestorePicture(deviceWrapper, commandData) {
     let record = getRecord(deviceWrapper);
     if (!record || !deviceWrapper?.deviceHandler) {
@@ -108,10 +124,6 @@ async function setFilter(deviceWrapper, commandData) {
 
     if (filter.collection) {
         switch(filter.collection) {
-            case 'general':
-                // Don't filter at all.
-                break;
-
             case 'trashed':
                 dynformsFilter.collections = ['trashed'];
                 break;
@@ -238,6 +250,7 @@ async function updateRecord(deviceWrapper, record) {
 const handlers = {
     _processApiResponse, // Not for frontend use!
     addTags,
+    addToCollection,
     hideRestorePicture,
     nextPicture,
     setFilter,

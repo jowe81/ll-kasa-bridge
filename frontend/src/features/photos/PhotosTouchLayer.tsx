@@ -1,4 +1,5 @@
 import PhotosFilterLayer from "./PhotosFilterLayer";
+import PhotosAddToCollectionLayer from "./PhotosAddToCollectionLayer";
 import { useState } from "react";
 import { getPhotosService, runChannelCommand } from "../../devicesHelpers";
 import { getDynformsServiceRecord } from "../../dynformsHelpers";
@@ -8,6 +9,7 @@ import './photosTouchLayer.css';
 function PhotosTouchLayer() {
     const [showMainLayer, setShowMainLayer] = useState(false);
     const [showChangeFilterLayer, setShowChangeFilterLayer] = useState(false);
+    const [showAddToCollectionLayer, setShowAddToCollectionLayer] = useState(false);
     const { showKeyboard } = useScreenKeyboard();
 
     const photosService = getPhotosService();
@@ -23,11 +25,11 @@ function PhotosTouchLayer() {
     const prevBtnClick = () => runPhotosServiceCommand("previousPicture", {});
     const nextBtnClick = () => runPhotosServiceCommand("nextPicture", {});
     const hideRestoreBtnClick = () => { 
-        console.log(`Hide/Restore on: ${record?._id}, ${JSON.stringify(record?.tags)}, ${JSON.stringify(record?.collections)}`);
         runPhotosServiceCommand("hideRestorePicture", { hide: !record.collections?.includes('trashed') })
     };
     const favoritesClick = () => runPhotosServiceCommand("toggleFavorites", {});
     const addTags = (tagString) => runPhotosServiceCommand("addTags", { tagString });
+    const addToCollection = (collectionName) => runPhotosServiceCommand("addToCollection", { collectionName });
     const setPhotosServiceFilter = (filter) => runPhotosServiceCommand("setFilter", { filter });
     
     const photoButtonHidden = showMainLayer ? "" : "photo-button-hidden";
@@ -45,16 +47,6 @@ function PhotosTouchLayer() {
         onClose: onKeyboardCloseTags,
     };
 
-    function onKeyboardCloseCollection(value) {
-        console.log("Keyboard returned with: ", value);
-    }
-
-    const keyboardConfigCollection = {
-        fieldLabel: "Collection Name:",
-        instructions: "Type the name of a collection you want to add the image to.",
-        onClose: onKeyboardCloseCollection,
-    };
-
     if (showChangeFilterLayer) {
         const props = {
             hideChangeFilterLayer: () => setShowChangeFilterLayer(false),
@@ -64,12 +56,23 @@ function PhotosTouchLayer() {
                 setShowMainLayer(false);
                 //nextBtnClick();
             },
+            photosService,
             uiInfo: photosService?.state.uiInfo,
         }
 
         return (
             <PhotosFilterLayer {...props}/>
         )
+    } else if (showAddToCollectionLayer) {
+        const props = {
+            hideLayer: () => setShowAddToCollectionLayer(false),
+            addToCollection,
+            photosService,
+            uiInfo: photosService?.state.uiInfo,
+        };
+
+        return <PhotosAddToCollectionLayer {...props} />;
+
     } else {
         return (
             <div className="photo-touch-layer">
@@ -88,9 +91,6 @@ function PhotosTouchLayer() {
                 <div className={`photo-button photo-button-show-ui ${photoButtonHidden}`} onClick={showUiBtnClick}>
                     Close
                 </div>
-                <div className={`photo-button photo-button-pause ${photoButtonHidden}`} onClick={showUiBtnClick}>
-                    Pause
-                </div>
                 <div className={`photo-rating-outer-container ${photoButtonHidden}`}>
                     <div className="photo-rating-header-container">Collection Management</div>
                     <div className="photo-rating-buttons-container">
@@ -103,9 +103,7 @@ function PhotosTouchLayer() {
                             {isHidden && <p>Restore</p>}
                             {!isHidden && (
                                 <p>
-                                    Don't show
-                                    <br />
-                                    this again
+                                    Trash
                                 </p>
                             )}
                         </div>
@@ -124,7 +122,7 @@ function PhotosTouchLayer() {
                         </div>
                         <div
                             className={`photo-button photo-button-rating ${photoButtonHidden}`}
-                            onClick={() => showKeyboard(keyboardConfigCollection)}
+                            onClick={() => setShowAddToCollectionLayer(true)}
                         >
                             Add to Collection
                         </div>
