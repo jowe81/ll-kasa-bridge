@@ -4,8 +4,7 @@
   width: 100%;
   display:flex;
   flex-flow: row wrap;
-  justify-content:space-between;
-  
+  justify-content:space-between;  
   z-index: 900;
   height: 100%;
 }

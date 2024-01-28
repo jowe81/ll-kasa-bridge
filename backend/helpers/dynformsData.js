@@ -112,8 +112,6 @@ function applyStaticFilter(match, filter = {}) {
                 // Check for a placeholder
                 const placeholder = getPlaceholderFromString(match[key]);
 
-                console.log('Resolved placeholder from ', match[key], placeholder);
-                
                 filter[key] = placeholder ? 
                     resolvePlaceholder(placeholder) :
                     match[key]; // Copy the value
@@ -125,6 +123,8 @@ function applyStaticFilter(match, filter = {}) {
                 break;
         }
     });
+
+    return filter;
 }
 
 function getPlaceholderFromString(string) {
@@ -146,13 +146,11 @@ function resolvePlaceholder({key, values}) {
         return null;
     }
 
-    log(`Resolving placeholder ${key} with values: ${JSON.stringify(values)}`);
-
     switch (key) {
         case "__DATE_DAYS_AGO":
             const date = new Date();
             date.setDate(date.getDate() - values[0]);
-            return date;
+            return `__DATE-${date.getTime()}`;
     }
 
     return null;

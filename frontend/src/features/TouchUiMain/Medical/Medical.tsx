@@ -7,8 +7,6 @@ import "./medical.css"
 function Medical() {
     const device = getDeviceByChannel(506);
     
-    console.log(device);
-
     if (!device) {
         return;
     }
@@ -22,23 +20,19 @@ function Medical() {
     ];
 
     const rowsJsx = sampleData
-        .filter(avgData => avgData) 
-        .map((avgData, index) => (
-        <tr key={index}>
-            <td>
-                {avgData?.label}
-            </td>
-            <td className="right-align">
-                {avgData?.sys}/{avgData?.dia}
-            </td>
-            <td className="right-align">
-                {avgData?.pulse}
-            </td>
-            <td className="right-align muted">
-                {avgData?.samples}
-            </td>
-        </tr>
-    ));
+        .filter((avgData) => avgData)
+        .map((avgData, index) => {
+            const sysDia = !(isNaN(avgData?.sys) || isNaN(avgData?.dia)) ? `${avgData?.sys}/${avgData?.dia}` : "N/A";
+            const pulse = !isNaN(avgData?.pulse) ? avgData?.pulse : "N/A";
+            return (
+                <tr key={index}>
+                    <td>{avgData?.label}</td>
+                    <td className="right-align">{sysDia}</td>
+                    <td className="right-align">{pulse}</td>
+                    <td className="right-align muted">{avgData?.samples}</td>
+                </tr>
+            );
+        });
 
     return (
         <div className="medical-container">

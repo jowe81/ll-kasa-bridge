@@ -30,7 +30,7 @@ function Calendar() {
     let lastEventStartDate: any = null;
     let lastEventWeekNumber: any = null;
 
-    events.forEach((event, index) => {
+    events?.forEach((event, index) => {
         const startDate = event.start ? new Date(event.start) : null;
         if (!startDate) {
             // At the very least we need a start date.

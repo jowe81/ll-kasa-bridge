@@ -1573,7 +1573,7 @@ const deviceMap = [
             },
             requests: [
                 {
-                    connectionName: "test", // Database name. Will fall back to default constant if absent.
+                    connectionName: null, // not implemented // Database name. Will fall back to default constant if absent.
                     collectionName: "address_book",
                     retrieve: {
                         time: {
@@ -1625,7 +1625,7 @@ const deviceMap = [
             },
             requests: [
                 {
-                    connectionName: "test",
+                    connectionName: null, // not implemented
                     collectionName: "scriptures",
                     retrieve: {
                         time: {
@@ -1683,7 +1683,7 @@ const deviceMap = [
             },
             requests: [
                 {
-                    connectionName: "test",
+                    connectionName: null, // not implemented
                     collectionName: "photosFileInfo",
                     retrieve: {
                         time: {
@@ -1791,7 +1791,7 @@ const deviceMap = [
                             {
                                 type: "static",
                                 match: {
-                                    created_at: { $lt: "__DATE_DAYS_AGO-30" } // Only get values up to 1 months ago                            
+                                    created_at: { $gt: "__DATE_DAYS_AGO-30" } // Only get values up to 1 months ago                            
                                 },
                             },
                         ],

@@ -4,13 +4,53 @@
  * See frontend: Photos.tsx
  */
 import _ from 'lodash';
+import { log } from '../../modules/Log.js';
+
+async function addTags(deviceWrapper, commandData) {
+    const record = getRecord(deviceWrapper);
+    if (!record || !deviceWrapper?.deviceHandler) {
+        return null;
+    }
+
+    const tagString = commandData?.body?.tagString;
+
+    if (!tagString) {
+        return;
+    }
+
+    const separator = tagString.includes(",") ? "," : " ";
+    const newTags = tagString.trim().split(separator);
+
+    const updatedTags = Array.isArray(record.tags) ? [...record.tags, ...newTags] : newTags;
+
+    record.tags = filterTags(updatedTags);
+    return await updateRecord(deviceWrapper, record);
+
+    /**
+     * This is copied from Photos - should be solved differently.
+     */
+    function filterTags(tags) {
+        if (!(tags && tags.length)) {
+            return [];
+        }
+
+        const excludeTags = ["and", "at", "edits", "edit", "for", "from", "in", "on", "the", "to", "with"];
+
+        return tags
+            .map((tag) => tag.toLowerCase())
+            .filter((tag) => {
+                const isAlpha = /^[a-zA-Z]+$/.test(tag);
+                return !excludeTags.includes(tag) && isAlpha;
+            });
+    }
+}
 
 async function hideRestorePicture(deviceWrapper, commandData) {
     let record = getRecord(deviceWrapper);
     if (!record || !deviceWrapper?.deviceHandler) {
         return null;
     }
-
+    console.log(commandData);
     const cache = deviceWrapper.getCache();       
 
     if (commandData?.body?.hide) {
@@ -19,20 +59,20 @@ async function hideRestorePicture(deviceWrapper, commandData) {
             recordBeforeHide: _.cloneDeep(record)
         }
 
-        record.rating = -1;
-        record.collections = [];
+        record.collections = ['trashed'];
+        console.log(`HIDING ${record._id} (tags: ${record.tags.join(', ')}: ${JSON.stringify(record.collections)}}` )
     } else {
         // Restore if we have a cached copy.
         const recordBeforeHide = cache.hideRestorePicture?.recordBeforeHide;
         if (recordBeforeHide) {
             record = { ...recordBeforeHide }
         } else {
-            record.rating = 0;
             record.collections = [];
         }
+        console.log(`RESTORING ${record._id} (tags: ${record.tags.join(", ")}: ${JSON.stringify(record.collections)}}`);
     }
     
-    return await updateRecord(deviceWrapper, record);    
+    await updateRecord(deviceWrapper, record);
 }
 
 function nextPicture(deviceWrapper, { channel, id, body }) {
@@ -50,8 +90,72 @@ async function setRating(deviceWrapper, commandData) {
     return await updateRecord(deviceWrapper, record);
 }
 
-function setFilter(deviceWrapper, commandData) {
-    console.log("Hi from the setFilter handler", commandData);
+async function setFilter(deviceWrapper, commandData) {
+    const record = getRecord(deviceWrapper);
+    if (!record || !deviceWrapper?.deviceHandler) {
+        return null;
+    }
+
+    const filter = commandData?.body?.filter;
+    if (!filter) {
+        log(`Could not set filter - no data: ${JSON.stringify(filter)}`, deviceWrapper, 'red');
+        return null;
+    }
+
+    const dynformsFilter = { 
+        
+    };
+
+    if (filter.collection) {
+        switch(filter.collection) {
+            case 'general':
+                // Don't filter at all.
+                break;
+
+            case 'trashed':
+                dynformsFilter.collections = ['trashed'];
+                break;
+
+            case 'unsorted':
+                // Pictures that haven't been put in any collection
+                dynformsFilter.collections = { $eq: [] };
+                break;
+
+            default:
+                dynformsFilter.collections = `__ARRAY_INCLUDES_ITEM-${JSON.stringify(filter.collection)}`;
+                break;
+
+        }
+        
+
+        
+    }
+
+    if (filter.tags?.length) {
+        dynformsFilter.tags = `__ARRAY_INCLUDES_ARRAY_${filter.tagsMode === 'and' ? `AND-` : `OR-` }${JSON.stringify(filter.tags)}`;
+    }
+    
+    // Grab the config of the first request.
+    const requestInfo = deviceWrapper.settings?.requests?.length && deviceWrapper.settings?.requests[0];
+
+    if (!requestInfo.query) {
+        requestInfo.query = {}
+    }
+
+    requestInfo.query.filter = dynformsFilter;
+    log(`Setting new filter: ${JSON.stringify(dynformsFilter)}`, deviceWrapper);
+
+    const newState = {
+        ...deviceWrapper.state,        
+    }
+
+    if (!newState.uiInfo) {
+        newState.uiInfo = {};
+    }
+
+    newState.uiInfo.filter = filter;
+    deviceWrapper._updateState(newState, true);
+    nextPicture(deviceWrapper, {});
 }
 
 async function toggleFavorites(deviceWrapper, commandData) {
@@ -63,7 +167,7 @@ async function toggleFavorites(deviceWrapper, commandData) {
     // Handle favorites collection
     const favorites = 'favorites';
 
-    if (!Array.isArray(record.collections)) {
+    if (!Array.isArray(record.collections) || record.collections.includes('trashed')) {
         record.collections = [];
     }
     
@@ -77,58 +181,6 @@ async function toggleFavorites(deviceWrapper, commandData) {
     record.rating = !record.rating || record.rating < 5 ? 5 : 0;
 
     return await updateRecord(deviceWrapper, record);
-}
-
-async function addTags(deviceWrapper, commandData) {
-    const record = getRecord(deviceWrapper);
-    if (!record || !deviceWrapper?.deviceHandler) {
-        return null;
-    }
-
-    const tagString = commandData?.body?.tagString;
-    
-    if (!tagString) {
-        return;
-    }
-
-    const separator = tagString.includes(',') ? ',' : ' ';
-    const newTags = tagString.trim().split(separator);
-    
-    const updatedTags = Array.isArray(record.tags) ? [...record.tags, ...newTags] : newTags;
-    
-    record.tags = filterTags(updatedTags);
-    return await updateRecord(deviceWrapper, record);
-
-    /**
-     * This is copied from Photos - should be solved differently.
-     */
-    function filterTags(tags) {
-        if (!(tags && tags.length)) {
-            return [];
-        }
-
-        const excludeTags = [
-            'and',
-            'at',
-            'edits',
-            'edit',
-            'for',
-            'from',
-            'in',
-            'on',
-            'the',
-            'to',
-            'with',
-        ]
-
-        return tags
-            .map((tag) => tag.toLowerCase())
-            .filter((tag) => {
-                const isAlpha = /^[a-zA-Z]+$/.test(tag);
-                return !excludeTags.includes(tag) && isAlpha;
-            });
-            
-    }
 }
 
 /**
@@ -159,6 +211,8 @@ function getRecord(deviceWrapper) {
     if (!(Array.isArray(records) && records.length)) {
         return {};
     }
+    // console.log("**** Current Record");
+    // console.log(records[0]);
 
     return records[0];
 }

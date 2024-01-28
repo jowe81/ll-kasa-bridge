@@ -124,6 +124,7 @@ class DynformsServiceHandler {
                 collectionName: info.collectionName,
                 sessionId: null,
                 settings: {},
+                filter: info.query?.filter,
                 orderBy: info.retrieve.orderBy ?? {},
             };
 
@@ -195,10 +196,10 @@ class DynformsServiceHandler {
                         break;
 
                     default:
-                        dynformsDbFilters.applyStaticFilter(match, resultFilter);
-                        console.log(resultFilter);
                         break;
                 }
+            } else {
+                dynformsDbFilters.applyStaticFilter(match, resultFilter);
             }
         });
 
@@ -347,6 +348,7 @@ class DynformsServiceHandler {
 
         this.service._updateState(
             {
+                ...this.service.state,
                 powerState: this.service.getPowerState(),
                 api: displayData,
                 settings: this.service.settings,

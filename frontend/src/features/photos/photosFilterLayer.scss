@@ -1,0 +1,20 @@
+@import './../../main.scss';
+
+.photos-filter-layer {
+
+    .filter-options-container {
+        width: 95%;
+        height: 80%;        
+
+        .header {
+            border-bottom: 1px solid $border-gray;
+            text-align: center;
+        }
+
+        .options-group {
+            padding: 15px; 
+            margin-top: 10px;
+            border-bottom: 1px solid $border-gray;
+        }
+    }
+}
