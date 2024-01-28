@@ -1701,7 +1701,7 @@ const deviceMap = [
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 30 * SECOND,
             ui: {
-                disabled: true,
+                disabled: false,
             },
 
             // Specific to this service:

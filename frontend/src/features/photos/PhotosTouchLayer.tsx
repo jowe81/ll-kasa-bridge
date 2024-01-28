@@ -29,7 +29,7 @@ function PhotosTouchLayer() {
     };
     const favoritesClick = () => runPhotosServiceCommand("toggleFavorites", {});
     const addTags = (tagString) => runPhotosServiceCommand("addTags", { tagString });
-    const addToCollection = (collectionName) => runPhotosServiceCommand("addToCollection", { collectionName });
+    const addToRemoveFromCollection = (collectionName) => runPhotosServiceCommand("addToRemoveFromCollection", { collectionName });
     const setPhotosServiceFilter = (filter) => runPhotosServiceCommand("setFilter", { filter });
     
     const photoButtonHidden = showMainLayer ? "" : "photo-button-hidden";
@@ -66,8 +66,9 @@ function PhotosTouchLayer() {
     } else if (showAddToCollectionLayer) {
         const props = {
             hideLayer: () => setShowAddToCollectionLayer(false),
-            addToCollection,
+            addToRemoveFromCollection,
             photosService,
+            record,
             uiInfo: photosService?.state.uiInfo,
         };
 
@@ -124,7 +125,7 @@ function PhotosTouchLayer() {
                             className={`photo-button photo-button-rating ${photoButtonHidden}`}
                             onClick={() => setShowAddToCollectionLayer(true)}
                         >
-                            Add to Collection
+                            Other Collections
                         </div>
                         <div
                             className={`photo-button photo-button-rating ${photoButtonHidden} ${

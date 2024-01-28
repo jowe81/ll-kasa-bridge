@@ -45,17 +45,28 @@ async function addTags(deviceWrapper, commandData) {
     }
 }
 
-async function addToCollection(deviceWrapper, commandData) {
+async function addToRemoveFromCollection(deviceWrapper, commandData) {
     let record = getRecord(deviceWrapper);
     if (!record || !deviceWrapper?.deviceHandler) {
         return null;
     }
 
     const { collectionName } = commandData.body;
-    console.log('Adding to ', collectionName);
 
     if (collectionName) {
-        record.collections.push(collectionName);
+        if (!record.collections.includes(collectionName)) {
+            //Add
+            if (collectionName === "unsorted") {
+                record.collections = [];
+            } else if (collectionName === "trashed") {
+                record.collections = ["trashed"];
+            } else {
+                record.collections.push(collectionName);
+            }
+        } else {
+            //Remove
+            record.collections = record.collections.filter((item) => item !== collectionName);
+        }
     }
 
     await updateRecord(deviceWrapper, record);
@@ -250,7 +261,7 @@ async function updateRecord(deviceWrapper, record) {
 const handlers = {
     _processApiResponse, // Not for frontend use!
     addTags,
-    addToCollection,
+    addToRemoveFromCollection,
     hideRestorePicture,
     nextPicture,
     setFilter,

@@ -12,9 +12,9 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
     };
 
     if (!initialFilterState.collection) {
-        initialFilterState.collection = "general";
+        initialFilterState.collection = "unsorted";
     }
-
+    
     const [filter, setFilter] = useState<any>(initialFilterState);
 
     const { showKeyboard } = useScreenKeyboard();
@@ -26,15 +26,20 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         onClose: (value) => setFilter({ ...filter, tags: splitTags(value) }),
     };
 
-    const collections = libraryInfo?.collections?.map((info) => info.collectionName);
+    const allCollections = libraryInfo?.collections?.map((info) => info.collectionName).sort();
+    const defaultCollections = allCollections
+        .filter((collectionName) => ["unsorted", "trashed", "favorites"].includes(collectionName))
+        .sort((a, b) => a > b ? -1 : 1 );
+        
+    const customCollections = allCollections
+        .filter((collectionName) => !["unsorted", "trashed", "favorites"].includes(collectionName))
+        .sort();
 
+    const collections = [...defaultCollections, ...customCollections];
+    
     const collectionItemsJsx = collections.map((collection, index) => {
         const collectionInfo = libraryInfo?.collections?.find(info => info.collectionName === collection);
         
-        if (collectionInfo) {
-
-        }
-
         return (
             <div
                 key={index}

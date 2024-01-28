@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
 import "./photosAddToCollectionLayer.scss";
 
-function PhotosAddToCollectionLayer({ addToCollection, hideLayer, uiInfo, photosService }) {
+function PhotosAddToCollectionLayer({ addToRemoveFromCollection, hideLayer, uiInfo, record, photosService }) {
     const libraryInfo = photosService?.state?.api?.libraryInfo;
 
     const { showKeyboard } = useScreenKeyboard();
@@ -11,11 +11,21 @@ function PhotosAddToCollectionLayer({ addToCollection, hideLayer, uiInfo, photos
     const keyboardConfigTags = {
         fieldLabel: "Collection Name:",
         instructions: "Type the name of the collection to add the picture to.",
-        value: collectionName,
+        value: '',
         onClose: (value) => setCollectionName(value),
     };
 
-    const collections = libraryInfo?.collections?.map((info) => info.collectionName);
+    const allCollections = libraryInfo?.collections?.map((info) => info.collectionName).sort();
+    const defaultCollections = allCollections
+        .filter((collectionName) => ["unsorted", "trashed", "favorites"].includes(collectionName))
+        .sort((a, b) => (a > b ? -1 : 1));
+
+    const customCollections = allCollections
+        .filter((collectionName) => !["unsorted", "trashed", "favorites"].includes(collectionName))
+        .sort();
+
+    const collections = [...defaultCollections, ...customCollections];
+    
 
     const collectionItemsJsx = collections.map((collection, index) => {
         const collectionInfo = libraryInfo?.collections?.find((info) => info.collectionName === collection);
@@ -24,9 +34,15 @@ function PhotosAddToCollectionLayer({ addToCollection, hideLayer, uiInfo, photos
         }
 
         return (
-            <div key={index} className={`touch-item`} onClick={() => setCollectionName(collection)}>
+            <div
+                key={index}
+                className={`touch-item ${record.collections.includes(collection) ? "touch-item-selected" : ""}`}
+                onClick={() => addToRemoveFromCollection(collection)}
+            >
                 {collection[0].toUpperCase() + collection.substring(1)}
-                <div className="touch-item-info">{collectionInfo?.count} pictures</div>
+                <div className="touch-item-info">
+                    {collectionInfo?.count} picture{collectionInfo?.count === 1 ? `` : `s`}
+                </div>
             </div>
         );
     });
@@ -40,7 +56,7 @@ function PhotosAddToCollectionLayer({ addToCollection, hideLayer, uiInfo, photos
                     <div className="touch-items-container">{collectionItemsJsx}</div>
                 </div>
                 <div className="options-group" onClick={() => showKeyboard(keyboardConfigTags)}>
-                    <div className="label">Collection Name (tap to type):</div>
+                    <div className="label">Collection Name to add to (tap to type):</div>
                     <div className="touch-items-container">{collectionName}</div>
                 </div>
             </div>
@@ -49,10 +65,10 @@ function PhotosAddToCollectionLayer({ addToCollection, hideLayer, uiInfo, photos
                     Cancel
                 </div>
                 <div className="action" onClick={() => {
-                    addToCollection(collectionName);
+                    addToRemoveFromCollection(collectionName);
                     hideLayer();
                 }}>
-                    Add Picture
+                    {collectionName ? `Add to "${collectionName}"` : `Close` }
                 </div>
             </div>
         </div>
