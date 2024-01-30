@@ -1,8 +1,8 @@
 import _ from "lodash";
 import { createDAVClient } from "tsdav";
 import nodeIcal from "node-ical";
-import axios, { all } from "axios";
 import { makeLiveDeviceObject } from "../TargetDataProcessor.js";
+import { getBeginningOfDay } from "../../helpers/jDateTimeUtils.js";
 import constants from "../../constants.js";
 import { log, debug } from "../Log.js";
 
@@ -265,11 +265,15 @@ class DavServiceHandler {
             allItems.push(...eventsFromRemote);
         })
 
+        const today = getBeginningOfDay();
+
         let displayData = {
             allItems,
             events: allItems
+                // We're only interested in events.
                 .filter((item) => item.type === "VEVENT")
-                .filter((item) => new Date(new Date(item.start)) > new Date() || new Date(item.endDate) > new Date())
+                // Discard events that were before today.
+                .filter((item) => new Date(new Date(item.start)) > today || new Date(item.end) > today)
                 .sort((a, b) => (a.start > b.start ? 1 : -1)),
         };
 

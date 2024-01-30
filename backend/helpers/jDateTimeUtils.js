@@ -431,10 +431,23 @@ const logDates = (dates, label) => {
   })
 }
 
+function getBeginningOfDay(date) {
+    if (!date) {
+        date = new Date();
+    }
+
+    date.setHours(0);
+    date.setMinutes(0);
+    date.setSeconds(0);
+
+    return date;
+}
+
 export {
   formatDate,
   formatDateLong,
   formatTime,
+  getBeginningOfDay,
   getSunrise,
   getSunset,
   getDaytimePercent,

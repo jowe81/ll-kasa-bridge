@@ -8,6 +8,7 @@ import {
     getWeekNumber,
     getBeginningOfWeek,
 } from "./calendarHelpers";
+
 import "./calendar.css";
 
 function Calendar() {
@@ -46,8 +47,10 @@ function Calendar() {
         const endTimeStr = endDate?.toLocaleTimeString(undefined, timeFormatOptions) ?? "";
 
         const eventIsToday = isToday(startDate);
-        const eventIsNow = startDate < now && endDate > now;
+        const eventIsNow = (startDate < now) && (endDate > now);
         const eventIsOver = endDate < now;
+
+        const eventStartsSoon = startsSoon(startDate, 90);
 
         let dateTimeStr = '';
 
@@ -132,13 +135,19 @@ function Calendar() {
                 <div className="header-container">
                     <div className={`calendar-index-${event.calendarIndex}`}>
                         {event.location && <div className="event-location">@{event.location}</div>}
-                        {event.calendarLabel}
+                        <div className="event-calendar-label">{event.calendarLabel}</div>
                     </div>
-                    <div className="event-start-end">{dateTimeStr}</div>
+                    <div className="event-start-end">
+                        {eventIsNow && <div className="event-happening-now-alert">In Progress</div>}
+                        {eventStartsSoon && (
+                            <div className="event-happening-soon-alert">In {getTimeDifference(startDate, now)}</div>
+                        )}
+                        {dateTimeStr}
+                    </div>
                 </div>
                 <div className="body-container">
                     <div className="event-summary">{event.summary}</div>
-                    <div className="event-description">{cutAtFirstWordAfterMaxChars(event.description ?? '', 120)}</div>
+                    <div className="event-description">{cutAtFirstWordAfterMaxChars(event.description ?? "", 120)}</div>
                 </div>
             </div>
         );
@@ -155,6 +164,38 @@ function Calendar() {
             </div>
         </div>
     );
+}
+
+function startsSoon(date: Date, maxMinutes: number) {
+    if (!date) {
+        date = new Date();
+    }
+
+    const diff = date.getTime() - Date.now();
+    const minutesOut = Math.floor(diff / 60000); 
+
+    return minutesOut > 0 && minutesOut <= maxMinutes;
+}
+
+function getTimeDifference(date1, date2) {
+    // Calculate the difference in milliseconds
+    var difference = date1 - date2;
+
+    // Convert milliseconds to hours and minutes
+    var hours = Math.floor(difference / 3600000); // 1 hour = 3600000 milliseconds
+    var minutes = Math.floor((difference % 3600000) / 60000); // 1 minute = 60000 milliseconds
+
+    // Format the hours and minutes to HH:MM
+    var hoursFormatted = hours.toString();
+    var minutesFormatted = minutes.toString().padStart(2, "0");
+
+    let output = ''
+    if (hours > 0) {
+        output += `${hoursFormatted}h, `;
+    }
+
+    output += `${minutesFormatted}m`;
+    return output;
 }
 
 function cutAtFirstWordAfterMaxChars(text, maxChars) {

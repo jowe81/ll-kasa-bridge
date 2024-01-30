@@ -18,7 +18,7 @@
   display: flex;
   transform: scale(1s);
   position: relative;
-  
+  overflow: hidden;  
 }
 
 .touch-ui-panel-container {

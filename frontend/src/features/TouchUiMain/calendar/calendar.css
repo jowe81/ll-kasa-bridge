@@ -67,6 +67,7 @@
     padding: 0px;
     padding-top: 0px;
     margin: 5px;
+    margin-right: 0px;
     margin-bottom: 3px;
     border-radius: 3px;
     border: 1px solid rgba(161, 121, 83, 0.449);
@@ -84,6 +85,38 @@
     color: rgba(209, 220, 213, 0.575);
 }
 
+.calendar-event-container .event-happening-now-alert {
+    background-color: rgba(170, 15, 15, 0.79);
+    text-transform: uppercase;
+    text-align: center;
+    color: rgb(255, 0, 0);
+    display: inline-block;
+    border-radius: 3px;
+    margin: 0px 3px;
+    font-size: 75%;
+    margin-top: 4px;
+    margin-left: 3px;
+    padding: 0px 3px;
+}
+
+.calendar-event-container .event-happening-soon-alert {
+    background-color: rgba(170, 87, 15, 0.703);
+    text-align: center;
+    color: rgb(255, 157, 0);
+    display: inline-block;
+    border-radius: 3px;
+    margin: 0px 3px;
+    font-size: 75%;
+    margin-top: 4px;
+    margin-left: 3px;
+    padding: 0px 3px;
+}
+
+
+.calendar-event-container .event-calendar-label {
+    padding-right: 3px;
+}
+
 .calendar-event-container > .header-container > .event-start-end {
     text-align: right;
     padding-right: 5px;
@@ -94,7 +127,6 @@
     text-align: right;
     font-size: 90%;    
     background-color: rgba(192, 242, 255, 0.23);
-    padding-right: 5px;
     color: rgba(217, 227, 218, 0.425);    
     height: 23px;
 }
@@ -103,7 +135,6 @@
     text-align: right;
     font-size: 90%;
     background-color: rgba(242, 215, 255, 0.302);
-    padding-right: 5px;
     color: rgba(225, 199, 225, 0.614);    
 }
 
