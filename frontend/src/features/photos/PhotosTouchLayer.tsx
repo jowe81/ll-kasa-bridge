@@ -1,16 +1,16 @@
 import PhotosFilterLayer from "./PhotosFilterLayer";
-import PhotosAddToCollectionLayer from "./PhotosAddToCollectionLayer";
+import PhotosManageCollectionsLayer from "./PhotosManageCollectionsLayer";
+import PhotosManageTagsLayer from "./PhotosManageTagsLayer";
 import { useState } from "react";
 import { getPhotosService, runChannelCommand } from "../../devicesHelpers";
 import { getDynformsServiceRecord } from "../../dynformsHelpers";
-import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
 import './photosTouchLayer.css';
 
 function PhotosTouchLayer() {
     const [showMainLayer, setShowMainLayer] = useState(false);
     const [showChangeFilterLayer, setShowChangeFilterLayer] = useState(false);
-    const [showAddToCollectionLayer, setShowAddToCollectionLayer] = useState(false);
-    const { showKeyboard } = useScreenKeyboard();
+    const [showManageCollectionsLayer, setShowManageCollectionsLayer] = useState(false);
+    const [showManageTagsLayer, setShowManageTagsLayer] = useState(false);
 
     const photosService = getPhotosService();
     const record = getDynformsServiceRecord(photosService?.channel);
@@ -28,24 +28,13 @@ function PhotosTouchLayer() {
         runPhotosServiceCommand("hideRestorePicture", { hide: !record.collections?.includes('trashed') })
     };
     const favoritesClick = () => runPhotosServiceCommand("toggleFavorites", {});
-    const addTags = (tagString) => runPhotosServiceCommand("addTags", { tagString });
+    const addRemoveTag = (tagString) => runPhotosServiceCommand("addRemoveTag", { tagString });
     const addToRemoveFromCollection = (collectionName) => runPhotosServiceCommand("addToRemoveFromCollection", { collectionName });
     const setPhotosServiceFilter = (filter) => runPhotosServiceCommand("setFilter", { filter });
     
     const photoButtonHidden = showMainLayer ? "" : "photo-button-hidden";
     const isInFavorites = record?.collections?.includes("favorites");
     const isHidden = record?.collections?.includes("trashed");
-
-    function onKeyboardCloseTags(value) {
-        console.log("Keyboard returned with: ", value);
-        addTags(value);
-    }   
-
-    const keyboardConfigTags = {
-        fieldLabel: "Tags to add:",
-        instructions: "Use commas or spaces to separate multiple tags.",
-        onClose: onKeyboardCloseTags,
-    };
 
     if (showChangeFilterLayer) {
         const props = {
@@ -54,7 +43,6 @@ function PhotosTouchLayer() {
                 setShowChangeFilterLayer(false);
                 setPhotosServiceFilter(filter);
                 setShowMainLayer(false);
-                //nextBtnClick();
             },
             photosService,
             uiInfo: photosService?.state.uiInfo,
@@ -63,17 +51,26 @@ function PhotosTouchLayer() {
         return (
             <PhotosFilterLayer {...props}/>
         )
-    } else if (showAddToCollectionLayer) {
+    } else if (showManageCollectionsLayer) {
         const props = {
-            hideLayer: () => setShowAddToCollectionLayer(false),
+            hideLayer: () => setShowManageCollectionsLayer(false),
             addToRemoveFromCollection,
             photosService,
             record,
             uiInfo: photosService?.state.uiInfo,
         };
 
-        return <PhotosAddToCollectionLayer {...props} />;
+        return <PhotosManageCollectionsLayer {...props} />;
+    } else if (showManageTagsLayer) {
+        const props = {
+            hideLayer: () => setShowManageTagsLayer(false),
+            addRemoveTag,
+            photosService,
+            record,
+            uiInfo: photosService?.state.uiInfo,
+        };
 
+        return <PhotosManageTagsLayer {...props} />;
     } else {
         return (
             <div className="photo-touch-layer">
@@ -106,9 +103,9 @@ function PhotosTouchLayer() {
                         </div>
                         <div
                             className={`photo-button photo-button-rating photo-button-rating-tag ${photoButtonHidden}`}
-                            onClick={() => showKeyboard(keyboardConfigTags)}
+                            onClick={() => setShowManageTagsLayer(true)}
                         >
-                            <div className="button-label">Add Tags</div>
+                            <div className="button-label">Tags</div>
                             <div className="current-items">
                                 {record?.tags && record.tags.length ? (
                                     record.tags.join(", ")
@@ -119,14 +116,14 @@ function PhotosTouchLayer() {
                         </div>
                         <div
                             className={`photo-button photo-button-rating photo-button-rating-tag ${photoButtonHidden}`}
-                            onClick={() => setShowAddToCollectionLayer(true)}
+                            onClick={() => setShowManageCollectionsLayer(true)}
                         >
                             <div className="button-label">Collections</div>
                             <div className="current-items">
-                                {record?.tags && record.tags.length ? (
+                                {record?.collections && record.collections.length ? (
                                     record.collections.join(", ").toLowerCase()
                                 ) : (
-                                    <div className="no-items-yet">no tags assigned</div>
+                                    <div className="no-items-yet">no collections assigned</div>
                                 )}
                             </div>
                         </div>

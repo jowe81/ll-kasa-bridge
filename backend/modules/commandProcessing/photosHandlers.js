@@ -45,6 +45,31 @@ async function addTags(deviceWrapper, commandData) {
     }
 }
 
+async function addRemoveTag(deviceWrapper, commandData) {
+    let record = getRecord(deviceWrapper);
+    if (!record || !deviceWrapper?.deviceHandler) {
+        return null;
+    }
+
+    const tagString = commandData?.body?.tagString?.toLowerCase();
+
+    if (tagString) {        
+        if (!Array.isArray(record.tags)) {
+            record.tags = [];
+        }
+
+        if (!record.tags.includes(tagString)) {
+            //Add
+            record.tags.push(tagString);
+        } else {
+            //Remove
+            record.tags = record.tags.filter((item) => item.toLowerCase() !== tagString);
+        }
+
+        await updateRecord(deviceWrapper, record);
+    }
+}
+
 async function addToRemoveFromCollection(deviceWrapper, commandData) {
     let record = getRecord(deviceWrapper);
     if (!record || !deviceWrapper?.deviceHandler) {
@@ -129,9 +154,7 @@ async function setFilter(deviceWrapper, commandData) {
         return null;
     }
 
-    const dynformsFilter = { 
-        
-    };
+    const dynformsFilter = {};
 
     if (filter.collection) {
         switch(filter.collection) {
@@ -148,10 +171,7 @@ async function setFilter(deviceWrapper, commandData) {
                 dynformsFilter.collections = `__ARRAY_INCLUDES_ITEM-${JSON.stringify(filter.collection)}`;
                 break;
 
-        }
-        
-
-        
+        }                
     }
 
     if (filter.tags?.length) {
@@ -234,8 +254,6 @@ function getRecord(deviceWrapper) {
     if (!(Array.isArray(records) && records.length)) {
         return {};
     }
-    // console.log("**** Current Record");
-    // console.log(records[0]);
 
     return records[0];
 }
@@ -260,6 +278,7 @@ async function updateRecord(deviceWrapper, record) {
 
 const handlers = {
     _processApiResponse, // Not for frontend use!
+    addRemoveTag,
     addTags,
     addToRemoveFromCollection,
     hideRestorePicture,

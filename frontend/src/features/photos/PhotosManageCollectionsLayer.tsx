@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
-import "./photosAddToCollectionLayer.scss";
+import "./photosManageCollectionsLayer.scss";
 
-function PhotosAddToCollectionLayer({ addToRemoveFromCollection, hideLayer, uiInfo, record, photosService }) {
+function PhotosManageCollectionsLayer({ addToRemoveFromCollection, hideLayer, uiInfo, record, photosService }) {
     const libraryInfo = photosService?.state?.api?.libraryInfo;
 
     const { showKeyboard } = useScreenKeyboard();
-    const [collectionName, setCollectionName] = useState("");
 
     const keyboardConfigTags = {
         fieldLabel: "Collection Name:",
         instructions: "Type the name of the collection to add the picture to.",
-        value: '',
-        onClose: (value) => setCollectionName(value),
+        value: "",
+        onClose: (value) => addToRemoveFromCollection(value),
     };
 
     const allCollections = libraryInfo?.collections?.map((info) => info.collectionName).sort();
@@ -56,23 +55,26 @@ function PhotosAddToCollectionLayer({ addToRemoveFromCollection, hideLayer, uiIn
                     <div className="touch-items-container">{collectionItemsJsx}</div>
                 </div>
                 <div className="options-group" onClick={() => showKeyboard(keyboardConfigTags)}>
-                    <div className="label">Add the picture to a new collection (tap to type a collection name):</div>
-                    <div className="touch-items-container">{collectionName}</div>
+                    <div className="action" style={{ maxWidth: "400px" }}>
+                        Use Different Collection
+                    </div>
                 </div>
             </div>
             <div className="actions-container">
                 <div className="action" onClick={hideLayer}>
                     Cancel
                 </div>
-                <div className="action" onClick={() => {
-                    addToRemoveFromCollection(collectionName);
-                    hideLayer();
-                }}>
-                    {collectionName ? `Add to "${collectionName}"` : `Close` }
+                <div
+                    className="action"
+                    onClick={() => {
+                        hideLayer();
+                    }}
+                >
+                    Close
                 </div>
             </div>
         </div>
     );
 }
 
-export default PhotosAddToCollectionLayer;
+export default PhotosManageCollectionsLayer;

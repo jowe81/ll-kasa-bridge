@@ -51,8 +51,38 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
         border-radius: 5px;
         padding: 5px;
         display: flex;
+        flex-flow: row wrap;
         min-height: 80px;
+        max-height: 222px;        
+        overflow-y: auto;
     }
+
+    
+    /*
+    Scrollbar (see https://www.w3schools.com/howto/howto_css_custom_scrollbar.asp)
+    */
+
+    /* width */
+    .touch-items-container::-webkit-scrollbar {
+    width: 10px;
+    }
+
+    /* Track */
+    .touch-items-container::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, .08);
+
+    }
+    
+    /* Handle */
+    .touch-items-container::-webkit-scrollbar-thumb {
+    background: #77777784;
+    /* background-color: rgba(55, 40, 40, 1); */
+    }
+
+    /* Handle on hover */
+    .touch-items-container::-webkit-scrollbar-thumb:hover {
+    background: rgb(152, 152, 152);
+    }    
 
     .options-groups-container {
         width: 95%;
@@ -68,6 +98,7 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
             padding: 15px; 
             margin-top: 10px;
             border-bottom: 1px solid $border-gray;
+            height: auto;
         }
     }
     
@@ -78,10 +109,14 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
         display: flex;
         border-top: 1px solid $border-gray;
         justify-content: flex-end;
-        .action {
-            @extend .touch-item;
-            max-height: 60px;          
-        }
+    }
+
+    .actions-container .action, .action {
+        @extend .touch-item;
+        max-height: 60px;          
+        // border-color: rgba(255, 255, 0, 0.439);
+        // color:rgba(255, 255, 153, 0.67);
+        background-color: rgba(255, 255, 255, 0.153);
     }
 }
 
