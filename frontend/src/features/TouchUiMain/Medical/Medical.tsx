@@ -1,6 +1,5 @@
 import { getDeviceByChannel } from "../../../devicesHelpers";
 import { getMidNight, getNDaysAgoMidnight } from "../calendar/calendarHelpers";
-import constants from "../../../constants";
 
 import "./medical.css"
 
@@ -11,13 +10,24 @@ function Medical() {
         return;
     }
     const records = device.state?.api?.data?.records;
-    
+    const lastSampleSysDiaPulse = records.length ? {
+        label: 'Last Sample',
+        sys: records[0].sys,
+        dia: records[0].dia,
+        pulse: records[0].pulse,
+        samples: 1,
+    } : null
+
     const sampleData = [        
         getAverageSysDiaPulse(records, getMidNight(), new Date(), 'Today'),
         getAverageSysDiaPulse(records, getNDaysAgoMidnight(1), getMidNight(), 'Yesterday'),
         getAverageSysDiaPulse(records, getNDaysAgoMidnight(7), getMidNight(), '7 Days'),
         getAverageSysDiaPulse(records, getNDaysAgoMidnight(30), getMidNight(), '30 Days'),
     ];
+
+    if (lastSampleSysDiaPulse) {
+        sampleData.unshift(lastSampleSysDiaPulse);
+    }
 
     const rowsJsx = sampleData
         .filter((avgData) => avgData)
