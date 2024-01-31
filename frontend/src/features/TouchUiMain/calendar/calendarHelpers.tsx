@@ -159,8 +159,14 @@ function isLeapYear(year) {
 function getDateString(date, dateFormatOptions) {
     const leapYear = isLeapYear(date.getFullYear());
     
-    if (leapYear && date.getMonth() === 2 && date.getDate(1)) {        
-        return getDayOfWeekString(date, 'short') + ' Feb 29';
+    if (leapYear && date.getMonth() === 2 && date.getDate(1)) {
+        let result; 
+
+        dateFormatOptions.includeDayOfWeek ? 
+            result = getDayOfWeekString(date, 'short') + ' Feb 29' :
+            result = 'Feb 29';
+
+        return result;
     }
 
     return date?.toLocaleDateString(undefined, dateFormatOptions);    
@@ -198,8 +204,6 @@ const isTomorrow = (date) => {
 }
 
 const isThisWeek = (date) => date <= getEndOfWeek();
-
-
 
 export {
     formatTime,
