@@ -31,21 +31,31 @@ function Calendar() {
     let lastEventStartDate: any = null;
     let lastEventWeekNumber: any = null;
 
+    const eventsToday = events.filter(event => {
+        const startDate = event.start ? new Date(event.start) : null;
+        return event.start && isToday(startDate);
+    })
+
+    const haveEventsToday = eventsToday.length;
+
     events?.forEach((event, index) => {
         const startDate = event.start ? new Date(event.start) : null;
         if (!startDate) {
             // At the very least we need a start date.
             return;
         }
-
+        
         const endDate = event.end ? new Date(event.end) : startDate;
+        if (now > endDate) {
+            return;
+        }
 
         const startDateStr = startDate?.toLocaleDateString(undefined, dateFormatOptions) ?? "";
         const startTimeStr = startDate?.toLocaleTimeString(undefined, timeFormatOptions) ?? '';
         
         const endDateStr = endDate?.toLocaleDateString(undefined, dateFormatOptions) ?? "";
         const endTimeStr = endDate?.toLocaleTimeString(undefined, timeFormatOptions) ?? "";
-
+        
         const eventIsToday = isToday(startDate);
         const eventIsNow = (startDate < now) && (endDate > now);
         const eventIsOver = endDate < now;
@@ -62,7 +72,25 @@ function Calendar() {
 
         if (!isSameDay(lastEventStartDate, startDate)) {
             // This event is on a future date. See if we want a divider.
+            if (lastEventStartDate === null && !isToday(startDate)) {
+                // Nothing today. Add in divider anyway.
+                calendarItemsJsx.push(
+                    <div key={`divider_${-1}`} className="calendar-event-divider-container">
+                        Today
+                    </div>
+                );
+                console.log('have events today', haveEventsToday)
+                
+                const nothingScheduledNote = haveEventsToday ?
+                    `No more scheduled events.` :
+                    `No scheduled events today.`;
 
+                calendarItemsJsx.push(
+                    <div key={-1} className="calendar-no-more-events">
+                        {nothingScheduledNote} Cheers! <span className="semi-opaque">&#127866;</span>
+                    </div>
+                );
+            }
             if (isThisWeek(startDate)) {
                 if (isSameDay(startDate, endDate)) {
                     dateTimeStr = `${startTimeStr} - ${endTimeStr}`;

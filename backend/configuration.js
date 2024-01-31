@@ -1721,24 +1721,24 @@ const deviceMap = [
         commandHandlersExtension: null,
         settings: {
             remotes: [
-                {
-                    defaultAccountType: "caldav",
-                    //serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/calendars/admin/calendar/",
-                    serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/",
-                    authMethod: "Basic",
-                    label: "Johannes",
-                    credentials: {
-                        // These point to .env variables
-                        username: "CALENDAR_SERVICE_CALDAV_JOHANNES_USERNAME",
-                        password: "CALENDAR_SERVICE_CALDAV_JOHANNES_PASSWORD",
-                    },
-                    calendarsToDisplay: [
-                        {
-                            displayName: "Johannes",
-                            url: "https://nc.jessandjohannes.com/remote.php/dav/calendars/admin/personal/",
-                        },
-                    ],
-                },
+                // {
+                //     defaultAccountType: "caldav",
+                //     //serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/calendars/admin/calendar/",
+                //     serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/",
+                //     authMethod: "Basic",
+                //     label: "Johannes",
+                //     credentials: {
+                //         // These point to .env variables
+                //         username: "CALENDAR_SERVICE_CALDAV_JOHANNES_USERNAME",
+                //         password: "CALENDAR_SERVICE_CALDAV_JOHANNES_PASSWORD",
+                //     },
+                //     calendarsToDisplay: [
+                //         {
+                //             displayName: "Johannes",
+                //             url: "https://nc.jessandjohannes.com/remote.php/dav/calendars/admin/personal/",
+                //         },
+                //     ],
+                // },
                 {
                     defaultAccountType: "caldav",
                     //serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/calendars/admin/calendar/",
@@ -1754,6 +1754,23 @@ const deviceMap = [
                         {
                             displayName: "Jess",
                             url: "https://caldav.icloud.com/287697599/calendars/home/",
+                        },
+                    ],
+                },
+                {
+                    defaultAccountType: "caldav",
+                    serverUrl: "https://caldav.icloud.com",
+                    authMethod: "Basic",
+                    label: "Johannes",
+                    credentials: {
+                        // These point to .env variables
+                        username: "CALENDAR_SERVICE_CALDAV_JOHANNES_ICLOUD_USERNAME",
+                        password: "CALENDAR_SERVICE_CALDAV_JOHANNES_ICLOUD_PASSWORD",
+                    },
+                    calendarsToDisplay: [
+                        {
+                            displayName: "Johannes",
+                            url: "https://caldav.icloud.com/1286479590/calendars/home/",
                         },
                     ],
                 },
@@ -1791,12 +1808,12 @@ const deviceMap = [
                             {
                                 type: "static",
                                 match: {
-                                    created_at: { $gt: "__DATE_DAYS_AGO-30" } // Only get values up to 1 months ago                            
+                                    created_at: { $gt: "__DATE_DAYS_AGO-30" }, // Only get values up to 1 months ago
                                 },
                             },
                         ],
                         orderBy: {
-                            created_at: 1
+                            created_at: 1,
                         },
                     },
                 },
