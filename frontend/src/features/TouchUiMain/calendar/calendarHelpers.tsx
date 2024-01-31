@@ -129,6 +129,18 @@ const isSameDay = (date1, date2) => {
     );
 };
 
+const isSameTime = (date1, date2) => {
+    if (!date1 || !date2) {
+        return false;
+    }
+
+    return (
+        date1.getHours() === date2.getHours() &&
+        date1.getMinutes() === date2.getMinutes() &&
+        date1.getSeconds() === date2.getSeconds()
+    );
+};
+
 const isInNDays = (date, n) => {
     if (!date) {
         return null;
@@ -138,6 +150,39 @@ const isInNDays = (date, n) => {
     targetDate.setDate(targetDate.getDate() + n);
     return isSameDay(date, targetDate);
 
+}
+
+function isLeapYear(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+function getDateString(date, dateFormatOptions) {
+    const leapYear = isLeapYear(date.getFullYear());
+    
+    if (leapYear && date.getMonth() === 2 && date.getDate(1)) {        
+        return getDayOfWeekString(date, 'short') + ' Feb 29';
+    }
+
+    return date?.toLocaleDateString(undefined, dateFormatOptions);    
+}
+
+function getDayOfWeekString(date, format) {
+    if (!date) {
+        return 'N/A';
+    }
+
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const daysShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    const day = date.getDay();
+    switch (format) {
+        case 'short':
+            return daysShort[day];
+
+        default:
+            return days[day];
+            
+    }
 }
 
 const isToday = (date) => isInNDays(date, 0);
@@ -160,7 +205,9 @@ export {
     formatTime,
     getBeginningOfWeek,
     getCalendarEvents,
+    getDateString,
     getDaysDifference,
+    getDayOfWeekString,
     getEndOfDay,
     getEndOfWeek,
     getEndOfYesterday,
@@ -168,7 +215,9 @@ export {
     getSecondsSinceMidnight,
     getNDaysAgoMidnight,
     getWeekNumber,
+    isLeapYear,
     isSameDay,
+    isSameTime,
     isThisWeek,
     isToday,
     isTomorrow,

@@ -1,6 +1,8 @@
 import {
     getCalendarEvents,
+    getDateString,
     isSameDay,
+    isSameTime,
     isThisWeek,
     isToday,
     isTomorrow,
@@ -50,10 +52,10 @@ function Calendar() {
             return;
         }
 
-        const startDateStr = startDate?.toLocaleDateString(undefined, dateFormatOptions) ?? "";
+        const startDateStr = getDateString(startDate, dateFormatOptions) ?? "";
         const startTimeStr = startDate?.toLocaleTimeString(undefined, timeFormatOptions) ?? '';
         
-        const endDateStr = endDate?.toLocaleDateString(undefined, dateFormatOptions) ?? "";
+        const endDateStr = getDateString(endDate, dateFormatOptions) ?? "";
         const endTimeStr = endDate?.toLocaleTimeString(undefined, timeFormatOptions) ?? "";
         
         const eventIsToday = isToday(startDate);
@@ -70,6 +72,12 @@ function Calendar() {
             dateTimeStr = `${startDateStr}, ${startTimeStr} - ${endDateStr}, ${endTimeStr}`;
         }
 
+        if (isSameTime(startDate, endDate)) {            
+            if (startDate.getHours() === 0) {                
+                dateTimeStr = `${startDateStr} - ${endDateStr}`;
+            }
+        }
+
         if (!isSameDay(lastEventStartDate, startDate)) {
             // This event is on a future date. See if we want a divider.
             if (lastEventStartDate === null && !isToday(startDate)) {
@@ -79,7 +87,6 @@ function Calendar() {
                         Today
                     </div>
                 );
-                console.log('have events today', haveEventsToday)
                 
                 const nothingScheduledNote = haveEventsToday ?
                     `No more scheduled events.` :
@@ -127,7 +134,9 @@ function Calendar() {
                 if (isSameDay(startDate, endDate)) {
                     dateTimeStr = `${weekdayShort} ${startDateStr}, ${startTimeStr} - ${endTimeStr}`;
                 } else {
-                    dateTimeStr = `${weekdayShort} ${startDateStr}, ${startTimeStr} - ${endDateStr}, ${endTimeStr}`;
+                    if (!isSameTime(startDate, endDate)) {
+                        dateTimeStr = `${weekdayShort} ${startDateStr}, ${startTimeStr} - ${endDateStr}, ${endTimeStr}`;
+                    }
                 }
 
                 const thisEventWeekNumber = getWeekNumber(startDate);
