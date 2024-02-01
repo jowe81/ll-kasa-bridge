@@ -9,6 +9,7 @@ import {
     getDaysDifference,
     getWeekNumber,
     getBeginningOfWeek,
+    getTimeDifference,
 } from "./calendarHelpers";
 
 import "./calendar.css";
@@ -62,7 +63,7 @@ function Calendar() {
         const eventIsNow = (startDate < now) && (endDate > now);
         const eventIsOver = endDate < now;
 
-        const eventStartsSoon = startsSoon(startDate, 90);
+        const eventStartsSoon = startsSoon(startDate, 120);
 
         let dateTimeStr = '';
 
@@ -214,26 +215,7 @@ function startsSoon(date: Date, maxMinutes: number) {
     return minutesOut > 0 && minutesOut <= maxMinutes;
 }
 
-function getTimeDifference(date1, date2) {
-    // Calculate the difference in milliseconds
-    var difference = date1 - date2;
 
-    // Convert milliseconds to hours and minutes
-    var hours = Math.floor(difference / 3600000); // 1 hour = 3600000 milliseconds
-    var minutes = Math.floor((difference % 3600000) / 60000); // 1 minute = 60000 milliseconds
-
-    // Format the hours and minutes to HH:MM
-    var hoursFormatted = hours.toString();
-    var minutesFormatted = minutes.toString().padStart(2, "0");
-
-    let output = ''
-    if (hours > 0) {
-        output += `${hoursFormatted}h, `;
-    }
-
-    output += `${minutesFormatted}m`;
-    return output;
-}
 
 function cutAtFirstWordAfterMaxChars(text, maxChars) {
     if (!(typeof maxChars === 'number') || !(maxChars > 0)) {

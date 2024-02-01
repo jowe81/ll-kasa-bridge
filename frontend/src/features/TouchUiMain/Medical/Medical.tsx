@@ -1,6 +1,7 @@
+import constants from "../../../constants.js";
 import { getDeviceByChannel } from "../../../devicesHelpers";
-import { getMidNight, getNDaysAgoMidnight } from "../calendar/calendarHelpers";
-
+import { getMidNight, getNDaysAgoMidnight, getTimeDifference } from "../calendar/calendarHelpers";
+import { formatTime } from "../calendar/calendarHelpers";
 import "./medical.css"
 
 function Medical() {
@@ -10,13 +11,6 @@ function Medical() {
         return;
     }
     const records = device.state?.api?.data?.records;
-    const lastSampleSysDiaPulse = records.length ? {
-        label: 'Last Sample',
-        sys: records[0].sys,
-        dia: records[0].dia,
-        pulse: records[0].pulse,
-        samples: 1,
-    } : null
 
     const sampleData = [        
         getAverageSysDiaPulse(records, getMidNight(), new Date(), 'Today'),
@@ -25,6 +19,7 @@ function Medical() {
         getAverageSysDiaPulse(records, getNDaysAgoMidnight(30), getMidNight(), '30 Days'),
     ];
 
+    const lastSampleSysDiaPulse = getLastSampleSysDiaPulse(records[records.length - 1]);
     if (lastSampleSysDiaPulse) {
         sampleData.unshift(lastSampleSysDiaPulse);
     }
@@ -96,7 +91,49 @@ function getAverageSysDiaPulse(records, startTime: Date, endTime: Date, label: s
         dia: Math.round(totalDia / samplesSysDia),
         pulse: Math.round(totalPulse / samplesPulse),
         samples: targetRecords.length,
-    };
+    };    
+}
+
+function getLastSampleSysDiaPulse(sample, sampleMaxAgeDays = 2) {
+    if (!sample) {
+        return null;
+    }
+    
+    const lastSample = sample;
+    let now = new Date();
+    let lastSampleLabel;
+    let lastSampleCreatedAt = new Date(lastSample.created_at);
+    let lastSampleTimeDiff = getTimeDifference(now, lastSampleCreatedAt);
+    let timeDiffHours = (Math.round(now.getTime() - lastSampleCreatedAt.getTime()) / constants.HOUR);
+
+    if (now.getTime() - lastSampleCreatedAt.getTime() > sampleMaxAgeDays * constants.DAY) {
+        // Don't show the last sample at all - too old.
+        return null;
+    }
+
+    let colorClass = 'badge-neutral';
+    if (timeDiffHours > 2) {
+        colorClass = 'badge-orange';
+    } else if (timeDiffHours > 5) {
+        colorClass = 'badge-red';
+    }
+
+    const style = {
+        display: 'inline-block',
+        fontSize: '85%',
+        padding: '1px 3px',
+        borderRadius: '3px',
+    }
+
+    lastSampleLabel = <span style={style} className={colorClass}>{lastSampleTimeDiff} ago</span>;
+
+    return {
+        label: lastSampleLabel,
+        sys: lastSample.sys,
+        dia: lastSample.dia,
+        pulse: lastSample.pulse,
+        samples: 1,
+    }
 }
 
 export default Medical;

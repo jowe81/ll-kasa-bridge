@@ -10,7 +10,7 @@ function formatTime(formatString, currentDate) {
         formatString = "H:MM"; // Default
     }
 
-    const hours = currentDate.getHours();
+    let hours = currentDate.getHours();
     const minutes = currentDate.getMinutes();
     const seconds = currentDate.getSeconds();
 
@@ -22,10 +22,19 @@ function formatTime(formatString, currentDate) {
             .replace("MM", minutes.toString().padStart(2, "0"))
             .replace("SS", seconds.toString().padStart(2, "0"));
     } else {
+        let suffix = ' AM';
+
+        if (hours > 12) {
+            suffix = ' PM';
+            hours = hours - 12;
+        }
+
         formattedTime = formatString
             .replace("H", hours.toString())
             .replace("MM", minutes.toString().padStart(2, "0"))
-            .replace("SS", seconds.toString().padStart(2, "0"));
+            .replace("SS", seconds.toString().padStart(2, "0"))
+            + suffix;
+
     }
     return formattedTime;
 }
@@ -51,6 +60,28 @@ function getDaysDifference(startDate, endDate) {
 
     // Round to the nearest whole number
     return Math.round(daysDifference);
+}
+
+function getTimeDifference(date1, date2) {
+    // Calculate the difference in milliseconds
+    var difference = date1 - date2;
+
+    // Convert milliseconds to hours and minutes
+    var hours = Math.floor(difference / 3600000); // 1 hour = 3600000 milliseconds
+    var minutes = Math.floor((difference % 3600000) / 60000); // 1 minute = 60000 milliseconds
+
+    // Format the hours and minutes to HH:MM
+    var hoursFormatted = hours.toString();
+    var minutesFormatted = minutes.toString().padStart(2, "0");
+
+    let output = "";
+    if (hours > 0) {
+        output += `${hoursFormatted}h ${minutesFormatted}m`;
+    } else {
+        output = `${minutes}m`;
+    }
+    
+    return output;
 }
 
 function getMidNight(date?: Date) {    
@@ -211,6 +242,7 @@ export {
     getCalendarEvents,
     getDateString,
     getDaysDifference,
+    getTimeDifference,
     getDayOfWeekString,
     getEndOfDay,
     getEndOfWeek,
