@@ -14,9 +14,7 @@ function PhotosManageTagsLayer({ addRemoveTag, hideLayer, uiInfo, record, photos
         onClose: (value) => addRemoveTag(value),
     };
 
-    const tags = record?.tags ?? [];
-    const availableTags = recordInfo?.availableTags ?? [];
-        
+    const tags = record?.tags ?? [];        
     const currentTagItemsJsx = tags?.map((tag, index) => {
         return (
             <div
@@ -29,6 +27,7 @@ function PhotosManageTagsLayer({ addRemoveTag, hideLayer, uiInfo, record, photos
         );
     });
 
+    const availableTags = recordInfo?.availableTags ?? [];
     const availableTagItemsJsx = availableTags.map((tag, index) => {
         return (
             <div

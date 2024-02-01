@@ -25,17 +25,19 @@ function PhotosManageCollectionsLayer({ addToRemoveFromCollection, hideLayer, ui
 
     const collections = [...defaultCollections, ...customCollections];
     
-
     const collectionItemsJsx = collections.map((collection, index) => {
         const collectionInfo = libraryInfo?.collections?.find((info) => info.collectionName === collection);
 
-        if (collectionInfo) {
-        }
+        let className = "touch-item";
+
+        if ((collection === "unsorted" && !record.collections.length) || record.collections?.includes(collection)) {
+            className += " touch-item-selected";
+        } 
 
         return (
             <div
                 key={index}
-                className={`touch-item ${record.collections.includes(collection) ? "touch-item-selected" : ""}`}
+                className={className}
                 onClick={() => addToRemoveFromCollection(collection)}
             >
                 {collection[0].toUpperCase() + collection.substring(1)}

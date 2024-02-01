@@ -86,6 +86,9 @@ async function addToRemoveFromCollection(deviceWrapper, commandData) {
             } else if (collectionName === "trashed") {
                 record.collections = ["trashed"];
             } else {
+                if (record.collections.includes('trashed')) {
+                    record.collections = [];
+                }
                 record.collections.push(collectionName);
             }
         } else {
@@ -153,30 +156,6 @@ async function setFilter(deviceWrapper, commandData) {
         log(`Could not set filter - no data: ${JSON.stringify(filter)}`, deviceWrapper, 'red');
         return null;
     }
-
-    const dynformsFilter = {};
-
-    if (filter.collection) {
-        switch(filter.collection) {
-            case 'trashed':
-                dynformsFilter.collections = ['trashed'];
-                break;
-
-            case 'unsorted':
-                // Pictures that haven't been put in any collection
-                dynformsFilter.collections = { $eq: [] };
-                break;
-
-            default:
-                dynformsFilter.collections = `__ARRAY_INCLUDES_ITEM-${JSON.stringify(filter.collection)}`;
-                break;
-
-        }                
-    }
-
-    if (filter.tags?.length) {
-        dynformsFilter.tags = `__ARRAY_INCLUDES_ARRAY_${filter.tagsMode === 'and' ? `AND-` : `OR-` }${JSON.stringify(filter.tags)}`;
-    }
     
     // Grab the config of the first request.
     const requestInfo = deviceWrapper.settings?.requests?.length && deviceWrapper.settings?.requests[0];
@@ -185,8 +164,36 @@ async function setFilter(deviceWrapper, commandData) {
         requestInfo.query = {}
     }
 
-    requestInfo.query.filter = dynformsFilter;
-    log(`Setting new filter: ${JSON.stringify(dynformsFilter)}`, deviceWrapper);
+    let collectionsFilter, tagsFilter;
+
+    if (filter.collections.length) {
+        collectionsFilter = { [filter.mode_collections]: [...filter.collections] };
+    }
+
+    if (filter.tags.length) {
+        tagsFilter = { [filter.mode_tags]: [...filter.tags] };
+    }
+
+    const $andMaster = [];
+    if (collectionsFilter) {
+        $andMaster.push({ collections: collectionsFilter });
+    }
+
+    if (tagsFilter) {
+        $andMaster.push({ tags: tagsFilter });
+    }
+
+    let mongoFilter = {};
+
+    if ($andMaster.length) {
+        mongoFilter = {
+            $and: $andMaster
+        }
+    }
+
+    console.log(mongoFilter);
+    requestInfo.query.filter = mongoFilter;
+    log(`Setting new filter: ${JSON.stringify(mongoFilter)}`, deviceWrapper);
 
     const newState = {
         ...deviceWrapper.state,        

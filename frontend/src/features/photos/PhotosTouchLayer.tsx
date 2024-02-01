@@ -30,7 +30,9 @@ function PhotosTouchLayer() {
     const favoritesClick = () => runPhotosServiceCommand("toggleFavorites", {});
     const addRemoveTag = (tagString) => runPhotosServiceCommand("addRemoveTag", { tagString });
     const addToRemoveFromCollection = (collectionName) => runPhotosServiceCommand("addToRemoveFromCollection", { collectionName });
-    const setPhotosServiceFilter = (filter) => runPhotosServiceCommand("setFilter", { filter });
+    const setPhotosServiceFilter = (filter) => {
+        runPhotosServiceCommand("setFilter", { filter });
+    };
     
     const photoButtonHidden = showMainLayer ? "" : "photo-button-hidden";
     const isInFavorites = record?.collections?.includes("favorites");

@@ -20,7 +20,34 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
     align-items: center; 
     z-index: 900;
     height: 100%;
-    font-size: 200%;
+    font-size: 130%;
+
+    .touch-boolean-field-container {
+        display: inline-flex;
+        border-radius: 3px;
+        border: 1px solid $border-color-touch-item;
+        
+        .switch-left {
+            padding: 3px;            
+            text-align: center;
+            min-width: 101px;
+            border-right: 1px solid $border-color-touch-item;
+        }
+
+        .switch-right {
+            padding: 3px;            
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .switch-inactive {
+            background-color: rgba(52, 52, 52, 0.575);            
+        }
+
+        .switch-active {
+            background-color: $touch-item-selected-background-color;
+        }
+    }
 
     .touch-item {
         border-radius: 5px;
@@ -99,7 +126,20 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
             margin-top: 10px;
             border-bottom: 1px solid $border-gray;
             height: auto;
+
+            .option-group {
+            }
+
+            .margin-left {
+                margin-left: 15px;
+            }
+            .options-side-by-side {
+                display: flex;
+                justify-content: space-between;
+            }
         }
+
+
     }
     
     .actions-container {
@@ -124,4 +164,43 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
     @extend .touch-layer;    
     background-color: rgba(36, 36, 36, 0.949);
 }
+
+.bg-neutral {
+    background-color: rgba(128, 128, 128, 0.366);
+}
+
+.text-neutral {
+    color: rgba(255, 255, 255, 0.414);
+}
+
+.badge-neutral {
+    @extend .bg-neutral;
+    @extend .text-neutral;    
+}
+.bg-orange {        
+    background-color: rgba(170, 87, 15, 0.703);
+}
+
+.text-orange {
+    color: rgb(255, 157, 0);
+}
+
+.badge-orange {
+    @extend .bg-orange;
+    @extend .text-orange;
+}
+
+.bg-red {
+    background-color: rgba(255, 0, 0, 0.273);
+}
+
+.text-red {
+    color: red !important;
+}
+
+.badge-red {
+    @extend .bg-red;
+    @extend .text-red;
+}
+
 
