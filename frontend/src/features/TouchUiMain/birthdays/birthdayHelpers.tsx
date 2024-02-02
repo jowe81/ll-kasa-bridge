@@ -65,7 +65,6 @@ function getDifference(record) {
     birthdayDate.setHours(0, 0, 0, 0);    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    console.log("Birthday date", birthdayDate, "today", today);
 
     return (birthdayDate.getTime() - today.getTime()) / constants.DAY;
 }

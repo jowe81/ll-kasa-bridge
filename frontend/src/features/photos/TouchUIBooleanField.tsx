@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function TouchUIBooleanField({initialValue, handleClick, labelTrue, labelFalse, styleTrue, styleFalse, valueTrue = true, valueFalse = false}) {
+function TouchUIBooleanField({initialValue, handleClick, labelTrue='ON', labelFalse = 'OFF', valueTrue = true, valueFalse = false, classTrueEnabled = '', classFalseEnabled = ''}) {
     const [value, setValue] = useState(initialValue ?? valueFalse);
 
     const onClick = (value) => {
@@ -11,18 +11,20 @@ function TouchUIBooleanField({initialValue, handleClick, labelTrue, labelFalse, 
     return (
         <div className="touch-boolean-field-container">
             <div
-                className={`switch-left ${value === valueTrue ? `switch-active` : `switch-inactive`}`}
-                style={styleTrue}
+                className={`switch-left ${
+                    value === valueTrue ? `switch-active ${classTrueEnabled}` : `switch-inactive`
+                }`}
                 onClick={() => onClick(valueTrue)}
             >
-                {labelTrue ?? "ON"}
+                {labelTrue}
             </div>
             <div
-                className={`switch-right ${value === valueTrue ? `switch-inactive` : `switch-active`}`}
-                style={styleFalse}
+                className={`switch-right ${
+                    value === valueTrue ? `switch-inactive` : `switch-active ${classFalseEnabled}`
+                }`}
                 onClick={() => onClick(valueFalse)}
             >
-                {labelFalse ?? "OFF"}
+                {labelFalse}
             </div>
         </div>
     );

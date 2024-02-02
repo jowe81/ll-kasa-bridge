@@ -443,14 +443,55 @@ function getBeginningOfDay(date) {
     return date;
 }
 
+function getMonthsOfTheYear(short = false) = {
+    const monthsFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return short ? shortMonths : monthsFull;
+}
+
+function getDaysOfTheWeek(short = false) {
+  const daysFull = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const daysShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  return short ? daysShort : daysFull;
+}
+
+function getDatesInMonth(date) {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate(); // Getting the last day of the month
+
+  const datesArray = Array.from({ length: daysInMonth }, (_, index) => index + 1);
+
+  // If it's February and the year is a leap year, adjust the array length
+  if (month === 1 && isLeapYear(year)) {
+    datesArray.push(29);
+  }
+
+  return datesArray;
+}
+
+function isLeapYear(year) {
+  // Assuming you have a valid implementation of isLeapYear
+  // You can replace this with your actual implementation
+  // ...
+
+  // For the sake of this example, a simple leap year check is provided
+  return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+}
+
+
 export {
   formatDate,
   formatDateLong,
   formatTime,
   getBeginningOfDay,
+  getDatesInMonth,
+  getDaysOfTheWeek,
   getSunrise,
   getSunset,
   getDaytimePercent,
+  getMonthsOfTheYear,
   getNighttimePercent,
   getNextSunEvent,
   getNoon,
@@ -462,6 +503,7 @@ export {
   isDusk,
   isAm,
   isPm,
+  isLeapYear,
   isDaytime,  
   isFullyDaytime,
   isNighttime,

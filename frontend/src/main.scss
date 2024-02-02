@@ -4,7 +4,7 @@ $color-text-red: red;
 $color-bg-red: rgba($color-text-red, 0.273);
 
 $color-touch-layer: rgba(255, 255, 255, 0.753);
-
+$color-bg-touch-layer: gray;
 $color-touch-layer-label: rgba(255, 255, 255, 0.74); 
 $color-touch-item: rgba(255, 255, 255, 0.812);
 $color-touch-item-info: rgba(255, 255, 255, 0.512);
@@ -12,8 +12,6 @@ $border-gray: rgba(128, 128, 128, 0.282);
 $border-color-touch-item: rgba(128, 128, 128, 1);
 
 $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
-
-
 
 .touch-layer {
     color: $color-touch-layer;
@@ -54,6 +52,32 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
         }
     }
 
+    .touch-select-field-container {
+
+        select {
+            min-width: 200px;
+            font-size: 120%;
+            background-color: $color-bg-touch-layer;
+            color: $color-touch-layer;
+            margin: 5px;
+            padding: 5px;
+            border-radius: 3px;
+            border: 1px solid $border-color-touch-item;
+        }
+    }
+
+    .touch-ui-date-selector-outer-container {    
+        display:flex;
+        margin-top: 5px;
+        padding:5px;
+        border: 1px solid $border-gray;
+        border-radius: 3px;
+
+        .touch-ui-date-selector-container {
+            display: flex;
+        }
+    }
+
     .touch-item {
         border-radius: 5px;
         border: 1px solid $border-color-touch-item;
@@ -77,7 +101,6 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
         background-color: $touch-item-selected-background-color;
     }
 
-
     .touch-items-container {
         border: 1px solid $border-gray;
         border-radius: 5px;
@@ -87,6 +110,15 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
         min-height: 80px;
         max-height: 222px;        
         overflow-y: auto;
+    }
+
+    .touch-ui-section-disabled {
+        opacity: 60%;
+        pointer-events: none;
+    }
+    
+    .touch-ui-switch-false-enabled {
+        background-color: rgba($color-bg-red, .25) !important;        
     }
 
     

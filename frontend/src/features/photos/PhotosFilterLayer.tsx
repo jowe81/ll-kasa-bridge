@@ -1,7 +1,10 @@
 import TouchUIBooleanField from "./TouchUIBooleanField";
+import TouchUIDateSelector from "./TouchUIDateSelector";
 import { useState } from "react";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
+import './../TouchUiMain/calendar/calendarHelpers';
 import "./photosFilterLayer.scss";
+import { getConsecutiveNumbers, getDatesInMonth, getMonthsOfTheYear } from "./../TouchUiMain/calendar/calendarHelpers";
 
 function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiInfo, photosService }) {
     const libraryInfo = photosService?.state?.api?.libraryInfo;
@@ -148,25 +151,14 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         );
     });
     
-    function handleTagClick(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        const tag = event.target.dataset.value;
-        console.log(`Removing ${tag}`);
-        setFilter({ ...filter, tags: filter.tags.filter((item) => item !== tag) });
+    function handleDateSelection(property, newDate) {
+        console.log(`New ${property}:`, newDate);
+        const newFilter = {
+            ...filter,
+            [property]: newDate,
+        }
+        setFilter(newFilter);
     }
-
-    const tagsJsx = filter.tags?.map((tag, index) => (
-        <div
-            key={index}
-            className={`touch-item`}
-            data-value={tag}
-            onClick={handleTagClick}
-        >
-            {tag}
-        </div>
-    ));
-
 
     return (
         <div className="touch-layer-opaque photos-filter-layer">
@@ -210,6 +202,19 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="options-group">
+                    <div className="options-group-header">Dates:</div>
+                    <div className="options-side-by-side">
+                        <div className="option-group">
+                            <div className="label">Include Pictures After:</div>
+                            <TouchUIDateSelector onChange={(newDate) => handleDateSelection("startDate", newDate)} />
+                        </div>
+                        <div className="option-group">
+                            <div className="label">Include Pictures Before:</div>
+                            <TouchUIDateSelector onChange={(newDate) => handleDateSelection("endDate", newDate)} />
                         </div>
                     </div>
                 </div>

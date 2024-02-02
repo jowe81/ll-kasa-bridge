@@ -236,18 +236,58 @@ const isTomorrow = (date) => {
 
 const isThisWeek = (date) => date <= getEndOfWeek();
 
+function getMonthsOfTheYear(short = false) {
+    const monthsFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return short ? shortMonths : monthsFull;
+}
+
+function getDaysOfTheWeek(short = false) {
+  const daysFull = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const daysShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  return short ? daysShort : daysFull;
+}
+
+function getDatesInMonth(date) {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate(); // Getting the last day of the month
+
+  const datesArray = Array.from({ length: daysInMonth }, (_, index) => index + 1);
+
+  // If it's February and the year is a leap year, adjust the array length
+  if (month === 1 && isLeapYear(year)) {
+    datesArray.push(29);
+  }
+
+  return datesArray;
+}
+
+function getConsecutiveNumbers(start, end) {
+    const numbers = [];
+    for(let i = start; i <= end; i++) {
+        numbers.push(i);
+    }
+    return numbers;
+}
+
 export {
     formatTime,
     getBeginningOfWeek,
     getCalendarEvents,
+    getConsecutiveNumbers,
     getDateString,
+    getDatesInMonth,
     getDaysDifference,
+    getDaysOfTheWeek,
     getTimeDifference,
     getDayOfWeekString,
     getEndOfDay,
     getEndOfWeek,
     getEndOfYesterday,
     getMidNight,
+    getMonthsOfTheYear,
     getSecondsSinceMidnight,
     getNDaysAgoMidnight,
     getWeekNumber,
