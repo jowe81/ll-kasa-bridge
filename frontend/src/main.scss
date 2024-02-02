@@ -1,3 +1,8 @@
+$color-bg-orange: rgba(100,50,0,1);
+$color-text-orange: rgb(255, 157, 0);
+$color-text-red: red;
+$color-bg-red: rgba($color-text-red, 0.273);
+
 $color-touch-layer: rgba(255, 255, 255, 0.753);
 
 $color-touch-layer-label: rgba(255, 255, 255, 0.74); 
@@ -177,30 +182,36 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
     @extend .bg-neutral;
     @extend .text-neutral;    
 }
+
+
+/* Orange */
+
 .bg-orange {        
-    background-color: rgba(170, 87, 15, 0.703);
+    background-color: $color-bg-orange;
 }
 
 .text-orange {
-    color: rgb(255, 157, 0);
+    color: $color-text-orange;
 }
 
 .badge-orange {
-    @extend .bg-orange;
-    @extend .text-orange;
+    color: $color-text-orange;
+    background-color: $color-bg-orange;
 }
 
-.bg-red {
-    background-color: rgba(255, 0, 0, 0.273);
+/* Reds */
+
+.bg-red {        
+    background-color: $color-bg-red;
 }
 
 .text-red {
-    color: red !important;
+    color: $color-text-red;
 }
 
 .badge-red {
-    @extend .bg-red;
-    @extend .text-red;
+    color: $color-text-red;
+    background-color: rgba($color-bg-red, .4);
 }
 
 

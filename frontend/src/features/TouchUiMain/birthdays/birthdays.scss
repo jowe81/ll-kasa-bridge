@@ -1,3 +1,5 @@
+@import './../../../main.scss';
+
 .birthdays-container {
   background-color: rgba(100, 100, 110, .7);  
   width: 300px;
@@ -79,7 +81,7 @@
 
 .birthday-item-container-tomorrow {
   color:rgb(229, 220, 211);  
-  background: rgba(100,50,0,1);
+  background: $color-bg-orange;
   font-size: 70%;  
 }
 

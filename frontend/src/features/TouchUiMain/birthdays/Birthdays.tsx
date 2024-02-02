@@ -1,4 +1,4 @@
-import "./birthdays.css";
+import "./birthdays.scss";
 
 import { getRecords, getJsx } from "./birthdayHelpers.tsx";
 

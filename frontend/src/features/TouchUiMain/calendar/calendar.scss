@@ -1,3 +1,5 @@
+@import './../../../main.scss';
+
 .calendar-outer-container {
   margin: 0px;
   padding: 5px 0px; 
@@ -92,11 +94,11 @@
 }
 
 .calendar-event-container-today {
-    background-color: rgba(255, 213, 0, 0.185);
+    background-color: $color-bg-orange;
 }
 
 .calendar-event-container-now {
-    background-color: rgba(255, 0, 0, 0.273);
+    background-color: $color-bg-red;
 }
 
 .calendar-event-container > .header-container {
@@ -144,16 +146,16 @@
 .calendar-event-container > .header-container > .calendar-index-0 {
     text-align: right;
     font-size: 90%;    
-    background-color: rgba(192, 242, 255, 0.23);
-    color: rgba(217, 227, 218, 0.425);    
+    background-color: rgba(72, 83, 85, 0.746);
+    color: rgba(217, 227, 218, 0.543);    
     height: 23px;
 }
 
 .calendar-event-container > .header-container > .calendar-index-1 {
     text-align: right;
     font-size: 90%;
-    background-color: rgba(242, 215, 255, 0.302);
-    color: rgba(225, 199, 225, 0.614);    
+    background-color: rgba(86, 74, 91, 0.786);
+    color: rgba(225, 199, 225, .614);    
 }
 
 .calendar-event-container > .body-container {

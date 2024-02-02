@@ -12,7 +12,7 @@ import {
     getTimeDifference,
 } from "./calendarHelpers";
 
-import "./calendar.css";
+import "./calendar.scss";
 
 function Calendar() {
     const events = getCalendarEvents();

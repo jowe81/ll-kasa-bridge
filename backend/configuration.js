@@ -1741,24 +1741,6 @@ const deviceMap = [
                 // },
                 {
                     defaultAccountType: "caldav",
-                    //serverUrl: "https://nc.jessandjohannes.com/remote.php/dav/calendars/admin/calendar/",
-                    serverUrl: "https://caldav.icloud.com",
-                    authMethod: "Basic",
-                    label: "Jess",
-                    credentials: {
-                        // These point to .env variables
-                        username: "CALENDAR_SERVICE_CALDAV_JESS_ICLOUD_USERNAME",
-                        password: "CALENDAR_SERVICE_CALDAV_JESS_ICLOUD_PASSWORD",
-                    },
-                    calendarsToDisplay: [
-                        {
-                            displayName: "Jess",
-                            url: "https://caldav.icloud.com/287697599/calendars/home/",
-                        },
-                    ],
-                },
-                {
-                    defaultAccountType: "caldav",
                     serverUrl: "https://caldav.icloud.com",
                     authMethod: "Basic",
                     label: "Johannes",
@@ -1771,6 +1753,23 @@ const deviceMap = [
                         {
                             displayName: "Johannes",
                             url: "https://caldav.icloud.com/1286479590/calendars/home/",
+                        },
+                    ],
+                },
+                {
+                    defaultAccountType: "caldav",
+                    serverUrl: "https://caldav.icloud.com",
+                    authMethod: "Basic",
+                    label: "Jess",
+                    credentials: {
+                        // These point to .env variables
+                        username: "CALENDAR_SERVICE_CALDAV_JESS_ICLOUD_USERNAME",
+                        password: "CALENDAR_SERVICE_CALDAV_JESS_ICLOUD_PASSWORD",
+                    },
+                    calendarsToDisplay: [
+                        {
+                            displayName: "Jess",
+                            url: "https://caldav.icloud.com/287697599/calendars/home/",
                         },
                     ],
                 },
