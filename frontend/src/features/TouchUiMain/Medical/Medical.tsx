@@ -98,7 +98,7 @@ function getLastSampleSysDiaPulse(sample, sampleMaxAgeDays = 2) {
     if (!sample) {
         return null;
     }
-    
+
     const lastSample = sample;
     let now = new Date();
     let lastSampleLabel;
@@ -112,10 +112,10 @@ function getLastSampleSysDiaPulse(sample, sampleMaxAgeDays = 2) {
     }
 
     let colorClass = 'badge-neutral';
-    if (timeDiffHours > 2) {
-        colorClass = 'badge-orange';
-    } else if (timeDiffHours > 5) {
+    if (timeDiffHours >= 5) {
         colorClass = 'badge-red';
+    } else if (timeDiffHours >= 3) {
+        colorClass = 'badge-orange';
     }
 
     const style = {
