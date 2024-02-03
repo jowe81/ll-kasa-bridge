@@ -14,7 +14,7 @@ function PhotosManageCollectionsLayer({ addToRemoveFromCollection, hideLayer, ui
         onClose: (value) => addToRemoveFromCollection(value),
     };
 
-    const allCollections = libraryInfo?.collections?.map((info) => info.collectionName).sort();
+    const allCollections = libraryInfo?.collections?.map((info) => info.item).sort();
     const defaultCollections = allCollections
         .filter((collectionName) => ["unsorted", "trashed", "favorites"].includes(collectionName))
         .sort((a, b) => (a > b ? -1 : 1));
@@ -26,7 +26,7 @@ function PhotosManageCollectionsLayer({ addToRemoveFromCollection, hideLayer, ui
     const collections = [...defaultCollections, ...customCollections];
     
     const collectionItemsJsx = collections.map((collection, index) => {
-        const collectionInfo = libraryInfo?.collections?.find((info) => info.collectionName === collection);
+        const collectionInfo = libraryInfo?.collections?.find((info) => info.item === collection);
 
         let className = "touch-item";
 

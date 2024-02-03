@@ -443,7 +443,7 @@ function getBeginningOfDay(date) {
     return date;
 }
 
-function getMonthsOfTheYear(short = false) = {
+function getMonthsOfTheYear(short = false) {
     const monthsFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     return short ? shortMonths : monthsFull;

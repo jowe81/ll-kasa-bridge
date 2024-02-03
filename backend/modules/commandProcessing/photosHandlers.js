@@ -167,21 +167,41 @@ async function setFilter(deviceWrapper, commandData) {
     let collectionsFilter, tagsFilter;
 
     if (filter.collections.length) {
-        collectionsFilter = { [filter.mode_collections]: [...filter.collections] };
+        collectionsFilter = {collections: { [filter.mode_collections]: [...filter.collections]}};
     }
 
     if (filter.tags.length) {
-        tagsFilter = { [filter.mode_tags]: [...filter.tags] };
+        tagsFilter = {tags: {[filter.mode_tags]: [...filter.tags]}};
     }
 
+    // Dates
+    let startDateFilter, endDateFilter
+
+    if (filter.startDate?.enabled || filter.endDate?.enabled) {
+        let startDate, endDate;
+
+        if (filter.startDate?.enabled) {
+            startDate = new Date();
+            startDate.setFullYear(filter.startDate.year);
+            startDate.setMonth(filter.startDate.month - 1);
+            startDate.setDate(filter.startDate.date);
+
+            startDateFilter = { date: { $gte: `__DATE-${startDate.getTime()}` } };
+        }
+
+        if (filter.endDate?.enabled) {
+            endDate = new Date();
+            endDate.setFullYear(filter.endDate.year);
+            endDate.setMonth(filter.endDate.month - 1);
+            endDate.setDate(filter.endDate.date);
+
+            endDateFilter = {date: { $lte: `__DATE-${endDate.getTime()}`}};
+        }
+    }
+
+    // Add all the filters into a master $and filter.
     const $andMaster = [];
-    if (collectionsFilter) {
-        $andMaster.push({ collections: collectionsFilter });
-    }
-
-    if (tagsFilter) {
-        $andMaster.push({ tags: tagsFilter });
-    }
+    [collectionsFilter, tagsFilter, startDateFilter, endDateFilter].forEach(filter => filter && $andMaster.push(filter));
 
     let mongoFilter = {};
 

@@ -4,11 +4,9 @@ import { useState } from "react";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
 import './../TouchUiMain/calendar/calendarHelpers';
 import "./photosFilterLayer.scss";
-import { getConsecutiveNumbers, getDatesInMonth, getMonthsOfTheYear } from "./../TouchUiMain/calendar/calendarHelpers";
 
 function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiInfo, photosService }) {
     const libraryInfo = photosService?.state?.api?.libraryInfo;
-    const currentMongoFilter = photosService?.state?.api?.filter;
     
     const initialFilterState = {
         collections: [],
@@ -71,7 +69,8 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         onClose: (value) => setFilter({ ...filter, tags: splitTags(value) }),
     };
 
-    let allCollections = libraryInfo?.collections?.map((info) => info.collectionName).sort();
+    let allCollections = libraryInfo?.collections?.map((info) => info.item).sort();
+
     let defaultCollections = allCollections && allCollections
         .filter((collectionName) => ["unsorted", "trashed", "favorites"].includes(collectionName))
         .sort((a, b) => a > b ? -1 : 1 );
@@ -93,9 +92,9 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
     }
 
     const collections = [...defaultCollections, ...customCollections];
-    
+
     const collectionItemsJsx = collections.map((collection, index) => {
-        const collectionInfo = libraryInfo?.collections?.find(info => info.collectionName === collection);
+        const collectionInfo = libraryInfo?.collections?.find(info => info.item === collection);
         
         let className = "touch-item";
 
@@ -109,8 +108,7 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
                 className={className}
                 onClick={() => addRemoveCollectionFromFilter(collection)}
             >
-                {collection[0].toUpperCase() + collection.substring(1)}
-                <div className="touch-item-info">{collectionInfo?.count} pictures</div>
+                {collection[0].toUpperCase() + collection.substring(1)} <span className="touch-item-info">{collectionInfo?.count}</span>
             </div>
         );
     });
@@ -138,15 +136,16 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         initialValue: uiInfo?.filter?.mode_tags,
     };
 
-    const availableTags = libraryInfo?.library?.tags ?? [];
-    const availableTagItemsJsx = availableTags.map((tag, index) => {
+    const availableTags = libraryInfo.tags;
+    const availableTagItemsJsx = availableTags.map((tagInfo, index) => {
+        const tag = tagInfo.item;
         return (
             <div
                 key={index}
                 className={`touch-item ${filter.tags?.includes(tag) ? "touch-item-selected" : ""}`}
                 onClick={() => addRemoveTagFromInput(tag)}
             >
-                {tag[0].toUpperCase() + tag.substring(1)}
+                {tag[0].toUpperCase() + tag.substring(1)} <span className="touch-item-info">{tagInfo.count}</span>
             </div>
         );
     });
@@ -195,7 +194,7 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
                                     <div className="label">Selected Tags:</div>
                                     <div
                                         className="touch-items-container"
-                                        style={{ maxHeight: "151px", color: "#AA7" }}
+                                        style={{ height: "151px", color: "#AA7" }}
                                         onClick={() => showKeyboard(keyboardConfigTags)}
                                     >
                                         {inputValue}
@@ -210,11 +209,17 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
                     <div className="options-side-by-side">
                         <div className="option-group">
                             <div className="label">Include Pictures After:</div>
-                            <TouchUIDateSelector onChange={(newDate) => handleDateSelection("startDate", newDate)} />
+                            <TouchUIDateSelector
+                                onChange={(newDate) => handleDateSelection("startDate", newDate)}
+                                initialValue={filter.startDate}
+                            />
                         </div>
                         <div className="option-group">
                             <div className="label">Include Pictures Before:</div>
-                            <TouchUIDateSelector onChange={(newDate) => handleDateSelection("endDate", newDate)} />
+                            <TouchUIDateSelector
+                                onChange={(newDate) => handleDateSelection("endDate", newDate)}
+                                initialValue={filter.endDate}
+                            />
                         </div>
                     </div>
                 </div>

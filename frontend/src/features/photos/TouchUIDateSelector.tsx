@@ -1,9 +1,9 @@
 import TouchUISelectBox from "./TouchUISelectBox";
 import TouchUIBooleanField from "./TouchUIBooleanField";
 import { useState } from "react";
-import { getConsecutiveNumbers, getDatesInMonth, getMonthsOfTheYear } from "./../TouchUiMain/calendar/calendarHelpers";
+import { getConsecutiveNumbers, getMonthsOfTheYear } from "./../TouchUiMain/calendar/calendarHelpers";
 
-function TouchUIDateSelector({onChange}) {
+function TouchUIDateSelector({onChange, initialValue}) {
     const now = new Date();
 
     const initialState = {
@@ -11,6 +11,7 @@ function TouchUIDateSelector({onChange}) {
         month: now.getMonth()+1,
         date: now.getDate(),
         enabled: false,
+        ...initialValue,
     }    
     const [date, setDate] = useState(initialState);
 
@@ -55,6 +56,7 @@ function TouchUIDateSelector({onChange}) {
         handleClick: handleSwitchClick,
         classTrueEnabled: 'touch-ui-switch-true-enabled',
         classFalseEnabled: 'touch-ui-switch-false-enabled',
+        initialValue: date.enabled,
     }
 
     let dateSelectorClassName = "touch-ui-date-selector-container";
