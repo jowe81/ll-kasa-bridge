@@ -164,7 +164,7 @@ async function setFilter(deviceWrapper, commandData) {
         requestInfo.query = {}
     }
 
-    let collectionsFilter, tagsFilter;
+    let collectionsFilter, tagsFilter, foldersFilter;
 
     if (filter.collections.length) {
         collectionsFilter = {collections: { [filter.mode_collections]: [...filter.collections]}};
@@ -172,6 +172,10 @@ async function setFilter(deviceWrapper, commandData) {
 
     if (filter.tags.length) {
         tagsFilter = {tags: {[filter.mode_tags]: [...filter.tags]}};
+    }
+
+    if (filter.folders.length) {
+        foldersFilter = { dirname: { "$in": [...filter.folders] } };
     }
 
     // Dates
@@ -201,7 +205,8 @@ async function setFilter(deviceWrapper, commandData) {
 
     // Add all the filters into a master $and filter.
     const $andMaster = [];
-    [collectionsFilter, tagsFilter, startDateFilter, endDateFilter].forEach(filter => filter && $andMaster.push(filter));
+    const filters = [collectionsFilter, tagsFilter, foldersFilter, startDateFilter, endDateFilter];
+    filters.forEach(filter => filter && $andMaster.push(filter));
 
     let mongoFilter = {};
 

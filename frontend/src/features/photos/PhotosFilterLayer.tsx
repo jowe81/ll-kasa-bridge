@@ -11,8 +11,9 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
     const initialFilterState = {
         collections: [],
         tags: [],
-        mode_collections: '$in',
-        mode_tags: '$in',
+        mode_collections: "$in",
+        mode_tags: "$in",
+        folders: [],
         ...uiInfo?.filter,
     };
 
@@ -20,6 +21,7 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
 
     const setFilter = (filter) => {
         _setFilter({...filter});
+        console.log(filter)
     }
 
     const { showKeyboard, inputValue, setInputValue } = useScreenKeyboard();
@@ -60,6 +62,23 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         }
 
         setFilter({...filter, collections: newCollections});
+    }
+
+    function addRemoveFolderFromFilter(folderInfo: any) {
+        let newFolders: string[] = [];
+        
+        if (filter.folders) {
+            if (filter.folders.includes(folderInfo.item)) {
+                newFolders = filter.folders.filter((item) => item != folderInfo.item);
+            } else {
+                newFolders = [...filter.folders, folderInfo.item];
+            }            
+        } else {
+            newFolders = [folderInfo.item as string];
+        }
+
+
+        setFilter({...filter, folders: newFolders});
     }
 
     const keyboardConfigTags = {
@@ -136,8 +155,8 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         initialValue: uiInfo?.filter?.mode_tags,
     };
 
-    const availableTags = libraryInfo.tags;
-    const availableTagItemsJsx = availableTags.map((tagInfo, index) => {
+    const availableTags = getItemsInfoSelectedFirst('tags');
+    const availableTagItemsJsx = availableTags?.map((tagInfo, index) => {
         const tag = tagInfo.item;
         return (
             <div
@@ -149,7 +168,33 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
             </div>
         );
     });
+
+    const folders = getItemsInfoSelectedFirst('folders');
+    const folderItemsJsx = folders?.map((folderInfo, index) => {
+        const label = folderInfo.label;        
+        return (
+            <div
+                key={index}
+                className={`touch-item ${filter.folders?.includes(folderInfo.item) ? "touch-item-selected" : ""}`}
+                onClick={() => addRemoveFolderFromFilter(folderInfo)}
+            >
+                {label} <span className="touch-item-info">{folderInfo.count}</span>
+            </div>
+        );
+    });
     
+    /**
+     * Sort the array of itemsInfos such that selected items show up first.
+     * For tags, collections, folders.
+     */
+    function getItemsInfoSelectedFirst(arrayPropertyName) {
+        const selectedItems = filter[arrayPropertyName] ?? [];
+        const selectedItemsInfo = libraryInfo[arrayPropertyName].filter(info => selectedItems.includes(info.item));
+        const otherItemsInfo = libraryInfo[arrayPropertyName].filter((info) => !selectedItems.includes(info.item));
+
+        return [...selectedItemsInfo, ...otherItemsInfo];
+    }
+
     function handleDateSelection(property, newDate) {
         console.log(`New ${property}:`, newDate);
         const newFilter = {
@@ -185,7 +230,7 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
                             <div className="touch-items-container">{availableTagItemsJsx}</div>
                         </div>
                         <div className="option-group">
-                            <div className="option-group margin-left" style={{ minWidth: "350px" }}>
+                            <div className="option-group margin-left">
                                 <div className="option-group">
                                     <div className="label">Filtering mode:</div>
                                     <TouchUIBooleanField {...tagsModeProps} />
@@ -206,20 +251,29 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
                 </div>
                 <div className="options-group">
                     <div className="options-group-header">Dates:</div>
-                    <div className="options-side-by-side">
-                        <div className="option-group">
+                    <div className="options-side-by-side-wrap">
+                        <div className="option-group" style={{ display: "inline-block" }}>
                             <div className="label">Include Pictures After:</div>
                             <TouchUIDateSelector
                                 onChange={(newDate) => handleDateSelection("startDate", newDate)}
                                 initialValue={filter.startDate}
                             />
                         </div>
-                        <div className="option-group">
+                        <div className="option-group" style={{ display: "inline-block" }}>
                             <div className="label">Include Pictures Before:</div>
                             <TouchUIDateSelector
                                 onChange={(newDate) => handleDateSelection("endDate", newDate)}
                                 initialValue={filter.endDate}
                             />
+                        </div>
+                    </div>
+                </div>
+                <div className="options-group">
+                    <div className="options-group-header">Folders:</div>
+                    <div className="options-side-by-side">
+                        <div className="option-group">
+                            <div className="lab``el">Tap to Add/Remove Folders:</div>
+                            <div className="touch-items-container" style={{maxHeight: '605px'}}>{folderItemsJsx}</div>
                         </div>
                     </div>
                 </div>
