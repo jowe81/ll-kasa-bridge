@@ -5,7 +5,8 @@ import Clock from "./clock/Clock";
 import Temperature from "./temperature/Temperature";
 import CompactTimer from "./compactTimer/CompactTimer";
 import CompactBirthdays from "./compactBirthdays/CompactBirthdays";
-import Scripture from "./scripture/Scripture";
+import CompactCalendar from "./compactCalendar/CompactCalendar.tsx";
+import Alerts from "./alerts/Alerts.tsx";
 import MasterSwitches from "./masterSwitches/MasterSwitches.tsx";
 import Mailbox from "./mailbox/Mailbox.tsx";
 
@@ -23,13 +24,10 @@ function TouchUiPanel(props: any) {
     return (
         <>
             <MasterSwitches {...props} />
-            <div className="placeholder-350">{fullScreen && <CompactTimer />}</div>
-
-            <div style={{width: '200px'}}>
-                {showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay} />}
-            </div>
-            <div className="placeholder-350">
-            </div>
+            {fullScreen && <CompactTimer />}
+            {fullScreen && <CompactCalendar />}
+            {showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay} />}
+            <div className="placeholder-350"></div>
             <Temperature thermometersStartIndex={2} />
 
             {showMailbox && <Mailbox />}

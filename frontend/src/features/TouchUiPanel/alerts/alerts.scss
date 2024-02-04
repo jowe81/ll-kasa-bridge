@@ -1,0 +1,19 @@
+
+.alerts-compact-container {
+  width: 222px;
+  border-radius: 5px;
+  padding-top: 5px;
+  margin: 0px 0px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  text-align: left;
+}
+
+.alerts-label {
+  max-height: 25px;  
+  color: #999;
+  font-size: 16px;
+  border-bottom: 1px solid #333;
+  width: 100%;
+}

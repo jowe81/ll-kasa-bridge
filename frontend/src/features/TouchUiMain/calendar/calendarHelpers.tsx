@@ -92,12 +92,17 @@ function getMidNight(date?: Date) {
     return midnight;
 }
 
-function getEndOfDay(date) {
+function getEndOfDay(date?) {
     const eod = date ? date : new Date();
     eod.setHours(23);
     eod.setMinutes(59);
     eod.setSeconds(59);
     return eod;
+}
+
+function getEndOfTomorrow() {
+    const tomorrow = getNDaysAgoMidnight(-1);
+    return getEndOfDay(tomorrow);
 }
 
 function getEndOfYesterday() {
@@ -222,7 +227,42 @@ function getDayOfWeekString(date, format) {
     }
 }
 
+
+const eventIsNow = (event) => {
+    const now = new Date();
+    const startDate = event.start ? new Date(event.start) : null;
+    if (!startDate) {
+        // At the very least we need a start date.
+        return null;
+    }
+    const endDate = event.end ? new Date(event.end) : startDate;
+    return startDate < now && endDate > now;
+}
+
+
 const isToday = (date) => isInNDays(date, 0);
+
+const eventIsToday = (event) => {
+    const endOfDay = getEndOfDay();
+    const startDate = event.start ? new Date(event.start) : null;
+    if (!startDate) {
+        // At the very least we need a start date.
+        return null;
+    }
+    const endDate = event.end ? new Date(event.end) : startDate;
+    return startDate < endOfDay || endDate < endOfDay;
+};
+
+const eventIsFuture = (event) => {
+    const now = new Date();
+    const startDate = event.start ? new Date(event.start) : null;
+    if (!startDate) {
+        // At the very least we need a start date.
+        return null;
+    }
+
+    return eventIsToday(event) && startDate > now
+}
 
 const isTomorrow = (date) => {
     if (!date) {
@@ -232,6 +272,19 @@ const isTomorrow = (date) => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     return isSameDay(date, tomorrow);
+}
+
+const eventIsTomorrow = (event) => {
+    const endOfDay = getEndOfDay();
+    const endOfTomorrow = getEndOfTomorrow();
+    const startDate = event.start ? new Date(event.start) : null;
+    if (!startDate) {
+        // At the very least we need a start date.
+        return null;
+    }
+    const endDate = event.end ? new Date(event.end) : startDate;
+    return endDate > endOfDay && endDate < endOfTomorrow;
+
 }
 
 const isThisWeek = (date) => date <= getEndOfWeek();
@@ -273,6 +326,10 @@ function getConsecutiveNumbers(start, end) {
 }
 
 export {
+    eventIsFuture,
+    eventIsNow,
+    eventIsToday,
+    eventIsTomorrow,
     formatTime,
     getBeginningOfWeek,
     getCalendarEvents,

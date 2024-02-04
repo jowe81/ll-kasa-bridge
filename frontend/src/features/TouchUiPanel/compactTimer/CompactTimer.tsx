@@ -67,7 +67,9 @@ function CompactTimer() {
   const configuredTimers = {};
 
   // Grab the configured timers and add in a scheduling handler.
-  timer.settings.timers?.forEach((timer) => {
+  timer.settings
+    .timers?.slice(0, 6)
+    .forEach((timer) => {
       configuredTimers[timer.id] = {
           ...timer,
           onClick: schedulePresetTimer,

@@ -38,7 +38,7 @@
 }
 
 .touch-ui-panel-container .placeholder-350 {
-    width: 335px;    
+    flex-grow: 10;
 }
 
 .touch-ui-panel-container .placeholder-200 {
