@@ -43,7 +43,7 @@
 
 .calendar-compact-nothing-scheduled {
     color: rgba(128, 128, 128, 0.559);
-    background-color: #333;
+    background-color: #333333ad;    
     // border: 1px solid $border-gray;
     border-radius: 0px;
     height: 100%;
@@ -64,8 +64,9 @@
   padding: 0px;
   padding-right: 0px;
   flex-grow: 10;
-  background-color: #333;
+  background-color: #333333ad;
   overflow-y: auto;
+  border-radius: 3px;  
 }
 
 .calendar-compact-item-container{

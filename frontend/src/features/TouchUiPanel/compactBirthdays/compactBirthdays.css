@@ -4,9 +4,31 @@
   padding-top: 5px;
   margin: 0px 0px;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-direction: column;  
   text-align: left;
+  height: 100%;
+  padding-bottom: 3px;  
+
+    ::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background-color: rgba(255, 255, 255, .08);
+    }
+    
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+    background: #77777784;
+    /* background-color: rgba(55, 40, 40, 1); */
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+    background: rgb(152, 152, 152);
+    }    
+
 }
 
 .birthdays-label {
@@ -21,9 +43,11 @@
   width: 100%;  
   margin: 5px auto;
   padding: 0px;
-  display: flex;
-  flex-flow: row wrap;
-  height: 100%;
+  padding-right: 0px;
+  flex-grow: 10;
+  background-color: #333333ad;
+  overflow-y: auto;
+  border-radius: 3px;
 }
 
 .birthday-compact-item-container{
