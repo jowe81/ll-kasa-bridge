@@ -1,9 +1,4 @@
-import { useState } from "react";
-
-interface Option {
-    text: string;
-    value?: string|number;
-}
+import { useState, useEffect } from "react";
 
 function TouchUISelectBox({
     initialValue,
@@ -13,6 +8,11 @@ function TouchUISelectBox({
     placeholder = '-- Select --',
 }) {
     const [value, setValue] = useState(initialValue ?? placeholder);
+
+    // InitialValue is not just initial but gets updated when a remote change comes in.
+    useEffect(() => {
+        setValue(initialValue);
+    }, [initialValue]);
 
     const onChange = (event) => {
         const value = event.target.value;

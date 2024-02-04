@@ -1,12 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function TouchUIBooleanField({initialValue, handleClick, labelTrue='ON', labelFalse = 'OFF', valueTrue = true, valueFalse = false, classTrueEnabled = '', classFalseEnabled = ''}) {
     const [value, setValue] = useState(initialValue ?? valueFalse);
 
+    // InitialValue is not just initial but gets updated when a remote change comes in.
+    useEffect(() => {
+        setValue(initialValue);
+    }, [initialValue]);
+
     const onClick = (value) => {
         setValue(value);
         handleClick(value);
-    }
+    };
 
     return (
         <div className="touch-boolean-field-container">

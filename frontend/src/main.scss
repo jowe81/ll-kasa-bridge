@@ -1,6 +1,7 @@
 $color-bg-orange: rgba(100,50,0,1);
 $color-text-orange: rgb(255, 157, 0);
 $color-text-red: red;
+$color-text-gray: gray;
 $color-bg-red: rgba($color-text-red, 0.273);
 
 $color-touch-layer: rgba(255, 255, 255, 0.753);
@@ -117,6 +118,12 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
         }
     }
 
+    .touch-item-placeholder {
+        @extend .touch-item;
+        border: 1px solid rgba(0, 0, 0, 0);
+        color: rgba($color-text-gray, .5);
+    }
+
     .touch-item:active {
         background-color:rgba(76, 76, 76, 0.52);   
     }
@@ -145,9 +152,23 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
         background-color: rgba($color-bg-red, .25) !important;        
     }
 
+    .touch-layer-title {
+        width: 95%;
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: 0%; /* Adjusts the initial size; setting to 0% ensures growth is based on the flex-grow value */                
+        .header {            
+            padding-top: 20px;
+            text-align: center;
+            font-size: 140%;
+        }
+
+        border-bottom: 1px solid $border-gray;
+    }
+
     .options-groups-container {
         width: 95%;
-        flex-grow: 90;
+        flex-grow: 10;
         flex-shrink: 1;
         flex-basis: 0%; /* Adjusts the initial size; setting to 0% ensures growth is based on the flex-grow value */        
         overflow-y: auto;       
@@ -187,12 +208,13 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
     
     .actions-container {
         width: 95%;
-        flex-grow: 10;
+        flex-grow: 1;
         flex-shrink: 1;
         flex-basis: 0%; /* Adjusts the initial size; setting to 0% ensures growth is based on the flex-grow value */        padding-top:10px;
         display: flex;
         border-top: 1px solid $border-gray;
         justify-content: flex-end;
+        align-items: flex-end;
     }
 
     .actions-container .action, .action {
@@ -201,6 +223,7 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
         // border-color: rgba(255, 255, 0, 0.439);
         // color:rgba(255, 255, 153, 0.67);
         background-color: rgba(255, 255, 255, 0.153);
+        margin: 15px 8px;
     }
 }
 
@@ -253,4 +276,16 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
     background-color: rgba($color-bg-red, .4);
 }
 
+/* Utility classes */
 
+.float-right {
+    float: right;
+}
+
+.flex-spacer {
+    flex-grow: 1;
+}
+
+.invisible {
+    opacity: 0;
+}

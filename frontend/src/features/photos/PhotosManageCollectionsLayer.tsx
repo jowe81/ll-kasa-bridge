@@ -50,8 +50,10 @@ function PhotosManageCollectionsLayer({ addToRemoveFromCollection, hideLayer, ui
 
     return (
         <div className="touch-layer-opaque photos-filter-layer">
+            <div className="touch-layer-title">
+                <div className="header">Collections This Picture Belongs To</div>
+            </div>
             <div className="options-groups-container">
-                <div className="header">Collections this picture belongs to</div>
                 <div className="options-group">
                     <div className="label">Tap a collection to add to/remove the picture from:</div>
                     <div className="touch-items-container">{collectionItemsJsx}</div>
@@ -63,9 +65,6 @@ function PhotosManageCollectionsLayer({ addToRemoveFromCollection, hideLayer, ui
                 </div>
             </div>
             <div className="actions-container">
-                <div className="action" onClick={hideLayer}>
-                    Cancel
-                </div>
                 <div
                     className="action"
                     onClick={() => {

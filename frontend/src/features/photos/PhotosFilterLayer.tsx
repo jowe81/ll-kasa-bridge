@@ -1,30 +1,64 @@
 import TouchUIBooleanField from "./TouchUIBooleanField";
 import TouchUIDateSelector from "./TouchUIDateSelector";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
 import './../TouchUiMain/calendar/calendarHelpers';
 import "./photosFilterLayer.scss";
 
 function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiInfo, photosService }) {
     const libraryInfo = photosService?.state?.api?.libraryInfo;
-    
-    const initialFilterState = {
+
+    const clearedFilterState = {
         collections: [],
         tags: [],
         mode_collections: "$in",
         mode_tags: "$in",
+        startDate: {
+            // Default to the beginning of the current year
+            year: (new Date()).getFullYear(),
+            month: 1,
+            date: 1,
+            enabled: false,
+        },
+        endDate: {
+            // Default to the current date
+            enabled: false,
+        },
+
         folders: [],
+    };
+
+    const initialFilterState = {
+        ...clearedFilterState,
         ...uiInfo?.filter,
     };
 
     const [filter, _setFilter] = useState<any>(initialFilterState);
 
     const setFilter = (filter) => {
-        _setFilter({...filter});
-        console.log(filter)
-    }
+        _setFilter({ ...filter });
+        setInputValue(filter.tags.join(' '));
+        console.log(`new filter`, filter);
+    };
 
+    // Make sure to update the filter if a remote change comes in.
+    useEffect(() => {
+        setFilter({
+            ...filter,
+            ...uiInfo?.filter,
+        })
+        setInputValue(filter.tags.join(" "));
+    }, [uiInfo.filter])
+
+    // Clear the select tags text when opening the dialog.
+    useEffect(() => {
+        setInputValue(filter.tags.join(" "));
+    }, []);
     const { showKeyboard, inputValue, setInputValue } = useScreenKeyboard();
+
+    function resetFilterState() {
+        setFilter({...clearedFilterState})
+    }
 
     function addRemoveTagFromInput(tag) {
         let newInputValue = '';
@@ -206,14 +240,19 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
 
     return (
         <div className="touch-layer-opaque photos-filter-layer">
-            <div className="options-groups-container">
+            <div className="touch-layer-title">
+                <div className="float-right">
+                    <div className="action" onClick={resetFilterState}>
+                        Clear All
+                    </div>
+                </div>
                 <div className="header">Filtering Options</div>
-
+            </div>
+            <div className="options-groups-container">
                 <div className="options-group">
                     <div className="options-group-header">Collections:</div>
                     <div className="options-side-by-side">
                         <div className="option-group">
-                            <div className="label">Tap to Add/Remove Collections:</div>
                             <div className="touch-items-container">{collectionItemsJsx}</div>
                         </div>
                         <div className="option-group margin-left">
@@ -226,7 +265,6 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
                     <div className="options-group-header">Tags:</div>
                     <div className="options-side-by-side">
                         <div className="option-group">
-                            <div className="label">Tap to Add/Remove Tags:</div>
                             <div className="touch-items-container">{availableTagItemsJsx}</div>
                         </div>
                         <div className="option-group">
@@ -239,7 +277,7 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
                                     <div className="label">Selected Tags:</div>
                                     <div
                                         className="touch-items-container"
-                                        style={{ height: "151px", color: "#AA7" }}
+                                        style={{ maxHeight: "151px", color: "#AA7" }}
                                         onClick={() => showKeyboard(keyboardConfigTags)}
                                     >
                                         {inputValue}
@@ -272,13 +310,15 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
                     <div className="options-group-header">Folders:</div>
                     <div className="options-side-by-side">
                         <div className="option-group">
-                            <div className="lab``el">Tap to Add/Remove Folders:</div>
-                            <div className="touch-items-container" style={{maxHeight: '605px'}}>{folderItemsJsx}</div>
+                            <div className="touch-items-container" style={{ maxHeight: "605px" }}>
+                                {folderItemsJsx}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div className="actions-container">
+                <div className="flex-spacer"></div>
                 <div className="action" onClick={hideChangeFilterLayer}>
                     Cancel
                 </div>

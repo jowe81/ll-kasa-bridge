@@ -3,19 +3,17 @@ import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
 
 function PhotosManageTagsLayer({ addRemoveTag, hideLayer, uiInfo, record, photosService }) {
     const libraryInfo = photosService?.state?.api?.libraryInfo;
-    const recordInfo = photosService?.state?.api?.recordInfo;
 
     const { showKeyboard } = useScreenKeyboard();
-    const [tagName, setTagName] = useState("");
 
     const keyboardConfigTags = {
-        fieldLabel: "Tag:",        
+        fieldLabel: "Tag:",
         value: "",
         onClose: (value) => addRemoveTag(value),
     };
 
     const tags = record?.tags ?? [];        
-    const currentTagItemsJsx = tags?.map((tag, index) => {
+    let currentTagItemsJsx = tags?.map((tag, index) => {
         return (
             <div
                 key={index}
@@ -27,8 +25,13 @@ function PhotosManageTagsLayer({ addRemoveTag, hideLayer, uiInfo, record, photos
         );
     });
 
-    const availableTags = recordInfo?.availableTags ?? [];
-    const availableTagItemsJsx = availableTags.map((tag, index) => {
+    if (!record.tags.length) {
+        currentTagItemsJsx = <div className="touch-item touch-item-placeholder">none assigned</div>;
+    }
+
+    const availableTags = libraryInfo?.tags ?? [];
+    const availableTagItemsJsx = availableTags.map((tagInfo, index) => {
+        const tag = tagInfo.item;
         return (
             <div
                 key={index}
@@ -42,8 +45,10 @@ function PhotosManageTagsLayer({ addRemoveTag, hideLayer, uiInfo, record, photos
 
     return (
         <div className="touch-layer-opaque photos-filter-layer">
+            <div className="touch-layer-title">
+                <div className="header">Tags on This Picture</div>
+            </div>
             <div className="options-groups-container">
-                <div className="header">Tags on this picture</div>
                 <div className="options-group">
                     <div className="label">Tap to remove a tag from the picture:</div>
                     <div className="touch-items-container">{currentTagItemsJsx}</div>
@@ -59,9 +64,6 @@ function PhotosManageTagsLayer({ addRemoveTag, hideLayer, uiInfo, record, photos
                 </div>
             </div>
             <div className="actions-container">
-                <div className="action" onClick={hideLayer}>
-                    Cancel
-                </div>
                 <div className="action" onClick={hideLayer}>
                     Close
                 </div>
