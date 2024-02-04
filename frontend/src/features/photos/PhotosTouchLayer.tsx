@@ -1,3 +1,4 @@
+import PhotosInfoLayer from "./PhotosInfoLayer";
 import PhotosFilterLayer from "./PhotosFilterLayer";
 import PhotosManageCollectionsLayer from "./PhotosManageCollectionsLayer";
 import PhotosManageTagsLayer from "./PhotosManageTagsLayer";
@@ -8,6 +9,7 @@ import './photosTouchLayer.css';
 
 function PhotosTouchLayer() {
     const [showMainLayer, setShowMainLayer] = useState(false);
+    const [showInfoLayer, setShowInfoLayer] = useState(false);
     const [showChangeFilterLayer, setShowChangeFilterLayer] = useState(false);
     const [showManageCollectionsLayer, setShowManageCollectionsLayer] = useState(false);
     const [showManageTagsLayer, setShowManageTagsLayer] = useState(false);
@@ -21,6 +23,9 @@ function PhotosTouchLayer() {
 
     // Touch Button Handlers
     const showUiBtnClick = () => setShowMainLayer(!showMainLayer);
+    const showInfoLayerClick = () => {
+        setShowInfoLayer(!showInfoLayer);
+    }
 
     const prevBtnClick = () => runPhotosServiceCommand("previousPicture", {});
     const nextBtnClick = () => runPhotosServiceCommand("nextPicture", {});
@@ -37,6 +42,12 @@ function PhotosTouchLayer() {
     const photoButtonHidden = showMainLayer ? "" : "photo-button-hidden";
     const isInFavorites = record?.collections?.includes("favorites");
     const isHidden = record?.collections?.includes("trashed");
+
+    const infoLayerProps = {
+        hideLayer: () => setShowInfoLayer(false),
+        photosService,
+        record,
+    };
 
     if (showChangeFilterLayer) {
         const props = {
@@ -73,27 +84,46 @@ function PhotosTouchLayer() {
         };
 
         return <PhotosManageTagsLayer {...props} />;
-    } else {
+    } else {        
         return (
-            <div className="photo-touch-layer">
-                <div className={`photo-button photo-button-top-row ${photoButtonHidden}`} onClick={prevBtnClick}>
-                    Previous Picture
-                </div>
-                <div
-                    className={`photo-button photo-button-top-row ${photoButtonHidden}`}
-                    onClick={() => setShowChangeFilterLayer(true)}
-                >
-                    Change Filter
-                </div>
-                <div className={`photo-button photo-button-top-row ${photoButtonHidden}`} onClick={nextBtnClick}>
-                    Next Picture
-                </div>
-                <div className={`photo-button photo-button-show-ui ${photoButtonHidden}`} onClick={showUiBtnClick}>
-                    Close
-                </div>
-                <div className={`photo-rating-outer-container ${photoButtonHidden}`}>
-                    <div className="photo-rating-header-container">Collection Management</div>
-                    <div className="photo-rating-buttons-container">
+            <>
+                {" "}
+                {!showMainLayer && showInfoLayer && <PhotosInfoLayer {...infoLayerProps} />}
+                <div className="photo-touch-layer">
+                    <div className={`photo-main-touch-layer-horizontal-row  ${photoButtonHidden}`}>
+                        <div
+                            className={`photo-button photo-button-top-row ${photoButtonHidden}`}
+                            onClick={prevBtnClick}
+                        >
+                            Previous Picture
+                        </div>
+                        <div
+                            className={`photo-button photo-button-top-row ${photoButtonHidden}`}
+                            onClick={() => setShowChangeFilterLayer(true)}
+                        >
+                            Change Filter
+                        </div>
+                        <div
+                            className={`photo-button photo-button-top-row ${photoButtonHidden}`}
+                            onClick={nextBtnClick}
+                        >
+                            Next Picture
+                        </div>
+                    </div>
+                    <div
+                        className={`photo-main-touch-layer-horizontal-row  ${photoButtonHidden}`}
+                        style={{ flexGrow: 10 }}
+                    >
+                        <div className={`photo-button info-layer-button ${showInfoLayer ? `info-layer-button-active` : ``}`} onClick={showInfoLayerClick}>
+                            <div className="button-label">Info Layer</div>                            
+                        </div>
+                        <div className={`photo-button photo-button-show-ui`} onClick={showUiBtnClick}>
+                            Close
+                        </div>
+                    </div>
+                    <div
+                        className={`photo-main-touch-layer-horizontal-row ${photoButtonHidden} photo-rating-buttons-container`}
+                    >
                         <div
                             className={`photo-button photo-button-rating photo-button-rating-hide ${photoButtonHidden} ${
                                 isHidden ? "photo-button-engaged" : ""
@@ -139,7 +169,7 @@ function PhotosTouchLayer() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </>
         );
     }
 }

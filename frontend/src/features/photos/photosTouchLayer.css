@@ -3,7 +3,7 @@
   /* background-color: rgba(0,0,0,.8); */
   width: 100%;
   display:flex;
-  flex-flow: row wrap;
+  flex-flow: column;
   justify-content:space-between;  
   z-index: 900;
   height: 100%;
@@ -35,38 +35,34 @@
     opacity: 0%;
 }
 
-.photo-button-show-ui {
-    width: 100%;
-    height: 50%
-}
-
 /* PREV/FILTER/NEXT buttons */
 .photo-button-top-row {
-    width: 32%;     
-    height: 20%;
+    width: 100%;     
 }
 
-
-/* CLOSE button */
+/* Show hide button */
 .photo-button-show-ui {
-    width: 76%;
-    height: 53%;
     opacity: 0%;
+    flex-grow: 10;
 }
+
 
 .photo-button-pause {
     width: 20%;
 }
-
-/* RATING container */
-.photo-rating-outer-container {
+.photo-main-touch-layer-horizontal-row {
     width: 100%;
     height: 25%;
+    display: flex;
+    flex-flow: row;
+    /* background-color: rgba(100,0,0,.2);
+    border: 1px solid green; */
+}
+/* RATING container */
+.photo-rating-outer-container {
     border: 1px solid rgba(168, 168, 168, .3);
     border-radius: 5px;
     margin: 5px;
-    display: flex;
-    flex-flow: row wrap;
     background-color: rgba(42, 30, 30, 0.603);
 }
 
@@ -87,7 +83,6 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    height: 70%;    
 }
 
 .photo-button-rating {
@@ -98,10 +93,6 @@
 .photo-button-rating-hide {
     width: 15%;
     margin-right: 15%;
-}
-
-.photo-button-rating-tag {
-    /* display: block; */
 }
 
 .photo-button-rating-tag .current-items {
@@ -121,3 +112,13 @@
 .photo-button-rating-tag .button-label {
     margin: -20px 0px;
 }
+
+.info-layer-button {
+    width: 14%
+}
+
+.info-layer-button-active {    
+    
+    background-color: rgba(101, 72, 72, 0.913) !important;
+}
+
