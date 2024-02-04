@@ -58,6 +58,13 @@ function PhotosInfoLayer({ photosService, hideLayer, record }) {
         return folderInfo.label;
     }
 
+    const dateText = getDateText();
+    const tagsText = getTagsText();
+    const collectionsText = getCollectionsText();
+    const folderText = getFolderText();
+    const deviceText = getDeviceText();
+    const resulutionText = getResolutionText();
+
     return (
         <div className="touch-layer photos-info-layer">
             <div className="horizontal-row"></div>
@@ -65,12 +72,12 @@ function PhotosInfoLayer({ photosService, hideLayer, record }) {
                 <div className="hide-button" onClick={hideLayer}></div>
             </div>
             <div className="horizontal-row">
-                <div>{getDateText()}</div>
-                <div>{getTagsText()}</div>
-                <div>{getCollectionsText()}</div>
-                <div>{getFolderText()}</div>
-                <div>{getDeviceText()}</div>
-                <div>{getResolutionText()}</div>
+                {dateText && <div>{dateText}</div>}
+                {tagsText && <div>{tagsText}</div>}
+                {collectionsText && <div>{collectionsText}</div>}
+                {folderText && <div>{folderText}</div>}
+                {deviceText && <div>{deviceText}</div>}
+                {resulutionText && <div>{resulutionText}</div>}
             </div>
         </div>
     );
