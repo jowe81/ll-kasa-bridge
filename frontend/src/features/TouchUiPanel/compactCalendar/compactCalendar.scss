@@ -42,10 +42,11 @@
 }
 
 .calendar-compact-nothing-scheduled {
-    color: rgba(128, 128, 128, 0.559);
-    background-color: #333333ad;    
-    // border: 1px solid $border-gray;
-    border-radius: 0px;
+    color: rgba(128, 128, 128, 0.389);
+    background-color: #333333ad;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 5px;
     height: 100%;
     width: 100%;
     display: flex;
