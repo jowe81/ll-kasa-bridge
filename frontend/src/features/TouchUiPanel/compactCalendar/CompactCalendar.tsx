@@ -17,12 +17,9 @@ import {
 } from "./../../TouchUiMain/calendar/calendarHelpers";
 
 import "./../../TouchUiMain/calendar/calendar.scss";
-
 import "./compactCalendar.scss";
 
-import { getSelectedRecordsInfo, getJsx } from "../../TouchUiMain/birthdays/birthdayHelpers.tsx";
-
-function CompactCalendar({ birthdayRangeToDisplay }) {
+function CompactCalendar() {
     const timeFormatOptions: Intl.DateTimeFormatOptions = {
         hour: "numeric",
         minute: "numeric",
@@ -39,7 +36,7 @@ function CompactCalendar({ birthdayRangeToDisplay }) {
     if (noEventsNow) {
         eventsNowJsx = eventsNow.slice(0, 2).map((event, index) => {
             return (
-                <div className="calendar-compact-item-container calendar-compact-item-container-now">
+                <div key={index} className="calendar-compact-item-container calendar-compact-item-container-now">
                     <div className="calendar-compact-item-summary">{event.summary}</div>
                     <div className="calendar-compact-item-header">
                         <div className="header-time-now event-happening-now-alert">IN PROGRESS</div>
@@ -58,7 +55,7 @@ function CompactCalendar({ birthdayRangeToDisplay }) {
             const endTimeStr = new Date(event.end).toLocaleTimeString(undefined, timeFormatOptions) ?? "";
 
             return (
-                <div className="calendar-compact-item-container calendar-compact-item-container-today">
+                <div key={index} className="calendar-compact-item-container calendar-compact-item-container-today">
                     <div className="calendar-compact-item-summary">{event.summary}</div>
                     <div className="calendar-compact-item-header">
                         <div className="header-time-today">

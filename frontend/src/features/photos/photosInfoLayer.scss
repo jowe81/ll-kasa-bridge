@@ -20,6 +20,11 @@
         }           
     }
 
+    .horizontal-row-top {
+        @extend .horizontal-row;
+        justify-content: flex-end;
+    }
+
     .horizontal-row-remaining-space {
         flex-grow: 0.5;
         width: 100%;

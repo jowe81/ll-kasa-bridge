@@ -33,7 +33,7 @@ function Photos(props: any) {
             <div className="photo" style={{ backgroundImage: `url(${url})` }} />
             <div className="photo-meta">                
             </div>
-            <PhotosTouchLayer />
+            <PhotosTouchLayer fullScreen={fullScreen}/>
         </div>
     );
 }

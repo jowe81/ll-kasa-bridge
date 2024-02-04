@@ -1,18 +1,18 @@
 import './photosInfoLayer.scss';
 
-function PhotosInfoLayer({ photosService, hideLayer, record }) {
+function PhotosInfoLayer({ photosService, hideLayer, record, fullScreen }) {
     const libraryInfo = photosService?.state?.api?.libraryInfo;
 
     function getTagsText() {
         return record?.tags?.length ?
             record.tags.join(', ') :
-            <span className="placeholder-text">No Tags Assigned</span>        
+            <span className="placeholder-text">No Tags</span>        
     }
 
     function getCollectionsText() {
         return record?.collections?.length ?
             record.collections.join(', ') :
-            <span className="placeholder-text">No Collections Assigned</span>        
+            <span className="placeholder-text">No Collections</span>        
 
     }
 
@@ -53,21 +53,48 @@ function PhotosInfoLayer({ photosService, hideLayer, record }) {
         return `${record.width} x ${record.height}`;
     }
 
+    function getAspectText() {
+        let text;
+        const aspectFixed = (record.width / record.height).toFixed(2);        
+        if (aspectFixed == '1.50') {
+            text = '3:2';
+        } else if (aspectFixed == "1.33") {
+            text = '4:3';
+        } else if (aspectFixed == "1.78") {
+            text = '16:9';
+        } else if (aspectFixed == "2.33") {
+            text = '21:9';
+        } else {
+            text = aspectFixed;
+        }
+
+        return text;
+    }
+
     function getFolderText() {
         const folderInfo = libraryInfo.folders?.find((info) => record.dirname === info.item);
         return folderInfo.label;
     }
 
+    function getFilterSizeText() {
+        return <div>{libraryInfo.filterSize} images</div>;
+    }
+
+    function getSpacer() {
+        return <div className="flex-spacer invisible"></div>
+    }
+    
     const dateText = getDateText();
     const tagsText = getTagsText();
     const collectionsText = getCollectionsText();
     const folderText = getFolderText();
     const deviceText = getDeviceText();
     const resulutionText = getResolutionText();
+    const aspectText = getAspectText();
 
     return (
         <div className="touch-layer photos-info-layer">
-            <div className="horizontal-row"></div>
+            <div className="horizontal-row-top">{!fullScreen && getFilterSizeText()}</div>
             <div className="horizontal-row-remaining-space">
                 <div className="hide-button" onClick={hideLayer}></div>
             </div>
@@ -78,6 +105,8 @@ function PhotosInfoLayer({ photosService, hideLayer, record }) {
                 {folderText && <div>{folderText}</div>}
                 {deviceText && <div>{deviceText}</div>}
                 {resulutionText && <div>{resulutionText}</div>}
+                {aspectText && <div>{aspectText}</div>}
+                {fullScreen && <>{getSpacer()} {getFilterSizeText()}</>}
             </div>
         </div>
     );

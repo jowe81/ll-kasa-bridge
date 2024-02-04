@@ -7,7 +7,7 @@ import { getPhotosService, runChannelCommand } from "../../devicesHelpers";
 import { getDynformsServiceRecord } from "../../dynformsHelpers";
 import './photosTouchLayer.css';
 
-function PhotosTouchLayer() {
+function PhotosTouchLayer({fullScreen}) {
     const [showMainLayer, setShowMainLayer] = useState(false);
     const [showInfoLayer, setShowInfoLayer] = useState(false);
     const [showChangeFilterLayer, setShowChangeFilterLayer] = useState(false);
@@ -47,6 +47,7 @@ function PhotosTouchLayer() {
         hideLayer: () => setShowInfoLayer(false),
         photosService,
         record,
+        fullScreen,
     };
 
     if (showChangeFilterLayer) {
