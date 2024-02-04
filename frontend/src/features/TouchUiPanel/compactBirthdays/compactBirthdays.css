@@ -8,28 +8,27 @@
   text-align: left;
   height: 100%;
   padding-bottom: 3px;  
-
-    ::-webkit-scrollbar {
-        width: 5px;
-    }
-
-    /* Track */
-    ::-webkit-scrollbar-track {
-        background-color: rgba(255, 255, 255, .08);
-    }
-    
-    /* Handle */
-    ::-webkit-scrollbar-thumb {
-    background: #77777784;
-    /* background-color: rgba(55, 40, 40, 1); */
-    }
-
-    /* Handle on hover */
-    ::-webkit-scrollbar-thumb:hover {
-    background: rgb(152, 152, 152);
-    }    
-
 }
+
+.birthdays-compact-container::-webkit-scrollbar {
+    width: 5px;
+}
+
+/* Track */
+.birthdays-compact-container::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, .08);
+}
+    
+/* Handle */
+.birthdays-compact-container::-webkit-scrollbar-thumb {
+    background: #77777784;
+}
+
+/* Handle on hover */
+.birthdays-compact-container::-webkit-scrollbar-thumb:hover {
+    background: rgb(152, 152, 152);
+}    
+
 
 .birthdays-label {
   max-height: 25px;  
