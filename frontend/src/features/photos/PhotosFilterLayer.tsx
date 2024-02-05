@@ -48,7 +48,7 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
             ...uiInfo?.filter,
         })
         setInputValue(filter.tags.join(" "));
-    }, [uiInfo.filter])
+    }, [uiInfo?.filter])
 
     // Clear the select tags text when opening the dialog.
     useEffect(() => {
