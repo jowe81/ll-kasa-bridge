@@ -115,7 +115,6 @@ async function hideRestorePicture(deviceWrapper, commandData) {
         }
 
         record.collections = ['trashed'];
-        console.log(`HIDING ${record._id} (tags: ${record.tags.join(', ')}: ${JSON.stringify(record.collections)}}` )
     } else {
         // Restore if we have a cached copy.
         const recordBeforeHide = cache.hideRestorePicture?.recordBeforeHide;
@@ -124,7 +123,6 @@ async function hideRestorePicture(deviceWrapper, commandData) {
         } else {
             record.collections = [];
         }
-        console.log(`RESTORING ${record._id} (tags: ${record.tags.join(", ")}: ${JSON.stringify(record.collections)}}`);
     }
     
     await updateRecord(deviceWrapper, record);
@@ -216,7 +214,6 @@ async function setFilter(deviceWrapper, commandData) {
         }
     }
 
-    console.log(mongoFilter);
     requestInfo.query.filter = mongoFilter;
     log(`Setting new filter: ${JSON.stringify(mongoFilter)}`, deviceWrapper);
 
@@ -261,7 +258,7 @@ async function toggleFavorites(deviceWrapper, commandData) {
 /**
  * Add Url field to actual picture in the api response data.
  */
-function _processApiResponse(deviceWrapper, displayData) {
+function _processApiResponse(deviceWrapper, displayData, requestIndex) {
     const records = displayData.data?.records;
     const record = records?.length && records[0] ? records[0] : null;
 
@@ -295,13 +292,14 @@ async function updateRecord(deviceWrapper, record) {
         return null;
     }
 
+    const pushRequestIndex = 1;
     const cache = deviceWrapper.getCache();
 
     return deviceWrapper.deviceHandler
-        .runPushRequest(record)
+        .runPushRequest(record, pushRequestIndex)
         .then((data) => {
-            cache.data[0] = data.data;
-            deviceWrapper.deviceHandler.processCachedApiResponse();
+            cache.data[pushRequestIndex] = data.data;
+            deviceWrapper.deviceHandler.processCachedApiResponse(pushRequestIndex);
         })
         .catch((err) => {
             console.log(`Post request error. ${err.message}`);

@@ -119,6 +119,11 @@ class DynformsServiceHandler {
                 return;
             }
 
+            if (!info.retrieve || info.push) {
+                // Its a push request - ignored here.
+                return;
+            }
+
             const request = {
                 connectionName: info.connectionName ?? localConstants.connectionName,
                 collectionName: info.collectionName,
@@ -136,24 +141,6 @@ class DynformsServiceHandler {
                 request.settings.singleRecord = info.retrieve.singleRecord;
 
                 switch (info.retrieve.singleRecord.type) {
-                    case "__INDEX":
-                        // Find out what the last requested index was.
-                        let lastIndex = -1;
-
-                        if (this.service.settings.useSingleRequest) {
-                            lastIndex = this.service.state.api?.data?.index ?? -1;
-                        } else {
-                            const allData = this.service.state.api;
-
-                            if (Array.isArray(allData) && allData.length > requestIndex) {
-                                lastIndex = allData[requestIndex].data?.index ?? -1;
-                            }
-                        }
-
-                        // Add one to get the next record.
-                        request.settings.singleRecord.index = lastIndex + 1;
-                        break;
-
                     case "__RANDOMIZED_PREORDERED":
                         // Use the dynforms semi-random algorithm
                         request.settings.singleRecord.semiRandom = true;
@@ -258,10 +245,25 @@ class DynformsServiceHandler {
         }, 5000);
     }
 
-    async runPushRequest(record) {
+    async runPushRequest(record, requestIndex) {
+        if ([null, undefined].includes(requestIndex)) {
+            return null;            
+        }
+
+        if (!Array.isArray(this.service.settings.requests) || this.service.settings.requests.length < requestIndex + 1) {
+            // Request config not found
+            return null;
+        }
+        const collectionName = this.service.settings.requests[requestIndex].collectionName;
+
+        const request = {
+            collectionName,
+            record,
+        }
+
         const url = this.service.fullUrlPush;
-        log(`Running post request: ${url}`, this.service);
-        return axios.post(url, { collectionName: "photosFileInfo", record });
+        log(`Running push request  (${requestIndex}) to ${url} (collection ${collectionName}), ${record?._id ? `updating record ${record._id}.` : `adding record: ${JSON.stringify(record)}`}`, this.service);
+        return axios.post(url, request);
     }
 
     async runRequestNow(requestIndex) {
@@ -269,18 +271,23 @@ class DynformsServiceHandler {
             return false;
         }
 
+        if (!(typeof requestIndex === 'number')) {
+            log(`Error: no request index. `, this.service, 'red');
+        }
+
         const requests = this._constructRequests([requestIndex]);
         const request = Array.isArray(requests) && requests.length ? requests[0] : null;
 
         this._executeRequest(request, requestIndex)
             .then((data) => {
+                console.log('runRequestNow requestIndex', requestIndex);
                 this.cache.data[requestIndex] = data.data;
             })
             .catch((err) => {
                 log(`${this.service.alias}: API request failed`, this.service, "red");
             })
             .then((data) => {
-                this.processCachedApiResponse();
+                this.processCachedApiResponse(requestIndex);
             })
             .catch((err) => {
                 log(`${this.service.alias}: Processing API response failed`, this.service, "red");
@@ -323,8 +330,10 @@ class DynformsServiceHandler {
         Promise.all(promises)
             .then((allResponseData) => {
                 // Cache the responses.
-                this.cache.data = allResponseData.map((data, requestIndex) => data?.data);
-                this.processCachedApiResponse();
+                allResponseData.forEach((data, requestIndex) => {
+                    this.cache.data[requestIndex] = data.data;
+                    this.processCachedApiResponse(requestIndex);
+                })                
             })
             .catch((err) => {
                 console.log(err.message, err);
@@ -334,8 +343,8 @@ class DynformsServiceHandler {
     /**
      * Update state after a request came back.
      */
-    processCachedApiResponse() {
-        let displayData = getDisplayDataFromApiResponse(this.cache.data, this.service.settings);
+    processCachedApiResponse(requestIndex) {
+        let displayData = getDisplayDataFromApiResponse(this.cache.data[requestIndex], this.service.settings, requestIndex);
 
         // See if a _processApiResponse handler exists for this device.
         const commandHandler = this.service.commandHandlersExtension
@@ -343,16 +352,28 @@ class DynformsServiceHandler {
             : null;
 
         if (commandHandler) {
-            displayData = commandHandler(this.service, displayData);
+            displayData = commandHandler(this.service, displayData, requestIndex);
+        }
+
+        const newState = {
+            ...this.service.state,
+            powerState: this.service.getPowerState(),
+            api: displayData,
+            requests: {
+                ...this.service.state.requests,
+                test: true,
+                [requestIndex]: displayData,
+            },
+            settings: this.service.settings,
+        };
+
+        if (this.service.channel === 507) {
+            console.log("Updating state for reqIndex", requestIndex);
+            console.log(newState);
         }
 
         this.service._updateState(
-            {
-                ...this.service.state,
-                powerState: this.service.getPowerState(),
-                api: displayData,
-                settings: this.service.settings,
-            },
+            newState,
             true
         );
 

@@ -1601,8 +1601,6 @@ const deviceMap = [
                     },
                 },
             ],
-            // If set causes the backend to return the results for the first request only; as a single object and not as an array.
-            useSingleRequest: true,
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 1 * HOUR,
         },
@@ -1634,17 +1632,12 @@ const deviceMap = [
                             minutes: 15,
                         },
                         singleRecord: {
-                            // index: n (will be inserted dynamically when requesting from dynforms)
-                            // type: "__INDEX",
-
                             // Have dynforms pick the item
                             type: "__RANDOMIZED_PREORDERED",
                         },
                     },
                 },
             ],
-            // If set causes the backend to return the results for the first request only; as a single object and not as an array.
-            useSingleRequest: true,
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 30 * SECOND,
             ui: {
@@ -1695,9 +1688,11 @@ const deviceMap = [
                         },
                     },
                 },
+                {
+                    collectionName: "photosFileInfo",
+                    push: true,
+                },
             ],
-            // If set causes the backend to return the results for the first request only; as a single object and not as an array.
-            useSingleRequest: true,
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 30 * SECOND,
             ui: {
@@ -1775,7 +1770,7 @@ const deviceMap = [
                 },
             ],
             // This is hoften the handler will retrieve updated calendar info
-            checkInterval: 10 * MINUTE,
+            checkInterval: 20 * MINUTE,
         },
     },
     {
@@ -1801,7 +1796,7 @@ const deviceMap = [
                     retrieve: {
                         time: {
                             frequency: "minutes",
-                            minutes: 1,
+                            minutes: 5,
                         },
                         filters: [
                             {
@@ -1817,11 +1812,114 @@ const deviceMap = [
                     },
                 },
             ],
-            // If set causes the backend to return the results for the first request only; as a single object and not as an array.
-            useSingleRequest: true,
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 10 * MINUTE,
             ui: {},
+        },
+    },
+    {
+        alias: "Chores Service",
+        channel: 507,
+        id: "chores-service",
+        display: true,
+        displayLabel: "Chores",
+        displayType: null,
+        locationId: "__internal",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_DYNFORMS_SERVICE,
+        commandHandlersExtension: "choresHandlers.js",
+        settings: {
+            api: {
+                baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
+                path: null, // will use .env DYNFORMS_PATH or default instead
+                queryParams: {},
+            },
+            requests: [
+                {
+                    connectionName: null, // not implemented
+                    collectionName: "chores",
+                    retrieve: {
+                        time: {
+                            frequency: "minutes",
+                            minutes: 5,
+                        },
+                        filters: [
+                            {
+                                type: "static",
+                                match: {
+                                    created_at: { $gt: "__DATE_DAYS_AGO-30" }, // Only get values up to 1 months ago
+                                },
+                            },
+                        ],
+                        orderBy: {
+                            created_at: 1,
+                        },
+                    },
+                },
+                {
+                    collectionName: "chores",
+                    push: true,
+                },
+            ],
+            // This is how often the handler will go out and check whether a request should actually be run.
+            checkInterval: 30 * SECOND,
+            ui: {},
+            custom: {
+                users: [
+                    {
+                        id: "jess",
+                        name: "Jess",
+                    },
+                    {
+                        id: "johannes",
+                        name: "Johannes",
+                    },
+                ],
+                chores: [
+                    {
+                        id: "vitamins",
+                        label: "vitamins",
+                        showAlert: true,
+                        weekly: 7,
+                        user: "jess",
+                    },
+                    {
+                        id: "cardio",
+                        label: "cardio",
+                        showAlert: false,
+                        weekly: 5,
+                        user: "jess",
+                    },
+                    {
+                        id: "weights",
+                        label: "weights",
+                        showAlert: false,
+                        weekly: 5,
+                        user: "jess",
+                    },
+                    {
+                        id: "vitamins",
+                        label: "vitamins",
+                        showAlert: true,
+                        weekly: 7,
+                        user: "johannes",
+                    },
+                    {
+                        id: "cardio",
+                        label: "cardio",
+                        showAlert: false,
+                        weekly: 5,
+                        user: "johannes",
+                    },
+                    {
+                        id: "weights",
+                        label: "weights",
+                        showAlert: false,
+                        weekly: 3,
+                        user: "johannes",
+                    },
+                ],
+            },
         },
     },
 

@@ -2,15 +2,9 @@ import { log } from "./jUtils.js";
 import { formatDate, isToday } from "./jDateTimeUtils.js";
 import constants from "../constants.js";
 
-function getDisplayDataFromApiResponse(responseData, settings) {
+function getDisplayDataFromApiResponse(responseData, settings, requestIndex) {
     // Currently not doing any processing here.
     let displayData = responseData;
-
-    if (settings.useSingleRequest) {
-      // Return the results for the first request only; as a single object and not as an array.
-      displayData = responseData.length ? responseData[0] : null;  
-    }
-
     return displayData;
 }
 
