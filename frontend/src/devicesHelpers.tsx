@@ -59,7 +59,11 @@ function getFirstDeviceOfType(type: string, subType: string | null) {
 
 const getClock = () => getFirstDeviceOfType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_CLOCK);
 
-const getPhotosService = () => getDeviceByChannel(constants.photos?.photosServiceChannel);
+const getPhotosService = () => getDeviceByChannel(constants.photos?.serviceChannel);
+
+const getChoresService = () => getDeviceByChannel(constants.chores?.serviceChannel);
+
+const getBirthdaysService = () => getDeviceByChannel(constants.birthdays?.serviceChannel);
 
 const getMasterSwitch = () => getFirstDeviceOfType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_MASTER_SWITCH);
 
@@ -116,6 +120,10 @@ function getMasterSwitchDimInfo() {
 
 
 function runChannelCommand(channel, commandId, body = {}) {
+    if (!channel) {
+        console.warn('Cannot emit command: channel is missing.');
+        return null;
+    }
     console.log(`Emitting command '${commandId}' to channel ${channel}:`, Object.keys(body).length ? body : `<no body>`);
     socket.emit(`auto/command/channel`, {
         channel,
@@ -124,15 +132,22 @@ function runChannelCommand(channel, commandId, body = {}) {
     });
 }
 
+function runServiceCommand(service, commandId, body) {
+    runChannelCommand(service?.channel, commandId, body);
+}
+
 
 export {
     getAllDevices,
+    getBirthdaysService,
     getDeviceByChannel,
     getDevicesByType,
     getCalendar,
     getClock,
     getMasterSwitch,
     getMasterSwitchDimInfo,
+    getChoresService,
     getPhotosService,
     runChannelCommand,
+    runServiceCommand,
 };

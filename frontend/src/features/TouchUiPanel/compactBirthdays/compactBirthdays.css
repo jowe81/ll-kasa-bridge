@@ -47,6 +47,7 @@
   background-color: #333333ad;
   overflow-y: auto;
   border-radius: 3px;
+  padding: 3px;
 }
 
 .birthday-compact-item-container{

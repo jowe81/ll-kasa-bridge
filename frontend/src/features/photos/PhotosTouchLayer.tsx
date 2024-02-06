@@ -4,7 +4,7 @@ import PhotosManageCollectionsLayer from "./PhotosManageCollectionsLayer";
 import PhotosManageTagsLayer from "./PhotosManageTagsLayer";
 import { useState } from "react";
 import { getPhotosService, runChannelCommand } from "../../devicesHelpers";
-import { getDynformsServiceRecord } from "../../dynformsHelpers";
+import { getFirstDynformsServiceRecord } from "../../dynformsHelpers";
 import './photosTouchLayer.css';
 
 function PhotosTouchLayer({fullScreen}) {
@@ -15,7 +15,7 @@ function PhotosTouchLayer({fullScreen}) {
     const [showManageTagsLayer, setShowManageTagsLayer] = useState(false);
 
     const photosService = getPhotosService();
-    const record = getDynformsServiceRecord(photosService?.channel);
+    const record = getFirstDynformsServiceRecord(photosService?.channel);
 
     function runPhotosServiceCommand(commandId, body) {
         runChannelCommand(photosService?.channel, commandId, body);

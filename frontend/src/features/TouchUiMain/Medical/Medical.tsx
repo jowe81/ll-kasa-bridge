@@ -1,16 +1,16 @@
 import constants from "../../../constants.js";
 import { getDeviceByChannel } from "../../../devicesHelpers";
+import { getDynformsServiceRecords } from "./../../../dynformsHelpers";
 import { getMidNight, getNDaysAgoMidnight, getTimeDifference } from "../calendar/calendarHelpers";
-import { formatTime } from "../calendar/calendarHelpers";
 import "./medical.css"
 
 function Medical() {
-    const device = getDeviceByChannel(506);
+    const service = getDeviceByChannel(506);
     
-    if (!device) {
+    if (!service) {
         return;
     }
-    const records = device.state?.api?.data?.records;
+    const records = getDynformsServiceRecords(service.channel);
 
     const sampleData = [        
         getAverageSysDiaPulse(records, getMidNight(), new Date(), 'Today'),

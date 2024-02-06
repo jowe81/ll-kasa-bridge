@@ -28,6 +28,7 @@ function TouchUiPanel(props: any) {
             {fullScreen && <CompactCalendar />}
             {showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay} />}
             <div className="placeholder-350"></div>
+            {/* {<Alerts />} */}
             <Temperature thermometersStartIndex={2} />
 
             {showMailbox && <Mailbox />}

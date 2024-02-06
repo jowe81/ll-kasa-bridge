@@ -1,21 +1,11 @@
-import { useAppSelector } from "../../../app/hooks.ts";
-
 import constants from "../../../constants.ts";
-
-import { VirtualDevice } from "../devices/dataSlice.ts";
+import { getDynformsServiceRecords } from "./../../../dynformsHelpers";
+import { getBirthdaysService } from "../../../devicesHelpers.tsx";
 
 function getRecords(maxDifference: number = 0) {
-    const devices: VirtualDevice[] = useAppSelector(
-        (state) => state.data.devices
-    );
-    const birthdayService = devices.find(
-        (device) =>
-            device.subType === constants.SUBTYPE_DYNFORMS_SERVICE &&
-            device.channel === constants.birthdays?.birthdayServiceChannel
-    );
-
-    const allRecords = birthdayService?.state?.api?.data?.records ?? [];
-
+    const service = getBirthdaysService();
+    
+    const allRecords = getDynformsServiceRecords(service?.channel) ?? [];
     const records = allRecords.filter((record) => record.show_birthday);
     
     if (maxDifference) {

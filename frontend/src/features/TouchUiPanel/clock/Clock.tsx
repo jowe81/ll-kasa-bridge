@@ -8,7 +8,7 @@ import "./clock.css";
 
 function Clock() {
     const devices: VirtualDevice[] = useAppSelector(state => state.data.devices);
-    const clock = devices.find(device => device.subType === constants.SUBTYPE_CLOCK && device.channel === constants.clock?.clockChannel);
+    const clock = devices.find(device => device.subType === constants.SUBTYPE_CLOCK && device.channel === constants.clock?.serviceChannel);
     const clockData = clock?.state?.clock;
 
     let sunEvents;

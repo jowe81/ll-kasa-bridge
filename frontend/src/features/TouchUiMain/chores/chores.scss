@@ -1,0 +1,60 @@
+.chores-container {
+  background-color: rgba(87, 71, 86, 0.785);
+  width: 300px;
+  border-radius: 5px;
+  padding-top: 5px;  
+  margin-top: 5px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  text-align: left;
+  height: 173px;
+}
+
+.chores-items-container {
+  width: 280px;  
+  background-color: rgb(42, 31, 42);
+  margin: 5px auto;
+  padding: 3px;
+  display: flex;
+  align-items: flex-start;
+  flex-flow: row wrap;  
+  // overflow-y: scroll;
+  height: 130px;
+  color:rgba(209, 190, 212, 0.608);
+
+}
+ 
+/* Handle */
+.chores-items-container::-webkit-scrollbar-thumb {
+  background: #5f4e6289;
+}
+
+/* Handle on hover */
+.chores-items-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(114, 84, 113, 0.735);
+}
+
+.chores-header {
+  text-align: center;
+  width: 300px;
+  font-weight: bold;
+  color:rgba(255, 255, 255, .5)
+}
+
+.chore-button {
+    width: 70px;
+    height: 40px;
+    color:rgba(217, 188, 220, 0.5);
+    border-color: rgba(217, 188, 220, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(83, 35, 35, 0.644);
+
+    
+}
+
+.chore-button-done {
+    background-color: rgba(49, 83, 35, 0.644) !important;
+}

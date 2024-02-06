@@ -6,26 +6,24 @@ import { VirtualDevice } from "./features/TouchUiMain/devices/dataSlice.ts";
 
 import { getDeviceByChannel } from './devicesHelpers.tsx';
 
-function getDynformsServiceRecords(channel) {
+function getDynformsServiceRecords(channel, requestIndex = 0) {
     const dynformsService: VirtualDevice = getDeviceByChannel(channel);
-
-    if (!dynformsService) {
-      return [];
+    if (!(dynformsService && dynformsService?.state?.requests)) {        
+        return [];
     }    
 
-    // This path should be a backend parameter in configuration.js
-    const records = dynformsService?.state?.api?.data?.records ?? [];
+    const records = dynformsService?.state?.requests[requestIndex].data?.records ?? [];
     return records;
 }
 
 // Return the first record.
-function getDynformsServiceRecord(channel) {
-    const records = getDynformsServiceRecords(channel);
+function getFirstDynformsServiceRecord(channel, requestIndex = 0) {
+    const records = getDynformsServiceRecords(channel, requestIndex);
 
     return Array.isArray(records) && records.length ? records[0] : null;
 }
 
 export {
   getDynformsServiceRecords,
-  getDynformsServiceRecord,
+  getFirstDynformsServiceRecord,
 }

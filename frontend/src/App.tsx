@@ -56,7 +56,7 @@ function App() {
     });
 
     socket.on('auto/device/state', (data: DeviceStateUpdate) => {      
-      if (!(data?.data?.channel === constants.clock.clockChannel)) {
+      if (!(data?.data?.channel === constants.clock.serviceChannel)) {
         // Ignore the clock updates which come every second.        
         console.log(`Socket: auto/device/state (${data?.data?.channel})`, data?.data?.state);
       }

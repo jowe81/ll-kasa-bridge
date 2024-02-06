@@ -8,6 +8,7 @@ import Calendar from "./features/TouchUiMain/calendar/Calendar.tsx";
 import ScreenKeyboard from "./features/ScreenKeyboard/ScreenKeyboard.tsx";
 import TouchUiPanel from "./features/TouchUiPanel/TouchUiPanel";
 import Scripture from "./features/TouchUiPanel/scripture/Scripture.tsx";
+import Pages from "./features/TouchUiMain/personal/Pages.tsx";
 import './touch.css';
 import { useState } from "react";
 import { useScreenKeyboard } from "./contexts/ScreenKeyboardContext.tsx";
@@ -87,7 +88,7 @@ function TouchUi() {
                     <div className="touch-ui-main-column touch-ui-left-column">
                         <TimerPanel />
                         <Birthdays />
-                        <Medical />
+                        <Pages />
                     </div>
                     <div className="touch-ui-main-column-remaining-space">
                         <div className="remaining-main">

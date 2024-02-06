@@ -1,0 +1,20 @@
+@import './../../../main.scss';
+
+.pages-container {
+    position: relative;
+}
+.pages-advance-container {
+    position: absolute;
+    right: 3px;    
+    top: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    border: 1px solid rgba($border-color-touch-item, .7);        
+    border-radius: 5px;
+
+    div {
+        color: rgba(223, 208, 223, 0.718);
+    }
+}

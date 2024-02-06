@@ -93,11 +93,15 @@ constants.services = {
 }
 
 // Other components
+constants.chores = {
+    serviceChannel: 507,
+}
+
 constants.photos = {
     //url: `http://johannes-mb.wnet.wn:3020/db/randomUrl`,
     url: `${constants.services.PHOTOS_BACKEND_HOST}:${constants.services.PHOTOS_BACKEND_PORT}`,
     refreshInterval: 30 * MINUTE,
-    photosServiceChannel: 504,
+    serviceChannel: 504,
 };
 
 constants.touchPanel = {
@@ -107,15 +111,15 @@ constants.touchPanel = {
 }
 
 constants.birthdays = {
-  birthdayServiceChannel: 502,
+  serviceChannel: 502,
 }
 
 constants.clock = {
-  clockChannel: 500,
+  serviceChannel: 500,
 }
 
 constants.scripture = {
-  scripturesServiceChannel: 503,
+  serviceChannel: 503,
 }
 
 export default constants;
