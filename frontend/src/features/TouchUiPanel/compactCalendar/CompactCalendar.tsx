@@ -1,19 +1,10 @@
 import {
     getCalendarEvents,
-    getDateString,
-    isSameDay,
-    isSameTime,
-    isThisWeek,
     eventIsFuture,
     eventIsNow,
     eventIsToday,
-    isToday,
-    eventIsTomorrow,
-    isTomorrow,
-    getDaysDifference,
-    getWeekNumber,
-    getBeginningOfWeek,
     getTimeDifference,
+    startsSoon,
 } from "./../../TouchUiMain/calendar/calendarHelpers";
 
 import "./../../TouchUiMain/calendar/calendar.scss";
@@ -51,15 +42,21 @@ function CompactCalendar() {
     let noEventsToday = eventsToday.length;
     if (noEventsToday) {
         eventsTodayJsx = eventsToday.slice(0, 2).map((event, index) => {
-            const startTimeStr = new Date(event.start).toLocaleTimeString(undefined, timeFormatOptions) ?? "";
+            const startDate = new Date(event.start);
+            const startTimeStr = startDate.toLocaleTimeString(undefined, timeFormatOptions) ?? "";
             const endTimeStr = new Date(event.end).toLocaleTimeString(undefined, timeFormatOptions) ?? "";
+
+            const eventStartsSoon = startsSoon(startDate, 180);
 
             return (
                 <div key={index} className="calendar-compact-item-container calendar-compact-item-container-today">
                     <div className="calendar-compact-item-summary">{event.summary}</div>
                     <div className="calendar-compact-item-header">
                         <div className="header-time-today">
-                            {startTimeStr} - {endTimeStr}
+                            {eventStartsSoon && (
+                                <div className="event-happening-soon-alert">In {getTimeDifference(startDate, new Date())}</div>
+                            )}
+                            {!eventStartsSoon && <>{startTimeStr} - {endTimeStr}</>}
                         </div>
                         <div className={`header-index-${event.calendarIndex}`}>{event.calendarLabel}</div>
                     </div>

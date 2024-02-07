@@ -14,9 +14,9 @@ import { getDeviceByChannel } from "../../devicesHelpers.tsx";
 
 function TouchUiPanel(props: any) {
     const fullScreen = props.fullScreen;
-    const birthdayRangeToDisplay = 0;
+    const birthdayRangeToDisplay = 2;
     const { recordsSelected } = getSelectedRecordsInfo(birthdayRangeToDisplay);
-    const showBirthdays = fullScreen && recordsSelected.length > 0;
+    const showBirthdays = fullScreen && recordsSelected.length >= 0;
 
     const mailbox = getDeviceByChannel(constants.touchPanel?.mailboxChannel);
     const showMailbox = mailbox?.powerState;

@@ -6,22 +6,22 @@ function CompactBirthdays({birthdayRangeToDisplay}) {
     
     const { recordsSelected, hiddenBirthdaysToday, hiddenBirthdaysTomorrow } = getSelectedRecordsInfo(birthdayRangeToDisplay);
 
-    if (!recordsSelected.length) { 
-      // Nothing to show.
-      return
-    };
-
     const fullSize = false;
+
+    const haveEntriesToShow = recordsSelected.length > 0;
+    
     const birthdaysJsx = recordsSelected
         .slice(0, 3) // Show a max of 3.
         .map((record, index) => getJsx(record, index, fullSize));
-
+    
     let hiddenBirthdaysJsx;
 
-    if (hiddenBirthdaysToday) {
-      hiddenBirthdaysJsx = <div className="hidden-birthdays hidden-birthdays-today">{hiddenBirthdaysToday} more!</div>
-    } else if (hiddenBirthdaysTomorrow) {
-      hiddenBirthdaysJsx = <div className="hidden-birthdays hidden-birthdays-tomorrow">{hiddenBirthdaysTomorrow} more!</div>
+    if (haveEntriesToShow) {
+        if (hiddenBirthdaysToday) {
+            hiddenBirthdaysJsx = <div className="hidden-birthdays hidden-birthdays-today">{hiddenBirthdaysToday} more!</div>
+        } else if (hiddenBirthdaysTomorrow) {
+            hiddenBirthdaysJsx = <div className="hidden-birthdays hidden-birthdays-tomorrow">{hiddenBirthdaysTomorrow} more!</div>
+        }
     }
 
     return (
@@ -31,9 +31,8 @@ function CompactBirthdays({birthdayRangeToDisplay}) {
                     Birthdays
                     {hiddenBirthdaysJsx}
                 </div>
-                <div className="birthdays-compact-items-container">
-                    {birthdaysJsx}
-                </div>
+                {haveEntriesToShow && <div className="birthdays-compact-items-container">{birthdaysJsx}</div>}
+                {!haveEntriesToShow && <div className="compact-birthdays-none">None Imminent</div>}
             </div>
         </div>
     );

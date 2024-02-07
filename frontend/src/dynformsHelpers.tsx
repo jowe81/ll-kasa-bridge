@@ -1,7 +1,3 @@
-import { useAppSelector } from "./app/hooks.ts";
-
-import constants from "./constants.ts";
-
 import { VirtualDevice } from "./features/TouchUiMain/devices/dataSlice.ts";
 
 import { getDeviceByChannel } from './devicesHelpers.tsx';

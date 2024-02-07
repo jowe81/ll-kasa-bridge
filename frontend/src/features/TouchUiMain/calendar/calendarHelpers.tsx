@@ -325,6 +325,17 @@ function getConsecutiveNumbers(start, end) {
     return numbers;
 }
 
+function startsSoon(date: Date, maxMinutes: number) {
+    if (!date) {
+        date = new Date();
+    }
+
+    const diff = date.getTime() - Date.now();
+    const minutesOut = Math.floor(diff / 60000);
+
+    return minutesOut > 0 && minutesOut <= maxMinutes;
+}
+
 export {
     eventIsFuture,
     eventIsNow,
@@ -354,5 +365,6 @@ export {
     isThisWeek,
     isToday,
     isTomorrow,
-    isInNDays
-}
+    isInNDays,
+    startsSoon,
+};

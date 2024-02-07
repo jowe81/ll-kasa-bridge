@@ -17,7 +17,6 @@ function TouchUIDateSelector({onChange, initialValue}) {
 
     // InitialValue is not just initial but gets updated when a remote change comes in.
     useEffect(() => {
-        console.log("Updated: ", initialValue)
         setDate({
             ...date,
             ...initialValue,
@@ -35,7 +34,6 @@ function TouchUIDateSelector({onChange, initialValue}) {
 
         setDate(newDate);
         onChange(newDate);
-        console.log("new", newDate);
     };
 
     function getSelectOptions(values, labels?) {

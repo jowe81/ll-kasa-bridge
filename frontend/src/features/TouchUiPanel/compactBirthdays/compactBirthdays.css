@@ -38,13 +38,31 @@
   width: 100%;
 }
 
+.compact-birthdays-none {
+    color: rgb(62, 54, 97);
+    background-color: rgb(24, 20, 41);
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    div {
+        width: 100%;
+        text-align: center;
+    }
+}
+
 .birthdays-compact-items-container{
   width: 100%;  
   margin: 5px auto;
   padding: 0px;
   padding-right: 0px;
   flex-grow: 10;
-  background-color: #333333ad;
+  background-color: rgb(24, 20, 41);
   overflow-y: auto;
   border-radius: 3px;
   padding: 3px;

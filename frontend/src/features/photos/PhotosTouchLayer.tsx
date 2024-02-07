@@ -2,17 +2,23 @@ import PhotosInfoLayer from "./PhotosInfoLayer";
 import PhotosFilterLayer from "./PhotosFilterLayer";
 import PhotosManageCollectionsLayer from "./PhotosManageCollectionsLayer";
 import PhotosManageTagsLayer from "./PhotosManageTagsLayer";
-import { useState } from "react";
 import { getPhotosService, runChannelCommand } from "../../devicesHelpers";
 import { getFirstDynformsServiceRecord } from "../../dynformsHelpers";
+import { useAppSelector, useAppDispatch } from "./../../app/hooks.ts";
+import { photosTouchLayerStateChanged } from "../localState/localStateSlice";
 import './photosTouchLayer.css';
 
 function PhotosTouchLayer({fullScreen}) {
-    const [showMainLayer, setShowMainLayer] = useState(false);
-    const [showInfoLayer, setShowInfoLayer] = useState(false);
-    const [showChangeFilterLayer, setShowChangeFilterLayer] = useState(false);
-    const [showManageCollectionsLayer, setShowManageCollectionsLayer] = useState(false);
-    const [showManageTagsLayer, setShowManageTagsLayer] = useState(false);
+    // State management
+    const dispatch = useAppDispatch();
+    const photosTouchLayerState = useAppSelector((state) => state.localState.photosTouchLayer);    
+    const { showMainLayer, showInfoLayer, showChangeFilterLayer, showManageCollectionsLayer, showManageTagsLayer } = photosTouchLayerState;
+    const updateState = (path, payload) => dispatch(photosTouchLayerStateChanged({...photosTouchLayerState, [path]: payload }));
+    const setShowMainLayer = (payload) => updateState('showMainLayer', payload);
+    const setShowInfoLayer = (payload) => updateState("showInfoLayer", payload);
+    const setShowChangeFilterLayer = (payload) => updateState("showChangeFilterLayer", payload);
+    const setShowManageCollectionsLayer = (payload) => updateState("showManageCollectionsLayer", payload);
+    const setShowManageTagsLayer = (payload) => updateState("showManageTagsLayer", payload);
 
     const photosService = getPhotosService();
     const record = getFirstDynformsServiceRecord(photosService?.channel);

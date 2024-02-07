@@ -1,6 +1,8 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import dataSliceReducer from '../features/TouchUiMain/devices/dataSlice';
 import configSliceReducer from '../features/TouchUiMain/devices/configSlice';
+import localStateSliceReducer from '../features/localState/localStateSlice';
+
 import { apiSlice } from '../features/TouchUiMain/devices/jjautoApiSlice';
 
 export const store = configureStore({
@@ -8,6 +10,7 @@ export const store = configureStore({
     reducer: { 
         data: dataSliceReducer,
         config: configSliceReducer,
+        localState: localStateSliceReducer,
         [apiSlice.reducerPath]: apiSlice.reducer
     },
     middleware: getDefaultMiddleware => {

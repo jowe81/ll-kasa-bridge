@@ -1,5 +1,7 @@
 @import './../../../main.scss';
 
+$compact-calendar-background-color: rgba(69, 92, 46, 0.4);
+
 .calendar-compact-container {
   width: 200px;
   border-radius: 5px;
@@ -42,8 +44,8 @@
 }
 
 .calendar-compact-nothing-scheduled {
-    color: rgba(128, 128, 128, 0.389);
-    background-color: #333333ad;
+    color: rgba(69, 92, 46, 0.653);
+    background-color: $compact-calendar-background-color;
     margin-top: 5px;
     margin-bottom: 5px;
     border-radius: 5px;
@@ -63,7 +65,7 @@
   width: 100%;  
   margin: 5px auto;
   flex-grow: 10;
-  background-color: #333333ad;
+  background-color: $compact-calendar-background-color;
   overflow-y: auto;
   border-radius: 3px;  
   padding: 3px;

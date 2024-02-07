@@ -1,54 +1,40 @@
 import TouchUIBooleanField from "./TouchUIBooleanField";
 import TouchUIDateSelector from "./TouchUIDateSelector";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
-import './../TouchUiMain/calendar/calendarHelpers';
+import { useAppSelector, useAppDispatch } from "./../../app/hooks.ts";
+import { photosFilterLayerStateChanged, initialState } from "../localState/localStateSlice";
+
+import "./../TouchUiMain/calendar/calendarHelpers";
 import "./photosFilterLayer.scss";
 
 function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiInfo, photosService }) {
-    const libraryInfo = photosService?.state?.api?.libraryInfo;
-
-    const clearedFilterState = {
-        collections: [],
-        tags: [],
-        mode_collections: "$in",
-        mode_tags: "$in",
-        startDate: {
-            // Default to the beginning of the current year
-            year: (new Date()).getFullYear(),
-            month: 1,
-            date: 1,
-            enabled: false,
-        },
-        endDate: {
-            // Default to the current date
-            enabled: false,
-        },
-
-        folders: [],
-    };
-
-    const initialFilterState = {
-        ...clearedFilterState,
-        ...uiInfo?.filter,
-    };
-
-    const [filter, _setFilter] = useState<any>(initialFilterState);
-
+    // State management
+    const dispatch = useAppDispatch();
+    const photosFilterLayerState = useAppSelector((state) => state.localState.photosFilterLayer);
+    const { filter } = photosFilterLayerState;
+    const updateState = (path, payload) => dispatch(photosFilterLayerStateChanged({ ...photosFilterLayerState, [path]: payload }));
+    const _setFilter = (payload) => updateState("filter", payload);
     const setFilter = (filter) => {
         _setFilter({ ...filter });
-        setInputValue(filter.tags.join(' '));
-        console.log(`new filter`, filter);
+        setInputValue(filter.tags.join(" "));
     };
+    
+    const clearedFilterState = initialState.photosFilterLayer.filter;
+    function resetFilterState() {
+        setFilter({ ...clearedFilterState });
+    }
+
+    const libraryInfo = photosService?.state?.api?.libraryInfo;
 
     // Make sure to update the filter if a remote change comes in.
     useEffect(() => {
         setFilter({
             ...filter,
             ...uiInfo?.filter,
-        })
+        });
         setInputValue(filter.tags.join(" "));
-    }, [uiInfo?.filter])
+    }, [uiInfo?.filter]);
 
     // Clear the select tags text when opening the dialog.
     useEffect(() => {
@@ -56,35 +42,32 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
     }, []);
     const { showKeyboard, inputValue, setInputValue } = useScreenKeyboard();
 
-    function resetFilterState() {
-        setFilter({...clearedFilterState})
-    }
 
     function addRemoveTagFromInput(tag) {
-        let newInputValue = '';
+        let newInputValue = "";
 
         if (splitTags(inputValue).includes(tag)) {
             newInputValue = removeTagFromString(inputValue, tag);
             console.log(`Removing ${tag}`);
         } else {
-            newInputValue = inputValue.trim() + ' ' + tag;
+            newInputValue = inputValue.trim() + " " + tag;
             console.log(`Adding ${tag}`);
         }
 
         setInputValue(newInputValue);
-        setFilter({ ...filter, tags: splitTags(newInputValue)});
+        setFilter({ ...filter, tags: splitTags(newInputValue) });
     }
 
     function addRemoveCollectionFromFilter(collectionName) {
         let newCollections;
 
-        // If 'unsorted': 
-        if (collectionName === 'unsorted') {
+        // If 'unsorted':
+        if (collectionName === "unsorted") {
             newCollections = [];
-        } else if (collectionName === 'trashed') {
-            newCollections = ['trashed'];
+        } else if (collectionName === "trashed") {
+            newCollections = ["trashed"];
         } else {
-            if (filter.collections.includes('trashed')) {
+            if (filter.collections.includes("trashed")) {
                 filter.collections = [];
             }
 
@@ -95,42 +78,45 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
             }
         }
 
-        setFilter({...filter, collections: newCollections});
+        setFilter({ ...filter, collections: newCollections });
     }
 
     function addRemoveFolderFromFilter(folderInfo: any) {
         let newFolders: string[] = [];
-        
+
         if (filter.folders) {
             if (filter.folders.includes(folderInfo.item)) {
                 newFolders = filter.folders.filter((item) => item != folderInfo.item);
             } else {
                 newFolders = [...filter.folders, folderInfo.item];
-            }            
+            }
         } else {
             newFolders = [folderInfo.item as string];
         }
 
-
-        setFilter({...filter, folders: newFolders});
+        setFilter({ ...filter, folders: newFolders });
     }
 
     const keyboardConfigTags = {
         fieldLabel: "Tags to filter by:",
         instructions: "Use spaces to separate multiple tags.",
-        value: filter.tags?.join(' '),
+        value: filter.tags?.join(" "),
         onClose: (value) => setFilter({ ...filter, tags: splitTags(value) }),
     };
 
     let allCollections = libraryInfo?.collections?.map((info) => info.item).sort();
 
-    let defaultCollections = allCollections && allCollections
-        .filter((collectionName) => ["unsorted", "trashed", "favorites"].includes(collectionName))
-        .sort((a, b) => a > b ? -1 : 1 );
-        
-    let customCollections = allCollections && allCollections
-        .filter((collectionName) => !["unsorted", "trashed", "favorites"].includes(collectionName))
-        .sort();
+    let defaultCollections =
+        allCollections &&
+        allCollections
+            .filter((collectionName) => ["unsorted", "trashed", "favorites"].includes(collectionName))
+            .sort((a, b) => (a > b ? -1 : 1));
+
+    let customCollections =
+        allCollections &&
+        allCollections
+            .filter((collectionName) => !["unsorted", "trashed", "favorites"].includes(collectionName))
+            .sort();
 
     if (!allCollections) {
         allCollections = [];
@@ -147,21 +133,18 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
     const collections = [...defaultCollections, ...customCollections];
 
     const collectionItemsJsx = collections.map((collection, index) => {
-        const collectionInfo = libraryInfo?.collections?.find(info => info.item === collection);
-        
+        const collectionInfo = libraryInfo?.collections?.find((info) => info.item === collection);
+
         let className = "touch-item";
 
-        if ((collection === 'unsorted' && !filter.collections.length) || (filter.collections?.includes(collection))) {
+        if ((collection === "unsorted" && !filter.collections.length) || filter.collections?.includes(collection)) {
             className += " touch-item-selected";
-        } 
+        }
 
         return (
-            <div
-                key={index}
-                className={className}
-                onClick={() => addRemoveCollectionFromFilter(collection)}
-            >
-                {collection[0].toUpperCase() + collection.substring(1)} <span className="touch-item-info">{collectionInfo?.count}</span>
+            <div key={index} className={className} onClick={() => addRemoveCollectionFromFilter(collection)}>
+                {collection[0].toUpperCase() + collection.substring(1)}{" "}
+                <span className="touch-item-info">{collectionInfo?.count}</span>
             </div>
         );
     });
@@ -171,12 +154,12 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         labelFalse: "Any",
         valueTrue: "$all",
         valueFalse: "$in",
-    }
+    };
 
     const collectionsModeProps: any = {
         ...filterModeProps,
         handleClick: (value) => {
-            setFilter({ ...filter, mode_collections: value});
+            setFilter({ ...filter, mode_collections: value });
         },
         initialValue: uiInfo?.filter?.mode_collections,
     };
@@ -189,7 +172,7 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         initialValue: uiInfo?.filter?.mode_tags,
     };
 
-    const availableTags = getItemsInfoSelectedFirst('tags');
+    const availableTags = getItemsInfoSelectedFirst("tags");
     const availableTagItemsJsx = availableTags?.map((tagInfo, index) => {
         const tag = tagInfo.item;
         return (
@@ -203,9 +186,9 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         );
     });
 
-    const folders = getItemsInfoSelectedFirst('folders');
+    const folders = getItemsInfoSelectedFirst("folders");
     const folderItemsJsx = folders?.map((folderInfo, index) => {
-        const label = folderInfo.label;        
+        const label = folderInfo.label;
         return (
             <div
                 key={index}
@@ -216,14 +199,14 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
             </div>
         );
     });
-    
+
     /**
      * Sort the array of itemsInfos such that selected items show up first.
      * For tags, collections, folders.
      */
     function getItemsInfoSelectedFirst(arrayPropertyName) {
         const selectedItems = filter[arrayPropertyName] ?? [];
-        const selectedItemsInfo = libraryInfo[arrayPropertyName].filter(info => selectedItems.includes(info.item));
+        const selectedItemsInfo = libraryInfo[arrayPropertyName].filter((info) => selectedItems.includes(info.item));
         const otherItemsInfo = libraryInfo[arrayPropertyName].filter((info) => !selectedItems.includes(info.item));
 
         return [...selectedItemsInfo, ...otherItemsInfo];
@@ -234,7 +217,7 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         const newFilter = {
             ...filter,
             [property]: newDate,
-        }
+        };
         setFilter(newFilter);
     }
 
@@ -322,7 +305,10 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
                 <div className="action" onClick={hideChangeFilterLayer}>
                     Cancel
                 </div>
-                <div className="action" onClick={() => setPhotosServiceFilter(filter)}>
+                <div className="action" onClick={() => { 
+                    setPhotosServiceFilter(filter);
+                    hideChangeFilterLayer();
+                }}>
                     Set New Filter
                 </div>
             </div>
@@ -334,9 +320,9 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
 function splitTags(tagsString) {
     const tags = tagsString
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, ' ')
-        .split(' ')
-        .filter(tag => tag);
+        .replace(/[^a-z0-9]+/g, " ")
+        .split(" ")
+        .filter((tag) => tag);
 
     return tags;
 }
@@ -351,6 +337,5 @@ function removeTagFromString(inputString, wordToRemove) {
     // Replace the matched word in the input string
     return inputString.replace(regex, "");
 }
-
 
 export default PhotosFilterLayer;
