@@ -718,7 +718,7 @@ const cmdFailPrefix = '[FAIL]';
   },
 
   async setLightState(commandObject, triggerSwitchPosition, origin, filters = null, skipAllFilters = false) {    
-    let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
+    let originText = typeof origin === 'object' ? (origin?.alias ?? origin?.id ?? origin?.ip ?? origin?.text) : origin ? origin : 'unknown origin';
 
     if (!commandObject || typeof commandObject !== 'object') {
       log(`${cmdPrefix} ${cmdFailPrefix} setLightState error: no command object passed in`, this, 'red');

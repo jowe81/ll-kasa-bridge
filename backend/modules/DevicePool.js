@@ -620,6 +620,19 @@ const devicePool = {
         deviceWrappers.forEach((deviceWrapper) => deviceWrapper.setPowerState(powerState));
     },
 
+    setGroupLightState(groupId, lightState) {        
+        const deviceWrappers = this.getDeviceWrappersByGroup(groupId);
+        
+        if (!deviceWrappers) {
+            log(`Error: Cannot switch group ${groupId}: it does not exist.`, null, "red");
+            return null;
+        }
+
+        deviceWrappers.forEach((deviceWrapper) => {            
+            deviceWrapper.setLightState(lightState, null, null, null, true);
+        });
+    },
+
     getDeviceWrappersByGroup(groupId) {
         const group = this.globalConfig.groups.find((group) => group.id === groupId);
 
