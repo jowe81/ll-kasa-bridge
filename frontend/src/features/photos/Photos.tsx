@@ -1,11 +1,11 @@
 import PhotosTouchLayer from "./PhotosTouchLayer";
-import { getFirstDynformsServiceRecord } from "../../dynformsHelpers";
+import { getFirstDynformsServiceRecordFromLastRequest } from "../../dynformsHelpers";
 import { getPhotosService } from "../../devicesHelpers";
 import "./photos.css";
 
 function Photos(props: any) {
     const photosService = getPhotosService();
-    const record = getFirstDynformsServiceRecord(photosService?.channel);
+    const record = getFirstDynformsServiceRecordFromLastRequest(photosService?.channel);
 
     const { fullScreen } = props;
 

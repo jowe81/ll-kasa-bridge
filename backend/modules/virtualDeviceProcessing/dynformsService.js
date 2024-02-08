@@ -363,14 +363,10 @@ class DynformsServiceHandler {
                 ...this.service.state.requests,
                 test: true,
                 [requestIndex]: displayData,
+                lastReturnedRequestIndex: requestIndex,
             },
             settings: this.service.settings,
         };
-
-        if (this.service.channel === 507) {
-            console.log("Updating state for reqIndex", requestIndex);
-            console.log(newState);
-        }
 
         this.service._updateState(
             newState,

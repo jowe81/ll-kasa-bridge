@@ -1,7 +1,3 @@
-import { useState, useEffect } from "react";
-import { Device } from "../../TouchUiMain/devices/dataSlice.ts";
-import constants from "../../../constants.ts";
-
 import { socket } from "../../websockets/socket.tsx";
 
 const MasterSwitchButton = ({ button, powerState }) => {

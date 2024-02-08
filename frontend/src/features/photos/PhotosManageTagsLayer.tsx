@@ -1,7 +1,6 @@
-import { useState } from "react";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
 
-function PhotosManageTagsLayer({ addRemoveTag, hideLayer, uiInfo, record, photosService }) {
+function PhotosManageTagsLayer({ addRemoveTag, hideLayer, uiInfo, record, photosService }) {    
     const libraryInfo = photosService?.state?.api?.libraryInfo;
 
     const { showKeyboard } = useScreenKeyboard();

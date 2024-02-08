@@ -3,7 +3,7 @@ import PhotosFilterLayer from "./PhotosFilterLayer";
 import PhotosManageCollectionsLayer from "./PhotosManageCollectionsLayer";
 import PhotosManageTagsLayer from "./PhotosManageTagsLayer";
 import { getPhotosService, runChannelCommand } from "../../devicesHelpers";
-import { getFirstDynformsServiceRecord } from "../../dynformsHelpers";
+import { getFirstDynformsServiceRecordFromLastRequest } from "../../dynformsHelpers";
 import { useAppSelector, useAppDispatch } from "./../../app/hooks.ts";
 import { photosTouchLayerStateChanged } from "../localState/localStateSlice";
 import './photosTouchLayer.css';
@@ -21,7 +21,7 @@ function PhotosTouchLayer({fullScreen}) {
     const setShowManageTagsLayer = (payload) => updateState("showManageTagsLayer", payload);
 
     const photosService = getPhotosService();
-    const record = getFirstDynformsServiceRecord(photosService?.channel);
+    const record = getFirstDynformsServiceRecordFromLastRequest(photosService?.channel);
 
     function runPhotosServiceCommand(commandId, body) {
         runChannelCommand(photosService?.channel, commandId, body);

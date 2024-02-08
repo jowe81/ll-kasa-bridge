@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useAppSelector } from "../../../app/hooks.ts";
-import { socket, setTimer, cancelTimer } from "../../websockets/socket.tsx";
+import { setTimer, cancelTimer } from "../../websockets/socket.tsx";
 import constants from "../../../constants.ts";
 
 import { VirtualDevice } from "../../TouchUiMain/devices/dataSlice.ts";

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
 import "./photosManageCollectionsLayer.scss";
 
