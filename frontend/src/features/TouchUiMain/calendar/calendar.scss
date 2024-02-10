@@ -102,7 +102,7 @@
 }
 
 .calendar-event-container > .header-container {
-    color: rgba(209, 220, 213, 0.575);
+    color: rgba(209, 220, 213, 0.4);
 }
 
 .calendar-event-container .event-happening-now-alert {
@@ -140,7 +140,8 @@
 .calendar-event-container > .header-container > .event-start-end {
     text-align: right;
     padding-right: 5px;
-    margin-bottom: 2px;    
+    margin-bottom: 2px;
+    font-size: 90%;
 }
 
 .calendar-event-container > .header-container > .calendar-index-0 {
@@ -164,7 +165,7 @@
 }
 
 .calendar-event-container > .body-container > .event-summary {
-    font-size: 105%;
+    font-size: 100%;
     color: rgba(255, 255, 255, 0.463);
 }
 

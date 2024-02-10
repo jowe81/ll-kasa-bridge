@@ -1,6 +1,8 @@
 import {
     getCalendarEvents,
     getDateString,
+    getEndOfDay,
+    isMidnightToMidnight,
     isSameDay,
     isSameTime,
     isThisWeek,
@@ -10,6 +12,7 @@ import {
     getWeekNumber,
     getBeginningOfWeek,
     getTimeDifference,
+    startsSoon,
 } from "./calendarHelpers";
 
 import "./calendar.scss";
@@ -22,6 +25,7 @@ function Calendar() {
     const dateFormatOptions: Intl.DateTimeFormatOptions = {
         month: "short", // Short month name (e.g., 'Apr')
         day: "numeric", // Numeric day of the month
+        includeDayOfWeek: true, // Custom
     };
     const timeFormatOptions: Intl.DateTimeFormatOptions = {
         hour: "numeric",
@@ -30,6 +34,8 @@ function Calendar() {
     };
 
     const calendarItemsJsx: any = [];
+    
+    const thisWeekNumber = getWeekNumber(now);
 
     let lastEventStartDate: any = null;
     let lastEventWeekNumber: any = null;
@@ -42,56 +48,57 @@ function Calendar() {
     const haveEventsToday = eventsToday.length;
 
     events?.forEach((event, index) => {
+        /* Loop through the events */
         const startDate = event.start ? new Date(event.start) : null;
         if (!startDate) {
             // At the very least we need a start date.
             return;
         }
-        
-        const endDate = event.end ? new Date(event.end) : startDate;
+
+        let endDate = event.end ? new Date(event.end) : startDate;
         if (now > endDate) {
             return;
         }
 
+        if (endDate.getHours() === 0 && endDate.getMinutes() === 0 && endDate.getSeconds() === 0) {            
+            endDate.setDate(endDate.getDate() - 1);
+            endDate = getEndOfDay(endDate);
+        }
+
         const startDateStr = getDateString(startDate, dateFormatOptions) ?? "";
-        const startTimeStr = startDate?.toLocaleTimeString(undefined, timeFormatOptions) ?? '';
-        
+        const startTimeStr = startDate?.toLocaleTimeString(undefined, timeFormatOptions) ?? "";
+
         const endDateStr = getDateString(endDate, dateFormatOptions) ?? "";
         const endTimeStr = endDate?.toLocaleTimeString(undefined, timeFormatOptions) ?? "";
-        
+
         const eventIsToday = isToday(startDate);
-        const eventIsNow = (startDate < now) && (endDate > now);
+        const eventStartsSoon = startsSoon(startDate, 180);
+        const eventIsNow = startDate < now && endDate > now;
         const eventIsOver = endDate < now;
 
-        const eventStartsSoon = startsSoon(startDate, 120);
-
-        let dateTimeStr = '';
+        let dateTimeStr = "";
 
         if (isSameDay(startDate, endDate)) {
+            // Contained within a day - only start date.
             dateTimeStr = `${startDateStr}, ${startTimeStr} - ${endTimeStr}`;
         } else {
+            // Multiday - start/end date.
             dateTimeStr = `${startDateStr}, ${startTimeStr} - ${endDateStr}, ${endTimeStr}`;
         }
 
-        if (isSameTime(startDate, endDate)) {            
-            if (startDate.getHours() === 0) {                
-                dateTimeStr = `${startDateStr} - ${endDateStr}`;
-            }
-        }
-
         if (!isSameDay(lastEventStartDate, startDate)) {
-            // This event is on a future date. See if we want a divider.
+            // This event is on a later date than the previous one. See if we want a divider.
             if (lastEventStartDate === null && !isToday(startDate)) {
                 // Nothing today. Add in divider anyway.
                 calendarItemsJsx.push(
                     <div key={`divider_${-1}`} className="calendar-event-divider-container">
-                        Today
+                        Today, {getDateString(now, dateFormatOptions)}
                     </div>
                 );
-                
-                const nothingScheduledNote = haveEventsToday ?
-                    `No more scheduled events.` :
-                    `No scheduled events today.`;
+
+                const nothingScheduledNote = haveEventsToday
+                    ? `No more scheduled events.`
+                    : `No scheduled events today.`;
 
                 calendarItemsJsx.push(
                     <div key={-1} className="calendar-no-more-events">
@@ -100,14 +107,10 @@ function Calendar() {
                 );
             }
             if (isThisWeek(startDate)) {
-                if (isSameDay(startDate, endDate)) {
-                    dateTimeStr = `${startTimeStr} - ${endTimeStr}`;
-                }
-
                 // It is within this week, divide every day.
-                let dateLabel = '';
+                let dateLabel = "";
                 if (isToday(startDate)) {
-                    dateLabel = "Today";
+                    dateLabel = `Today`;
                 } else if (isTomorrow(startDate)) {
                     dateLabel = "Tomorrow";
                 } else {
@@ -118,54 +121,58 @@ function Calendar() {
                     if (daysDifference < 7) {
                         dateLabel = `${weekday} (${startDate?.toLocaleDateString(undefined, dateFormatOptions)})`;
                     } else {
-                        dateLabel = `${startDate?.toLocaleDateString(undefined, {month: "long", day: "numeric"})}`;
+                        dateLabel = `${startDate?.toLocaleDateString(undefined, { month: "long", day: "numeric" })}`;
                     }
                 }
 
                 calendarItemsJsx.push(
                     <div key={`divider_${index}`} className="calendar-event-divider-container">
                         {dateLabel}
-                    </div>    
-                )
-
+                    </div>
+                );
             } else {
                 // It is after this week
-                const weekdayShort = new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(startDate);
-
                 if (isSameDay(startDate, endDate)) {
-                    dateTimeStr = `${weekdayShort} ${startDateStr}, ${startTimeStr} - ${endTimeStr}`;
+                    dateTimeStr = `${startDateStr}, ${startTimeStr} - ${endTimeStr}`;
                 } else {
                     if (!isSameTime(startDate, endDate)) {
-                        dateTimeStr = `${weekdayShort} ${startDateStr}, ${startTimeStr} - ${endDateStr}, ${endTimeStr}`;
+                        if (isMidnightToMidnight(startDate, endDate)) {
+                            dateTimeStr = `${startDateStr} - ${endDateStr}`;
+                        } else {
+                            dateTimeStr = `${startDateStr}, ${startTimeStr} - ${endDateStr}, ${endTimeStr}`;
+                        }
                     }
                 }
-
+            
                 const thisEventWeekNumber = getWeekNumber(startDate);
-                
+
                 if (lastEventWeekNumber !== thisEventWeekNumber) {
                     let weekLabel = "";
 
-                    if (lastEventWeekNumber + 1 === thisEventWeekNumber) {
+                    if (lastEventWeekNumber + 1 === thisWeekNumber + 1) {
                         weekLabel = `Next Week`;
                     } else {
                         const targetDate = getBeginningOfWeek(startDate);
-                        weekLabel = `Week of ${targetDate.toLocaleDateString(undefined, {month: "long", day: "numeric"})}`;
+                        weekLabel = `Week of ${targetDate.toLocaleDateString(undefined, {
+                            month: "long",
+                            day: "numeric",
+                        })}`;
                     }
-                    
+
                     calendarItemsJsx.push(
                         <div key={`divider_${index}`} className="calendar-event-divider-container">
                             {weekLabel}
                         </div>
                     );
                 }
-            }                        
+            }
         }
-        
+
         let classNames = `calendar-event-container`;
-        if (eventIsNow) { 
-            classNames+=` calendar-event-container-now`;
+        if (eventIsNow) {
+            classNames += ` calendar-event-container-now`;
         } else if (eventIsToday && !eventIsOver) {
-            classNames+=` calendar-event-container-today`;
+            classNames += ` calendar-event-container-today`;
         }
 
         calendarItemsJsx.push(
@@ -203,18 +210,6 @@ function Calendar() {
         </div>
     );
 }
-
-function startsSoon(date: Date, maxMinutes: number) {
-    if (!date) {
-        date = new Date();
-    }
-
-    const diff = date.getTime() - Date.now();
-    const minutesOut = Math.floor(diff / 60000); 
-
-    return minutesOut > 0 && minutesOut <= maxMinutes;
-}
-
 
 
 function cutAtFirstWordAfterMaxChars(text, maxChars) {

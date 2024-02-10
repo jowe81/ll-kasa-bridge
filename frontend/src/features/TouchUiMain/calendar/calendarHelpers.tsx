@@ -192,22 +192,18 @@ function isLeapYear(year) {
     return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
 
-function getDateString(date, dateFormatOptions) {
-    const leapYear = isLeapYear(date.getFullYear());
-    
-    if (leapYear && date.getMonth() === 2 && date.getDate(1)) {
-        let result; 
-
-        dateFormatOptions.includeDayOfWeek ? 
-            result = getDayOfWeekString(date, 'short') + ' Feb 29' :
-            result = 'Feb 29';
-
-        return result;
+// This is leapyear aware.
+function getDateString(date, dateFormatOptions) {    
+    let result = '';
+    if (dateFormatOptions.includeDayOfWeek) {
+        result += getDayOfWeekString(date, 'short') + ' ';
     }
+    result += date?.toLocaleDateString(undefined, dateFormatOptions);
 
-    return date?.toLocaleDateString(undefined, dateFormatOptions);    
+    return result;    
 }
 
+// This is leapyear aware.
 function getDayOfWeekString(date, format) {
     if (!date) {
         return 'N/A';
@@ -216,7 +212,8 @@ function getDayOfWeekString(date, format) {
     const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const daysShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-    const day = date.getDay();
+    let day = date.getDay();
+
     switch (format) {
         case 'short':
             return daysShort[day];
@@ -336,6 +333,21 @@ function startsSoon(date: Date, maxMinutes: number) {
     return minutesOut > 0 && minutesOut <= maxMinutes;
 }
 
+function isMidnightToMidnight(startDate, endDate) {
+    let result = false;
+    if (startDate.getHours() === 0 && startDate.getMinutes() === 0 && startDate.getSeconds() === 0) {    
+        if (endDate.getHours() === 23 && endDate.getMinutes() === 59 && endDate.getSeconds() === 59) {
+            //00:00 - 11:59
+            result = true;
+        } else if (!isSameDay(startDate, endDate) && endDate.getHours() === 0 && endDate.getMinutes() === 0 && endDate.getSeconds() === 0) {
+            //00:00 - 00:00
+            result = true;
+        }
+    }
+
+    return result;
+}
+
 export {
     eventIsFuture,
     eventIsNow,
@@ -359,6 +371,7 @@ export {
     getSecondsSinceMidnight,
     getNDaysAgoMidnight,
     getWeekNumber,
+    isMidnightToMidnight,
     isLeapYear,
     isSameDay,
     isSameTime,
