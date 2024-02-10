@@ -1,19 +1,21 @@
 .presets-container {
-  border-right: 1px solid rgb(64, 64, 64);
-  height: 100%;
-  padding-right: 10px;
+    border-right: 1px solid rgb(64, 64, 64);
+    height: 100%;    
+    overflow-y: scroll;
+    height: 100%;
 
-    .preset-buttons-container {
+    .preset-buttons-container {        
         display: flex;
         flex-flow: row wrap;
-        justify-content: space-between;
+        justify-content: flex-start;
         padding-top: 8px;
-        width: 350px;
+        width: 348px;
 
         .preset-button {
-            width: 80px;
+            width: 78px;
             height: 55px;
             margin-bottom:10px;
+            margin-right: 9px;
             padding: 0px 3px;
             text-align: center;
 
@@ -71,4 +73,24 @@
 
     }
 }
+
+.presets-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+/* Track */
+.presets-container::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, .08);
+}
+
+/* Handle */
+.presets-container::-webkit-scrollbar-thumb {
+background: #7777773b;
+/* background-color: rgba(55, 40, 40, 1); */
+}
+
+/* Handle on hover */
+.presets-container::-webkit-scrollbar-thumb:hover {
+background: rgb(152, 152, 152, .4);
+}    
 

@@ -2234,6 +2234,32 @@ const deviceMap = [
                         },
                     ],
                 },
+                {
+                    type: "preset",
+                    alias: "Bedroom Full",
+                    switch: [
+                        {
+                            groupId: "group-bedroomCeilingLights",
+                            stateData: {
+                                on_off: 1,
+                                brightness: 100,
+                            },
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Bedroom Low",
+                    switch: [
+                        {
+                            groupId: "group-bedroomCeilingLights",
+                            stateData: {
+                                on_off: 1,
+                                brightness: 15,
+                            },
+                        },
+                    ],
+                },
 
                 // *********** Master *************
                 {
