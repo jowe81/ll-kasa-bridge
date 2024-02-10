@@ -879,11 +879,11 @@ const deviceMap = [
         locationId: "loc-kitchen",
         subType: SUBTYPE_BULB,
         filters: [
-            {
-                refId: "naturalLight",
-                periodicallyActive: true,
-                applyPartially: 0.125,
-            },
+            // {
+            //     refId: "naturalLight",
+            //     periodicallyActive: true,
+            //     applyPartially: 0.125,
+            // },
         ],
     },
     {
@@ -1176,7 +1176,7 @@ const deviceMap = [
                 },
                 // Ceiling
                 { channel: 6, stateData: false },
-                { channel: 7, stateData: false }
+                { channel: 7, stateData: false },
             ],
         },
     },
@@ -1956,6 +1956,110 @@ const deviceMap = [
                 // *********** Presets *************
                 {
                     type: "preset",
+                    alias: "Full",
+                    switch: [
+                        {
+                            groupId: "group-livingroomLights",
+                            stateData: {
+                                brightness: 100,
+                            },
+                        },
+                        {
+                            // Kitchen table
+                            channel: 28,
+                            stateData: {
+                                brightness: 100,
+                            },
+                        },
+                        {
+                            groupId: "group-hallwayCeiling",
+                            stateData: {
+                                brightness: 100,
+                            },
+                            ignoreForButtonState: true,
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Low",
+                    switch: [
+                        {
+                            groupId: "group-livingroomLights",
+                            stateData: {
+                                brightness: 15,
+                            },
+                        },
+                        {
+                            // Kitchen table
+                            channel: 28,
+                            stateData: {
+                                brightness: 15,
+                            },
+                        },
+                        {
+                            groupId: "group-hallwayCeiling",
+                            stateData: {
+                                brightness: 15,
+                            },
+                            ignoreForButtonState: true,
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Warm",
+                    switch: [
+                        {
+                            groupId: "group-livingroomLights",
+                            stateData: {
+                                color_temp: 2700,
+                            },
+                        },
+                        {
+                            // Kitchen table
+                            channel: 28,
+                            stateData: {
+                                color_temp: 2700,
+                            },
+                        },
+                        {
+                            groupId: "group-hallwayCeiling",
+                            stateData: {
+                                color_temp: 2700,
+                            },
+                            ignoreForButtonState: true,
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Daylight",
+                    switch: [
+                        {
+                            groupId: "group-livingroomLights",
+                            stateData: {
+                                color_temp: 6000,
+                            },
+                        },
+                        {
+                            // Kitchen table
+                            channel: 28,
+                            stateData: {
+                                color_temp: 6000,
+                            },
+                        },
+                        {
+                            groupId: "group-hallwayCeiling",
+                            stateData: {
+                                color_temp: 6000,
+                            },
+                            ignoreForButtonState: true,
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
                     alias: "Movie",
                     switch: [
                         {
@@ -1988,90 +2092,145 @@ const deviceMap = [
                 },
                 {
                     type: "preset",
-                    alias: "Living Full",
+                    alias: "Red",
                     switch: [
+                        {
+                            groupId: "group-jessDeskLights",
+                            stateData: false,
+                        },
                         {
                             groupId: "group-livingroomLights",
                             stateData: {
                                 on_off: 1,
-                                brightness: 100,
-                            },
-                        },
-                    ],
-                },
-                {
-                    type: "preset",
-                    alias: "Living Warm",
-                    switch: [
-                        {
-                            groupId: "group-livingroomLights",
-                            stateData: {
-                                color_temp: 2700,
-                            },
-                        },
-                    ],
-                },
-                {
-                    type: "preset",
-                    alias: "Bedroom Low",
-                    switch: [
-                        {
-                            groupId: "group-bedroomCeilingLights",
-                            stateData: {
-                                on_off: 1,
-                                brightness: 10,
-                            },
-                        },
-                    ],
-                },
-                {
-                    type: "preset",
-                    alias: "Bedroom Full",
-                    switch: [
-                        {
-                            groupId: "group-bedroomCeilingLights",
-                            stateData: {
-                                on_off: 1,
-                                brightness: 100,
-                            },
-                        },
-                    ],
-                },
-                {
-                    type: "preset",
-                    alias: "Bedroom Cold",
-                    switch: [
-                        {
-                            groupId: "group-bedroomCeilingLights",
-                            stateData: {
-                                color_temp: 6000,
-                            },
-                        },
-                    ],
-                },
-                {
-                    type: "preset",
-                    alias: "Bedroom warm",
-                    switch: [
-                        {
-                            groupId: "group-bedroomCeilingLights",
-                            stateData: {
-                                color_temp: 2700,
-                            },
-                        },
-                    ],
-                },
-                {
-                    type: "preset",
-                    alias: "Bedroom Pink",
-                    switch: [
-                        {
-                            groupId: "group-bedroomCeilingLights",
-                            stateData: {
                                 hue: 0,
-                                saturation: 40,
+                                saturation: 100,
                                 color_temp: 0,
                             },
+                        },
+                        {
+                            // Kitchen table
+                            channel: 28,
+                            stateData: {
+                                on_off: 1,
+                                hue: 0,
+                                saturation: 100,
+                                color_temp: 0,
+                            },
+                        },
+                        {
+                            groupId: "group-kitchenCounterLights",
+                            stateData: false,
+                        },
+                        {
+                            // Kitchen Aleds
+                            channel: 44,
+                            stateData: true,
+                        },
+                        {
+                            groupId: "group-hallwayCeiling",
+                            stateData: {
+                                on_off: 1,
+                                hue: 0,
+                                saturation: 100,
+                                color_temp: 0,
+                            },
+                            ignoreForButtonState: true,
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Green",
+                    switch: [
+                        {
+                            groupId: "group-jessDeskLights",
+                            stateData: false,
+                        },
+                        {
+                            groupId: "group-livingroomLights",
+                            stateData: {
+                                on_off: 1,
+                                hue: 120,
+                                saturation: 100,
+                                color_temp: 0,
+                            },
+                        },
+                        {
+                            // Kitchen table
+                            channel: 28,
+                            stateData: {
+                                on_off: 1,
+                                hue: 120,
+                                saturation: 100,
+                                color_temp: 0,
+                            },
+                        },
+                        {
+                            groupId: "group-kitchenCounterLights",
+                            stateData: false,
+                        },
+                        {
+                            // Kitchen Aleds
+                            channel: 44,
+                            stateData: false,
+                        },
+                        {
+                            groupId: "group-hallwayCeiling",
+                            stateData: {
+                                on_off: 1,
+                                hue: 120,
+                                saturation: 100,
+                                color_temp: 0,
+                            },
+                            ignoreForButtonState: true,
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Blue",
+                    switch: [
+                        {
+                            groupId: "group-jessDeskLights",
+                            stateData: false,
+                        },
+                        {
+                            groupId: "group-livingroomLights",
+                            stateData: {
+                                on_off: 1,
+                                hue: 240,
+                                saturation: 100,
+                                color_temp: 0,
+                            },
+                        },
+                        {
+                            // Kitchen table
+                            channel: 28,
+                            stateData: {
+                                on_off: 1,
+                                hue: 240,
+                                saturation: 100,
+                                color_temp: 0,
+                            },
+                        },
+                        {
+                            groupId: "group-kitchenCounterLights",
+                            stateData: false,
+                        },
+                        {
+                            // Kitchen Aleds
+                            channel: 44,
+                            stateData: false,
+                        },
+                        {
+                            groupId: "group-hallwayCeiling",
+                            stateData: {
+                                on_off: 1,
+                                hue: 240,
+                                saturation: 100,
+                                color_temp: 0,
+                            },
+                            ignoreForButtonState: true,
                         },
                     ],
                 },

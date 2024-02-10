@@ -14,57 +14,59 @@
             width: 80px;
             height: 55px;
             margin-bottom:10px;
+            padding: 0px 3px;
             text-align: center;
 
-            border: 1px solid rgba(135, 110, 77, 1);
-            padding: 0px 3px;
+            border: 1px solid rgba(128, 128, 128, 0.7);
             border-radius:5px;
-            background-color: rgba(0, 0, 0, 1);
-            color:rgb(206, 167, 117);
 
             .preset-button-meta {
                 .preset-button-top-text {
                     font-size: 70%;
-                    color:rgba(206, 167, 117, 0.349);
+                    color:rgba(177, 177, 177, .4);
                 }
 
                 .preset-button-label {
                     font-size: 80%;
                     line-height: 1.3;
-                    color:rgba(206, 167, 117, 0.749);
+                    color:rgba(255, 255, 255, .45);
                 }
             }
         }
 
-        /* Power state classes, supported: on, off, none */
+        /* Satisfied */        
+        $satisfied-color: rgb(0, 95, 0);
+
         .preset-button-state-satisfied {
-            $color: rgb(82, 184, 71);
-            background-color: rgb(24, 49, 19);
+            background-color: rgba($satisfied-color, .6);
             
-            .preset-button-meta {               
-                
+            .preset-button-meta {                               
                 .preset-button-top-text {
                     font-size: 70%;
                 }
-
-                .preset-button-label {
-                }
             }
         }
+
+        .preset-button-state-satisfied:active {
+            background-color: rgba($satisfied-color, .8);
+        }
+
+
+        /* Not Satisfied */
+        $not-satisfied-color: rgb(89, 22, 22);
 
         .preset-button-state-not-satisfied {
-            $color: rgb(184, 71, 71);
-            background-color: rgba($color, 0.4);
+            background-color: rgba($not-satisfied-color, .75);
             
-            .preset-button-meta {               
-                
+            .preset-button-meta {                               
                 .preset-button-top-text {
                     font-size: 70%;
                 }
-
-                .preset-button-label {
-                }
             }
+        }
+
+        .preset-button-state-not-satisfied:active {
+            background-color: rgba($not-satisfied-color, 1);
         }
 
     }
