@@ -154,7 +154,7 @@ class WeatherServiceHandler {
         }
       
         try {
-          const data = await axios.get(this.weatherService.fullUrl);
+          const data = process.env.DISABLE_OUTSIDE_API_CALLS ? getMockData() : await axios.get(this.weatherService.fullUrl);
           //const data = getMockData();
           const responseData = data.data;
 

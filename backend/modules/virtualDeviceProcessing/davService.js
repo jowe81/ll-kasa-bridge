@@ -151,7 +151,7 @@ class DavServiceHandler {
                     credentials,
                 });
 
-                const calendars = await client.fetchCalendars();
+                const calendars = process.env.DISABLE_OUTSIDE_API_CALLS ? [] : await client.fetchCalendars();
 
                 // Update the calendars in the cache                
                 calendars.forEach(calendar => calendar.url && (this.cache.data.calendars[calendar.url] = calendar));
@@ -192,7 +192,10 @@ class DavServiceHandler {
                                 `Remote "${settings.label}": Fetching calendar objects from ${calendar.url}`,
                                 this.deviceWrapper
                             );
-                            const calendarObjects = await client.fetchCalendarObjects({ calendar });
+                            const calendarObjects = process.env.DISABLE_OUTSIDE_API_CALLS
+                                ? []
+                                : await client.fetchCalendarObjects({ calendar });
+                                
                             this.cache.data.calendarData[url] = calendarObjects;
 
                             const convertedCalendarObjects = [];
