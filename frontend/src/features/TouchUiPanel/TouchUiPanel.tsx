@@ -8,6 +8,7 @@ import CompactBirthdays from "./compactBirthdays/CompactBirthdays";
 import CompactCalendar from "./compactCalendar/CompactCalendar.tsx";
 import Alerts from "./alerts/Alerts.tsx";
 import MasterSwitches from "./masterSwitches/MasterSwitches.tsx";
+import DevicePresetButtons from "./devicePresetButtons/devicePresetButtons.tsx";
 import Mailbox from "./mailbox/Mailbox.tsx";
 
 import { getDeviceByChannel } from "../../devicesHelpers.tsx";
@@ -24,6 +25,7 @@ function TouchUiPanel(props: any) {
     return (
         <>
             <MasterSwitches {...props} />
+            {!fullScreen && <DevicePresetButtons {...props} />}
             {fullScreen && <CompactTimer />}
             {fullScreen && <CompactCalendar />}
             {showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay} />}

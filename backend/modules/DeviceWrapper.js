@@ -468,6 +468,10 @@ const cmdFailPrefix = '[FAIL]';
     return data;
   },
 
+  getLightState() {
+    return buildCommandObjectFromCurrentState(this);
+  },
+
   // Return power state as a boolean, regardless of the type of device
   getPowerState() {
     let powerState = undefined;

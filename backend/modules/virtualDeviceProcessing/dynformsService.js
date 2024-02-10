@@ -280,7 +280,6 @@ class DynformsServiceHandler {
 
         this._executeRequest(request, requestIndex)
             .then((data) => {
-                console.log('runRequestNow requestIndex', requestIndex);
                 this.cache.data[requestIndex] = data.data;
             })
             .catch((err) => {

@@ -1174,6 +1174,9 @@ const deviceMap = [
                         transition: 20000,
                     },
                 },
+                // Ceiling
+                { channel: 6, stateData: false },
+                { channel: 7, stateData: false }
             ],
         },
     },
@@ -1950,7 +1953,132 @@ const deviceMap = [
                 },
             },
             buttons: [
+                // *********** Presets *************
                 {
+                    type: "preset",
+                    alias: "Movie",
+                    switch: [
+                        {
+                            groupId: "group-livingroomLights",
+                            stateData: {
+                                on_off: 1,
+                                brightness: 1,
+                            },
+                        },
+                        {
+                            groupId: "group-kitchenCounterLights",
+                            stateData: false,
+                        },
+                        {
+                            groupId: "group-hallwayCeiling",
+                            stateData: false,
+                            ignoreForButtonState: true,
+                        },
+                        {
+                            // Kitchen table
+                            channel: 28,
+                            stateData: false,
+                        },
+                        {
+                            // Kitchen Aleds
+                            channel: 44,
+                            stateData: true,
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Living Full",
+                    switch: [
+                        {
+                            groupId: "group-livingroomLights",
+                            stateData: {
+                                on_off: 1,
+                                brightness: 100,
+                            },
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Living Warm",
+                    switch: [
+                        {
+                            groupId: "group-livingroomLights",
+                            stateData: {
+                                color_temp: 2700,
+                            },
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Bedroom Low",
+                    switch: [
+                        {
+                            groupId: "group-bedroomCeilingLights",
+                            stateData: {
+                                on_off: 1,
+                                brightness: 10,
+                            },
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Bedroom Full",
+                    switch: [
+                        {
+                            groupId: "group-bedroomCeilingLights",
+                            stateData: {
+                                on_off: 1,
+                                brightness: 100,
+                            },
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Bedroom Cold",
+                    switch: [
+                        {
+                            groupId: "group-bedroomCeilingLights",
+                            stateData: {
+                                color_temp: 6000,
+                            },
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Bedroom warm",
+                    switch: [
+                        {
+                            groupId: "group-bedroomCeilingLights",
+                            stateData: {
+                                color_temp: 2700,
+                            },
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Bedroom Pink",
+                    switch: [
+                        {
+                            groupId: "group-bedroomCeilingLights",
+                            stateData: {
+                                hue: 0,
+                                saturation: 40,
+                                color_temp: 0,
+                            },
+                        },
+                    ],
+                },
+
+                // *********** Master *************
+                {
+                    type: "master",
                     alias: "On",
                     buttonId: "master-on",
                     switch: [
@@ -1966,11 +2094,8 @@ const deviceMap = [
                             // Kitchen table
                             channel: 28,
                             stateData: {
-                                // Can configure detailed state, but don't need to
-                                lightState: {
-                                    on_off: 1,
-                                    brightness: 100,
-                                },
+                                on_off: 1,
+                                brightness: 100,
                             },
                         },
                         {
@@ -1982,6 +2107,7 @@ const deviceMap = [
                     ],
                 },
                 {
+                    type: "master",
                     alias: "Off",
                     buttonId: "master-off",
                     switch: [
@@ -2001,10 +2127,7 @@ const deviceMap = [
                             // Kitchen table
                             channel: 28,
                             stateData: {
-                                // Can configure detailed state, but don't need to
-                                lightState: {
-                                    on_off: 0,
-                                },
+                                on_off: 0,
                             },
                         },
                         {

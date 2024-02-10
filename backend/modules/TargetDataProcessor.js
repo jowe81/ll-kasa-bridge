@@ -160,6 +160,26 @@ const getCommandObjectFromTargetData = (targetData) => {
   return commandObject;
 };
 
+const commandObjectToBoolean = (commandObject) => {
+    let result = null;
+
+    if (typeof commandObject === "object") {
+        switch (commandObject.on_off) {
+            case 0:
+                result = false;
+                break;
+            
+            case 1:
+                result = true;
+                break;
+        }        
+    } else if (![null, undefined].includes(commandObject)) {
+        result = !!item.stateData;
+    }
+
+    return result;
+}
+
 const makeLiveDeviceObject = (deviceWrapper, includeKeys, defaults, excludeKeys, useGlobalDefaultKeys = true) => {
     // Include these keys for all devices.
     const globalIncludeKeys = [
@@ -221,5 +241,6 @@ export {
   commandMatchesCurrentState,
   buildCommandObjectFromCurrentState,
   getCommandObjectFromTargetData,
+  commandObjectToBoolean,
   makeLiveDeviceObject,
 }

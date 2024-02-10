@@ -20,6 +20,8 @@ import {
 import { loadFilterPlugins } from "./Filters.js";
 import { loadDeviceHandlerPlugins, loadCommandHandlerPlugins } from "./Plugins.js";
 
+import { commandMatchesCurrentState, commandObjectToBoolean } from "./TargetDataProcessor.js";
+
 import { globalConfig } from "../configuration.js";
 import { socketHandler } from "./SocketHandler.js";
 
@@ -73,7 +75,7 @@ const devicePool = {
 
         if (useUdpDiscovery) {
             this.startDiscovery();
-        } else {            
+        } else {
             this.initDevicesFromStoredSysInfo();
         }
     },
@@ -140,22 +142,24 @@ const devicePool = {
             const sysInfoRecord = await this.getSysInfoRecord(mapItem._id);
 
             if (sysInfoRecord) {
-                const { acknowledged } = await this.dbSysInfo.updateOne({
-                    _id: sysInfoRecord._id}, 
+                const { acknowledged } = await this.dbSysInfo.updateOne(
                     {
-                        $set: { 
+                        _id: sysInfoRecord._id,
+                    },
+                    {
+                        $set: {
                             ...sysInfoRecord,
                             host: device.host,
                             port: device.port,
-                            updated_at: new Date()
-                        }
+                            updated_at: new Date(),
+                        },
                     }
                 );
-                if (acknowledged) { 
+                if (acknowledged) {
                     log(`Updated sysInfo record.`, deviceWrapper);
                 }
-            } else {                    
-                if (typeof device._sysInfo === 'object') {                        
+            } else {
+                if (typeof device._sysInfo === "object") {
                     // Create a new sysInfo record.
                     const { acknowledged } = await this.dbSysInfo.insertOne({
                         mapItemId: mapItem._id,
@@ -168,10 +172,10 @@ const devicePool = {
 
                     if (acknowledged) {
                         log(`Created sysInfo record.`, deviceWrapper);
-                    }                         
+                    }
                 } else {
-                    log(`Could not create sysInfo record: no data from device!`, deviceWrapper, 'red');
-                }                    
+                    log(`Could not create sysInfo record: no data from device!`, deviceWrapper, "red");
+                }
             }
         } else {
             // This device is not in the map (and therefore not in the pool and has no wrapper yet)
@@ -376,6 +380,106 @@ const devicePool = {
         return result;
     },
 
+    getGroupLightState(groupId) {
+        const deviceWrappers = this.getGroupMembers(groupId, true);
+
+        if (!deviceWrappers || !deviceWrappers.length) {
+            return {};
+        }
+
+        // Have a least 1 deviceWrapper.
+        const referenceState = { ...deviceWrappers[0].getLightState() };
+        const properties = Object.keys(referenceState);
+
+        for (let i = 1; i < deviceWrappers.length - 1; i++) {
+            const thisState = { ...deviceWrappers[i].getLightState() };
+
+            // Any time a remaining state object has a property that doesn't match the reference, set that property on the reference to null.
+            properties.forEach((property) => {
+                if (referenceState[property] !== null && referenceState[property] !== thisState[property]) {
+                    referenceState[property] = null;
+                }
+            });
+        }
+
+        // Now Remove all the null propertyies from the reference
+        // so that only the parts of the state that match all group members remain.
+        properties.forEach((property) => {
+            if (referenceState[property] === null) {
+                delete referenceState[property];
+            }
+        });
+
+        // Remove a 0 color temp
+        if (referenceState.color_temp === 0) {
+            delete referenceState.color_temp;
+        }
+
+        // Remove saturation if color temp is present as it gets overwritten.
+        if (referenceState.color_temp && referenceState.saturation) {
+            delete referenceState.saturation;
+        }
+
+        return referenceState;
+    },
+
+    groupStateMatchesState(groupId, stateData) {
+        const log = false//groupId === "group-livingroomLights";
+        let result = true;
+
+        // Ensure we have a state object.
+        if (typeof stateData !== "object") {
+            stateData = {
+                on_off: stateData ? 1 : 0,
+            };
+        }
+
+        const deviceWrappers = this.getGroupMembers(groupId);
+        deviceWrappers.every((deviceWrapper) => {
+            let stateDataMatchesCurrent = commandMatchesCurrentState(deviceWrapper, stateData);
+            if (stateDataMatchesCurrent === null) {
+                if ([undefined, null].includes(deviceWrapper.getPowerState()) && (!stateData || stateData.on_off === 0)) {
+                    stateDataMatchesCurrent = true;
+                }
+            }
+
+            log && console.log(groupId, "stateData", stateData, "current", this.getGroupLightState(groupId));
+            log && console.log(groupId, "matchesCurrent", stateDataMatchesCurrent);
+
+            if (!stateDataMatchesCurrent) {
+                result = false;
+                return false;
+            }
+            return true;
+        });
+
+        return result;
+    },
+
+    getGroupMembers(groupId, discoveredOnly = true) {
+        const group = this.globalConfig.groups.find((group) => group.id === groupId);
+        if (!group) {
+            return null;
+        }
+
+        let naCount = 0;
+        let deviceWrappers = [];
+
+        group.channels.forEach((channel) => {
+            const deviceWrapper = this.getDeviceWrapperByChannel(channel);
+
+            if (!deviceWrapper) {
+                naCount++;
+            }
+
+            if (deviceWrapper || !discoveredOnly) {
+                deviceWrappers.push(deviceWrapper);
+            }
+        });
+
+        return deviceWrappers;
+    },
+
     getDeviceWrappersByClassName(className) {
         const deviceWrappers = [];
 
@@ -457,16 +561,16 @@ const devicePool = {
     },
 
     // Read exisiting SysInfo for the devices on the map instead of waiting for discovery.
-    async initDevicesFromStoredSysInfo() {        
+    async initDevicesFromStoredSysInfo() {
         log(`Attempting to initialize devices from stored sysInfo records...`, "bgRed");
 
         const client = new TplinkSmarthomeApi.Client();
         const deviceMap = await this.getDeviceMapFromDb();
 
-        deviceMap.forEach(async (mapItem) =>  {
+        deviceMap.forEach(async (mapItem) => {
             const sysInfoRecord = await this.getSysInfoRecord(mapItem._id);
 
-            if (sysInfoRecord) {                
+            if (sysInfoRecord) {
                 const host = sysInfoRecord.host;
                 if (host) {
                     log(`Initializing ${mapItem.alias ?? mapItem.id ?? mapItem.channel} at ${host}`);
@@ -474,7 +578,7 @@ const devicePool = {
                     client
                         .getDevice({ host })
                         .catch((err) => {
-                            log(`Device at ${host} is not responding: ${err.message}`, null, 'bgRed');
+                            log(`Device at ${host} is not responding: ${err.message}`, null, "bgRed");
                         })
                         .then((device) => this.addDevice(device));
                 }
@@ -620,16 +724,24 @@ const devicePool = {
         deviceWrappers.forEach((deviceWrapper) => deviceWrapper.setPowerState(powerState));
     },
 
-    setGroupLightState(groupId, lightState) {        
+    setGroupLightState(groupId, lightState) {
         const deviceWrappers = this.getDeviceWrappersByGroup(groupId);
-        
+
         if (!deviceWrappers) {
             log(`Error: Cannot switch group ${groupId}: it does not exist.`, null, "red");
             return null;
         }
 
-        deviceWrappers.forEach((deviceWrapper) => {            
-            deviceWrapper.setLightState(lightState, null, null, null, true);
+        deviceWrappers.forEach((deviceWrapper) => {
+            if (
+                typeof lightState === "boolean" ||
+                ![constants.SUBTYPE_BULB, constants.SUBTYPE_LED_STRIP].includes(deviceWrapper.subType)
+            ) {
+                // Device does not support setLightState (or the targetStaet is boolean anyway)
+                deviceWrapper.setPowerState(commandObjectToBoolean(lightState));
+            } else {
+                deviceWrapper.setLightState(lightState, null, null, null, true);
+            }
         });
     },
 

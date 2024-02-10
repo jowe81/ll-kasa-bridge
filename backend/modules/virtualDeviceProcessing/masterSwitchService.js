@@ -1,6 +1,11 @@
 import _ from "lodash";
 import axios from "axios";
-import { makeLiveDeviceObject } from "../TargetDataProcessor.js";
+import {
+    makeLiveDeviceObject,
+    commandMatchesCurrentState,
+    buildCommandObjectFromCurrentState,
+    commandObjectToBoolean,
+} from "../TargetDataProcessor.js";
 import constants from "../../constants.js";
 import { log, debug } from "../Log.js";
 
@@ -76,14 +81,27 @@ class MasterSwitchHandler {
 
         this.masterSwitch.subscribeListener("powerState", (newPowerState) => {});
 
+        this.masterSwitch.settings.buttons.forEach((button, index) => {
+            // Create IDs for the buttons that don't have one.
+            if (!button.buttonId) {
+                button.buttonId = button.alias.toLowerCase().replace(/[^a-z]/g, "") + "_" + index;
+            }
+            // Resolve switch array state data if only powerstate (boolean) was given.
+            if (Array.isArray(button.switch)) {
+                button.switch.forEach((condition) => {
+                    if (typeof condition.stateData !== "object") {
+                        condition.stateData = {
+                            on_off: condition.stateData ? 1 : 0,
+                        };
+                    }
+                });
+            }
+        });
+
+        log(`Initialized ${this.masterSwitch.subType} "${this.masterSwitch.alias}".`, this.masterSwitch);
+
         log(
-            `Initialized ${this.masterSwitch.subType} "${this.masterSwitch.alias}".`,
-            this.masterSwitch
-        );
-        log(
-            `Check-Interval: ${Math.ceil(
-                this.masterSwitch.settings.checkInterval / constants.MINUTE
-            )} minutes.`,
+            `Check-Interval: ${Math.ceil(this.masterSwitch.settings.checkInterval / constants.MINUTE)} minutes.`,
             this.masterSwitch
         );
 
@@ -92,14 +110,9 @@ class MasterSwitchHandler {
             clearInterval(this._checkingIntervalHandler);
         }
 
-        const interval =
-            this.masterSwitch.settings.checkInterval ??
-            localConstants.CHECKING_INTERVAL_DEFAULT;
+        const interval = this.masterSwitch.settings.checkInterval ?? localConstants.CHECKING_INTERVAL_DEFAULT;
 
-        this._checkingIntervalHandler = setInterval(
-            () => this.masterSwitchIntervalHandler(),
-            interval
-        );
+        this._checkingIntervalHandler = setInterval(() => this.masterSwitchIntervalHandler(), interval);
 
         this.initialized = true;
 
@@ -119,7 +132,7 @@ class MasterSwitchHandler {
         this.masterSwitch._updateState(
             {
                 powerState: this.masterSwitch.getPowerState(),
-                buttons,                
+                buttons,
             },
             false
         );
@@ -129,13 +142,14 @@ class MasterSwitchHandler {
     getButtonsState() {
         let buttonsState = {};
 
-        this.masterSwitch.settings.buttons.forEach((button) => {
+        this.masterSwitch.settings.buttons.forEach((button, index) => {
+            const log = false//button.buttonId === "movie_0";
 
             const conditions = button.switch;
 
             if (conditions) {
                 const state = [];
-                
+
                 conditions.forEach((condition, index) => {
                     let conditionState = {};
 
@@ -145,22 +159,47 @@ class MasterSwitchHandler {
                         if (condition.groupId) {
                             conditionState.groupId = condition.groupId;
                             conditionState.powerState = this.devicePool.getGroupPowerState(condition.groupId);
+                            conditionState.deviceStateMatches = this.devicePool.groupStateMatchesState(
+                                condition.groupId,
+                                condition.stateData
+                            );
+                            log &&
+                                console.log(
+                                    `${condition.groupId} Condition/Actual`,
+                                    condition.stateData,
+                                    this.devicePool.getGroupLightState(condition.groupId)
+                                );
+                            log &&
+                                console.log(
+                                    `${condition.groupId} matches`,
+                                    conditionState.deviceStateMatches
+                                );
                         } else if (condition.channel) {
                             conditionState.channel = condition.channel;
                             const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(condition.channel);
                             conditionState.powerState = deviceWrapper.getPowerState();
+                            conditionState.deviceStateMatches = commandMatchesCurrentState(
+                                deviceWrapper,
+                                condition.stateData
+                            );
+                            log &&
+                                console.log(
+                                    `${deviceWrapper.alias} Condition/Actual`,
+                                    condition.stateData,
+                                    buildCommandObjectFromCurrentState(deviceWrapper)
+                                );
+                            log &&
+                                console.log(
+                                    `${deviceWrapper.alias} matches`,
+                                    conditionState.deviceStateMatches                                    
+                                );
                         }
                     }
 
-                    conditionState.targetPowerState = typeof condition.stateData === 'boolean' ? 
-                        condition.stateData : 
-                        !!condition.stateData?.lightState?.on_off;
-
-                    conditionState.fulfilled =
-                        (conditionState.targetPowerState === conditionState.powerState) || condition.ignoreForButtonState;
+                    conditionState.fulfilled = conditionState.deviceStateMatches || condition.ignoreForButtonState;
 
                     state.push(conditionState);
-                })
+                });
 
                 const fullfilledConditions = state.filter((conditionState) => conditionState.fulfilled);
 
@@ -169,66 +208,79 @@ class MasterSwitchHandler {
                     buttonsState[button.buttonId] = true;
                 } else if (fullfilledConditions.length === 0) {
                     buttonsState[button.buttonId] = false;
-                } else {
+                } else {                    
                     buttonsState[button.buttonId] = null;
                 }
-            }                        
+
+                log && console.log(`${button.buttonId} Set to `, buttonsState[button.buttonId]);
+            }
         });
 
         return buttonsState;
     }
 
     execute(buttonId, origin) {
-      if (!Array.isArray(this.masterSwitch.settings.buttons)) {
-        return null;
-      }
+        if (!Array.isArray(this.masterSwitch.settings.buttons)) {
+            return null;
+        }
 
-      const button = this.masterSwitch.settings.buttons.find((button) => button.buttonId === buttonId);
+        const button = this.masterSwitch.settings.buttons.find((button) => button.buttonId === buttonId);
 
-      if (!button || !button.switch?.length) {
-        return null;
-      }
+        if (!button || !button.switch?.length) {
+            return null;
+        }
 
-      // Have the button; process it.
+        // Have the button; process it.
 
-      let logItems = [];
+        let logItems = [];
 
-      button.switch.forEach(item => {
-        let logId;
-        let switchingThisItem = true;
+        button.switch.forEach((item) => {
+            let logId;
+            let switchingThisItem = true;
 
-        if (item.channel) {
-          // Channel
-          logId = item.channel;          
-          const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(item.channel);
-          
-          if (deviceWrapper) {
-            switchingThisItem = true;
-            if (typeof item.stateData === 'boolean') {
-              deviceWrapper.setPowerState(item.stateData, null, origin);              
-            } else {
-              deviceWrapper.setLightState(item.stateData?.lightState, null, origin, null, true);            
+            if (item.channel) {
+                // Channel
+                logId = item.channel;
+                const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(item.channel);
+
+                if (deviceWrapper) {
+                    switchingThisItem = true;
+                    if (
+                        typeof item.stateData === "boolean" ||
+                        ![constants.SUBTYPE_BULB, constants.SUBTYPE_LED_STRIP].includes(deviceWrapper.subType)
+                    ) {
+                        let setTo;
+                        if (typeof item.stateData === "object") {
+                            setTo = item.stateData?.on_off ? true : false;
+                        } else {
+                            setTo = !!item.stateData;
+                        }
+
+                        deviceWrapper.setPowerState(setTo, null, origin);
+                    } else {
+                        deviceWrapper.setLightState(item.stateData, null, origin, null, true);
+                    }
+                } else {
+                    switchingThisItem = false;
+                }
+            } else if (item.groupId) {
+                // Group
+                logId = item.groupId;
+                if (typeof item.stateData === "boolean") {
+                    this.devicePool.switchGroup(item.groupId, item.stateData);
+                } else {
+                    this.devicePool.setGroupLightState(item.groupId, item.stateData);
+                }
             }
-            
-          } else {
-            switchingThisItem = false;
-          }
 
-        } else if (item.groupId) {
-          // Group
-          logId = item.groupId;
-          this.devicePool.switchGroup(item.groupId, item.stateData);          
-        }
+            if (switchingThisItem) {
+                logItems.push(`${logId}/${JSON.stringify(item.stateData)}`);
+            }
+        });
 
-        if (switchingThisItem) {
-          logItems.push(`${logId}/${JSON.stringify(item.stateData)}`);        
-        }
-        
-      });
+        let logText = `MasterSwitch ${buttonId}: ${logItems.join(", ")}`;
 
-      let logText = `MasterSwitch ${buttonId}: ${logItems.join(', ')}`;
-
-      log(logText, this.masterSwitch, "greenBright");
+        log(logText, this.masterSwitch, "greenBright");
     }
 }
 

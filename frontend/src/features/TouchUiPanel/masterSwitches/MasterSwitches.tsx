@@ -13,7 +13,7 @@ function MasterSwitches(props) {
         return;
     }
 
-    const buttonsConfig = masterSwitch.settings?.buttons;
+    const buttonsConfig = masterSwitch.settings?.buttons?.filter(button => button.type === 'master');
 
     const buttonsJsx = buttonsConfig.map((button, index) => {
       const props = {
