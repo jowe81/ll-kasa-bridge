@@ -90,17 +90,23 @@
 }
 
 .photo-button-rating {
-    width: 25%;
+    width: 30%;
     font-size: 1.5vw;
 }
 
-.photo-button-trash {
+.photo-button-trash, .photo-button-favorite {
     width: 15%;    
 }
 
 .photo-button-trash img {
     opacity: 40%;
     width: 100%;
+    max-width: 160px;
+    max-height: 160px;
+}
+
+.photo-button img {
+    opacity: 40%;
     max-width: 160px;
     max-height: 160px;
 }
@@ -160,3 +166,12 @@
 .photo-button-green {
     background-color: rgba(0, 100, 0, 0.9);
 }
+
+.photo-button-purple-inactive {
+    background-color: rgba(40, 0, 33, 0.9);
+}
+
+.photo-button-purple-active {
+    background-color: rgba(100, 0, 83, 0.9);
+}
+

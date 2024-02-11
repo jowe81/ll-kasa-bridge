@@ -1,16 +1,25 @@
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
 import "./photosManageCollectionsLayer.scss";
 
-function PhotosManageCollectionsLayer({ addToRemoveFromCollection, hideLayer, uiInfo, record, photosService }) {
+function PhotosManageCollectionsLayer({ addToRemoveFromCollection, hideLayer, hideLayers, uiInfo, record, photosService }) {
     const libraryInfo = photosService?.state?.api?.libraryInfo;
+    const isUnsorted = !record?.collections?.length;
 
     const { showKeyboard } = useScreenKeyboard();
+
+    const addToRemoveFromCollectionWrapper = (collectionName) => {
+        // If the record was previously unsorted, the backend will advance to the next picture; so hide this layer.
+        if (isUnsorted) {
+            hideLayers();
+        }
+        addToRemoveFromCollection(collectionName);
+    }
 
     const keyboardConfigTags = {
         fieldLabel: "Collection Name:",
         instructions: "Type the name of the collection to add the picture to.",
         value: "",
-        onClose: (value) => addToRemoveFromCollection(value),
+        onClose: (value) => addToRemoveFromCollectionWrapper(value),
     };
 
     const allCollections = libraryInfo?.collections?.map((info) => info.item).sort();
@@ -37,7 +46,7 @@ function PhotosManageCollectionsLayer({ addToRemoveFromCollection, hideLayer, ui
             <div
                 key={index}
                 className={className}
-                onClick={() => addToRemoveFromCollection(collection)}
+                onClick={() => addToRemoveFromCollectionWrapper(collection)}
             >
                 {collection[0].toUpperCase() + collection.substring(1)}
                 <div className="touch-item-info">

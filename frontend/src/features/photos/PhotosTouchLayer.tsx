@@ -35,17 +35,12 @@ function PhotosTouchLayer({fullScreen}) {
 
     const prevBtnClick = () => runPhotosServiceCommand("previousPicture", {});
     const nextBtnClick = () => runPhotosServiceCommand("nextPicture", {});
-    const hideRestoreBtnClick = () => { 
-        runPhotosServiceCommand("hideRestorePicture", { hide: !record.collections?.includes('trashed') });
-        nextBtnClick();
-    };
+    const hideRestoreBtnClick = () => runPhotosServiceCommand("hideRestorePicture", { hide: !record.collections?.includes('trashed') });
     const favoritesClick = () => runPhotosServiceCommand("toggleFavorites", {});    
     const addRemoveTag = (tagString) => runPhotosServiceCommand("addRemoveTag", { tagString });
     const addToRemoveFromCollection = (collectionName) => runPhotosServiceCommand("addToRemoveFromCollection", { collectionName });
     const generalClick = () => addToRemoveFromCollection("general");
-    const setPhotosServiceFilter = (filter) => {
-        runPhotosServiceCommand("setFilter", { filter });
-    };
+    const setPhotosServiceFilter = (filter) => runPhotosServiceCommand("setFilter", { filter });
     
     const photoButtonHidden = showMainLayer ? "" : "photo-button-hidden";
     const isInFavorites = record?.collections?.includes("favorites");
@@ -77,6 +72,11 @@ function PhotosTouchLayer({fullScreen}) {
     } else if (showManageCollectionsLayer) {
         const props = {
             hideLayer: () => setShowManageCollectionsLayer(false),
+            hideLayers: () => {
+                // Both layers should be hidden here but the main layer behaves funny.
+                //setTimeout(() => setShowMainLayer(true), 1500);
+                setShowManageCollectionsLayer(false);
+            },
             addToRemoveFromCollection,
             photosService,
             record,
@@ -178,12 +178,13 @@ function PhotosTouchLayer({fullScreen}) {
                             </div>
                         </div>
                         <div
-                            className={`photo-button photo-button-rating ${photoButtonHidden} ${
-                                isInFavorites ? "photo-button-engaged" : ""
+                            className={`photo-button photo-button-favorite ${isUnsorted ? `photo-button-purple-inactive` : photoButtonHidden} ${
+                                isInFavorites ? "photo-button-purple-active" : ""
                             }`}
                             onClick={favoritesClick}
                         >
-                            {isInFavorites ? "Remove from" : "Add to"} Favorites
+                            {/* {isInFavorites ? "Remove from" : "Add to"} Favorites */}
+                            <img src="/big-icons/icon-bg-favorite.png" />
                         </div>
                     </div>
                 </div>

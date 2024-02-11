@@ -284,14 +284,32 @@ function getRecord(deviceWrapper) {
         return {};
     }
 
-    return records[0];
+    return _.cloneDeep(records[0]);
+}
+
+function shouldAdvanceAfterPush(deviceWrapper, record) {
+    let result = false;
+    const currentRecord = getRecord(deviceWrapper);
+    const isUnsorted = !currentRecord?.collections?.length;    
+    if (isUnsorted) {
+        const tagsChanged = !_.isEqual(currentRecord.tags, record.tags);
+        const collectionsChanged = !_.isEqual(currentRecord.collections, record.collections);
+        if (!(tagsChanged && !collectionsChanged)) {
+            
+            // Advance after update in case the picture was unsorted before and now has been put in a collection (or trashed).
+            // Do not advance if tags changed but collections didn't (user just edited the tags but might still want to pick a collection other than general as well)
+            result = true;
+        }
+    }
+
+    return result;
 }
 
 async function updateRecord(deviceWrapper, record) {
     if (!record || !deviceWrapper?.deviceHandler) {
         return null;
     }
-
+    const shouldAdvance = shouldAdvanceAfterPush(deviceWrapper, record);
     const pushRequestIndex = 1;
     const cache = deviceWrapper.getCache();
 
@@ -300,9 +318,13 @@ async function updateRecord(deviceWrapper, record) {
         .then((data) => {
             cache.data[pushRequestIndex] = data.data;
             deviceWrapper.deviceHandler.processCachedApiResponse(pushRequestIndex);
+
+            if (shouldAdvance) {
+                nextPicture(deviceWrapper, {});
+            }
         })
         .catch((err) => {
-            console.log(`Post request error. ${err.message}`);
+            log(`Post request error. ${err.message}`);
         });
 }
 
