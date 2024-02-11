@@ -36,18 +36,21 @@ function PhotosTouchLayer({fullScreen}) {
     const prevBtnClick = () => runPhotosServiceCommand("previousPicture", {});
     const nextBtnClick = () => runPhotosServiceCommand("nextPicture", {});
     const hideRestoreBtnClick = () => { 
-        runPhotosServiceCommand("hideRestorePicture", { hide: !record.collections?.includes('trashed') })
+        runPhotosServiceCommand("hideRestorePicture", { hide: !record.collections?.includes('trashed') });
+        nextBtnClick();
     };
-    const favoritesClick = () => runPhotosServiceCommand("toggleFavorites", {});
+    const favoritesClick = () => runPhotosServiceCommand("toggleFavorites", {});    
     const addRemoveTag = (tagString) => runPhotosServiceCommand("addRemoveTag", { tagString });
     const addToRemoveFromCollection = (collectionName) => runPhotosServiceCommand("addToRemoveFromCollection", { collectionName });
+    const generalClick = () => addToRemoveFromCollection("general");
     const setPhotosServiceFilter = (filter) => {
         runPhotosServiceCommand("setFilter", { filter });
     };
     
     const photoButtonHidden = showMainLayer ? "" : "photo-button-hidden";
     const isInFavorites = record?.collections?.includes("favorites");
-    const isHidden = record?.collections?.includes("trashed");
+    const isTrashed = record?.collections?.includes("trashed");
+    const isUnsorted = !record?.collections?.length;
 
     const infoLayerProps = {
         hideLayer: () => setShowInfoLayer(false),
@@ -94,10 +97,9 @@ function PhotosTouchLayer({fullScreen}) {
     } else {        
         return (
             <>
-                {" "}
-                {!showMainLayer && showInfoLayer && <PhotosInfoLayer {...infoLayerProps} />}
+                {showInfoLayer && <PhotosInfoLayer {...infoLayerProps} />}
                 <div className="photo-touch-layer">
-                    <div className={`photo-main-touch-layer-horizontal-row  ${photoButtonHidden}`}>
+                    <div className={`photo-main-touch-layer-horizontal-row`}>
                         <div
                             className={`photo-button photo-button-top-row ${photoButtonHidden}`}
                             onClick={prevBtnClick}
@@ -117,29 +119,38 @@ function PhotosTouchLayer({fullScreen}) {
                             Next Picture
                         </div>
                     </div>
-                    <div
-                        className={`photo-main-touch-layer-horizontal-row  ${photoButtonHidden}`}
-                        style={{ flexGrow: 10 }}
-                    >
-                        <div className={`photo-button info-layer-button ${showInfoLayer ? `info-layer-button-active` : ``}`} onClick={showInfoLayerClick}>
-                            <div className="button-label">Info Layer</div>                            
+                    <div className={`photo-main-touch-layer-horizontal-row`} style={{ flexGrow: 10 }}>
+                        <div
+                            className={`photo-button info-layer-button  ${photoButtonHidden} ${
+                                showInfoLayer ? `info-layer-button-active` : ``
+                            }`}
+                            onClick={showInfoLayerClick}
+                        >
+                            <div className="button-label">Info Layer</div>
                         </div>
                         <div className={`photo-button photo-button-show-ui`} onClick={showUiBtnClick}>
                             Close
                         </div>
                     </div>
-                    <div
-                        className={`photo-main-touch-layer-horizontal-row ${photoButtonHidden} photo-rating-buttons-container`}
-                    >
+                    <div className={`photo-main-touch-layer-horizontal-row photo-rating-buttons-container`}>
                         <div
-                            className={`photo-button photo-button-rating photo-button-rating-hide ${photoButtonHidden} ${
-                                isHidden ? "photo-button-engaged" : ""
-                            }`}
+                            className={`photo-button photo-button-rating photo-button-trash ${
+                                isUnsorted ? `photo-button-orange` : isTrashed ? `` : photoButtonHidden
+                            } ${isTrashed ? "photo-button-green" : ""}`}
                             onClick={hideRestoreBtnClick}
                         >
-                            {isHidden && <p>Restore</p>}
-                            {!isHidden && <p>Trash</p>}
+                            {isTrashed && <img src="/big-icons/icon-bg-save.png" />}
+                            {!isTrashed && <img src="/big-icons/icon-bg-trashed.png" />}
                         </div>
+                        {isUnsorted && (
+                            <div
+                                className={`photo-button photo-button-rating photo-button-add-to-general photo-button-green`}
+                                onClick={generalClick}
+                            >
+                                <img src="/big-icons/icon-bg-save.png" />
+                            </div>
+                        )}
+                        {!isUnsorted && <div className={`photo-button-spaceholder-15 ${photoButtonHidden}`}></div>}
                         <div
                             className={`photo-button photo-button-rating photo-button-rating-tag ${photoButtonHidden}`}
                             onClick={() => setShowManageTagsLayer(true)}

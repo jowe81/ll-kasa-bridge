@@ -10,8 +10,10 @@ function PhotosInfoLayer({ photosService, hideLayer, record, fullScreen }) {
     }
 
     function getCollectionsText() {
-        return record?.collections?.length ?
-            record.collections.join(', ') :
+        const displayCollections = (record?.collections ?? []).filter(collectionName => !['general', 'trashed'].includes(collectionName)).sort();
+
+        return displayCollections.length ?
+            displayCollections.join(', ') :
             <span className="placeholder-text">No Collections</span>        
 
     }

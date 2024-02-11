@@ -1,4 +1,5 @@
 import PhotosTouchLayer from "./PhotosTouchLayer";
+import PhotosIndicatorLayer from "./PhotosIndicatorLayer";
 import { getFirstDynformsServiceRecordFromLastRequest } from "../../dynformsHelpers";
 import { getPhotosService } from "../../devicesHelpers";
 import "./photos.css";
@@ -26,6 +27,11 @@ function Photos(props: any) {
         );
     }
 
+    const indicatorLayerProps = {
+        photosService,
+        record,
+        fullScreen,
+    };
 
     return (
         <div className={containerClassNames}>
@@ -33,6 +39,7 @@ function Photos(props: any) {
             <div className="photo" style={{ backgroundImage: `url(${url})` }} />
             <div className="photo-meta">                
             </div>
+            <PhotosIndicatorLayer {...indicatorLayerProps}/>
             <PhotosTouchLayer fullScreen={fullScreen}/>
         </div>
     );

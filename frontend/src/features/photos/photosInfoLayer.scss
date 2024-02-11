@@ -4,6 +4,7 @@
 .photos-info-layer {
     display: flex;
     justify-content: space-between !important;
+    padding: 5px;
     
     .horizontal-row {
         width: 100%;
@@ -15,7 +16,7 @@
             color: rgb(143, 143, 110);
             padding: 2px 10px; 
             border-radius: 3px;
-            margin: 3px 0px 3px 5px;
+            margin: 0px 2px;
             font-size: 80%;
         }           
     }
