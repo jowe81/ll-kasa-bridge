@@ -144,6 +144,7 @@ constants.DEVICETYPE_DEFAULTS = {
 
             AUDIO_PATH: "./media-files/",
             AUDIO_FILE_EXPIRED_TIMER_DEFAULT: "alert_default.mp3",
+            AUDIO_FILE_SCHEDULED_TIMER_DEFAULT: "shortbeep.mp3",
         },
 
         [constants.SUBTYPE_DYNFORMS_SERVICE]: {

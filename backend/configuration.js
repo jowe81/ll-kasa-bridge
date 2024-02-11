@@ -1457,7 +1457,6 @@ const deviceMap = [
                     id: "1m",
                     length: 1 * MINUTE,
                     ttl: 0,
-                    audiofile: null,
                 },
                 {
                     id: "3m",
@@ -1466,33 +1465,31 @@ const deviceMap = [
                     length: 3 * MINUTE,
                     ttl: 3 * MINUTE,
                     repeatAlarmEvery: 60 * SECOND, // will default to a minute if undefined or null
-                    audiofile: null,
+                    audiofileScheduled: "3-minutes.mp3",
                 },
                 {
                     id: "4m",
                     subLabel: "Coffee",
                     length: 4 * MINUTE,
                     ttl: 3 * MINUTE,
-                    audiofile: null,
+                    audiofileScheduled: "4-minutes.mp3",
                 },
                 {
                     id: "6m30",
                     subLabel: "Eggs",
                     length: 6 * MINUTE + 30 * SECOND,
                     ttl: 3 * MINUTE,
-                    audiofile: null,
+                    audiofileScheduled: "6-30minutes.mp3",
                 },
                 {
                     id: "10m",
                     length: 10 * MINUTE,
                     ttl: 3 * MINUTE,
-                    audiofile: null,
                 },
                 {
                     id: "20m",
                     length: 20 * MINUTE,
                     ttl: 3 * MINUTE,
-                    audiofile: null,
                 },
                 {
                     id: "pomodoro",
@@ -1501,7 +1498,8 @@ const deviceMap = [
                     displayButton: true,
                     length: 25 * MINUTE,
                     ttl: 0,
-                    audiofile: "timer-pomodoro.mp3",
+                    audiofileScheduled: false,
+                    audiofileExpired: "timer-pomodoro.mp3",
                 },
                 {
                     id: "60m",
@@ -1509,7 +1507,6 @@ const deviceMap = [
                     displayButton: true,
                     length: 60 * MINUTE,
                     ttl: 3 * MINUTE,
-                    audiofile: null,
                 },
             ],
         },
