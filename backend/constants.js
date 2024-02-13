@@ -164,6 +164,7 @@ constants.DEVICETYPE_DEFAULTS = {
         },
         [constants.SUBTYPE_DAV_SERVICE]: {
             CHECKING_INTERVAL_DEFAULT: 10 * constants.MINUTE,
+            EXPAND_RECURRING_EVENTS_TIME_WINDOW: 25 * constants.WEEK,
         },
     },
 };

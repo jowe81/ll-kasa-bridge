@@ -17,9 +17,10 @@
             padding: 2px 10px; 
             border-radius: 3px;
             margin: 0px 2px;
-            font-size: 80%;
+            font-size: 80%;            
         }           
     }
+
 
     .horizontal-row-top {
         @extend .horizontal-row;
@@ -41,3 +42,8 @@
         color: rgba($color-text-gray, .5);
     }
 }
+
+.window-mode {
+    font-size: 105% !important;
+}
+

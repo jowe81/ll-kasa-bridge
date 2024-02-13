@@ -6,7 +6,8 @@ import { getPhotosService, runChannelCommand } from "../../devicesHelpers";
 import { getFirstDynformsServiceRecordFromLastRequest } from "../../dynformsHelpers";
 import { useAppSelector, useAppDispatch } from "./../../app/hooks.ts";
 import { photosTouchLayerStateChanged } from "../localState/localStateSlice";
-import './photosTouchLayer.css';
+import { getCollectionLabelsForRecord, getDefaultCollectionsJsx } from "./PhotosHelpers.tsx";
+import './photosTouchLayer.scss';
 
 function PhotosTouchLayer({fullScreen}) {
     // State management
@@ -36,14 +37,15 @@ function PhotosTouchLayer({fullScreen}) {
     const prevBtnClick = () => runPhotosServiceCommand("previousPicture", {});
     const nextBtnClick = () => runPhotosServiceCommand("nextPicture", {});
     const hideRestoreBtnClick = () => runPhotosServiceCommand("hideRestorePicture", { hide: !record.collections?.includes('trashed') });
-    const favoritesClick = () => runPhotosServiceCommand("toggleFavorites", {});    
+    const favoritesClick = (collectionName) => runPhotosServiceCommand("addToRemoveFromCollection", { collectionName });
     const addRemoveTag = (tagString) => runPhotosServiceCommand("addRemoveTag", { tagString });
     const addToRemoveFromCollection = (collectionName) => runPhotosServiceCommand("addToRemoveFromCollection", { collectionName });
     const generalClick = () => addToRemoveFromCollection("general");
     const setPhotosServiceFilter = (filter) => runPhotosServiceCommand("setFilter", { filter });
     
     const photoButtonHidden = showMainLayer ? "" : "photo-button-hidden";
-    const isInFavorites = record?.collections?.includes("favorites");
+    const isInJessFavorites = record?.collections?.includes("Jess' Faves");
+    const isInJohannesFavorites = record?.collections?.includes("Johannes' Faves");
     const isTrashed = record?.collections?.includes("trashed");
     const isUnsorted = !record?.collections?.length;
 
@@ -94,7 +96,12 @@ function PhotosTouchLayer({fullScreen}) {
         };
 
         return <PhotosManageTagsLayer {...props} />;
-    } else {        
+    } else {
+        let currentLabels = []; 
+        if (record?.collections?.length) {
+            currentLabels = record.collections.filter(collection => collection !== 'general');
+        }
+               
         return (
             <>
                 {showInfoLayer && <PhotosInfoLayer {...infoLayerProps} />}
@@ -170,20 +177,29 @@ function PhotosTouchLayer({fullScreen}) {
                         >
                             <div className="button-label">Collections</div>
                             <div className="current-items">
-                                {record?.collections && record.collections.length ? (
-                                    record.collections.join(", ").toLowerCase()
+                                {currentLabels.length ? (
+                                    currentLabels.join(", ").toLowerCase()
                                 ) : (
                                     <div className="no-items-yet">no collections assigned</div>
                                 )}
                             </div>
                         </div>
                         <div
-                            className={`photo-button photo-button-favorite ${isUnsorted ? `photo-button-purple-inactive` : photoButtonHidden} ${
-                                isInFavorites ? "photo-button-purple-active" : ""
-                            }`}
-                            onClick={favoritesClick}
+                            className={`photo-button photo-button-favorite ${
+                                isUnsorted ? `photo-button-purple-inactive` : photoButtonHidden
+                            } ${isInJessFavorites ? "photo-button-purple-active" : ""}`}
+                            onClick={() => favoritesClick("Jess' Faves")}
                         >
-                            {/* {isInFavorites ? "Remove from" : "Add to"} Favorites */}
+                            Jess' Faves
+                            <img src="/big-icons/icon-bg-favorite.png" />
+                        </div>
+                        <div
+                            className={`photo-button photo-button-favorite ${
+                                isUnsorted ? `photo-button-purple-inactive` : photoButtonHidden
+                            } ${isInJohannesFavorites ? "photo-button-purple-active" : ""}`}
+                            onClick={() => favoritesClick("Johannes' Faves")}
+                        >
+                            Johannes' Faves
                             <img src="/big-icons/icon-bg-favorite.png" />
                         </div>
                     </div>

@@ -1698,6 +1698,33 @@ const deviceMap = [
             ui: {
                 disabled: false,
             },
+            defaultCollections: [
+                {
+                    label: "general",
+                    color: "green",
+                    imgSrc: "/big-icons/icon-bg-general.png",
+                },
+                {
+                    label: "unsorted",
+                    color: "gray",
+                    imgSrc: "/big-icons/icon-bg-unsorted.png",
+                },
+                {
+                    label: "trashed",
+                    color: "orange",
+                    imgSrc: "/big-icons/icon-bg-trashed.png",
+                },
+                {
+                    label: "Johannes' Faves",
+                    imgSrc: "/big-icons/icon-bg-favorite.png",
+                    color: "purple",
+                },
+                {
+                    label: "Jess' Faves",
+                    imgSrc: "/big-icons/icon-bg-favorite.png",
+                    color: "purple",
+                },
+            ],
 
             // Specific to this service:
             photosServiceBaseUrl: "http://jj-photos.wnet.wn:3021/db",

@@ -1,8 +1,22 @@
+import {
+    getCollectionLabelsForRecord,
+    getCustomCollectionLabels,
+    getDefaultCollectionsJsx,
+    getLibraryInfo,
+} from "./PhotosHelpers.tsx";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
 import "./photosManageCollectionsLayer.scss";
 
-function PhotosManageCollectionsLayer({ addToRemoveFromCollection, hideLayer, hideLayers, uiInfo, record, photosService }) {
-    const libraryInfo = photosService?.state?.api?.libraryInfo;
+function PhotosManageCollectionsLayer({
+    addToRemoveFromCollection,
+    hideLayer,
+    hideLayers,
+    record,
+    photosService,
+}) {
+    const libraryInfo = getLibraryInfo(photosService);
+    const customCollections = getCustomCollectionLabels(photosService);
+
     const isUnsorted = !record?.collections?.length;
 
     const { showKeyboard } = useScreenKeyboard();
@@ -13,7 +27,7 @@ function PhotosManageCollectionsLayer({ addToRemoveFromCollection, hideLayer, hi
             hideLayers();
         }
         addToRemoveFromCollection(collectionName);
-    }
+    };
 
     const keyboardConfigTags = {
         fieldLabel: "Collection Name:",
@@ -22,32 +36,25 @@ function PhotosManageCollectionsLayer({ addToRemoveFromCollection, hideLayer, hi
         onClose: (value) => addToRemoveFromCollectionWrapper(value),
     };
 
-    const allCollections = libraryInfo?.collections?.map((info) => info.item).sort();
-    const defaultCollections = allCollections
-        .filter((collectionName) => ["unsorted", "trashed", "favorites"].includes(collectionName))
-        .sort((a, b) => (a > b ? -1 : 1));
 
-    const customCollections = allCollections
-        .filter((collectionName) => !["unsorted", "trashed", "favorites"].includes(collectionName))
-        .sort();
+    const defaultCollectionsJsx = getDefaultCollectionsJsx(
+        photosService,
+        record?.collections,
+        addToRemoveFromCollectionWrapper,
+        false,
+    );
 
-    const collections = [...defaultCollections, ...customCollections];
-    
-    const collectionItemsJsx = collections.map((collection, index) => {
+    const collectionItemsJsx = customCollections.map((collection, index) => {
         const collectionInfo = libraryInfo?.collections?.find((info) => info.item === collection);
 
         let className = "touch-item";
 
-        if ((collection === "unsorted" && !record.collections.length) || record.collections?.includes(collection)) {
+        if ((collection === "unsorted" && !record?.collections.length) || record?.collections?.includes(collection)) {
             className += " touch-item-selected";
-        } 
+        }
 
         return (
-            <div
-                key={index}
-                className={className}
-                onClick={() => addToRemoveFromCollectionWrapper(collection)}
-            >
+            <div key={index} className={className} onClick={() => addToRemoveFromCollectionWrapper(collection)}>
                 {collection[0].toUpperCase() + collection.substring(1)}
                 <div className="touch-item-info">
                     {collectionInfo?.count} picture{collectionInfo?.count === 1 ? `` : `s`}
@@ -56,19 +63,30 @@ function PhotosManageCollectionsLayer({ addToRemoveFromCollection, hideLayer, hi
         );
     });
 
+
+    const currentLabels = getCollectionLabelsForRecord(photosService);
+
     return (
         <div className="touch-layer-opaque photos-filter-layer">
             <div className="touch-layer-title">
-                <div className="header">Collections This Picture Belongs To</div>
+                <div className="header">Collections Containing This Picture</div>
             </div>
+
             <div className="options-groups-container">
                 <div className="options-group">
-                    <div className="label">Tap a collection to add to/remove the picture from:</div>
+                    <div className="label">Currently Selected Collections:</div>
+                    <div className="italic">
+                        {currentLabels.length ? <div className="emphasize">{currentLabels.join(", ")}</div> : <div className="mute">(none)</div>}
+                    </div>                                        
+                </div>
+                <div className="options-group">
+                    <div className="label">Tap on any collection to add to/remove the picture from it:</div>
+                    <div className="touch-items-container">{defaultCollectionsJsx}</div>
                     <div className="touch-items-container">{collectionItemsJsx}</div>
                 </div>
                 <div className="options-group" onClick={() => showKeyboard(keyboardConfigTags)}>
                     <div className="action" style={{ maxWidth: "400px" }}>
-                        Use Different Collection
+                        Add to a New Collection
                     </div>
                 </div>
             </div>

@@ -9,7 +9,7 @@ const initialState: LocalState = {
     photosTouchLayer: {},
     photosFilterLayer: {
         filter: {
-            collections: [],
+            collections: ['general'],
             tags: [],
             mode_collections: "$in",
             mode_tags: "$in",

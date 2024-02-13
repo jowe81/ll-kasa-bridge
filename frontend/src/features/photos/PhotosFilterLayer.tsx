@@ -1,3 +1,8 @@
+import {
+    getCustomCollectionLabels,
+    getDefaultCollectionsJsx,
+    getLibraryInfo,
+} from "./PhotosHelpers.tsx";
 import TouchUIBooleanField from "./TouchUIBooleanField";
 import TouchUIDateSelector from "./TouchUIDateSelector";
 import { useEffect } from "react";
@@ -13,19 +18,20 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
     const dispatch = useAppDispatch();
     const photosFilterLayerState = useAppSelector((state) => state.localState.photosFilterLayer);
     const { filter } = photosFilterLayerState;
-    const updateState = (path, payload) => dispatch(photosFilterLayerStateChanged({ ...photosFilterLayerState, [path]: payload }));
+    const updateState = (path, payload) =>
+        dispatch(photosFilterLayerStateChanged({ ...photosFilterLayerState, [path]: payload }));
     const _setFilter = (payload) => updateState("filter", payload);
     const setFilter = (filter) => {
         _setFilter({ ...filter });
         setInputValue(filter.tags.join(" "));
     };
-    
+
     const clearedFilterState = initialState.photosFilterLayer.filter;
     function resetFilterState() {
         setFilter({ ...clearedFilterState });
     }
 
-    const libraryInfo = photosService?.state?.api?.libraryInfo;
+    const libraryInfo = getLibraryInfo(photosService);
 
     // Make sure to update the filter if a remote change comes in.
     useEffect(() => {
@@ -41,7 +47,6 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         setInputValue(filter.tags.join(" "));
     }, []);
     const { showKeyboard, inputValue, setInputValue } = useScreenKeyboard();
-
 
     function addRemoveTagFromInput(tag) {
         let newInputValue = "";
@@ -66,15 +71,23 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
             newCollections = [];
         } else if (collectionName === "trashed") {
             newCollections = ["trashed"];
-        } else {
-            if (filter.collections.includes("trashed")) {
-                filter.collections = [];
+        } else {            
+            newCollections = filter.collections.includes("trashed") ? [] : [...filter.collections];
+
+            if (newCollections.includes('general')) {
+                // Were on general but clicked something else; remove general from the filter
+                newCollections = newCollections.filter(collection => collection !== 'general');
             }
 
             if (filter.collections.includes(collectionName)) {
-                newCollections = filter.collections.filter((collection) => collection !== collectionName);
+                newCollections = newCollections.filter((collection) => collection !== collectionName);
             } else {
-                newCollections = [...filter.collections, collectionName];
+                newCollections.push(collectionName);
+            }
+
+            if (!newCollections.length) {
+                // Nothing left - default to general.
+                newCollections = ['general'];
             }
         }
 
@@ -104,33 +117,17 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         onClose: (value) => setFilter({ ...filter, tags: splitTags(value) }),
     };
 
-    let allCollections = libraryInfo?.collections?.map((info) => info.item).sort();
+    const defaultCollectionsJsx = getDefaultCollectionsJsx(
+        photosService,
+        filter.collections,
+        addRemoveCollectionFromFilter,
+        true, // Include unsorted
+        true, // Include general
+    );
 
-    let defaultCollections =
-        allCollections &&
-        allCollections
-            .filter((collectionName) => ["unsorted", "trashed", "favorites"].includes(collectionName))
-            .sort((a, b) => (a > b ? -1 : 1));
+    let customCollections = getCustomCollectionLabels(photosService);
 
-    let customCollections =
-        allCollections &&
-        allCollections
-            .filter((collectionName) => !["unsorted", "trashed", "favorites"].includes(collectionName))
-            .sort();
-
-    if (!allCollections) {
-        allCollections = [];
-    }
-
-    if (!defaultCollections) {
-        defaultCollections = [];
-    }
-
-    if (!customCollections) {
-        customCollections = [];
-    }
-
-    const collections = [...defaultCollections, ...customCollections];
+    const collections = [...customCollections];
 
     const collectionItemsJsx = collections.map((collection, index) => {
         const collectionInfo = libraryInfo?.collections?.find((info) => info.item === collection);
@@ -236,6 +233,7 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
                     <div className="options-group-header">Collections:</div>
                     <div className="options-side-by-side">
                         <div className="option-group">
+                            <div className="touch-items-container">{defaultCollectionsJsx}</div>
                             <div className="touch-items-container">{collectionItemsJsx}</div>
                         </div>
                         <div className="option-group margin-left">
@@ -305,10 +303,13 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
                 <div className="action" onClick={hideChangeFilterLayer}>
                     Cancel
                 </div>
-                <div className="action" onClick={() => { 
-                    setPhotosServiceFilter(filter);
-                    hideChangeFilterLayer();
-                }}>
+                <div
+                    className="action"
+                    onClick={() => {
+                        setPhotosServiceFilter(filter);
+                        hideChangeFilterLayer();
+                    }}
+                >
                     Set New Filter
                 </div>
             </div>

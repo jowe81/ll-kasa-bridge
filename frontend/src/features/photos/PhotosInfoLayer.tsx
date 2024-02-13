@@ -95,7 +95,7 @@ function PhotosInfoLayer({ photosService, hideLayer, record, fullScreen }) {
     const aspectText = getAspectText();
 
     return (
-        <div className="touch-layer photos-info-layer">
+        <div className={`touch-layer photos-info-layer ${fullScreen ? `` : `window-mode`}`}>
             <div className="horizontal-row-top">{!fullScreen && getFilterSizeText()}</div>
             <div className="horizontal-row-remaining-space">
                 <div className="hide-button" onClick={hideLayer}></div>

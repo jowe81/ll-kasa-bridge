@@ -12,7 +12,9 @@ $color-touch-item-info: rgba(255, 255, 255, 0.512);
 $border-gray: rgba(128, 128, 128, 0.282);
 $border-color-touch-item: rgba(128, 128, 128, 1);
 
-$touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
+// $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
+$touch-item-selected-background-color: rgba(0, 94, 0, 0.9);
+
 
 
 .touch-layer {
@@ -115,6 +117,8 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
         .touch-item-info {
             font-size: 80%;
             color: $color-touch-item-info;
+            margin-top: -7px;
+            min-width: 110px;
         }
     }
 
@@ -175,7 +179,6 @@ $touch-item-selected-background-color: rgba(255, 255, 0, 0.296);
 
         .header {
             border-bottom: 1px solid $border-gray;
-            text-align: center;
             font-size: 130%;
         }
 
