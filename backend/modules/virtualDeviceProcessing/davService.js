@@ -198,18 +198,40 @@ class DavServiceHandler {
                                 
                             this.cache.data.calendarData[url] = calendarObjects;
 
+                            const now = new Date();
+
                             const convertedCalendarObjects = [];
                             calendarObjects.forEach((calendarObject) => {
                                 const parsed = nodeIcal.parseICS(calendarObject.data);
-                                const items = Object.values(parsed).filter((item) => true || item.type === "VEVENT");
+                                const items = Object.values(parsed).filter((item) => item.type === "VEVENT");
 
-                                items.forEach((vevent) => {
-                                    convertedCalendarObjects.push({
-                                        ...vevent,
+                                items.forEach((event) => {
+                                    const convertedEvent = {
+                                        ...event,
                                         calendarLabel: settings.label, // Locally assigned label to all the calendars at this remote
                                         calendarDisplayName: displayName, // Calendar specific remotely assigned display name
                                         calendarIndex: index,
-                                    });
+                                        lengthInMs: new Date(event.end).getTime() - new Date(event.start).getTime(),                                        
+                                    };
+
+                                    convertedCalendarObjects.push(convertedEvent);
+
+                                    // If this is a recurring event, expand it.
+                                    if (event.rrule) {
+                                        const expandUntil = new Date(now.getTime() + localConstants.EXPAND_RECURRING_EVENTS_TIME_WINDOW);
+                                        const dates = event.rrule.between(new Date(), expandUntil);
+                                        
+                                        const expandedEvents = dates.map((date) => {                                            
+                                            const repeatEvent = {
+                                                ...convertedEvent,
+                                                start: date,
+                                                end: new Date(date.getTime() + convertedEvent.lengthInMs),
+                                            };
+                                            return repeatEvent;
+                                        });
+
+                                        convertedCalendarObjects.push(...expandedEvents);
+                                    }
                                 });
                             });
 
