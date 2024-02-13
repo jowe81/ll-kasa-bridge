@@ -3,7 +3,7 @@ import {
     getCustomCollectionLabels,
     getDefaultCollectionsJsx,
     getLibraryInfo,
-} from "./PhotosHelpers.tsx";
+} from "./photosHelpers.tsx";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
 import "./photosManageCollectionsLayer.scss";
 

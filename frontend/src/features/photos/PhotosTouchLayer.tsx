@@ -6,7 +6,7 @@ import { getPhotosService, runChannelCommand } from "../../devicesHelpers";
 import { getFirstDynformsServiceRecordFromLastRequest } from "../../dynformsHelpers";
 import { useAppSelector, useAppDispatch } from "./../../app/hooks.ts";
 import { photosTouchLayerStateChanged } from "../localState/localStateSlice";
-import { getCollectionLabelsForRecord, getDefaultCollectionsJsx } from "./PhotosHelpers.tsx";
+
 import './photosTouchLayer.scss';
 
 function PhotosTouchLayer({fullScreen}) {

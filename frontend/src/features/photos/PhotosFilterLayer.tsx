@@ -2,7 +2,7 @@ import {
     getCustomCollectionLabels,
     getDefaultCollectionsJsx,
     getLibraryInfo,
-} from "./PhotosHelpers.tsx";
+} from "./photosHelpers.tsx";
 import TouchUIBooleanField from "./TouchUIBooleanField";
 import TouchUIDateSelector from "./TouchUIDateSelector";
 import { useEffect } from "react";
