@@ -6,7 +6,6 @@ import { getPhotosService, runChannelCommand } from "../../devicesHelpers";
 import { getFirstDynformsServiceRecordFromLastRequest } from "../../dynformsHelpers";
 import { useAppSelector, useAppDispatch } from "./../../app/hooks.ts";
 import { photosTouchLayerStateChanged } from "../localState/localStateSlice";
-
 import './photosTouchLayer.scss';
 
 function PhotosTouchLayer({fullScreen}) {
@@ -108,10 +107,12 @@ function PhotosTouchLayer({fullScreen}) {
                 <div className="photo-touch-layer">
                     <div className={`photo-main-touch-layer-horizontal-row`}>
                         <div
-                            className={`photo-button photo-button-top-row ${photoButtonHidden}`}
-                            onClick={prevBtnClick}
+                            className={`photo-button photo-button-top-row ${photoButtonHidden} ${
+                                showInfoLayer ? `info-layer-button-active` : ``
+                            }`}
+                            onClick={showInfoLayerClick}
                         >
-                            Previous Picture
+                            <div className="button-label">Info Layer</div>
                         </div>
                         <div
                             className={`photo-button photo-button-top-row ${photoButtonHidden}`}
@@ -120,46 +121,7 @@ function PhotosTouchLayer({fullScreen}) {
                             Change Filter
                         </div>
                         <div
-                            className={`photo-button photo-button-top-row ${photoButtonHidden}`}
-                            onClick={nextBtnClick}
-                        >
-                            Next Picture
-                        </div>
-                    </div>
-                    <div className={`photo-main-touch-layer-horizontal-row`} style={{ flexGrow: 10 }}>
-                        <div
-                            className={`photo-button info-layer-button  ${photoButtonHidden} ${
-                                showInfoLayer ? `info-layer-button-active` : ``
-                            }`}
-                            onClick={showInfoLayerClick}
-                        >
-                            <div className="button-label">Info Layer</div>
-                        </div>
-                        <div className={`photo-button photo-button-show-ui`} onClick={showUiBtnClick}>
-                            Close
-                        </div>
-                    </div>
-                    <div className={`photo-main-touch-layer-horizontal-row photo-rating-buttons-container`}>
-                        <div
-                            className={`photo-button photo-button-rating photo-button-trash ${
-                                isUnsorted ? `photo-button-orange` : isTrashed ? `` : photoButtonHidden
-                            } ${isTrashed ? "photo-button-green" : ""}`}
-                            onClick={hideRestoreBtnClick}
-                        >
-                            {isTrashed && <img src="/big-icons/icon-bg-save.png" />}
-                            {!isTrashed && <img src="/big-icons/icon-bg-trashed.png" />}
-                        </div>
-                        {isUnsorted && (
-                            <div
-                                className={`photo-button photo-button-rating photo-button-add-to-general photo-button-green`}
-                                onClick={generalClick}
-                            >
-                                <img src="/big-icons/icon-bg-save.png" />
-                            </div>
-                        )}
-                        {!isUnsorted && <div className={`photo-button-spaceholder-15 ${photoButtonHidden}`}></div>}
-                        <div
-                            className={`photo-button photo-button-rating photo-button-rating-tag ${photoButtonHidden}`}
+                            className={`photo-button photo-button-top-row photo-button-items-info ${photoButtonHidden}`}
                             onClick={() => setShowManageTagsLayer(true)}
                         >
                             <div className="button-label">Tags</div>
@@ -172,7 +134,7 @@ function PhotosTouchLayer({fullScreen}) {
                             </div>
                         </div>
                         <div
-                            className={`photo-button photo-button-rating photo-button-rating-tag ${photoButtonHidden}`}
+                            className={`photo-button photo-button-top-row photo-button-items-info ${photoButtonHidden}`}
                             onClick={() => setShowManageCollectionsLayer(true)}
                         >
                             <div className="button-label">Collections</div>
@@ -184,23 +146,64 @@ function PhotosTouchLayer({fullScreen}) {
                                 )}
                             </div>
                         </div>
+                    </div>
+                    <div className={`photo-main-touch-layer-horizontal-row`} style={{ flexGrow: 10 }}>
                         <div
-                            className={`photo-button photo-button-favorite ${
-                                isUnsorted ? `photo-button-purple-inactive` : photoButtonHidden
-                            } ${isInJessFavorites ? "photo-button-purple-active" : ""}`}
-                            onClick={() => favoritesClick("Jess' Faves")}
+                            className={`photo-button photo-button-mid-row ${photoButtonHidden}`}
+                            onClick={prevBtnClick}
                         >
-                            Jess' Faves
-                            <img src="/big-icons/icon-bg-favorite.png" />
+                            Previous Picture
                         </div>
                         <div
-                            className={`photo-button photo-button-favorite ${
-                                isUnsorted ? `photo-button-purple-inactive` : photoButtonHidden
-                            } ${isInJohannesFavorites ? "photo-button-purple-active" : ""}`}
-                            onClick={() => favoritesClick("Johannes' Faves")}
+                            className={`photo-button photo-button-mid-row photo-button-show-ui`}
+                            onClick={showUiBtnClick}
                         >
-                            Johannes' Faves
-                            <img src="/big-icons/icon-bg-favorite.png" />
+                            Close
+                        </div>
+                        <div
+                            className={`photo-button photo-button-mid-row ${photoButtonHidden}`}
+                            onClick={nextBtnClick}
+                        >
+                            Next Picture
+                        </div>
+                    </div>
+                    <div className={`photo-main-touch-layer-horizontal-row`}>
+                        <div className="photo-buttons-bottom-row-left-container">
+                            <div
+                                className={`photo-button photo-button-trash ${
+                                    isUnsorted ? `photo-button-orange` : isTrashed ? `` : photoButtonHidden
+                                } ${isTrashed ? "photo-button-green" : ""}`}
+                                onClick={hideRestoreBtnClick}
+                            >
+                                {isTrashed && <img src="/big-icons/icon-bg-save.png" />}
+                                {!isTrashed && <img src="/big-icons/icon-bg-trashed.png" />}
+                            </div>
+                            {isUnsorted && (
+                                <div className={`photo-button  photo-button-green`} onClick={generalClick}>
+                                    <img src="/big-icons/icon-bg-save.png" />
+                                </div>
+                            )}
+                            {!isUnsorted && <div className={`photo-button-spaceholder-15 ${photoButtonHidden}`}></div>}
+                        </div>
+                        <div className="photo-buttons-bottom-row-right-container">
+                            <div
+                                className={`photo-button photo-button-collection-shortcut ${
+                                    isUnsorted ? `photo-button-purple-inactive` : photoButtonHidden
+                                } ${isInJessFavorites ? "photo-button-purple-active" : ""}`}
+                                onClick={() => favoritesClick("Jess' Faves")}
+                            >
+                                Jess' Faves
+                                <img src="/big-icons/icon-bg-favorite.png" />
+                            </div>
+                            <div
+                                className={`photo-button photo-button-collection-shortcut ${
+                                    isUnsorted ? `photo-button-purple-inactive` : photoButtonHidden
+                                } ${isInJohannesFavorites ? "photo-button-purple-active" : ""}`}
+                                onClick={() => favoritesClick("Johannes' Faves")}
+                            >
+                                Johannes' Faves
+                                <img src="/big-icons/icon-bg-favorite.png" />
+                            </div>
                         </div>
                     </div>
                 </div>

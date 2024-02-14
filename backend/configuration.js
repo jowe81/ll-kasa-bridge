@@ -1446,7 +1446,7 @@ const deviceMap = [
         channel: 209,
         id: "timer-kitchen",
         display: true,
-        displayLabel: "Timer",
+        displayLabel: "Timers",
         displayType: constants.SUBTYPE_TIMER,
         locationId: "loc-kitchen",
         type: constants.DEVICETYPE_VIRTUAL,

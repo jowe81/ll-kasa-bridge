@@ -196,7 +196,11 @@ function isLeapYear(year) {
 function getDateString(date, dateFormatOptions) {    
     let result = '';
     if (dateFormatOptions.includeDayOfWeek) {
-        result += getDayOfWeekString(date, 'short') + ' ';
+        let dowFormat = 'short';
+        if (dateFormatOptions.includeDayOfWeek === 'long') {
+            dowFormat = 'long';
+        }
+        result += getDayOfWeekString(date, dowFormat) + " ";
     }
     result += date?.toLocaleDateString(undefined, dateFormatOptions);
 

@@ -166,6 +166,9 @@ async function setFilter(deviceWrapper, commandData) {
 
     if (filter.collections.length) {
         collectionsFilter = {collections: { [filter.mode_collections]: [...filter.collections]}};
+    } else {
+        // No collections selected; this indicates unsorted.
+        collectionsFilter = {collections: { $eq: [] }};
     }
 
     if (filter.tags.length) {

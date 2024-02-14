@@ -1,4 +1,5 @@
 import { useAppSelector } from "../../../app/hooks.ts";
+import { getDateString } from "../../TouchUiMain/calendar/calendarHelpers.tsx";
 
 import constants from "../../../constants.ts";
 
@@ -15,13 +16,13 @@ function Clock() {
 
     if (clockData?.nextSunEvent === 'sunset') {
       sunEvents = <>
-        <div>Sunset: <span>{clockData?.sunset ?? "N/A"}</span></div>
-        <div>Sunrise: <span>{clockData?.sunrise ?? "N/A"}+</span></div>
+        <div>SS: <span>{clockData?.sunset ?? "N/A"}</span></div>
+        <div>SR: <span>{clockData?.sunrise ?? "N/A"}+</span></div>
       </>
     } else if(clockData?.nextSunEvent ==='sunrise') {
       sunEvents = <>
-        <div>Sunrise: <span>{clockData?.sunrise ?? "N/A"}{clockData?.am ? '' : '+'}</span></div>
-        <div>Sunset: <span>{clockData?.sunset ?? "N/A"}{clockData?.am ? '' : '+'}</span></div>
+        <div>SR: <span>{clockData?.sunrise ?? "N/A"}{clockData?.am ? '' : '+'}</span></div>
+        <div>SS: <span>{clockData?.sunset ?? "N/A"}{clockData?.am ? '' : '+'}</span></div>
       </>
     }
 
@@ -52,11 +53,10 @@ function currentDate(ms?: number) {
     const date = new Date(ms);
 
     const options: any = {
-        month: "short",
+        month: "numeric",
         day: "numeric",
     };
-
-    return date.toLocaleDateString("en-CA", options);
+    return getDateString(date, { ...options, includeDayOfWeek: 'long'});
 }
 
 export default Clock;

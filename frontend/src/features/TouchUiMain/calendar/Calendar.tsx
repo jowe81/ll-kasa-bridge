@@ -204,7 +204,7 @@ function Calendar() {
     return (
         <div className="calendar-outer-container">
             <div className="calendar-container">
-                <div className="calendar-header">Upcoming Events</div>
+                <div className="calendar-header">Calendar</div>
                 <div className="calendar-items-container">{calendarItemsJsx}</div>
             </div>
         </div>

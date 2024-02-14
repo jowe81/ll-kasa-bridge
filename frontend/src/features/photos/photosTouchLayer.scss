@@ -41,13 +41,22 @@
 
 /* PREV/FILTER/NEXT buttons */
 .photo-button-top-row {
-    width: 100%;     
+    width: 25%;     
+}
+
+.photo-button-mid-row {
+    width: 25%;
+}
+
+.photo-button-bottom-row {
+    width: 10%;
+    max-width: 10% !important;
 }
 
 /* Show hide button */
 .photo-button-show-ui {
     opacity: 0%;
-    flex-grow: 10;
+    width: 50%;
 }
 
 
@@ -59,54 +68,46 @@
     height: 25%;
     display: flex;
     flex-flow: row;
-    /* background-color: rgba(100,0,0,.2);
-    border: 1px solid green; */
-}
-/* RATING container */
-.photo-rating-outer-container {
-    border: 1px solid rgba(168, 168, 168, .3);
-    border-radius: 5px;
-    margin: 5px;
-    background-color: rgba(42, 30, 30, 0.603);
-}
-
-.photo-rating-header-container {
-    width: 100%;
-    height: 20%;
-    /* This just centers text */
-    display: grid;
-    place-items: center;
-    text-align: center;
-
-    font-size: 1vw;
-    font-style: italic;
-    color: rgba(255, 255, 255, 0.509);    
-}
-
-.photo-rating-buttons-container {
-    width: 100%;
-    display: flex;
     justify-content: space-between;
 }
 
-.photo-button-rating {
-    width: 22%;
-    font-size: 1.5vw;
+.photo-buttons-bottom-row-left-container {
+    display: flex;
+    flex-flow: row;
+    justify-content: flex-start;
+    width: 25%;    
+    margin: 5px;
+
+    div {
+        margin: 0px;
+        margin-right: 10px;
+        
+    }
 }
 
-.photo-button-trash, .photo-button-favorite {
-    width: 15%;    
+.photo-buttons-bottom-row-right-container {
+    display: flex;
+    flex-flow: row;
+    justify-content: flex-end;
+    margin: 5px;
+    width: 75%;
+
+    div {
+        margin-right: 0px;
+        margin-top: 0px;
+        margin-bottom: 0px;
+        margin-left: 10px;
+        min-width: 160px;        
+    }
 }
 
-.photo-button-favorite {
+.photo-button-collection-shortcut {
     width: 10%;
     font-size: 120%;
-}
-.photo-button-trash img {
-    opacity: 40%;
-    width: 100%;
-    max-width: 160px;
-    max-height: 160px;
+
+    img {
+        width: 70% !important;
+    }
 }
 
 .photo-button img {
@@ -116,44 +117,32 @@
     max-height: 160px;
 }
 
-.photo-button-add-to-general {
-    width: 15%;
-}
-
-.photo-button-add-to-general img {
-    opacity: 40%;
-    width: 100%;
-    max-width: 160px;
-    max-height: 160px;
-}
-
-
 .photo-button-spaceholder-15 {
     width: 15%;
     margin: 5px;
     border: 1px solid rgba(0, 0, 0, 0);
 }
 
-.photo-button-rating-tag .current-items {
-    border-top: 1px solid rgba(168, 168, 168, .3);
-    width: 100%;
-    font-size: 60%;
-    color:rgb(209, 223, 182);
-    height: 100%;
-    padding: 3px;
-}
+.photo-button-items-info {
+    font-size: 1.5vw;
 
-.photo-button-rating-tag .current-items .no-items-yet {
-    color:rgba(168, 168, 168, 1);
-    font-style: italic;
-}
+    .current-items {
+        border-top: 1px solid rgba(168, 168, 168, .3);
+        width: 100%;
+        font-size: 60%;
+        color:rgb(209, 223, 182);
+        height: 100%;
+        padding: 3px;
 
-.photo-button-rating-tag .button-label {
-    margin: -20px 0px;
-}
+        .no-items-yet {
+            color:rgba(168, 168, 168, 1);
+            font-style: italic;
+        }
+    }
 
-.info-layer-button {
-    width: 14%
+    .button-label {
+        margin: -20px 0px;
+    }
 }
 
 .info-layer-button-active {        
