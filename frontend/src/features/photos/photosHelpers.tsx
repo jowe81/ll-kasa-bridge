@@ -50,8 +50,8 @@ function getCustomCollectionLabels(photosService) {
 
     const defaultCollectionLabels = getDefaultCollectionLabels(
         photosService,
-        false,
-        true // Include the general collection here (so that it gets filtered below)
+        true, // Include unsorted (so that it gets filtered below)
+        true, // Include the general collection here (so that it gets filtered below)
     );
 
     return allCollectionLabels
@@ -92,9 +92,51 @@ function getDefaultCollectionsJsx(
                 className={`collection-button ${classNames} ${collection.className}`}
                 onClick={() => onClick(collection.label)}
             >
-                <div>{collection.label[0].toUpperCase() + collection.label.substring(1)} </div>
-                <img src={collection.imgSrc} />
-                <div className="touch-item-info">{collectionInfo?.count ?? 0}</div>
+                {collection.label !== "trashed" && (
+                    <>
+                        <div className="touch-item-label">
+                            {collection.label[0].toUpperCase() + collection.label.substring(1)}{" "}
+                        </div>
+                        <div className="touch-item-info">
+                            {collectionInfo?.count ?? 0} picture{collectionInfo?.count === 1 ? `` : `s`}
+                        </div>
+                    </>
+                )}
+                <div className={`img-container ${collection.label === "trashed" ? "opacity-25" : ""}`}>
+                    <img src={collection.imgSrc} />
+                </div>
+            </div>
+        );
+    });
+}
+
+function getCustomCollectionsJsx(
+    photosService,
+    currentSetOfLabels,
+    onClick,
+) {
+    if (!Array.isArray(currentSetOfLabels)) {
+        return null;
+    }
+
+    const libraryInfo = getLibraryInfo(photosService);
+    const customCollections = getCustomCollectionLabels(photosService);
+    const record = getRecord(photosService);
+
+    return customCollections.map((collection, index) => {
+        const collectionInfo = libraryInfo?.collections?.find((info) => info.item === collection);
+
+        let className = "touch-item";
+        if (currentSetOfLabels.includes(collection)) {
+            className += " touch-item-selected";
+        }
+
+        return (
+            <div key={index} className={className} onClick={() => onClick(collection)}>
+                <div className="touch-item-label">{collection[0].toUpperCase() + collection.substring(1)}</div>
+                <div className="touch-item-info">
+                    {collectionInfo?.count} picture{collectionInfo?.count === 1 ? `` : `s`}
+                </div>
             </div>
         );
     });
@@ -112,6 +154,7 @@ export {
     colorToButtonClass,
     getCollectionLabelsForRecord,
     getCustomCollectionLabels,
+    getCustomCollectionsJsx,
     getDefaultCollectionsObjects,
     getDefaultCollectionLabels,
     getDefaultCollectionsJsx,

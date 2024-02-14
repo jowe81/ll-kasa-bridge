@@ -1446,7 +1446,7 @@ const deviceMap = [
         channel: 209,
         id: "timer-kitchen",
         display: true,
-        displayLabel: "Timers",
+        displayLabel: "Timer",
         displayType: constants.SUBTYPE_TIMER,
         locationId: "loc-kitchen",
         type: constants.DEVICETYPE_VIRTUAL,
@@ -1718,11 +1718,13 @@ const deviceMap = [
                     label: "Johannes' Faves",
                     imgSrc: "/big-icons/icon-bg-favorite.png",
                     color: "purple",
+                    type: "favorite",
                 },
                 {
                     label: "Jess' Faves",
                     imgSrc: "/big-icons/icon-bg-favorite.png",
                     color: "purple",
+                    type: "favorite",
                 },
             ],
 

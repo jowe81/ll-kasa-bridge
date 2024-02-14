@@ -81,7 +81,7 @@
     div {
         margin: 0px;
         margin-right: 10px;
-        
+        min-width: 110px;
     }
 }
 
@@ -93,11 +93,9 @@
     width: 75%;
 
     div {
-        margin-right: 0px;
-        margin-top: 0px;
-        margin-bottom: 0px;
+        margin: 0px;
         margin-left: 10px;
-        min-width: 160px;        
+        min-width: 110px;
     }
 }
 
@@ -149,25 +147,60 @@
     background-color: rgba(101, 72, 72, 0.913) !important;
 }
 
-
-
-
 .collection-button {
-    img {
-        width: 100%;
-        opacity: 40%;
-        max-width: 50px;
-        max-height: 50px;
+    // img {
+    //     width: 100%;
+    //     opacity: 40%;
+    //     max-width: 50px;
+    //     max-height: 50px;
+    // }
+}
+
+.touch-items-container {
+    
+    .collection-button {
+        max-width: 100px;
+        max-height: 130px;
+        min-height: 100px;
+        position: relative;     
+        padding: 0px !important;   
+
+        .touch-item-label {
+            padding: 4px 3px;
+
+            line-height: 1.2;
+            height: 100%;
+
+        }
+
+        .img-container {
+            position: absolute;
+            top: 0px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            width: 100%;
+            height: 100%;            
+            opacity: 15%;
+            
+            img {
+                display: block;
+                width: 80%;                
+            }
+        }
+        .touch-item-info {
+            width: 100%;
+            position: absolute;
+            bottom: 0px;
+        }
     }
-
-
 }
 
 $photoButtonGrayColor: rgb(180, 180, 180);
 
 .photo-button-gray-inactive {
     color: $photoButtonGrayColor !important;
-    background-color: rgba(44, 44, 44, 0.9);
+    background-color: rgba(55, 55, 55, 0.9);
 }
 
 .photo-button-gray-active, .photo-button-gray {
@@ -206,7 +239,7 @@ $photoButtonOrangeColor: rgb(180, 159, 143);
 
 .photo-button-orange-inactive {
     color: $photoButtonOrangeColor !important;
-    background-color: rgba(106, 65, 0, 0.265);
+    background-color: rgba(61, 38, 0, 0.897);
 }
 
 .photo-button-orange-active, .photo-button-orange {

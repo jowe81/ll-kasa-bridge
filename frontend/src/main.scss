@@ -113,12 +113,12 @@ $touch-item-selected-background-color: rgba(0, 94, 0, 0.9);
         margin: 5px;
         color: $color-touch-item;
         text-align: center;
+        min-width: 110px;
 
         .touch-item-info {
             font-size: 80%;
             color: $color-touch-item-info;
-            margin-top: -7px;
-            min-width: 110px;
+            margin-top: -7px;            
         }
     }
 
@@ -291,4 +291,8 @@ $touch-item-selected-background-color: rgba(0, 94, 0, 0.9);
 
 .invisible {
     opacity: 0;
+}
+
+.opacity-25 {
+    opacity: 25% !important;
 }

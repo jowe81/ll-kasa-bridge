@@ -1,6 +1,7 @@
 import {
     getCollectionLabelsForRecord,
     getCustomCollectionLabels,
+    getCustomCollectionsJsx,
     getDefaultCollectionsJsx,
     getLibraryInfo,
 } from "./photosHelpers.tsx";
@@ -36,7 +37,6 @@ function PhotosManageCollectionsLayer({
         onClose: (value) => addToRemoveFromCollectionWrapper(value),
     };
 
-
     const defaultCollectionsJsx = getDefaultCollectionsJsx(
         photosService,
         record?.collections,
@@ -44,25 +44,11 @@ function PhotosManageCollectionsLayer({
         false,
     );
 
-    const collectionItemsJsx = customCollections.map((collection, index) => {
-        const collectionInfo = libraryInfo?.collections?.find((info) => info.item === collection);
-
-        let className = "touch-item";
-
-        if ((collection === "unsorted" && !record?.collections.length) || record?.collections?.includes(collection)) {
-            className += " touch-item-selected";
-        }
-
-        return (
-            <div key={index} className={className} onClick={() => addToRemoveFromCollectionWrapper(collection)}>
-                {collection[0].toUpperCase() + collection.substring(1)}
-                <div className="touch-item-info">
-                    {collectionInfo?.count} picture{collectionInfo?.count === 1 ? `` : `s`}
-                </div>
-            </div>
-        );
-    });
-
+    const collectionItemsJsx = getCustomCollectionsJsx(
+        photosService,
+        record?.collections,
+        addToRemoveFromCollectionWrapper,
+    );
 
     const currentLabels = getCollectionLabelsForRecord(photosService);
 

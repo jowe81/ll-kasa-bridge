@@ -1,6 +1,10 @@
 import './photosInfoLayer.scss';
 
 function PhotosInfoLayer({ photosService, hideLayer, record, fullScreen }) {
+    if (!record) {
+        return null;
+    }
+
     const libraryInfo = photosService?.state?.api?.libraryInfo;
 
     function getTagsText() {
@@ -19,7 +23,7 @@ function PhotosInfoLayer({ photosService, hideLayer, record, fullScreen }) {
     }
 
     function getDateText() {
-        if (record.date) {
+        if (record?.date) {
             const date = new Date(record.date);
             const dateFormatOptions: Intl.DateTimeFormatOptions = {
                 month: "short", // Short month name (e.g., 'Apr')

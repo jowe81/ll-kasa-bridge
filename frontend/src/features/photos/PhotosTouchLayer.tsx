@@ -40,7 +40,10 @@ function PhotosTouchLayer({fullScreen}) {
     const addRemoveTag = (tagString) => runPhotosServiceCommand("addRemoveTag", { tagString });
     const addToRemoveFromCollection = (collectionName) => runPhotosServiceCommand("addToRemoveFromCollection", { collectionName });
     const generalClick = () => addToRemoveFromCollection("general");
-    const setPhotosServiceFilter = (filter) => runPhotosServiceCommand("setFilter", { filter });
+    const setPhotosServiceFilter = (filter) => {
+        // Should hide the main layer here but it behaves funny.
+        runPhotosServiceCommand("setFilter", { filter })        
+    };
     
     const photoButtonHidden = showMainLayer ? "" : "photo-button-hidden";
     const isInJessFavorites = record?.collections?.includes("Jess' Faves");
@@ -170,16 +173,18 @@ function PhotosTouchLayer({fullScreen}) {
                     <div className={`photo-main-touch-layer-horizontal-row`}>
                         <div className="photo-buttons-bottom-row-left-container">
                             <div
-                                className={`photo-button photo-button-trash ${
-                                    isUnsorted ? `photo-button-orange` : isTrashed ? `` : photoButtonHidden
-                                } ${isTrashed ? "photo-button-green" : ""}`}
+                                className={`photo-button photo-button-collection-shortcut ${
+                                    isTrashed ? `photo-button-green-inactive` : `photo-button-orange-inactive`
+                                } ${
+                                    isUnsorted ? `` : photoButtonHidden
+                                }`}
                                 onClick={hideRestoreBtnClick}
                             >
                                 {isTrashed && <img src="/big-icons/icon-bg-save.png" />}
                                 {!isTrashed && <img src="/big-icons/icon-bg-trashed.png" />}
                             </div>
                             {isUnsorted && (
-                                <div className={`photo-button  photo-button-green`} onClick={generalClick}>
+                                <div className={`photo-button photo-button-collection-shortcut photo-button-green-inactive`} onClick={generalClick}>
                                     <img src="/big-icons/icon-bg-save.png" />
                                 </div>
                             )}

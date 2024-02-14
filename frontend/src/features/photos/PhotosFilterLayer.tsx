@@ -1,6 +1,7 @@
 import {
     getCustomCollectionLabels,
     getDefaultCollectionsJsx,
+    getCustomCollectionsJsx,
     getLibraryInfo,
 } from "./photosHelpers.tsx";
 import TouchUIBooleanField from "./TouchUIBooleanField";
@@ -71,6 +72,8 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
             newCollections = [];
         } else if (collectionName === "trashed") {
             newCollections = ["trashed"];
+        } else if (collectionName === "general") {
+            newCollections = ["general"];
         } else {            
             newCollections = filter.collections.includes("trashed") ? [] : [...filter.collections];
 
@@ -129,22 +132,29 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
 
     const collections = [...customCollections];
 
-    const collectionItemsJsx = collections.map((collection, index) => {
-        const collectionInfo = libraryInfo?.collections?.find((info) => info.item === collection);
+    const collectionItemsJsx = getCustomCollectionsJsx(
+        photosService,
+        filter.collections,
+        addRemoveCollectionFromFilter,
+    );
 
-        let className = "touch-item";
 
-        if ((collection === "unsorted" && !filter.collections.length) || filter.collections?.includes(collection)) {
-            className += " touch-item-selected";
-        }
+    // const collectionItemsJsx = collections.map((collection, index) => {
+    //     const collectionInfo = libraryInfo?.collections?.find((info) => info.item === collection);
 
-        return (
-            <div key={index} className={className} onClick={() => addRemoveCollectionFromFilter(collection)}>
-                {collection[0].toUpperCase() + collection.substring(1)}{" "}
-                <span className="touch-item-info">{collectionInfo?.count}</span>
-            </div>
-        );
-    });
+    //     let className = "touch-item";
+
+    //     if ((collection === "unsorted" && !filter.collections.length) || filter.collections?.includes(collection)) {
+    //         className += " touch-item-selected";
+    //     }
+
+    //     return (
+    //         <div key={index} className={className} onClick={() => addRemoveCollectionFromFilter(collection)}>
+    //             {collection[0].toUpperCase() + collection.substring(1)}{" "}
+    //             <span className="touch-item-info">{collectionInfo?.count}</span>
+    //         </div>
+    //     );
+    // });
 
     const filterModeProps: any = {
         labelTrue: "All",
