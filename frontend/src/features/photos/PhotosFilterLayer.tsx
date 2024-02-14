@@ -128,33 +128,11 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         true, // Include general
     );
 
-    let customCollections = getCustomCollectionLabels(photosService);
-
-    const collections = [...customCollections];
-
     const collectionItemsJsx = getCustomCollectionsJsx(
         photosService,
         filter.collections,
         addRemoveCollectionFromFilter,
     );
-
-
-    // const collectionItemsJsx = collections.map((collection, index) => {
-    //     const collectionInfo = libraryInfo?.collections?.find((info) => info.item === collection);
-
-    //     let className = "touch-item";
-
-    //     if ((collection === "unsorted" && !filter.collections.length) || filter.collections?.includes(collection)) {
-    //         className += " touch-item-selected";
-    //     }
-
-    //     return (
-    //         <div key={index} className={className} onClick={() => addRemoveCollectionFromFilter(collection)}>
-    //             {collection[0].toUpperCase() + collection.substring(1)}{" "}
-    //             <span className="touch-item-info">{collectionInfo?.count}</span>
-    //         </div>
-    //     );
-    // });
 
     const filterModeProps: any = {
         labelTrue: "All",

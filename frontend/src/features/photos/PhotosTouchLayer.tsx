@@ -6,6 +6,7 @@ import { getPhotosService, runChannelCommand } from "../../devicesHelpers";
 import { getFirstDynformsServiceRecordFromLastRequest } from "../../dynformsHelpers";
 import { useAppSelector, useAppDispatch } from "./../../app/hooks.ts";
 import { photosTouchLayerStateChanged } from "../localState/localStateSlice";
+import { getLatestOps, getCollectionsLastAddedTo } from "./photosHelpers.tsx";
 import './photosTouchLayer.scss';
 
 function PhotosTouchLayer({fullScreen}) {
@@ -103,7 +104,23 @@ function PhotosTouchLayer({fullScreen}) {
         if (record?.collections?.length) {
             currentLabels = record.collections.filter(collection => collection !== 'general');
         }
-               
+            
+        const collectionsLastAddedTo = getCollectionsLastAddedTo(photosService, 3, true);
+        const collectionsLastAddedToJsx = collectionsLastAddedTo.map((collectionName, index) => {
+            const isActive = record?.collections.includes(collectionName);
+            
+            return (
+                <div key={index}
+                    className={`photo-button photo-button-collection-shortcut ${
+                        isUnsorted ? `photo-button-green-inactive` : photoButtonHidden
+                    } ${isActive ? "photo-button-green-active" : "photo-button-green-inactive"}`}
+                    onClick={() => addToRemoveFromCollection(collectionName)}
+                >
+                    {collectionName}
+                </div>
+            );
+        });
+
         return (
             <>
                 {showInfoLayer && <PhotosInfoLayer {...infoLayerProps} />}
@@ -175,26 +192,28 @@ function PhotosTouchLayer({fullScreen}) {
                             <div
                                 className={`photo-button photo-button-collection-shortcut ${
                                     isTrashed ? `photo-button-green-inactive` : `photo-button-orange-inactive`
-                                } ${
-                                    isUnsorted ? `` : photoButtonHidden
-                                }`}
+                                } ${isUnsorted ? `` : photoButtonHidden}`}
                                 onClick={hideRestoreBtnClick}
                             >
                                 {isTrashed && <img src="/big-icons/icon-bg-save.png" />}
                                 {!isTrashed && <img src="/big-icons/icon-bg-trashed.png" />}
                             </div>
                             {isUnsorted && (
-                                <div className={`photo-button photo-button-collection-shortcut photo-button-green-inactive`} onClick={generalClick}>
+                                <div
+                                    className={`photo-button photo-button-collection-shortcut photo-button-green-inactive`}
+                                    onClick={generalClick}
+                                >
                                     <img src="/big-icons/icon-bg-save.png" />
                                 </div>
                             )}
                             {!isUnsorted && <div className={`photo-button-spaceholder-15 ${photoButtonHidden}`}></div>}
                         </div>
                         <div className="photo-buttons-bottom-row-right-container">
+                            {collectionsLastAddedToJsx}
                             <div
                                 className={`photo-button photo-button-collection-shortcut ${
                                     isUnsorted ? `photo-button-purple-inactive` : photoButtonHidden
-                                } ${isInJessFavorites ? "photo-button-purple-active" : ""}`}
+                                } ${isInJessFavorites ? "photo-button-purple-active" : "photo-button-purple-inactive"}`}
                                 onClick={() => favoritesClick("Jess' Faves")}
                             >
                                 Jess' Faves
@@ -203,7 +222,11 @@ function PhotosTouchLayer({fullScreen}) {
                             <div
                                 className={`photo-button photo-button-collection-shortcut ${
                                     isUnsorted ? `photo-button-purple-inactive` : photoButtonHidden
-                                } ${isInJohannesFavorites ? "photo-button-purple-active" : ""}`}
+                                } ${
+                                    isInJohannesFavorites
+                                        ? "photo-button-purple-active"
+                                        : "photo-button-purple-inactive"
+                                }`}
                                 onClick={() => favoritesClick("Johannes' Faves")}
                             >
                                 Johannes' Faves

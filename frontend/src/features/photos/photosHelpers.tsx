@@ -17,6 +17,27 @@ function getLibraryInfo(photosService) {
     return photosService?.state?.api?.libraryInfo;
 }
 
+function getLatestOps(photosService) {
+    return photosService?.state?.api?.latestOps;
+}
+
+function getCollectionsLastAddedTo(photosService, limit = 0, reverse = false) {
+    let collectionsLastAddedTo = getLatestOps(photosService)?.collectionsLastAddedTo?.filter((collectionName) =>
+        !["Jess' Faves", "Johannes' Faves"].includes(collectionName)
+    );
+
+    if (collectionsLastAddedTo && reverse) {
+        
+        collectionsLastAddedTo = collectionsLastAddedTo.reverse();
+    }
+
+    if (limit && collectionsLastAddedTo.length > limit) {
+        collectionsLastAddedTo = collectionsLastAddedTo.slice(-3);
+    }
+
+    return collectionsLastAddedTo;
+}
+
 function getDefaultCollectionLabels(photosService, includeUnsorted = false, includeGeneral = false, includeTrash = true) {
     const defaultCollections = getDefaultCollectionsObjects(photosService, includeUnsorted, includeGeneral, includeTrash);
     if (!defaultCollections) {
@@ -159,5 +180,7 @@ export {
     getDefaultCollectionLabels,
     getDefaultCollectionsJsx,
     getLibraryInfo,
+    getLatestOps,
+    getCollectionsLastAddedTo,
     getRecord,
 };
