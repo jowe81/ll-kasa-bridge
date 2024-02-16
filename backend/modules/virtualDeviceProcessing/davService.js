@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { createDAVClient } from "tsdav";
 import nodeIcal from "node-ical";
+import moment from "moment-timezone";
 import { makeLiveDeviceObject } from "../TargetDataProcessor.js";
 import { getBeginningOfDay } from "../../helpers/jDateTimeUtils.js";
 import constants from "../../constants.js";
@@ -139,6 +140,7 @@ class DavServiceHandler {
             return false;
         }
                 
+        const calendarTimeZone = process.env.CALENDAR_TIMEZONE ?? "America/Vancouver";
         const promises = this.apiCredentials.map(async (settings, index) => {
             // **** Process this remote ********************
             const { serverUrl, authMethod, defaultAccountType, credentials } = settings;
@@ -198,7 +200,10 @@ class DavServiceHandler {
                                 
                             this.cache.data.calendarData[url] = calendarObjects;
 
-                            const now = new Date();
+                            const today = new Date();
+                            today.setHours(0);
+                            today.setMinutes(0);
+                            today.setSeconds(0);
 
                             const convertedCalendarObjects = [];
                             calendarObjects.forEach((calendarObject) => {
@@ -218,14 +223,42 @@ class DavServiceHandler {
 
                                     // If this is a recurring event, expand it.
                                     if (event.rrule) {
-                                        const expandUntil = new Date(now.getTime() + localConstants.EXPAND_RECURRING_EVENTS_TIME_WINDOW);
-                                        const dates = event.rrule.between(new Date(), expandUntil);
-                                        
-                                        const expandedEvents = dates.map((date) => {                                            
+                                        const expandUntil = new Date(today.getTime() + localConstants.EXPAND_RECURRING_EVENTS_TIME_WINDOW);
+                                        const dates = event.rrule.between(today, expandUntil);
+
+                                        const rruleTimezone = event.rrule.origOptions.tzid;
+                                        const processOffset = rruleTimezone !== calendarTimeZone;
+
+                                        let timezoneId;
+                                        if (processOffset) {
+                                            timezoneId = rruleTimezone ?? "Etc/UTC";
+                                        } else {
+                                            timezoneId = calendarTimeZone;
+                                        }
+
+                                        const timezone = moment.tz.zone(calendarTimeZone);
+
+                                        const expandedEvents = dates.map((date) => {
+                                            let newDate;
+                                            if (processOffset) {
+                                                const offset = timezone.utcOffset(date) - moment.tz.zone("UTC").utcOffset(date);
+                                                newDate = moment(date).add(offset, "minutes").toDate();
+                                            } else {
+                                                newDate = new Date(
+                                                    date.setHours(
+                                                        date.getHours() -
+                                                            (event.start.getTimezoneOffset() -
+                                                                date.getTimezoneOffset()) /
+                                                                60
+                                                    )
+                                                );
+                                            }
+                                            const localDate = moment(newDate).tz(calendarTimeZone).toDate();
+
                                             const repeatEvent = {
                                                 ...convertedEvent,
-                                                start: date,
-                                                end: new Date(date.getTime() + convertedEvent.lengthInMs),
+                                                start: localDate,
+                                                end: new Date(localDate.getTime() + convertedEvent.lengthInMs),
                                             };
                                             return repeatEvent;
                                         });

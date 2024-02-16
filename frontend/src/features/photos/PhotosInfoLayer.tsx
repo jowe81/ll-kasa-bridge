@@ -79,7 +79,7 @@ function PhotosInfoLayer({ photosService, hideLayer, record, fullScreen }) {
 
     function getFolderText() {
         const folderInfo = libraryInfo.folders?.find((info) => record.dirname === info.item);
-        return folderInfo.label;
+        return folderInfo?.label;
     }
 
     function getFilterSizeText() {
