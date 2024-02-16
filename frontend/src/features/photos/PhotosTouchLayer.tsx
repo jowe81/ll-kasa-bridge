@@ -6,7 +6,7 @@ import { getPhotosService, runChannelCommand } from "../../devicesHelpers";
 import { getFirstDynformsServiceRecordFromLastRequest } from "../../dynformsHelpers";
 import { useAppSelector, useAppDispatch } from "./../../app/hooks.ts";
 import { photosTouchLayerStateChanged } from "../localState/localStateSlice";
-import { getLatestOps, getCollectionsLastAddedTo } from "./photosHelpers.tsx";
+import { slideShowIsPaused, getCollectionsLastAddedTo } from "./photosHelpers.tsx";
 import './photosTouchLayer.scss';
 
 function PhotosTouchLayer({fullScreen}) {
@@ -45,12 +45,14 @@ function PhotosTouchLayer({fullScreen}) {
         // Should hide the main layer here but it behaves funny.
         runPhotosServiceCommand("setFilter", { filter })        
     };
+    const pausebuttonClick = () => runPhotosServiceCommand("pauseResumeSlideshow", {});
     
     const photoButtonHidden = showMainLayer ? "" : "photo-button-hidden";
     const isInJessFavorites = record?.collections?.includes("Jess' Faves");
     const isInJohannesFavorites = record?.collections?.includes("Johannes' Faves");
     const isTrashed = record?.collections?.includes("trashed");
     const isUnsorted = !record?.collections?.length;
+    const fullFullScreen = false;
 
     const infoLayerProps = {
         hideLayer: () => setShowInfoLayer(false),
@@ -105,8 +107,8 @@ function PhotosTouchLayer({fullScreen}) {
             currentLabels = record.collections.filter(collection => collection !== 'general');
         }
             
-        const collectionsLastAddedTo = getCollectionsLastAddedTo(photosService, 3, true);
-        const collectionsLastAddedToJsx = collectionsLastAddedTo.map((collectionName, index) => {
+        const collectionsLastAddedTo = getCollectionsLastAddedTo(photosService, fullScreen ? 7 : 3, true);
+        const collectionsLastAddedToJsx = collectionsLastAddedTo?.map((collectionName, index) => {
             const isActive = record?.collections.includes(collectionName);
             
             return (
@@ -206,7 +208,28 @@ function PhotosTouchLayer({fullScreen}) {
                                     <img src="/big-icons/icon-bg-save.png" />
                                 </div>
                             )}
-                            {!isUnsorted && <div className={`photo-button-spaceholder-15 ${photoButtonHidden}`}></div>}
+                            {!isUnsorted && (
+                                <div
+                                    className={`photo-button-settings-pause-container ${photoButtonHidden}`}
+                                    onClick={pausebuttonClick}
+                                >
+                                    <div className={`photo-button`}>Settings</div>
+                                    <div className={`photo-button`}>
+                                        <img
+                                            src={
+                                                slideShowIsPaused(photosService)
+                                                    ? `/big-icons/icon-bg-play.png`
+                                                    : `/big-icons/icon-bg-pause.png`
+                                            }
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                            {fullFullScreen && (
+                                <div className={`photo-button `} onClick={generalClick}>
+                                    Exit Full Screen
+                                </div>
+                            )}
                         </div>
                         <div className="photo-buttons-bottom-row-right-container">
                             {collectionsLastAddedToJsx}

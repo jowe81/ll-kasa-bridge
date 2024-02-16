@@ -17,13 +17,13 @@ function CompactCalendar() {
         hour12: true,
     };
 
-    const events = getCalendarEvents().slice(0, 4);
+    const events = getCalendarEvents()?.slice(0, 4);
     
-    const eventsNow = events.filter((event) => eventIsNow(event));    
-    const eventsToday = events.filter((event) => eventIsToday(event) && eventIsFuture(event));
+    const eventsNow = events?.filter((event) => eventIsNow(event));    
+    const eventsToday = events?.filter((event) => eventIsToday(event) && eventIsFuture(event));
 
     let eventsNowJsx;
-    let noEventsNow = eventsNow.length;
+    let noEventsNow = eventsNow?.length;
     if (noEventsNow) {
         eventsNowJsx = eventsNow.slice(0, 2).map((event, index) => {
             return (
@@ -39,7 +39,7 @@ function CompactCalendar() {
     }
 
     let eventsTodayJsx;
-    let noEventsToday = eventsToday.length;
+    let noEventsToday = eventsToday?.length;
     if (noEventsToday) {
         eventsTodayJsx = eventsToday.slice(0, 2).map((event, index) => {
             const startDate = new Date(event.start);

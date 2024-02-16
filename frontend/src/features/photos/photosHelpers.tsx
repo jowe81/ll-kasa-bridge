@@ -26,13 +26,14 @@ function getCollectionsLastAddedTo(photosService, limit = 0, reverse = false) {
         !["Jess' Faves", "Johannes' Faves"].includes(collectionName)
     );
 
-    if (collectionsLastAddedTo && reverse) {
-        
-        collectionsLastAddedTo = collectionsLastAddedTo.reverse();
-    }
+    if (Array.isArray(collectionsLastAddedTo)) {
+        if (reverse) {
+            collectionsLastAddedTo = collectionsLastAddedTo.reverse();
+        }
 
-    if (limit && collectionsLastAddedTo.length > limit) {
-        collectionsLastAddedTo = collectionsLastAddedTo.slice(-3);
+        if (limit && collectionsLastAddedTo.length > limit) {
+            collectionsLastAddedTo = collectionsLastAddedTo.slice(-limit);
+        }
     }
 
     return collectionsLastAddedTo;
@@ -171,6 +172,16 @@ function getCollectionLabelsForRecord(photosService, excludeCollections = [ 'gen
     return record.collections.filter((collection) => !excludeCollections.includes(collection));
 }
 
+function slideShowIsPaused(photosService) {
+    const pausedRequestIndexes = photosService?.state.requests?.pausedRequestIndexes;
+    if (!Array.isArray(pausedRequestIndexes)) {
+        return false;
+    }
+
+    // Index 0 points to the pull request.
+    return pausedRequestIndexes.includes(0);
+}
+
 export {
     colorToButtonClass,
     getCollectionLabelsForRecord,
@@ -183,4 +194,5 @@ export {
     getLatestOps,
     getCollectionsLastAddedTo,
     getRecord,
+    slideShowIsPaused,
 };

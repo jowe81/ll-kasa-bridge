@@ -206,6 +206,7 @@ class DynformsServiceHandler {
         // Store the cache reference.
         this.cache = cache;
         this.cache.data = {};
+        this.cache.pausedRequestIndexes = [];
 
         this.service.fullUrlPull = this._constructFullUrlToPullEndpoint();
         this.service.fullUrlPush = this._constructFullUrlToPushEndpoint();
@@ -243,6 +244,28 @@ class DynformsServiceHandler {
         setTimeout(() => {
             this.dynformsServiceIntervalHandler();
         }, 5000);
+    }
+
+    pauseResumeRequest(requestIndex) {
+        let { pausedRequestIndexes } = this.cache;        
+        let newIndexes;
+        let result = null;
+
+        if (pausedRequestIndexes.includes(requestIndex)) {
+            newIndexes = pausedRequestIndexes.filter(index => index !== requestIndex);
+            result = 'resume';
+        } else {
+            newIndexes = [...pausedRequestIndexes, requestIndex];
+            result = 'pause';
+        }
+
+        this.cache.pausedRequestIndexes = newIndexes;
+
+        const newState = _.cloneDeep(this.service.state);
+        newState.requests.pausedRequestIndexes = newIndexes;
+        this.service._updateState(newState, true);        
+
+        return result;
     }
 
     async runPushRequest(record, requestIndex) {
@@ -305,10 +328,27 @@ class DynformsServiceHandler {
         }
 
         // Get those requests that are due to run. Construct them now, as they may contain a reference to the current date.
+        let pausedRequestsCount = 0;
+
         const requestsReadyToRun = this._constructRequests().filter((requestInfo, requestIndex) => {
             const requestConfig = this.service.settings.requests[requestIndex];
-            return requestShouldRun(requestConfig, requestConfig._lastExecuted) ? true : false;
+            const requestIsDue = requestShouldRun(requestConfig, requestConfig._lastExecuted) ? true : false;
+
+            if (requestIsDue) {
+                if (!this.cache.pausedRequestIndexes.includes(requestIndex)) {
+                    return true;
+                }
+
+                // Request is paused.
+                pausedRequestsCount++;
+            }
+
+            return false;
         });
+
+        if (pausedRequestsCount) {
+            log(`${this.service.alias} has ${pausedRequestsCount} requests that are due to run but currently paused.`, this.service, 'yellow');
+        }
 
         if (!requestsReadyToRun.length) {
             // Nothing to do

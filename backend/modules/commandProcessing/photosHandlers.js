@@ -132,6 +132,25 @@ function nextPicture(deviceWrapper, { channel, id, body }) {
     deviceWrapper.deviceHandler.runRequestNow(0);
 }
 
+function pauseResumeSlideshow(deviceWrapper, commandData) {
+    // Pause-resume the pull request.
+    const action = deviceWrapper.deviceHandler.pauseResumeRequest(0);
+
+    switch (action) {
+        case 'pause':
+            log(`Paused the slideshow.`, deviceWrapper, "yellow");
+            break;
+
+        case 'resume':
+            log(`Resumed the slideshow.`, deviceWrapper, "yellow");
+            break;
+
+        default:
+            log(`Unable to pause/resume the slideshow.`, deviceWrapper, "red");
+            break;
+    }
+}
+
 async function setRating(deviceWrapper, commandData) {
     const record = getRecord(deviceWrapper);
     if (!record || !deviceWrapper?.deviceHandler) {
@@ -338,6 +357,7 @@ const handlers = {
     addToRemoveFromCollection,
     hideRestorePicture,
     nextPicture,
+    pauseResumeSlideshow,
     setFilter,
     setRating,
     toggleFavorites,

@@ -6,10 +6,12 @@ interface LocalState {
 }
 
 const initialState: LocalState = {
-    photosTouchLayer: {},
+    photosTouchLayer: {
+        showInfoLayer: true,
+    },
     photosFilterLayer: {
         filter: {
-            collections: ['general'],
+            collections: ["general"],
             tags: [],
             mode_collections: "$in",
             mode_tags: "$in",

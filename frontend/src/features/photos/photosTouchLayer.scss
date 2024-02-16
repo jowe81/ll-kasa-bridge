@@ -99,6 +99,23 @@
     }
 }
 
+.photo-button-settings-pause-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .photo-button {
+        height: 48%;
+        font-size: 120%;
+        width: 100%;
+        
+        img {
+            width: 50%;
+            opacity: 30%;
+        }
+    }
+}
 .photo-button-collection-shortcut {
     width: 10%;
     font-size: 120%;
