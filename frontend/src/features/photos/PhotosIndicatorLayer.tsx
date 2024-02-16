@@ -1,6 +1,6 @@
 import "./photosIndicatorLayer.scss";
 
-function PhotosIndicatorLayer({ photosService, record, fullScreen }) {
+function PhotosIndicatorLayer({ photosService, record }) {
     if (!record) {
         return;
     }

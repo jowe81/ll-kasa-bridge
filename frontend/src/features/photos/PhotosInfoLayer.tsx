@@ -1,9 +1,11 @@
 import './photosInfoLayer.scss';
 
-function PhotosInfoLayer({ photosService, hideLayer, record, fullScreen }) {
+function PhotosInfoLayer({ photosService, hideLayer, record, screenMode }) {
     if (!record) {
         return null;
     }
+
+    const fullWidth = ["panel", "full"].includes(screenMode);
 
     const libraryInfo = photosService?.state?.api?.libraryInfo;
 
@@ -99,8 +101,8 @@ function PhotosInfoLayer({ photosService, hideLayer, record, fullScreen }) {
     const aspectText = getAspectText();
 
     return (
-        <div className={`touch-layer photos-info-layer ${fullScreen ? `` : `window-mode`}`}>
-            <div className="horizontal-row-top">{!fullScreen && getFilterSizeText()}</div>
+        <div className={`touch-layer photos-info-layer ${fullWidth ? `` : `window-mode`}`}>
+            <div className="horizontal-row-top">{!fullWidth && getFilterSizeText()}</div>
             <div className="horizontal-row-remaining-space">
                 <div className="hide-button" onClick={hideLayer}></div>
             </div>
@@ -112,7 +114,7 @@ function PhotosInfoLayer({ photosService, hideLayer, record, fullScreen }) {
                 {deviceText && <div>{deviceText}</div>}
                 {resulutionText && <div>{resulutionText}</div>}
                 {aspectText && <div>{aspectText}</div>}
-                {fullScreen && <>{getSpacer()} {getFilterSizeText()}</>}
+                {fullWidth && <>{getSpacer()} {getFilterSizeText()}</>}
             </div>
         </div>
     );

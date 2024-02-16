@@ -3,7 +3,6 @@ import AutomationPanel from "./features/TouchUiMain/devices/AutomationPanel";
 import TimerPanel from "./features/TouchUiMain/timer/TimerPanel";
 import Photos from "./features/photos/Photos";
 import Birthdays from "./features/TouchUiMain/birthdays/Birthdays";
-import Medical from "./features/TouchUiMain/Medical/Medical.tsx";
 import Calendar from "./features/TouchUiMain/calendar/Calendar.tsx";
 import ScreenKeyboard from "./features/ScreenKeyboard/ScreenKeyboard.tsx";
 import TouchUiPanel from "./features/TouchUiPanel/TouchUiPanel";
@@ -16,32 +15,50 @@ import { useScreenKeyboard } from "./contexts/ScreenKeyboardContext.tsx";
 import { getAllDevices, getClock, getMasterSwitchDimInfo } from "./devicesHelpers.tsx";
 
 function TouchUi() {
-    const [fullScreen, setFullScreen] = useState<boolean>(true);
-    
+    const [screenMode, _setScreenMode] = useState<String>("panel");
+    const [prevScreenMode, setPrevScreenMode] = useState<String>("controls");
     const { isKeyboardVisible } = useScreenKeyboard();
 
-    function toggleFullScreen() {
-        setFullScreen(!fullScreen);
+
+    function setScreenMode(newScreenMode) {
+        console.log('Screenmode:', newScreenMode)
+
+        setPrevScreenMode(screenMode);
+
+        switch (newScreenMode) {
+            case "__prev":
+                _setScreenMode(prevScreenMode);
+                break;
+
+            default:
+                _setScreenMode(newScreenMode);
+                break;
+        }
     }
 
     const devices = getAllDevices();
     const clock = getClock();
     const dimInfo = getMasterSwitchDimInfo();
    
-    let fullScreenButtonClassName = "compact-base-button toggle-fullscreen-button";
-
-    if (fullScreen) {
-      fullScreenButtonClassName += " "
-    }
-    const fullScreenButton = (
-        <button className="compact-base-button toggle-fullscreen-button" onClick={toggleFullScreen}>
-            {fullScreen ? `All Controls` : `Full Screen`}
-        </button>
+    const screenModeButtons = (
+        <div className="screenmode-buttons-container">
+            <button
+                className="compact-base-button screenmode-button"
+                onClick={() => setScreenMode(screenMode === "panel" ? "controls" : "panel")}
+            >
+                {screenMode === "panel" ? `Control` : `Panel`}
+            </button>
+            <button className="compact-base-button screenmode-button" onClick={() => setScreenMode("full")}>
+                {`Full Screen`}
+            </button>
+        </div>
     );
 
     const props = {
-        fullScreen,
-        fullScreenButton,
+        screenModeButtons,
+        prevScreenMode,
+        screenMode, 
+        setScreenMode,
         renderForMainViewingArea: false,
     };
     
@@ -54,7 +71,7 @@ function TouchUi() {
 
     const overrideDevice = getMainViewingAreaOverrideDevice(overrideChannels, clock, devices);    
   
-    if (overrideDevice && fullScreen) {
+    if (overrideDevice && screenMode !== "panel") {
         const overrideProps = { ...props };
         overrideProps.renderForMainViewingArea = true;
 
@@ -68,16 +85,20 @@ function TouchUi() {
         }
     }
 
-
-    if (fullScreen) {
+    if (screenMode === "full") {
         content = (
             <>
-                {isKeyboardVisible && <ScreenKeyboard/>}
-                <div className="touch-ui-fullscreen-container">
-                    {mainViewingAreaJsx}
-                </div>
+                {isKeyboardVisible && <ScreenKeyboard />}
+                <div className="touch-ui-full-full-screen-container">{mainViewingAreaJsx}</div>
+            </>
+        )
+    } else if (screenMode === "panel") {
+        content = (
+            <>
+                {isKeyboardVisible && <ScreenKeyboard />}
+                <div className="touch-ui-fullscreen-container">{mainViewingAreaJsx}</div>
                 <div className="touch-ui-panel-container">
-                    <TouchUiPanel {...props}/>
+                    <TouchUiPanel {...props} />
                 </div>
             </>
         );
@@ -96,7 +117,7 @@ function TouchUi() {
                             {mainViewingAreaJsx}
                         </div>
                         <div className="remaining-panel">
-                            <Scripture />
+                            <Scripture renderForMainViewingArea={false} />
                         </div>
                     </div>
                     <div className="touch-ui-main-column touch-ui-right-column">

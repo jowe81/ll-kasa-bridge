@@ -27,7 +27,7 @@ function MasterSwitches(props) {
     return (
         <div className="touch-ui-panel-item">
             <div className="master-switches-container">
-                {props.fullScreenButton}
+                {props.screenModeButtons}
                 <div className="master-switches-buttons-container">
                     {buttonsJsx}
                 </div>

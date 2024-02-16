@@ -14,10 +14,10 @@ import Mailbox from "./mailbox/Mailbox.tsx";
 import { getDeviceByChannel } from "../../devicesHelpers.tsx";
 
 function TouchUiPanel(props: any) {
-    const fullScreen = props.fullScreen;
+    const panelMode = props.screenMode === "panel";
     const birthdayRangeToDisplay = 2;
     const { recordsSelected } = getSelectedRecordsInfo(birthdayRangeToDisplay);
-    const showBirthdays = fullScreen && recordsSelected.length >= 0;
+    const showBirthdays = panelMode && recordsSelected.length >= 0;
 
     const mailbox = getDeviceByChannel(constants.touchPanel?.mailboxChannel);
     const showMailbox = mailbox?.powerState;
@@ -25,9 +25,9 @@ function TouchUiPanel(props: any) {
     return (
         <>
             <MasterSwitches {...props} />
-            {!fullScreen && <DevicePresetButtons {...props} />}
-            {fullScreen && <CompactTimer />}
-            {fullScreen && <CompactCalendar />}
+            {!panelMode && <DevicePresetButtons {...props} />}
+            {panelMode && <CompactTimer />}
+            {panelMode && <CompactCalendar />}
             {showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay} />}
             <div className="placeholder-350"></div>
             {/* {<Alerts />} */}

@@ -9,6 +9,12 @@
   height: 930px;
   width: 1900px;
 }
+
+.touch-ui-full-full-screen-container {
+  height: 1078px;
+  width: 1900px;
+}
+
 .touch-ui-columns-container {
   border: 1px solid rgb(64, 64, 64);
   border-radius: 3px;

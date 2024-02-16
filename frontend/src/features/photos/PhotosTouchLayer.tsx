@@ -9,7 +9,7 @@ import { photosTouchLayerStateChanged } from "../localState/localStateSlice";
 import { slideShowIsPaused, getCollectionsLastAddedTo } from "./photosHelpers.tsx";
 import './photosTouchLayer.scss';
 
-function PhotosTouchLayer({fullScreen}) {
+function PhotosTouchLayer({fullWidth, screenMode, setScreenMode}) {
     // State management
     const dispatch = useAppDispatch();
     const photosTouchLayerState = useAppSelector((state) => state.localState.photosTouchLayer);    
@@ -52,13 +52,14 @@ function PhotosTouchLayer({fullScreen}) {
     const isInJohannesFavorites = record?.collections?.includes("Johannes' Faves");
     const isTrashed = record?.collections?.includes("trashed");
     const isUnsorted = !record?.collections?.length;
-    const fullFullScreen = false;
 
     const infoLayerProps = {
         hideLayer: () => setShowInfoLayer(false),
         photosService,
         record,
-        fullScreen,
+        fullWidth,
+        screenMode,
+        setScreenMode,
     };
 
     if (showChangeFilterLayer) {
@@ -107,7 +108,7 @@ function PhotosTouchLayer({fullScreen}) {
             currentLabels = record.collections.filter(collection => collection !== 'general');
         }
             
-        const collectionsLastAddedTo = getCollectionsLastAddedTo(photosService, fullScreen ? 7 : 3, true);
+        const collectionsLastAddedTo = getCollectionsLastAddedTo(photosService, fullWidth ? 7 : 3, true);
         const collectionsLastAddedToJsx = collectionsLastAddedTo?.map((collectionName, index) => {
             const isActive = record?.collections.includes(collectionName);
             
@@ -213,7 +214,9 @@ function PhotosTouchLayer({fullScreen}) {
                                     className={`photo-button-settings-pause-container ${photoButtonHidden}`}
                                     onClick={pausebuttonClick}
                                 >
-                                    <div className={`photo-button`}>Settings</div>
+                                    <div className={`photo-button`}>
+                                        <img src="/big-icons/icon-bg-settings.png" />
+                                    </div>
                                     <div className={`photo-button`}>
                                         <img
                                             src={
@@ -225,9 +228,9 @@ function PhotosTouchLayer({fullScreen}) {
                                     </div>
                                 </div>
                             )}
-                            {fullFullScreen && (
-                                <div className={`photo-button `} onClick={generalClick}>
-                                    Exit Full Screen
+                            {["full", "panel"].includes(screenMode) && (
+                                <div className={`photo-button ${photoButtonHidden}`} onClick={() => setScreenMode(screenMode === "full" ? '__prev' : "full")}>
+                                    <img src={`/big-icons/icon-bg-${screenMode === "full" ? "collapse" : "expand"}.png`} />
                                 </div>
                             )}
                         </div>

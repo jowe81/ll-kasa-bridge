@@ -4,17 +4,15 @@ import { getFirstDynformsServiceRecordFromLastRequest } from "../../dynformsHelp
 import { getPhotosService } from "../../devicesHelpers";
 import "./photos.css";
 
-function Photos(props: any) {
+function Photos({ screenMode, setScreenMode }) {
     const photosService = getPhotosService();
     const record = getFirstDynformsServiceRecordFromLastRequest(photosService?.channel);
-
-    const { fullScreen } = props;
-
+    const fullWidth = ["panel", "full"].includes(screenMode);
     const containerClassNames = `photo-container ${
-        fullScreen ? `photo-container-full-screen` : `photo-container-embedded`
+        fullWidth ? `photo-container-full-screen` : `photo-container-embedded`
     }`;
 
-    let url = record ? record.url : '/images/photos_no_picture.png';
+    let url = record ? record.url : "/images/photos_no_picture.png";
     if (!record) {
         //return;
     }
@@ -27,20 +25,21 @@ function Photos(props: any) {
         );
     }
 
-    const indicatorLayerProps = {
+    const props = {
         photosService,
         record,
-        fullScreen,
+        fullWidth,
+        screenMode,
+        setScreenMode,
     };
 
     return (
         <div className={containerClassNames}>
             <div className="background" style={{ backgroundImage: `url(${url})` }} />
             <div className="photo" style={{ backgroundImage: `url(${url})` }} />
-            <div className="photo-meta">                
-            </div>
-            <PhotosIndicatorLayer {...indicatorLayerProps}/>
-            <PhotosTouchLayer fullScreen={fullScreen}/>
+            <div className="photo-meta"></div>
+            <PhotosIndicatorLayer {...props} />
+            <PhotosTouchLayer {...props} />
         </div>
     );
 }
