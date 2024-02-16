@@ -38,18 +38,18 @@ function PhotosInfoLayer({ photosService, hideLayer, record, fullScreen }) {
     function getDeviceText() {
         let text;
 
-        if (Array.isArray(record.device.model)) {
+        if (Array.isArray(record.device?.model)) {
             if (record.device.model.length) {
                 text = record.device.model[0];
             }
-        } else if (record.device.model) {
+        } else if (record.device?.model) {
             text = record.device.model;
-        } else if (Array.isArray(record.device.make)) {
+        } else if (Array.isArray(record.device?.make)) {
             if (record.device.make.length) {
                 text = record.device.make[0];
             }
         } else {
-            text = record.device.make;
+            text = record.device?.make;
         }
 
         return text;
