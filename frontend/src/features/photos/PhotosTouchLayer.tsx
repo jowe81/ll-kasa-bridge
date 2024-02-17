@@ -124,6 +124,19 @@ function PhotosTouchLayer({fullWidth, screenMode, setScreenMode}) {
             );
         });
 
+        const trashCanJsx = (
+            <div
+                className={`photo-button ${
+                    isTrashed ? `photo-button-green-inactive` : `photo-button-orange-inactive`
+                } ${isUnsorted ? `` : photoButtonHidden}`}
+                onClick={hideRestoreBtnClick}
+            >
+                {isTrashed && <img src="/big-icons/icon-bg-save.png" />}
+                {!isTrashed && <img src="/big-icons/icon-bg-trashed.png" />}
+            </div>
+        );                            
+
+
         return (
             <>
                 {showInfoLayer && <PhotosInfoLayer {...infoLayerProps} />}
@@ -192,46 +205,53 @@ function PhotosTouchLayer({fullWidth, screenMode, setScreenMode}) {
                     </div>
                     <div className={`photo-main-touch-layer-horizontal-row`}>
                         <div className="photo-buttons-bottom-row-left-container">
-                            <div
-                                className={`photo-button photo-button-collection-shortcut ${
-                                    isTrashed ? `photo-button-green-inactive` : `photo-button-orange-inactive`
-                                } ${isUnsorted ? `` : photoButtonHidden}`}
-                                onClick={hideRestoreBtnClick}
-                            >
-                                {isTrashed && <img src="/big-icons/icon-bg-save.png" />}
-                                {!isTrashed && <img src="/big-icons/icon-bg-trashed.png" />}
-                            </div>
                             {isUnsorted && (
-                                <div
-                                    className={`photo-button photo-button-collection-shortcut photo-button-green-inactive`}
-                                    onClick={generalClick}
-                                >
-                                    <img src="/big-icons/icon-bg-save.png" />
-                                </div>
+                                <>
+                                    {trashCanJsx}
+                                    <div
+                                        className={`photo-button photo-button-collection-shortcut photo-button-green-inactive`}
+                                        onClick={generalClick}
+                                    >
+                                        <img src="/big-icons/icon-bg-save.png" />
+                                    </div>
+                                </>
                             )}
                             {!isUnsorted && (
-                                <div
-                                    className={`photo-button-settings-pause-container ${photoButtonHidden}`}
-                                    onClick={pausebuttonClick}
-                                >
-                                    <div className={`photo-button`}>
-                                        <img src="/big-icons/icon-bg-settings.png" />
+                                <>
+                                    {["full"].includes(screenMode) && (
+                                        <div className={`photo-button-settings-pause-container ${photoButtonHidden}`}>
+                                            {trashCanJsx}{" "}
+                                            <div
+                                                className={`photo-button ${photoButtonHidden}`}
+                                                onClick={() => setScreenMode(screenMode === "full" ? "__prev" : "full")}
+                                            >
+                                                <img
+                                                    src={`/big-icons/icon-bg-${
+                                                        screenMode === "full" ? "collapse" : "expand"
+                                                    }.png`}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+                                    {!["full"].includes(screenMode) && trashCanJsx}
+                                    <div
+                                        className={`photo-button-settings-pause-container ${photoButtonHidden}`}
+                                        onClick={pausebuttonClick}
+                                    >
+                                        <div className={`photo-button`}>
+                                            <img src="/big-icons/icon-bg-settings.png" />
+                                        </div>
+                                        <div className={`photo-button`}>
+                                            <img
+                                                src={
+                                                    slideShowIsPaused(photosService)
+                                                        ? `/big-icons/icon-bg-play.png`
+                                                        : `/big-icons/icon-bg-pause.png`
+                                                }
+                                            />
+                                        </div>
                                     </div>
-                                    <div className={`photo-button`}>
-                                        <img
-                                            src={
-                                                slideShowIsPaused(photosService)
-                                                    ? `/big-icons/icon-bg-play.png`
-                                                    : `/big-icons/icon-bg-pause.png`
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                            )}
-                            {["full", "panel"].includes(screenMode) && (
-                                <div className={`photo-button ${photoButtonHidden}`} onClick={() => setScreenMode(screenMode === "full" ? '__prev' : "full")}>
-                                    <img src={`/big-icons/icon-bg-${screenMode === "full" ? "collapse" : "expand"}.png`} />
-                                </div>
+                                </>
                             )}
                         </div>
                         <div className="photo-buttons-bottom-row-right-container">
