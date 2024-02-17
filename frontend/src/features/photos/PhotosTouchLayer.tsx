@@ -207,7 +207,23 @@ function PhotosTouchLayer({fullWidth, screenMode, setScreenMode}) {
                         <div className="photo-buttons-bottom-row-left-container">
                             {isUnsorted && (
                                 <>
-                                    {trashCanJsx}
+                                    {["full"].includes(screenMode) && (
+                                        <div className={`photo-button-settings-pause-container`}>
+                                            {trashCanJsx}{" "}
+                                            <div
+                                                className={`photo-button`}
+                                                onClick={() => setScreenMode(screenMode === "full" ? "__prev" : "full")}
+                                            >
+                                                <img
+                                                    src={`/big-icons/icon-bg-${
+                                                        screenMode === "full" ? "collapse" : "expand"
+                                                    }.png`}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+                                    {!["full"].includes(screenMode) && trashCanJsx}
+
                                     <div
                                         className={`photo-button photo-button-collection-shortcut photo-button-green-inactive`}
                                         onClick={generalClick}
