@@ -427,8 +427,8 @@ const globalConfig = {
                  */
                 {
                     trigger: {
-                        hours: 6,
-                        minutes: 15,
+                        hours: 9,
+                        minutes: 0,
                     },
                     stateData: {
                         on_off: 1,
@@ -445,7 +445,7 @@ const globalConfig = {
                 },
                 {
                     trigger: {
-                        hours: 23,
+                        hours: 22,
                         minutes: 30,
                     },
                     stateData: {

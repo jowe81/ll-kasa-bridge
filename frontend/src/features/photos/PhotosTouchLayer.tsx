@@ -22,6 +22,9 @@ function PhotosTouchLayer({fullWidth, screenMode, setScreenMode}) {
     const setShowManageTagsLayer = (payload) => updateState("showManageTagsLayer", payload);
 
     const photosService = getPhotosService();
+    const libraryInfo = getLibraryInfo(photosService);
+    //console.log(photosService?.state?.api)
+    // console.log(libraryInfo);
     const record = getFirstDynformsServiceRecordFromLastRequest(photosService?.channel);
 
     function runPhotosServiceCommand(commandId, body) {

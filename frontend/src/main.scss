@@ -120,6 +120,10 @@ $touch-item-selected-background-color: rgba(0, 94, 0, 0.9);
             color: $color-touch-item-info;
             margin-top: -7px;            
         }
+
+        .tiny {
+            font-size: 60%;
+        }
     }
 
     .touch-item-placeholder {
@@ -295,4 +299,12 @@ $touch-item-selected-background-color: rgba(0, 94, 0, 0.9);
 
 .opacity-25 {
     opacity: 25% !important;
+}
+
+.text-gray {
+    color: rgba(128, 128, 128, 0.494);
+}
+
+.align-left {
+    text-align: left !important;
 }

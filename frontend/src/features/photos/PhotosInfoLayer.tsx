@@ -1,4 +1,5 @@
 import './photosInfoLayer.scss';
+import { getLatestOps } from './photosHelpers';
 
 function PhotosInfoLayer({ photosService, hideLayer, record, screenMode }) {
     if (!record) {
@@ -8,6 +9,7 @@ function PhotosInfoLayer({ photosService, hideLayer, record, screenMode }) {
     const fullWidth = ["panel", "full"].includes(screenMode);
 
     const libraryInfo = photosService?.state?.api?.libraryInfo;
+    const latestOps = getLatestOps(photosService);
 
     function getTagsText() {
         return record?.tags?.length ?
@@ -85,7 +87,15 @@ function PhotosInfoLayer({ photosService, hideLayer, record, screenMode }) {
     }
 
     function getFilterSizeText() {
-        return <div>{libraryInfo.filterSize} images</div>;
+        if (typeof latestOps.cursorIndex === 'number') {
+            return (
+                <div>
+                    #{latestOps.cursorIndex} of {latestOps.filterSize} images
+                </div>
+            );
+        } else {
+            return <div>{latestOps.filterSize} images</div>;
+        }        
     }
 
     function getSpacer() {

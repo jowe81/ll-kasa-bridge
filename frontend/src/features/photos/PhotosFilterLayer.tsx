@@ -177,10 +177,11 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         return (
             <div
                 key={index}
-                className={`touch-item ${filter.folders?.includes(folderInfo.item) ? "touch-item-selected" : ""}`}
+                className={`touch-item align-left ${filter.folders?.includes(folderInfo.item) ? "touch-item-selected" : ""}`}
                 onClick={() => addRemoveFolderFromFilter(folderInfo)}
             >
                 {label} <span className="touch-item-info">{folderInfo.count}</span>
+                <div className="tiny text-gray">{folderInfo.long}</div>
             </div>
         );
     });
