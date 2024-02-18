@@ -70,8 +70,8 @@ function TouchUi() {
     const overrideChannels = [ 503 ];
 
     const overrideDevice = getMainViewingAreaOverrideDevice(overrideChannels, clock, devices);    
-  
-    if (overrideDevice && screenMode !== "panel") {
+    
+    if (overrideDevice && screenMode !== "control") {
         const overrideProps = { ...props };
         overrideProps.renderForMainViewingArea = true;
 
@@ -89,7 +89,7 @@ function TouchUi() {
         content = (
             <>
                 {isKeyboardVisible && <ScreenKeyboard />}
-                <div className="touch-ui-full-full-screen-container">{mainViewingAreaJsx}</div>
+                <div className="touch-ui-full-full-screen-container" onClick={() => setScreenMode('__prev')}>{mainViewingAreaJsx}</div>
             </>
         )
     } else if (screenMode === "panel") {
