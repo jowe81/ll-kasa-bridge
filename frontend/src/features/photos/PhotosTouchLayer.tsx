@@ -6,7 +6,7 @@ import { getPhotosService, runChannelCommand } from "../../devicesHelpers";
 import { getFirstDynformsServiceRecordFromLastRequest } from "../../dynformsHelpers";
 import { useAppSelector, useAppDispatch } from "./../../app/hooks.ts";
 import { photosTouchLayerStateChanged } from "../localState/localStateSlice";
-import { slideShowIsPaused, getCollectionsLastAddedTo } from "./photosHelpers.tsx";
+import { slideShowIsPaused, getCollectionsLastAddedTo, getLibraryInfo } from "./photosHelpers.tsx";
 import './photosTouchLayer.scss';
 
 function PhotosTouchLayer({fullWidth, screenMode, setScreenMode}) {
@@ -53,6 +53,12 @@ function PhotosTouchLayer({fullWidth, screenMode, setScreenMode}) {
     const isTrashed = record?.collections?.includes("trashed");
     const isUnsorted = !record?.collections?.length;
 
+    if (!record && !showChangeFilterLayer) {
+        // No picture returned. Touch anywhere to change the filter.
+        return (
+            <div className="photo-touch-layer" onClick={() => setShowChangeFilterLayer(true)}/>
+        );
+    }
     const infoLayerProps = {
         hideLayer: () => setShowInfoLayer(false),
         photosService,

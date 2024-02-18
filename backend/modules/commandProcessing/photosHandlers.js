@@ -129,7 +129,16 @@ async function hideRestorePicture(deviceWrapper, commandData) {
 }
 
 function nextPicture(deviceWrapper, { channel, id, body }) {
-    deviceWrapper.deviceHandler.runRequestNow(0);
+    /**
+     * The adjustment is sent after trashing a picture; in that case the picture is no longer 
+     * in the current filter and therefore the same index should be retrieved again.
+     */
+    const offsetAdjust = body?.offsetAdjust ?? 0;
+    deviceWrapper.deviceHandler.runRequestNow(0, { cursorIndexOffset: 1 + offsetAdjust });
+}
+
+function previousPicture(deviceWrapper, commandData) {
+    deviceWrapper.deviceHandler.runRequestNow(0, {cursorIndexOffset: -1});    
 }
 
 function pauseResumeSlideshow(deviceWrapper, commandData) {
@@ -163,8 +172,7 @@ async function setRating(deviceWrapper, commandData) {
 }
 
 async function setFilter(deviceWrapper, commandData) {
-    const record = getRecord(deviceWrapper);
-    if (!record || !deviceWrapper?.deviceHandler) {
+    if (!deviceWrapper?.deviceHandler) {
         return null;
     }
 
@@ -297,13 +305,13 @@ function _processApiResponse(deviceWrapper, displayData, requestIndex) {
 // Get the current photo record.
 function getRecord(deviceWrapper) {
     if (!deviceWrapper) {
-        return {};
+        return;
     }
     
     const records = deviceWrapper.state?.api?.data?.records;
 
     if (!(Array.isArray(records) && records.length)) {
-        return {};
+        return;
     }
 
     return _.cloneDeep(records[0]);
@@ -358,6 +366,7 @@ const handlers = {
     hideRestorePicture,
     nextPicture,
     pauseResumeSlideshow,
+    previousPicture,
     setFilter,
     setRating,
     toggleFavorites,

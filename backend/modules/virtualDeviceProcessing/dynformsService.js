@@ -289,7 +289,7 @@ class DynformsServiceHandler {
         return axios.post(url, request);
     }
 
-    async runRequestNow(requestIndex) {
+    async runRequestNow(requestIndex, extraData) {
         if (!this.initialized) {
             return false;
         }
@@ -299,7 +299,23 @@ class DynformsServiceHandler {
         }
 
         const requests = this._constructRequests([requestIndex]);
-        const request = Array.isArray(requests) && requests.length ? requests[0] : null;
+
+        let request = {};
+
+        const mainData = Array.isArray(requests) && requests.length ? requests[0] : null;
+        if (mainData) {
+            request = {
+                ...mainData,
+            }
+        }
+
+        if (extraData) {
+            request = {
+                ...request,
+                ...extraData,
+            }
+        }
+        
 
         this._executeRequest(request, requestIndex)
             .then((data) => {

@@ -114,7 +114,7 @@ function TouchUi() {
                     <div className="touch-ui-main-column-remaining-space">
                         <div className="remaining-main">
                             <Calendar />
-                            {mainViewingAreaJsx}
+                            <Photos {...props} />
                         </div>
                         <div className="remaining-panel">
                             <Scripture renderForMainViewingArea={false} />

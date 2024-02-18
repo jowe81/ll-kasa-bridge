@@ -1657,6 +1657,7 @@ const deviceMap = [
         },
     },
     {
+        // Note: this is configured as a dynforms service but it is in fact targeting the photos backend.
         alias: "Photos Service",
         channel: 504,
         id: "photos-service",
@@ -1682,9 +1683,6 @@ const deviceMap = [
                         time: {
                             frequency: "minutes",
                             minutes: 30,
-                        },
-                        singleRecord: {
-                            type: "__RANDOMIZED_PREORDERED",
                         },
                     },
                 },
