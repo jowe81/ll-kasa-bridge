@@ -69,7 +69,7 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
 
         // If 'unsorted':
         if (collectionName === "unsorted") {
-            newCollections = [];
+            newCollections = ['unsorted'];
         } else if (collectionName === "trashed") {
             newCollections = ["trashed"];
         } else if (collectionName === "general") {
@@ -99,18 +99,26 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
 
     function addRemoveFolderFromFilter(folderInfo: any) {
         let newFolders: string[] = [];
-
+        let newCollections = [...filter.collections];
         if (filter.folders) {
             if (filter.folders.includes(folderInfo.item)) {
                 newFolders = filter.folders.filter((item) => item != folderInfo.item);
             } else {
+                // Add this folder.
                 newFolders = [...filter.folders, folderInfo.item];
+                // Also, ensure to look in all the default collections
+                newCollections = [
+                    ...filter.collections.filter((collectionName) => !["general", "trashed", "unsorted"].includes(collectionName)),
+                    'general',
+                    'unsorted',
+                    'trashed',
+                ]
             }
         } else {
             newFolders = [folderInfo.item as string];
         }
 
-        setFilter({ ...filter, folders: newFolders });
+        setFilter({ ...filter, collections: newCollections, folders: newFolders });
     }
 
     const keyboardConfigTags = {

@@ -133,8 +133,11 @@ function nextPicture(deviceWrapper, { channel, id, body }) {
      * The adjustment is sent after trashing a picture; in that case the picture is no longer 
      * in the current filter and therefore the same index should be retrieved again.
      */
-    const offsetAdjust = body?.offsetAdjust ?? 0;
-    deviceWrapper.deviceHandler.runRequestNow(0, { cursorIndexOffset: 1 + offsetAdjust });
+    const offsetAdjust = body?.offsetAdjust;
+    const cursorIndexOffset = offsetAdjust ? 1 + offsetAdjust : 1;
+    const request = { settings: { cursorIndexOffset}};
+    log(`Requesting next picture: ${JSON.stringify(request)}`, deviceWrapper, 'yellow');
+    deviceWrapper.deviceHandler.runRequestNow(0, { settings: { cursorIndexOffset}});
 }
 
 function previousPicture(deviceWrapper, commandData) {
