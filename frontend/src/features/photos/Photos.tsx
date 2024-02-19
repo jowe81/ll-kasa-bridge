@@ -47,7 +47,7 @@ function Photos({ screenMode, setScreenMode }) {
 
     // Stretch/Cover only in fullscreen mode and for landscape formats.
     // Orientations 6 and 8 are CW/CCW rotations.
-    const stretchToCover = screenMode === `full` && (record.aspect > 1 || [6, 8].includes(record.orientation));
+    const stretchToCover = screenMode === `full` && (record.aspect > 1 && ![6, 8].includes(record.orientation));
 
     return (
         <div className={containerClassNames}>

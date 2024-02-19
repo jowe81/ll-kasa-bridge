@@ -268,7 +268,7 @@ class DynformsServiceHandler {
         return result;
     }
 
-    async runPushRequest(record, requestIndex) {
+    async runPushRequest(record, requestIndex, extraData = {}) {
         if ([null, undefined].includes(requestIndex)) {
             return null;            
         }
@@ -282,6 +282,7 @@ class DynformsServiceHandler {
         const request = {
             collectionName,
             record,
+            ...extraData,
         }
 
         const url = this.service.fullUrlPush;

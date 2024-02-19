@@ -106,12 +106,11 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
             } else {
                 // Add this folder.
                 newFolders = [...filter.folders, folderInfo.item];
-                // Also, ensure to look in all the default collections
+                // Also, ensure to look in the default collections
                 newCollections = [
-                    ...filter.collections.filter((collectionName) => !["general", "trashed", "unsorted"].includes(collectionName)),
+                    ...filter.collections.filter((collectionName) => !["general", "unsorted"].includes(collectionName)),
                     'general',
                     'unsorted',
-                    'trashed',
                 ]
             }
         } else {

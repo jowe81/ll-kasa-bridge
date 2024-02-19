@@ -28,6 +28,7 @@ function PhotosTouchLayer({fullWidth, screenMode, setScreenMode}) {
     const record = getFirstDynformsServiceRecordFromLastRequest(photosService?.channel);
 
     function runPhotosServiceCommand(commandId, body) {
+        console.log("**********",commandId,body)
         runChannelCommand(photosService?.channel, commandId, body);
     }
 
@@ -42,8 +43,9 @@ function PhotosTouchLayer({fullWidth, screenMode, setScreenMode}) {
     const hideRestoreBtnClick = () => runPhotosServiceCommand("hideRestorePicture", { hide: !record.collections?.includes('trashed') });
     const favoritesClick = (collectionName) => runPhotosServiceCommand("addToRemoveFromCollection", { collectionName });
     const addRemoveTag = (tagString) => runPhotosServiceCommand("addRemoveTag", { tagString });
-    const addToRemoveFromCollection = (collectionName) => runPhotosServiceCommand("addToRemoveFromCollection", { collectionName });
-    const generalClick = () => addToRemoveFromCollection("general");
+    const addToRemoveFromCollection = (collectionName, advance) => runPhotosServiceCommand("addToRemoveFromCollection", { collectionName, advance });
+    const applyToAllPicturesInSelectedFolders = (itemType) => runPhotosServiceCommand("applyToAllPicturesInSelectedFolders", {itemType});
+    const generalClick = () => addToRemoveFromCollection("general", isUnsorted ? true : false);
     const setPhotosServiceFilter = (filter) => {
         // Should hide the main layer here but it behaves funny.
         runPhotosServiceCommand("setFilter", { filter })        
@@ -88,6 +90,7 @@ function PhotosTouchLayer({fullWidth, screenMode, setScreenMode}) {
         )
     } else if (showManageCollectionsLayer) {
         const props = {
+            applyToAllPicturesInSelectedFolders,
             hideLayer: () => setShowManageCollectionsLayer(false),
             hideLayers: () => {
                 // Both layers should be hidden here but the main layer behaves funny.
@@ -126,7 +129,7 @@ function PhotosTouchLayer({fullWidth, screenMode, setScreenMode}) {
                     className={`photo-button photo-button-collection-shortcut ${
                         isUnsorted ? `photo-button-green-inactive` : photoButtonHidden
                     } ${isActive ? "photo-button-green-active" : "photo-button-green-inactive"}`}
-                    onClick={() => addToRemoveFromCollection(collectionName)}
+                    onClick={() => addToRemoveFromCollection(collectionName, isUnsorted ? true : false)}
                 >
                     {collectionName}
                 </div>

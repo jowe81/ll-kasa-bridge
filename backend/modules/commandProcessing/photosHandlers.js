@@ -76,7 +76,7 @@ async function addToRemoveFromCollection(deviceWrapper, commandData) {
         return null;
     }
 
-    const { collectionName } = commandData.body;
+    const { collectionName, advance } = commandData.body;
 
     if (collectionName) {
         if (!record.collections.includes(collectionName)) {
@@ -97,7 +97,26 @@ async function addToRemoveFromCollection(deviceWrapper, commandData) {
         }
     }
 
-    await updateRecord(deviceWrapper, record);
+    await updateRecord(deviceWrapper, record, advance);
+}
+
+async function applyToAllPicturesInSelectedFolders(deviceWrapper, commandData) {
+    let record = getRecord(deviceWrapper);
+    if (!record || !deviceWrapper?.deviceHandler) {
+        return null;
+    }
+
+    const itemType = commandData?.body?.itemType;
+    if (!itemType) {
+        log(`Cannot apply to all pictures in selected folders; no item type was given (should be collections or tags).`, deviceWrapper, 'bgRed');
+        return;
+    }
+    log(`Requesting to apply ${itemType} to all pictures in selected folders: ${JSON.stringify(record[itemType])}`, deviceWrapper, "yellow");
+
+    await deviceWrapper.deviceHandler.runPushRequest(record, 1, { settings: {
+        action: 'applyToAllPicturesInSelectedFolders',
+        itemType,
+    }})
 }
 
 async function hideRestorePicture(deviceWrapper, commandData) {
@@ -137,11 +156,11 @@ function nextPicture(deviceWrapper, { channel, id, body }) {
     const cursorIndexOffset = offsetAdjust ? 1 + offsetAdjust : 1;
     const request = { settings: { cursorIndexOffset}};
     log(`Requesting next picture: ${JSON.stringify(request)}`, deviceWrapper, 'yellow');
-    deviceWrapper.deviceHandler.runRequestNow(0, { settings: { cursorIndexOffset}});
+    deviceWrapper.deviceHandler.runRequestNow(0, { settings: {cursorIndexOffset}});
 }
 
 function previousPicture(deviceWrapper, commandData) {
-    deviceWrapper.deviceHandler.runRequestNow(0, {cursorIndexOffset: -1});    
+    deviceWrapper.deviceHandler.runRequestNow(0, {settings: {cursorIndexOffset: -1}});    
 }
 
 function pauseResumeSlideshow(deviceWrapper, commandData) {
@@ -338,11 +357,11 @@ function shouldAdvanceAfterPush(deviceWrapper, record) {
     return result;
 }
 
-async function updateRecord(deviceWrapper, record) {
+async function updateRecord(deviceWrapper, record, advance) {
     if (!record || !deviceWrapper?.deviceHandler) {
         return null;
     }
-    const shouldAdvance = shouldAdvanceAfterPush(deviceWrapper, record);
+    //const shouldAdvance = shouldAdvanceAfterPush(deviceWrapper, record);
     const pushRequestIndex = 1;
     const cache = deviceWrapper.getCache();
 
@@ -352,7 +371,7 @@ async function updateRecord(deviceWrapper, record) {
             cache.data[pushRequestIndex] = data.data;
             deviceWrapper.deviceHandler.processCachedApiResponse(pushRequestIndex);
 
-            if (shouldAdvance) {
+            if (advance) {
                 nextPicture(deviceWrapper, {});
             }
         })
@@ -366,6 +385,7 @@ const handlers = {
     addRemoveTag,
     addTags,
     addToRemoveFromCollection,
+    applyToAllPicturesInSelectedFolders,
     hideRestorePicture,
     nextPicture,
     pauseResumeSlideshow,

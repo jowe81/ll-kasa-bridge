@@ -1,14 +1,15 @@
 import {
     getCollectionLabelsForRecord,
-    getCustomCollectionLabels,
     getCustomCollectionsJsx,
     getDefaultCollectionsJsx,
+    getLatestOps,
     getLibraryInfo,
 } from "./photosHelpers.tsx";
 import { useScreenKeyboard } from "../../contexts/ScreenKeyboardContext";
 import "./photosManageCollectionsLayer.scss";
 
 function PhotosManageCollectionsLayer({
+    applyToAllPicturesInSelectedFolders,
     addToRemoveFromCollection,
     hideLayer,
     hideLayers,
@@ -16,18 +17,30 @@ function PhotosManageCollectionsLayer({
     photosService,
 }) {
     const libraryInfo = getLibraryInfo(photosService);
-    const customCollections = getCustomCollectionLabels(photosService);
+    const latestOps = getLatestOps(photosService);
+
+    let dirnameFilter;
+
+    const lastUsedFilter = latestOps?.lastUsedFilter;
+    if (lastUsedFilter) {
+        dirnameFilter = lastUsedFilter.$and?.find(filterItem => filterItem.dirname);
+    }
 
     const isUnsorted = !record?.collections?.length;
 
     const { showKeyboard } = useScreenKeyboard();
 
     const addToRemoveFromCollectionWrapper = (collectionName) => {
-        // If the record was previously unsorted, the backend will advance to the next picture; so hide this layer.
-        if (isUnsorted) {
+        console.log(`Unsorted`, isUnsorted, `dirnamefilter`, dirnameFilter)
+        if (isUnsorted && !dirnameFilter) { 
+            // Record was previously unsorted, request the backend to advance to the next picture; hide this layer.
+            addToRemoveFromCollection(collectionName, true);
             hideLayers();
-        }
-        addToRemoveFromCollection(collectionName);
+        } else {
+            console.log('%%%%%%%%%%%%%%%%%');
+            // Either it wasn't unsorted or the filter is on a folder; in which case we also do not advance.
+            addToRemoveFromCollection(collectionName, false);
+        }        
     };
 
     const keyboardConfigTags = {
@@ -77,6 +90,14 @@ function PhotosManageCollectionsLayer({
                 </div>
             </div>
             <div className="actions-container">
+                {dirnameFilter &&
+                    <div className="action" onClick={() => {
+                        applyToAllPicturesInSelectedFolders('collections');
+                        hideLayer();
+                    }}>
+                        Apply Selection to All Pictures in Selected Folders
+                    </div>
+                }
                 <div
                     className="action"
                     onClick={() => {

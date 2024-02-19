@@ -1682,7 +1682,7 @@ const deviceMap = [
                     retrieve: {
                         time: {
                             frequency: "minutes",
-                            minutes: 30,
+                            minutes: 1,
                         },
                     },
                 },

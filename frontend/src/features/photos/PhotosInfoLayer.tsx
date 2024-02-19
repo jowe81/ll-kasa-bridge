@@ -90,7 +90,7 @@ function PhotosInfoLayer({ photosService, hideLayer, record, screenMode }) {
         if (typeof latestOps.cursorIndex === 'number') {
             return (
                 <div>
-                    #{latestOps.cursorIndex} of {latestOps.filterSize} images
+                    #{latestOps.cursorIndex + 1} of {latestOps.filterSize} images
                 </div>
             );
         } else {
