@@ -1682,8 +1682,11 @@ const deviceMap = [
                     retrieve: {
                         time: {
                             frequency: "minutes",
-                            minutes: 1,
+                            minutes: 20,
                         },
+                    },
+                    settings: {
+                        cursorIndexOffset: 1, // by default advance one picture
                     },
                 },
                 {

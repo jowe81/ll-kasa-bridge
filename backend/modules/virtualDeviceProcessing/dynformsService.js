@@ -128,8 +128,8 @@ class DynformsServiceHandler {
                 connectionName: info.connectionName ?? localConstants.connectionName,
                 collectionName: info.collectionName,
                 sessionId: null,
-                settings: {},
-                filter: info.query?.filter,
+                settings: info.settings ?? {},
+                filter: info.query?.filter ?? {},
                 orderBy: info.retrieve.orderBy ?? {},
             };
 
@@ -380,6 +380,7 @@ class DynformsServiceHandler {
         const promises = requestsReadyToRun.map((requestInfo, requestIndex) => {
             const requestConfig = this.service.settings.requests[requestIndex];
             requestConfig._lastExecuted = now;
+            log(`Request ${requestIndex}: ${this.service.fullUrlPull} ${JSON.stringify(requestInfo)}`, this.service, 'yellow');
             return axios.post(this.service.fullUrlPull, requestInfo);
         });
 
