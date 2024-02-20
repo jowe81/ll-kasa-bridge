@@ -463,6 +463,61 @@ const globalConfig = {
                 },
             ],
         },
+        {
+            id: "schedule-bathroomLights",
+            pluginName: "schedule",
+            periodicallyActive: true,
+            schedule: [
+                /**
+                 * This is a plain schedule item - specify a time and stateData.
+                 */
+                {
+                    trigger: {
+                        hours: 22,
+                        minutes: 0,
+                    },
+                    stateData: {
+                        brightness: 10,
+                    },
+                },
+                {
+                    trigger: {
+                        hours: 23,
+                        minutes: 30,
+                    },
+                    stateData: {
+                        brightness: 1,
+                    },
+                },
+                {
+                    trigger: {
+                        hours: 6,
+                        minutes: 0,
+                    },
+                    stateData: {
+                        brightness: 10,
+                    },
+                },
+                {
+                    trigger: {
+                        hours: 7,
+                        minutes: 0,
+                    },
+                    stateData: {
+                        brightness: 40,
+                    },
+                },
+                {
+                    trigger: {
+                        hours: 8,
+                        minutes: 30,
+                    },
+                    stateData: {
+                        brightness: 90,
+                    },
+                },
+            ],
+        },
     ],
 
     /**
@@ -747,7 +802,7 @@ const deviceMap = [
         id: "80128096836910A62F80A6B532C1461E1F79D295",
         locationId: "loc-bathroom",
         subType: SUBTYPE_BULB,
-        filters: [{ refId: "naturalLight" }],
+        filters: [{ refId: "naturalLight" }, { refId: "schedule-bathroomLights" }],
     },
     {
         alias: "Bathroom 4",
@@ -1813,6 +1868,7 @@ const deviceMap = [
         locationId: "__internal",
         type: constants.DEVICETYPE_VIRTUAL,
         subType: constants.SUBTYPE_DYNFORMS_SERVICE,
+        commandHandlersExtension: "medicalHandlers.js",
         settings: {
             api: {
                 baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
@@ -1843,8 +1899,11 @@ const deviceMap = [
                 },
             ],
             // This is how often the handler will go out and check whether a request should actually be run.
-            checkInterval: 10 * MINUTE,
-            ui: {},
+            checkInterval: 2 * MINUTE,
+            ui: {
+                warnAfter: 3 * HOUR,
+                alertAfter: 5 * HOUR,
+            },
         },
     },
     {
@@ -2351,11 +2410,11 @@ const deviceMap = [
                             groupId: "group-hallwayCeiling",
                             stateData: false,
                         },
-                        {
-                            groupId: "group-bathroomLights",
-                            stateData: false,
-                            ignoreForButtonState: true,
-                        },
+                        // {
+                        //     groupId: "group-bathroomLights",
+                        //     stateData: false,
+                        //     ignoreForButtonState: true,
+                        // },
                         {
                             groupId: "group-bedroomCeilingLights",
                             stateData: false,
