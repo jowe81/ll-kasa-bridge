@@ -5,7 +5,7 @@ function Notes() {
 
     const service = getNotesService();
     const record = getFirstDynformsServiceRecord(service?.channel, 0);
-    const createdAt = new Date(record.created_at);
+    const createdAt = new Date(record?.created_at);
 
     const url = `http://jj-photos.wnet.wn:3021/db/imageFile?path=${record?.urlpath}`
     return (
