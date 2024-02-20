@@ -2,6 +2,7 @@ import _ from "lodash";
 import { makeLiveDeviceObject } from '../TargetDataProcessor.js';
 import constants from "../../constants.js";
 import { log, debug } from '../Log.js';
+import { createAlert } from "../../helpers/dynformsData.js";
 
 const localConstants = constants.DEVICETYPE_DEFAULTS[constants.DEVICETYPE_VIRTUAL][constants.SUBTYPE_THERMOSTAT];
 
@@ -156,6 +157,7 @@ class ThermostatHandler {
     const safetyShutoff = !temperature || temperature.isStale || currentTempC > localConstants.SAFETY_SHUTOFF_HIGH_TEMP || currentTempC < localConstants.SAFETY_SHUTOFF_LOW_TEMP;
 
     let liveDeviceCount = 0;
+    const alerts = [];
 
     if (safetyShutoff) {
       let turnOffHeat = false;
@@ -236,7 +238,14 @@ class ThermostatHandler {
             liveDeviceCount = location.setCooling(switchAcTo);
           }
         }  
-      }  
+      } else {
+        if (location.isHeating()) {
+            alerts.push(createAlert(`${location.name}: Uncontrolled heater.`, "warn", this.thermostat.displayLabel));
+            log(`${location.name}: Uncontrolled heater`, this.thermostat, 'bgRed');
+        }
+      }
+
+      this.thermostat.setAlerts(alerts);
     }
       
     if (liveDeviceCount || safetyShutoff) {

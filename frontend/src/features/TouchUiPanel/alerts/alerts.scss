@@ -1,13 +1,35 @@
+@import './../../../main.scss';
 
 .alerts-compact-container {
   width: 222px;
+  height: 100%;
   border-radius: 5px;
-  padding-top: 5px;
+  padding-top: 5px;  
   margin: 0px 0px;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  text-align: left;
+  flex-direction: column;
+  text-align: left;  
+
+    ::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background-color: rgba(255, 255, 255, .08);
+    }
+    
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+    background: #722b2b84;
+    /* background-color: rgba(55, 40, 40, 1); */
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+    background: rgb(141, 4, 4);
+    }    
+
 }
 
 .alerts-label {
@@ -17,3 +39,30 @@
   border-bottom: 1px solid #333;
   width: 100%;
 }
+
+
+.alerts-compact-items-container {
+    width: 100%;    
+    overflow-y: scroll;
+    padding-right: 2px;
+
+}
+
+.alert-container {
+    border-radius: 3px;
+    padding: 2px 4px;
+    margin-top: 7px;    
+    width: 100%;
+
+    .alert-header-container {
+        display:flex;
+        justify-content: space-between;
+        font-size: 70%;        
+    }
+
+    .alert-message{
+        font-size:85%;
+        
+    }
+}
+

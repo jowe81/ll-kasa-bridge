@@ -7,20 +7,24 @@ import CompactTimer from "./compactTimer/CompactTimer";
 import CompactBirthdays from "./compactBirthdays/CompactBirthdays";
 import CompactCalendar from "./compactCalendar/CompactCalendar.tsx";
 import Alerts from "./alerts/Alerts.tsx";
+import Notes from "./notes/Notes.tsx";
 import MasterSwitches from "./masterSwitches/MasterSwitches.tsx";
 import DevicePresetButtons from "./devicePresetButtons/devicePresetButtons.tsx";
 import Mailbox from "./mailbox/Mailbox.tsx";
 
-import { getDeviceByChannel } from "../../devicesHelpers.tsx";
+import { getDeviceByChannel, getAlerts } from "../../devicesHelpers.tsx";
 
 function TouchUiPanel(props: any) {
     const panelMode = props.screenMode === "panel";
+    const controlsMode = props.screenMode === "controls";
     const birthdayRangeToDisplay = 2;
     const { recordsSelected } = getSelectedRecordsInfo(birthdayRangeToDisplay);
     const showBirthdays = panelMode && recordsSelected.length >= 0;
 
     const mailbox = getDeviceByChannel(constants.touchPanel?.mailboxChannel);
     const showMailbox = mailbox?.powerState;
+
+    const alerts = getAlerts();
 
     return (
         <>
@@ -29,8 +33,9 @@ function TouchUiPanel(props: any) {
             {panelMode && <CompactTimer />}
             {panelMode && <CompactCalendar />}
             {showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay} />}
-            <div className="placeholder-350"></div>
-            {/* {<Alerts />} */}
+            {controlsMode && <div className="placeholder-200"></div>}
+            {alerts.length > 0 && <Alerts alerts={alerts}/>}
+            {alerts.length === 0 && <Notes />}
             <Temperature thermometersStartIndex={2} />
 
             {showMailbox && <Mailbox />}

@@ -65,7 +65,11 @@ const getChoresService = () => getDeviceByChannel(constants.chores?.serviceChann
 
 const getBirthdaysService = () => getDeviceByChannel(constants.birthdays?.serviceChannel);
 
+const getMedicalService = () => getDeviceByChannel(constants.medical?.serviceChannel);
+
 const getMasterSwitch = () => getFirstDeviceOfType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_MASTER_SWITCH);
+
+const getThermostats = () => getDevicesByType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_THERMOSTAT);
 
 const getCalendar = (): VirtualDevice|null => getFirstDeviceOfType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_DAV_SERVICE);
 
@@ -136,6 +140,26 @@ function runServiceCommand(service, commandId, body) {
     runChannelCommand(service?.channel, commandId, body);
 }
 
+function getAlerts() {
+    let services: any[] = [];
+
+    services.push(getMedicalService());
+    services.push(getChoresService());
+    
+    const thermostats = getThermostats();
+    if (Array.isArray(thermostats) && thermostats.length) {
+        services.push(...thermostats);
+    }
+    
+    // Remove null/undefined
+    services = services.filter((item) => item);
+
+    const alerts = [];
+    services.forEach((service) => Array.isArray(service.state.alerts) && alerts.push(...service.state.alerts));
+
+    return alerts;
+}
+
 
 export {
     getAllDevices,
@@ -146,8 +170,11 @@ export {
     getClock,
     getMasterSwitch,
     getMasterSwitchDimInfo,
+    getMedicalService,
     getChoresService,
     getPhotosService,
+    getAlerts,
+    getThermostats,
     runChannelCommand,
     runServiceCommand,
 };

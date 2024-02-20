@@ -140,6 +140,13 @@ const VirtualDeviceWrapper = {
     log(`Power state change: ${this.subType} turned ${newPowerState ? 'on' : 'off'}.`, this);  
   },
 
+  setAlerts(alerts) {
+    this._updateState({
+        ...this.state,
+        alerts,
+    })
+  },
+
   toggle(origin) {  
     this.setPowerState(!this.getPowerState(), null, origin);
   },

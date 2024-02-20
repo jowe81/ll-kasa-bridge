@@ -150,13 +150,18 @@ function resolvePlaceholder({key, values}) {
     return null;
 }
 
+function createAlert(message, level, serviceLabel) {
+    return {
+        message,
+        level,
+        serviceLabel,
+        issued_at: new Date(),
+    };
+}
+
 const dynformsDbFilters = {
     applyCurrentDateFilter,
     applyStaticFilter,
 };
 
-export { 
-  dynformsDbFilters,
-  getDisplayDataFromApiResponse,
-  requestShouldRun,
-};
+export { createAlert, dynformsDbFilters, getDisplayDataFromApiResponse, requestShouldRun };

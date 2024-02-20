@@ -122,4 +122,8 @@ constants.scripture = {
   serviceChannel: 503,
 }
 
+constants.medical = {
+  serviceChannel: 506,
+}
+
 export default constants;

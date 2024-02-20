@@ -1,0 +1,17 @@
+.notes-container {
+    width: 222px;
+    display: grid;
+    place-items: center;
+
+    // background-color: rgb(54, 54, 20);
+
+    display: grid;
+    place-items: center;
+
+
+    img {
+        display: block;
+        max-width: 100%;
+        opacity: 90%;
+    }
+}

@@ -384,17 +384,21 @@ class DynformsServiceHandler {
             return axios.post(this.service.fullUrlPull, requestInfo);
         });
 
-        Promise.all(promises)
-            .then((allResponseData) => {
-                // Cache the responses.
-                allResponseData.forEach((data, requestIndex) => {
-                    this.cache.data[requestIndex] = data.data;
-                    this.processCachedApiResponse(requestIndex);
-                })                
-            })
-            .catch((err) => {
-                console.log(err.message, err);
-            });
+        if (promises.length) {
+            Promise.all(promises)
+                .then((allResponseData) => {
+                    // Cache the responses.
+                    allResponseData.forEach((data, requestIndex) => {
+                        this.cache.data[requestIndex] = data.data;
+                        this.processCachedApiResponse(requestIndex);
+                    });
+                })
+                .catch((err) => {
+                    console.log(err.message, err);
+                });
+        } else {
+            // No new data, but might still want to check if there might be alert changes?
+        }
     }
 
     /**
@@ -403,13 +407,17 @@ class DynformsServiceHandler {
     processCachedApiResponse(requestIndex) {
         let displayData = getDisplayDataFromApiResponse(this.cache.data[requestIndex], this.service.settings, requestIndex);
 
-        // See if a _processApiResponse handler exists for this device.
-        const commandHandler = this.service.commandHandlersExtension
-            ? this.service.getCommandHandler("_processApiResponse")
-            : null;
+        let processApiResponseHandler, getAlertsHandler;        
+        if (this.service.commandHandlersExtension) {
+            // See if a _processApiResponse handler exists for this device.
+            processApiResponseHandler = this.service.getCommandHandler("_processApiResponse");
+        
+            // See if a _getAlerts handler exists for this device.
+            getAlertsHandler = this.service.getCommandHandler("_getAlerts");
+        }
 
-        if (commandHandler) {
-            displayData = commandHandler(this.service, displayData, requestIndex);
+        if (processApiResponseHandler) {
+            displayData = processApiResponseHandler(this.service, displayData, requestIndex);
         }
 
         const newState = {
@@ -424,6 +432,10 @@ class DynformsServiceHandler {
             },
             settings: this.service.settings,
         };
+
+        if (getAlertsHandler) {
+            newState.alerts = getAlertsHandler(this.service, displayData, requestIndex);
+        }
 
         this.service._updateState(
             newState,
