@@ -59,6 +59,8 @@ function getFirstDeviceOfType(type: string, subType: string | null) {
 
 const getClock = () => getFirstDeviceOfType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_CLOCK);
 
+const getNotesService = () => getDeviceByChannel(constants.notes?.serviceChannel);
+
 const getPhotosService = () => getDeviceByChannel(constants.photos?.serviceChannel);
 
 const getChoresService = () => getDeviceByChannel(constants.chores?.serviceChannel);
@@ -145,7 +147,7 @@ function getAlerts() {
 
     services.push(getMedicalService());
     services.push(getChoresService());
-    
+
     const thermostats = getThermostats();
     if (Array.isArray(thermostats) && thermostats.length) {
         services.push(...thermostats);
@@ -171,6 +173,7 @@ export {
     getMasterSwitch,
     getMasterSwitchDimInfo,
     getMedicalService,
+    getNotesService,
     getChoresService,
     getPhotosService,
     getAlerts,

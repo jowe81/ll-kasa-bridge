@@ -61,41 +61,30 @@ const constants: any = {
     DEVICE_DEFAULT_LOCATION_ID: "loc-default",
 };
 
-constants.DEVICETYPES_LIGHTING = [
-  constants.SUBTYPE_LIGHT,
-  constants.SUBTYPE_BULB,
-  constants.SUBTYPE_LED_STRIP,
-];
+constants.DEVICETYPES_LIGHTING = [constants.SUBTYPE_LIGHT, constants.SUBTYPE_BULB, constants.SUBTYPE_LED_STRIP];
 
-constants.DEVICETYPES_HVAC = [
-  constants.SUBTYPE_AIR_AC,
-  constants.SUBTYPE_AIR_FAN,
-  constants.SUBTYPE_AIR_HEAT,
-];
-
+constants.DEVICETYPES_HVAC = [constants.SUBTYPE_AIR_AC, constants.SUBTYPE_AIR_FAN, constants.SUBTYPE_AIR_HEAT];
 
 constants.DEVICETYPES_WITH_POWERSTATE = [
-  constants.DEVICETYPE_KASA_SMARTPLUGSWITCH,
-  constants.DEVICETYPE_KASA_SMARTBULB,
-  constants.DEVICETYPE_ESP_RELAY,
-  constants.DEVICETYPE_VIRTUAL,
-]
+    constants.DEVICETYPE_KASA_SMARTPLUGSWITCH,
+    constants.DEVICETYPE_KASA_SMARTBULB,
+    constants.DEVICETYPE_ESP_RELAY,
+    constants.DEVICETYPE_VIRTUAL,
+];
 
-constants.DEVICETYPES_CUSTOM_DISPLAY = [
-  constants.SUBTYPE_TIMER,
-]
+constants.DEVICETYPES_CUSTOM_DISPLAY = [constants.SUBTYPE_TIMER];
 
 constants.services = {
-  JJ_AUTO_BACKEND_HOST: "http://jj-auto.wnet.wn",
-  JJ_AUTO_BACKEND_PORT: 4000, 
-  PHOTOS_BACKEND_HOST: "http://jj-photos.wnet.wn",
-  PHOTOS_BACKEND_PORT: 3020,
-}
+    JJ_AUTO_BACKEND_HOST: "http://jj-auto.wnet.wn",
+    JJ_AUTO_BACKEND_PORT: 4000,
+    PHOTOS_BACKEND_HOST: "http://jj-photos.wnet.wn",
+    PHOTOS_BACKEND_PORT: 3020,
+};
 
 // Other components
 constants.chores = {
     serviceChannel: 507,
-}
+};
 
 constants.photos = {
     //url: `http://johannes-mb.wnet.wn:3020/db/randomUrl`,
@@ -105,25 +94,29 @@ constants.photos = {
 };
 
 constants.touchPanel = {
-  thermometerChannels: [ 201, 202, 203, 204 ],
-  forecastChannels: [ 501 ],
-  mailboxChannel: 206, 
-}
+    thermometerChannels: [201, 202, 203, 204],
+    forecastChannels: [501],
+    mailboxChannel: 206,
+};
 
 constants.birthdays = {
-  serviceChannel: 502,
-}
+    serviceChannel: 502,
+};
 
 constants.clock = {
-  serviceChannel: 500,
-}
+    serviceChannel: 500,
+};
+
+constants.notes = {
+    serviceChannel: 508,
+};
 
 constants.scripture = {
-  serviceChannel: 503,
-}
+    serviceChannel: 503,
+};
 
 constants.medical = {
-  serviceChannel: 506,
-}
+    serviceChannel: 506,
+};
 
 export default constants;

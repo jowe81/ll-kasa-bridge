@@ -1,29 +1,29 @@
 .notes-container {
     width: 222px;
     height: 100%;
-    border-radius: 5px;
-
-    // background-color: rgb(54, 54, 20);
-
-
     position: relative;
-
-
     background-color: rgba(156, 57, 161, 0.387);
     font-size: 80%;
     padding-left: 10px;
     padding-top: 6px;
     color: rgba(160, 106, 160, 0.71);
 
+    .notes-date {
+        font-style: italic;
+        display: block;
+        float: right;
+        padding-right: 10px;
+    }
+
     .notes-image-container {
-        margin-top: 5px;
+        margin-top: 12px;
         position: absolute;
         top: 0px;
         display: grid;
         place-items: center;
         height: 100%;
 
-        img {                
+        img {                            
             display: block;
             max-width: 100%;
             opacity: 50%;

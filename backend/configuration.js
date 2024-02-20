@@ -2011,6 +2011,46 @@ const deviceMap = [
             },
         },
     },
+    {
+        alias: "Notes Service",
+        channel: 508,
+        id: "notes-service",
+        display: true,
+        displayLabel: "Notes",
+        displayType: null,
+        locationId: "__internal",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_DYNFORMS_SERVICE,
+        commandHandlersExtension: null,
+        settings: {
+            api: {
+                baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
+                path: null, // will use .env DYNFORMS_PATH or default instead
+                queryParams: {},
+            },
+            requests: [
+                {
+                    connectionName: null, // not implemented
+                    collectionName: "notes_scanned",
+                    retrieve: {
+                        time: {
+                            frequency: "daily",
+                            hours: 0,
+                            minutes: 15,
+                        },
+                        singleRecord: {
+                            // Have dynforms pick the item
+                            type: "__RANDOMIZED_PREORDERED",
+                        },
+                    },
+                },
+            ],
+            // This is how often the handler will go out and check whether a request should actually be run.
+            checkInterval: 30 * SECOND,
+            ui: {
+            },
+        },
+    },
 
     {
         alias: "Master Switch Service",
