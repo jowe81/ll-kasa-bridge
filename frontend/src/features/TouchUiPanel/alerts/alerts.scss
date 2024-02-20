@@ -3,7 +3,7 @@
 .alerts-compact-container {
   width: 222px;
   height: 100%;
-  border-radius: 5px;
+  // border-radius: 5px;
   padding-top: 5px;  
   margin: 0px 0px;
   display: flex;
@@ -30,14 +30,17 @@
     background: rgb(141, 4, 4);
     }    
 
+    background-color: rgba(255, 0, 0, 0.343);
+    padding-left: 4px;
 }
 
 .alerts-label {
-  max-height: 25px;  
-  color: #999;
-  font-size: 16px;
-  border-bottom: 1px solid #333;
-  width: 100%;
+    max-height: 25px;  
+    color: #ff0000;
+    font-size: 16px;
+    border-bottom: 1px solid #333;
+    width: 100%;
+    background-image: linear-gradient(to right, rgba(255, 0, 0, 0), rgb(255, 0, 0));
 }
 
 
@@ -49,10 +52,11 @@
 }
 
 .alert-container {
-    border-radius: 3px;
+    border-radius: 3px;    
     padding: 2px 4px;
     margin-top: 7px;    
     width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.135);
 
     .alert-header-container {
         display:flex;
@@ -61,7 +65,7 @@
     }
 
     .alert-message{
-        font-size:85%;
+        font-size:80%;
         
     }
 }

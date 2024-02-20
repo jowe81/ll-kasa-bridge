@@ -268,6 +268,10 @@ $touch-item-selected-background-color: rgba(0, 94, 0, 0.9);
     background-color: $color-bg-orange;
 }
 
+.badge-border-orange {
+    border: 1px solid rgba($color-text-orange, .3);
+}
+
 /* Reds */
 
 .bg-red {        
@@ -282,6 +286,11 @@ $touch-item-selected-background-color: rgba(0, 94, 0, 0.9);
     color: $color-text-red;
     background-color: rgba($color-bg-red, .4);
 }
+
+.badge-border-red {
+    border: 1px solid rgba($color-text-red, .3);
+}
+
 
 /* Utility classes */
 

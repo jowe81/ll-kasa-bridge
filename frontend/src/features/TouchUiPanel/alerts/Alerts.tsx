@@ -11,12 +11,12 @@ function Alerts({alerts}) {
         switch (alert.level) {
             case "warn":
                 levelText = "Warning";
-                badgeClass = "badge-orange";
+                badgeClass = "badge-orange badge-border-orange";
                 break;
 
             case "alert":
                 levelText = "Alarm";
-                badgeClass = "badge-red";
+                badgeClass = "badge-red badge-border-red";
                 break;
 
             case "critical":
@@ -46,7 +46,7 @@ function Alerts({alerts}) {
     return (
         <div className="touch-ui-panel-item">
             <div className="alerts-compact-container">
-                <div className="alerts-label">Alerts</div>
+                <div className="alerts-label">{alerts.length} Alert{alerts.length === 1 ? '' : 's'}</div>
                 <div className="alerts-compact-items-container">{alertsJsx}</div>
             </div>
         </div>
