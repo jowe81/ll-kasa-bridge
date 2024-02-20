@@ -4,7 +4,10 @@ function Notes() {
     return (
         <div className="touch-ui-panel-item">
             <div className={`notes-container`}>
-                <img src="/TestNote.png" />
+                POST-IT
+                <div className="notes-image-container">
+                    <img src="/TestNote.png" />
+                </div>
             </div>
         </div>
     );
