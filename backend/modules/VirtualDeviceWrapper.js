@@ -13,237 +13,258 @@ const cmdFailPrefix = '[FAIL]';
 const localConstants = constants.DEVICETYPE_DEFAULTS[constants.DEVICETYPE_VIRTUAL];
 
 const VirtualDeviceWrapper = {
-  device: null,
-  initialized: false,
+    device: null,
+    initialized: false,
 
-  addCallback(callbackFn, event) {
-    log(`Adding callback to '${event}`, this);
-  },
+    addCallback(callbackFn, event) {
+        log(`Adding callback to '${event}`, this);
+    },
 
-  /**
-   * Compare newState against the current state of the device.
-   * 
-   * @param   {} newState 
-   * @returns {} Infomation about the change or undefined if current state doesn't exist.
-   */
-   analyzeStateChange(newState) {
-    if (this.state === undefined) {
-      // Have no current state. Just received the first update.
-      return undefined;
-    }
+    /**
+     * Compare newState against the current state of the device.
+     *
+     * @param   {} newState
+     * @returns {} Infomation about the change or undefined if current state doesn't exist.
+     */
+    analyzeStateChange(newState) {
+        if (this.state === undefined) {
+            // Have no current state. Just received the first update.
+            return undefined;
+        }
 
-    let changeInfo = {};
-    changeInfo.changed = !_.isEqual(this.state, newState);
+        let changeInfo = {};
+        changeInfo.changed = !_.isEqual(this.state, newState);
 
-    switch (this.subType) {
-      case constants.SUBTYPE_THERMOSTAT:
-        changeInfo.on_off = changeInfo.changed;
-        break;
-    }
+        switch (this.subType) {
+            case constants.SUBTYPE_THERMOSTAT:
+                changeInfo.on_off = changeInfo.changed;
+                break;
+        }
 
-    return changeInfo;
-  },
+        return changeInfo;
+    },
 
-  getPowerState() {
-    return this.state.powerState;    
-  },
+    getPowerState() {
+        return this.state.powerState;
+    },
 
-  getCommandHandler(commandId) {
-    log(`Looking for command "${commandId}" in command handler extension ${this.commandHandlersExtension}`, this, "yellow");
-    const commandHandlers = getCommandHandlerPlugins(this.commandHandlersExtension);
-    
-    if (commandHandlers && commandHandlers[commandId]) {
-      return commandHandlers[commandId];
-    }
-    //
-  },
+    getCommandHandler(commandId) {
+        log(
+            `Looking for command "${commandId}" in command handler extension ${this.commandHandlersExtension}`,
+            this,
+            "yellow"
+        );
+        const commandHandlers = getCommandHandlerPlugins(this.commandHandlersExtension);
 
-  init(cache, mapItem, globalConfig, deviceEventCallback, devicePool, socketHandler) {
-    this.globalConfig = globalConfig;
-    this.deviceEventCallback = deviceEventCallback;
-    this.devicePool = devicePool;
-    this.socketHandler = socketHandler;
+        if (commandHandlers && commandHandlers[commandId]) {
+            return commandHandlers[commandId];
+        }
+        //
+    },
 
-    this.listeners = {
-      'powerState': [],
-    };
+    init(cache, mapItem, globalConfig, deviceEventCallback, devicePool, socketHandler) {
+        this.globalConfig = globalConfig;
+        this.deviceEventCallback = deviceEventCallback;
+        this.devicePool = devicePool;
+        this.socketHandler = socketHandler;
 
-    const requiredFields = ['alias', 'channel', 'id', 'settings', 'display', 'locationId', 'type', 'subType'];
+        this.listeners = {
+            powerState: [],
+        };
 
-    this.alias = mapItem.alias;
-    this.channel = mapItem.channel;
-    this.id = mapItem.id;
-    this.host = 'localhost';
-    this.settings = mapItem.settings;
-    this.display = mapItem.display;
-    this.displayLabel = mapItem.displayLabel;
-    this.displayType = mapItem.displayType;
-    this.locationId = mapItem.locationId;
-    this.type = mapItem.type;
-    this.subType = mapItem.subType;
-    this.state = {
-      powerState: null,
-    }
-    this.powerState = false;
-    this.commandHandlersExtension = mapItem.commandHandlersExtension;
-    this.isOnline = true; // Always online.
-    
-    resolveDeviceDependencies(this);
-        
-    requiredFields.forEach(field => {       
-      if (!this.field) { 
-        return false;
-      }
-    });
-        
-    // Initialize the cache for all Virtual devices
-    if (!this.cache) {
-      this.cache = cache;
-    }
+        const requiredFields = ["alias", "channel", "id", "settings", "display", "locationId", "type", "subType"];
 
-    // Initialize the cache for this device
-    this.cache[mapItem.channel] = {};
-    const cacheForThisDevice = this.cache[mapItem.channel];
+        this.alias = mapItem.alias;
+        this.channel = mapItem.channel;
+        this.id = mapItem.id;
+        this.host = "localhost";
+        this.settings = mapItem.settings;
+        this.display = mapItem.display;
+        this.displayLabel = mapItem.displayLabel;
+        this.displayType = mapItem.displayType;
+        this.locationId = mapItem.locationId;
+        this.type = mapItem.type;
+        this.subType = mapItem.subType;
+        this.state = {
+            powerState: null,
+        };
+        this.powerState = false;
+        this.commandHandlersExtension = mapItem.commandHandlersExtension;
+        this.isOnline = true; // Always online.
 
-    this.deviceHandler = {};         
+        resolveDeviceDependencies(this);
 
-    // Device-specific initialization (using plugin)
-    const deviceHandlerPlugins = getDeviceHandlerPlugins();
-    const handlerGenerator = deviceHandlerPlugins[`${this.subType}Handler`];
+        requiredFields.forEach((field) => {
+            if (!this.field) {
+                return false;
+            }
+        });
 
-    if (handlerGenerator) {
-      log(`Instantiating handler for device of type: ${this.type}/${this.subType}`, this);
-      const getHandlerInstance = deviceHandlerPlugins[`${this.subType}Handler`].default;
-      this.deviceHandler = getHandlerInstance(devicePool, this, cacheForThisDevice);  
-    } else {
-      log(`Warning: No device handler for virtual device of subtype ${this.subType} found. The device will be ignored.`, this, 'yellow');
-    }
-  },
+        // Initialize the cache for all Virtual devices
+        if (!this.cache) {
+            this.cache = cache;
+        }
 
-  // Get a reference to the cache segment for this specific device.
-  getCache(data) {
-    return this.cache[this.channel];
-  },
+        // Initialize the cache for this device
+        this.cache[mapItem.channel] = {};
+        const cacheForThisDevice = this.cache[mapItem.channel];
 
-  setPowerState(newPowerState, triggerSwitchPosition, origin) {
-    let originText = typeof origin === 'object' ? (origin.alias ?? origin.id ?? origin.ip ?? origin.text) : origin ? origin : 'unknown origin';
-    log(`${cmdPrefix} [${originText}] setPowerState ${newPowerState ? 'on' : 'off'}`, this, 'cyan');  
+        this.deviceHandler = {};
 
-    const currentState = this.state;
-    const newState = {
-      ...currentState,
-      powerState: newPowerState,
-    };
+        // Device-specific initialization (using plugin)
+        const deviceHandlerPlugins = getDeviceHandlerPlugins();
+        const handlerGenerator = deviceHandlerPlugins[`${this.subType}Handler`];
 
-    this._updateState(newState);
+        if (handlerGenerator) {
+            log(`Instantiating handler for device of type: ${this.type}/${this.subType}`, this);
+            const getHandlerInstance = deviceHandlerPlugins[`${this.subType}Handler`].default;
+            this.deviceHandler = getHandlerInstance(devicePool, this, cacheForThisDevice);
+        } else {
+            log(
+                `Warning: No device handler for virtual device of subtype ${this.subType} found. The device will be ignored.`,
+                this,
+                "yellow"
+            );
+        }
+    },
 
-    log(`Power state change: ${this.subType} turned ${newPowerState ? 'on' : 'off'}.`, this);  
-  },
+    getAlerts() {
+        if (!Array.isArray(this.state.alerts)) {
+            return [];
+        }
 
-  setAlerts(alerts) {
-    this._updateState({
-        ...this.state,
-        alerts,
-    })
-  },
+        return this.state.alerts;
+    },
 
-  toggle(origin) {  
-    this.setPowerState(!this.getPowerState(), null, origin);
-  },
+    // Get a reference to the cache segment for this specific device.
+    getCache(data) {
+        return this.cache[this.channel];
+    },
 
+    setPowerState(newPowerState, triggerSwitchPosition, origin) {
+        let originText =
+            typeof origin === "object"
+                ? origin.alias ?? origin.id ?? origin.ip ?? origin.text
+                : origin
+                ? origin
+                : "unknown origin";
+        log(`${cmdPrefix} [${originText}] setPowerState ${newPowerState ? "on" : "off"}`, this, "cyan");
 
-  getLiveDevice() {
-    if (typeof this.deviceHandler.getLiveDevice === 'function') {
-      return this.deviceHandler.getLiveDevice();
-    }
+        const currentState = this.state;
+        const newState = {
+            ...currentState,
+            powerState: newPowerState,
+        };
 
-    // Default
-    return makeLiveDeviceObject(
-      this, [
-        // Include
-        'powerState',
-      ], {
+        this._updateState(newState);
+
+        log(`Power state change: ${this.subType} turned ${newPowerState ? "on" : "off"}.`, this);
+    },
+
+    setAlerts(alerts) {
+        this._updateState({
+            ...this.state,
+            alerts,
+        });
+    },
+
+    toggle(origin) {
+        this.setPowerState(!this.getPowerState(), null, origin);
+    },
+
+    getLiveDevice() {
+        if (typeof this.deviceHandler.getLiveDevice === "function") {
+            return this.deviceHandler.getLiveDevice();
+        }
+
         // Default
-        'display': true,
-      }, [
-        // Exclude
-      ],
-      // Use global defaults
-      true,
-    );
-  },
+        return makeLiveDeviceObject(
+            this,
+            [
+                // Include
+                "powerState",
+            ],
+            {
+                // Default
+                display: true,
+            },
+            [
+                // Exclude
+            ],
+            // Use global defaults
+            true
+        );
+    },
 
-  /**
-   * Return a state update to be emitted to the sockets
-   */
-  getLiveDeviceStateUpdate() {
-    const state = this._getState();
-    const data = {
-      state,
-      powerState: state?.powerState,
-      channel: this.channel,
-      isOnline: this.isOnline,      
-    };
+    /**
+     * Return a state update to be emitted to the sockets
+     */
+    getLiveDeviceStateUpdate() {
+        const state = this._getState();
+        const data = {
+            state,
+            powerState: state?.powerState,
+            channel: this.channel,
+            isOnline: this.isOnline,
+        };
 
-    return data;
-  },
+        return data;
+    },
 
-  subscribeListener(event, listenerFn) {
-    switch (event) {
-      case 'powerState':
-        this.listeners.powerState.push(listenerFn);
-    }
-  },
+    subscribeListener(event, listenerFn) {
+        switch (event) {
+            case "powerState":
+                this.listeners.powerState.push(listenerFn);
+        }
+    },
 
-  _emitDeviceStateUpdate(changeInfo) {
-    this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo, this);
-  },
+    _emitDeviceStateUpdate(changeInfo) {
+        this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo, this);
+    },
 
-  /**
-   * Get the state from the handler if it supports it.
-   */
-  _getState() {
-    if (typeof this.deviceHandler.getState === 'function') {
-      return this.deviceHandler.getState();
-    }
+    /**
+     * Get the state from the handler if it supports it.
+     */
+    _getState() {
+        if (typeof this.deviceHandler.getState === "function") {
+            return this.deviceHandler.getState();
+        }
 
-    return this.state;
-  },
+        return this.state;
+    },
 
-  _trigger(event, data) {
-    const functions = this.listeners[event];
+    _trigger(event, data) {
+        const functions = this.listeners[event];
 
-    if (functions) {
-      this.listeners[event].forEach(listenerFn => listenerFn(data));
-    }
-  },
+        if (functions) {
+            this.listeners[event].forEach((listenerFn) => listenerFn(data));
+        }
+    },
 
-  _updateOnlineState(isRunning) {
-    if (isRunning) {
-      this.isOnline = isRunning;
-      this.lastSeenAt = Date.now();
-    }      
-  },
+    _updateOnlineState(isRunning) {
+        if (isRunning) {
+            this.isOnline = isRunning;
+            this.lastSeenAt = Date.now();
+        }
+    },
 
-  _updateState(payload, force) {
-    this.lastSeenAt = Date.now();
-    if (force || !_.isEqual(this.state, payload)) {
-      const changeInfo = this.deviceHandler.analyzeStateChange ?
-        this.deviceHandler.analyzeStateChange(this.state, payload) :
-        undefined;
+    _updateState(payload, force) {
+        this.lastSeenAt = Date.now();
+        if (force || !_.isEqual(this.state, payload)) {
+            const changeInfo = this.deviceHandler.analyzeStateChange
+                ? this.deviceHandler.analyzeStateChange(this.state, payload)
+                : undefined;
 
-      this.state = _.cloneDeep(payload);
-      this.powerState = this.state?.powerState;
+            this.state = _.cloneDeep(payload);
+            this.powerState = this.state?.powerState;
 
-      if (changeInfo?.on_off) {
-        this._trigger('powerState', this.powerState);
-      }
+            if (changeInfo?.on_off) {
+                this._trigger("powerState", this.powerState);
+            }
 
-      this._emitDeviceStateUpdate(changeInfo);      
-    }    
-  }
-  
-
+            this._emitDeviceStateUpdate(changeInfo);
+        }
+    },
 };
 
 export default VirtualDeviceWrapper;

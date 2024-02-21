@@ -5,7 +5,7 @@ function Alerts({alerts}) {
         return;
     }
 
-    const alertsJsx = alerts.map((alert: any, index) => {
+    const alertsJsx = alerts.sort((a, b) => a.issued_at > b.issued_at ? -1 : 1).map((alert: any, index) => {
         let levelText, badgeClass;
 
         switch (alert.level) {
@@ -30,7 +30,7 @@ function Alerts({alerts}) {
                 <div className={`alert-header-container`}>
                     <div>{alert.serviceLabel}</div>
                     <div>
-                        Issued at
+                        Issued at{" "}
                         {new Date(alert.issued_at).toLocaleTimeString(undefined, {
                             hour: "2-digit",
                             minute: "2-digit",

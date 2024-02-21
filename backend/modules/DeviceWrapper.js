@@ -434,6 +434,14 @@ const cmdFailPrefix = '[FAIL]';
     return commandObject;
   },
 
+  getAlerts() {
+    if (!Array.isArray(this.state.alerts)) {
+        return []
+    };
+
+    return this.state.alerts
+  },
+
   getLiveDevice() {
     return makeLiveDeviceObject(
       this, [

@@ -240,7 +240,7 @@ class ThermostatHandler {
         }  
       } else {
         if (location.isHeating()) {
-            alerts.push(createAlert(`${location.name}: Uncontrolled heater!`, "warn", this.thermostat.displayLabel));
+            alerts.push(createAlert(`${location.name}: Uncontrolled heater!`, "warn", this.thermostat));
             log(`${location.name}: Uncontrolled heater!`, this.thermostat, 'bgRed');
         }
       }
