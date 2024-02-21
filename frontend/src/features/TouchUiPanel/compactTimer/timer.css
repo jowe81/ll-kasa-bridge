@@ -11,18 +11,13 @@
   position: relative;
 }
 
-
-
-
 .compact-base-button {
   width: 75px; 
   height: 57px;
   border-radius: 5px;
-  border: 1px solid gray;
+  border: 1px solid rgba(128, 128, 128, 0.7);
   padding: 5px 0px;
-  /* margin: 5px 5px; */
   margin-bottom: 0px;
-  border: 1px solid gray;
   background-size: 20%;
   background-position: bottom left;
   background-repeat: no-repeat;

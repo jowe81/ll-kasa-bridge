@@ -33,9 +33,11 @@ function TouchUiPanel(props: any) {
             {panelMode && <CompactTimer />}
             {panelMode && <CompactCalendar />}
             {showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay} />}
-            {controlsMode && <div className="placeholder-200"></div>}
-            {alerts.length > 0 && <Alerts alerts={alerts}/>}
-            {alerts.length === 0 && <Notes />}
+
+            {controlsMode && <Notes />}
+            {controlsMode && <Alerts alerts={alerts}/>}
+            {panelMode && alerts.length > 0 && <Alerts alerts={alerts} />}
+            {panelMode && alerts.length === 0 && <Notes />}
             <Temperature thermometersStartIndex={2} />
 
             {showMailbox && <Mailbox />}

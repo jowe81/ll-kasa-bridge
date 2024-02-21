@@ -43,10 +43,16 @@ function Alerts({alerts}) {
         );
     });
 
+    let classNamePostfix = 'none';
+    if (alerts.length) {
+        classNamePostfix = 'red';
+    }
     return (
         <div className="touch-ui-panel-item">
-            <div className="alerts-compact-container">
-                <div className="alerts-label">{alerts.length} Alert{alerts.length === 1 ? '' : 's'}</div>
+            <div className={`alerts-compact-container alerts-compact-container-${classNamePostfix}`}>
+                {alerts.length > 0 && <div className={`alerts-label alerts-label-${classNamePostfix}`}>{alerts.length} Alert{alerts.length === 1 ? '' : 's'}</div>}
+                {!alerts.length && <div className={`alerts-label alerts-label-${classNamePostfix}`}>Alerts</div>}
+
                 <div className="alerts-compact-items-container">{alertsJsx}</div>
             </div>
         </div>
