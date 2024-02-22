@@ -6,20 +6,24 @@ function Notes() {
     const service = getNotesService();
     const records = getDynformsServiceRecords(service?.channel, undefined, true);
     const record = getMostRecentDisplayableRecord(records);
+    if (!record) {
+        return <div className="touch-ui-panel-item"><div className={`notes-container`}></div></div>
+    }
+
     const libraryInfo = getDynformsLibraryInfo(service);
     const supportedColors = ["purple", "blue", "green", "yellow", "gray", "pink"];
-    const createdAt = new Date(record?.created_at);
+    const createdAt = new Date(record.created_at);
     const colorClassName = mapRecordToColorClass(record, supportedColors, libraryInfo?.totalDocumentCount);
 
-    const url = record?.urlpath ? `http://jj-photos.wnet.wn:3021/db/imageFile?path=${record?.urlpath}` : null;
+    const url = record.urlpath ? `http://jj-photos.wnet.wn:3021/db/imageFile?path=${record.urlpath}` : null;
 
-    const message = record?.message;
+    const message = record.message;
     return (
         <div className="touch-ui-panel-item">
             <div className={`notes-container ${colorClassName}`}>
                 POST-IT
                 <span className="notes-date">
-                    (from {record.__user.name}, {createdAt.toLocaleDateString(undefined, { month: "short", day: "numeric" })})
+                    (from {record.__user?.name}, {createdAt.toLocaleDateString(undefined, { month: "short", day: "numeric" })})
                 </span>
                 {url && <div className="notes-image-container">
                     <img src={url} />
@@ -31,7 +35,7 @@ function Notes() {
 }
 
 function getMessageDivStyle(message) {
-    const length = message.split(/\s+/).length;
+    const length = message?.split(/\s+/).length;
     let fontSize = 14;
 
     if (length < 20) {
