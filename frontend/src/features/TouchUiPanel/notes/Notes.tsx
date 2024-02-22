@@ -1,47 +1,79 @@
 import './notes.scss'
 import { getNotesService } from '../../../devicesHelpers';
-import { getFirstDynformsServiceRecord } from '../../../dynformsHelpers';
+import { getDynformsServiceRecords, getDynformsLibraryInfo } from "../../../dynformsHelpers";
 function Notes() {
 
     const service = getNotesService();
-    const record = getFirstDynformsServiceRecord(service?.channel, 0);
-    console.log(service?.state)
+    const records = getDynformsServiceRecords(service?.channel, undefined, true);
+    const record = getMostRecentDisplayableRecord(records);
+    const libraryInfo = getDynformsLibraryInfo(service);
+    const supportedColors = ["purple", "blue", "green", "yellow", "gray", "pink"];
     const createdAt = new Date(record?.created_at);
+    const colorClassName = mapRecordToColorClass(record, supportedColors, libraryInfo?.totalDocumentCount);
 
-    function mapDateToColorClass(date) {
-        const n = date.getDate() % 4;
-        
-        switch(n) {
-            case 0:
-                return 'notes-purple';
-            
-            case 1:
-                return 'notes-blue';
+    const url = record?.urlpath ? `http://jj-photos.wnet.wn:3021/db/imageFile?path=${record?.urlpath}` : null;
 
-            case 2:
-                return 'notes-green';
-
-            case 3:
-                return 'notes-yellow';
-        }
-    }
-
-    const colorClassName = mapDateToColorClass(createdAt)
-
-    const url = `http://jj-photos.wnet.wn:3021/db/imageFile?path=${record?.urlpath}`
+    const message = record?.message;
     return (
         <div className="touch-ui-panel-item">
             <div className={`notes-container ${colorClassName}`}>
                 POST-IT
                 <span className="notes-date">
-                    (from {createdAt.toLocaleDateString(undefined, { month: "short", day: "numeric" })})
+                    (from {record.__user.name}, {createdAt.toLocaleDateString(undefined, { month: "short", day: "numeric" })})
                 </span>
-                <div className="notes-image-container">
+                {url && <div className="notes-image-container">
                     <img src={url} />
-                </div>
+                </div>}
+                {!url && <div className={`notes-message`} style={getMessageDivStyle(message)}>{message}</div>}
             </div>
         </div>
     );
 }
+
+function getMessageDivStyle(message) {
+    const length = message.split(/\s+/).length;
+    let fontSize = 14;
+
+    if (length < 20) {
+        fontSize = 20;
+    }
+
+    if (length > 40) {
+        fontSize = 11;
+    }
+
+    return {
+        fontSize,
+    }
+}
+function getMostRecentDisplayableRecord(records) {
+    return records.find(record => record.display && (record.urlpath || record.message));
+}
+
+function mapRecordToColorClass(record, supportedColors, runningNumber) {
+    if (supportedColors.includes(record?.color)) {
+        return `notes-${record.color}`;
+    }
+
+    const n = (runningNumber ?? 0) % 4;
+
+    switch (n) {
+        case 0:
+            return "notes-yellow";
+
+        case 1:
+            return "notes-purple";
+
+        case 2:
+            return "notes-green";
+
+        case 3:
+            return "notes-blue";
+
+        default:
+            return "notes-gray";
+    }
+}
+
 
 export default Notes

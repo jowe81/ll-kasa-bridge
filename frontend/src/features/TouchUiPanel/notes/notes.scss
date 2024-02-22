@@ -27,11 +27,52 @@
             opacity: 50%;
         }
     }
+
+    .notes-message {
+        position: absolute;
+        top: 25px;
+        height: 113px;
+        overflow-y: auto;
+        left: 0px;
+        width: 100%;
+        padding: 5px;        
+        display: grid;
+        place-content: center;        
+    }
+
+    /* Track */
+    .notes-message::-webkit-scrollbar-track {
+        background-color: rgba(81, 36, 217, 0.118);
+    }
+    
+    /* Handle */
+    .notes-message::-webkit-scrollbar-thumb {
+        background: #5031e984;
+    }
+
+    /* Handle on hover */
+    .notes-message::-webkit-scrollbar-thumb:hover {
+        background: rgb(141, 4, 4);
+    }    
+
+    
 }
 
 .notes-purple {
     background-color: rgba(156, 57, 161, 0.387);
     color: rgba(160, 106, 160, 0.71);
+}
+
+.notes-pink {
+    $color: rgba(255, 98, 239, 0.33);
+    color: $color;
+    background-color: rgba($color, .5)
+}
+
+.notes-red {
+    $color: rgba(255, 98, 98, 0.33);
+    color: $color;
+    background-color: rgba($color, .5)
 }
 
 .notes-green {
@@ -48,6 +89,12 @@
 
 .notes-yellow {
     $color: rgba(162, 141, 66, 0.615);
+    color: $color;
+    background-color: rgba($color, .5)
+}
+
+.notes-gray {
+    $color: rgba(130, 130, 130, 0.615);
     color: $color;
     background-color: rgba($color, .5)
 }

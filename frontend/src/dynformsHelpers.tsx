@@ -23,9 +23,14 @@ function getFirstDynformsServiceRecordFromLastRequest(channel) {
     return getFirstDynformsServiceRecord(channel, undefined, true);
 }
 
+function getDynformsLibraryInfo(dynformsService) {  
+    return dynformsService?.state?.requests[0]?.data?.libraryInfo;  
+}
+
 
 export {
   getDynformsServiceRecords,
+  getDynformsLibraryInfo,
   getFirstDynformsServiceRecord,
   getFirstDynformsServiceRecordFromLastRequest,
 }
