@@ -2034,21 +2034,18 @@ const deviceMap = [
                     collectionName: "notes_scanned",
                     retrieve: {
                         time: {
-                            frequency: "daily",
-                            hours: 0,
-                            minutes: 15,
+                            frequency: "minutes",
+                            minutes: 60,
                         },
-                        singleRecord: {
-                            // Have dynforms pick the item
-                            type: "__RANDOMIZED_PREORDERED",
+                        orderBy: {
+                            created_at: -1,
                         },
                     },
                 },
             ],
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 30 * SECOND,
-            ui: {
-            },
+            ui: {},
         },
     },
 
@@ -2080,6 +2077,38 @@ const deviceMap = [
             },
             buttons: [
                 // *********** Presets *************
+                {
+                    type: "preset",
+                    alias: "Movie",
+                    switch: [
+                        {
+                            groupId: "group-livingroomLights",
+                            stateData: {
+                                on_off: 1,
+                                brightness: 1,
+                            },
+                        },
+                        {
+                            groupId: "group-kitchenCounterLights",
+                            stateData: false,
+                        },
+                        {
+                            groupId: "group-hallwayCeiling",
+                            stateData: false,
+                            ignoreForButtonState: true,
+                        },
+                        {
+                            // Kitchen table
+                            channel: 28,
+                            stateData: false,
+                        },
+                        {
+                            // Kitchen Aleds
+                            channel: 44,
+                            stateData: true,
+                        },
+                    ],
+                },
                 {
                     type: "preset",
                     alias: "Full",
@@ -2181,38 +2210,6 @@ const deviceMap = [
                                 color_temp: 6000,
                             },
                             ignoreForButtonState: true,
-                        },
-                    ],
-                },
-                {
-                    type: "preset",
-                    alias: "Movie",
-                    switch: [
-                        {
-                            groupId: "group-livingroomLights",
-                            stateData: {
-                                on_off: 1,
-                                brightness: 1,
-                            },
-                        },
-                        {
-                            groupId: "group-kitchenCounterLights",
-                            stateData: false,
-                        },
-                        {
-                            groupId: "group-hallwayCeiling",
-                            stateData: false,
-                            ignoreForButtonState: true,
-                        },
-                        {
-                            // Kitchen table
-                            channel: 28,
-                            stateData: false,
-                        },
-                        {
-                            // Kitchen Aleds
-                            channel: 44,
-                            stateData: true,
                         },
                     ],
                 },

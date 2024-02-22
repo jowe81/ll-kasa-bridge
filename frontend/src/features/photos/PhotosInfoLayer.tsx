@@ -110,21 +110,66 @@ function PhotosInfoLayer({ photosService, hideLayer, record, screenMode }) {
     const resulutionText = getResolutionText();
     const aspectText = getAspectText();
 
+    const filterSizeText = getFilterSizeText();
+    const filterSizeJsx = <div className="info-section">
+                        <div className="info-section-header">Current Filter:</div>
+                        {filterSizeText}
+                    </div>;
+
     return (
         <div className={`touch-layer photos-info-layer ${fullWidth ? `` : `window-mode`}`}>
-            <div className="horizontal-row-top">{!fullWidth && getFilterSizeText()}</div>
+            <div className="horizontal-row-top">{!fullWidth && filterSizeJsx}</div>
             <div className="horizontal-row-remaining-space">
                 <div className="hide-button" onClick={hideLayer}></div>
             </div>
             <div className="horizontal-row">
-                {dateText && <div>{dateText}</div>}
-                {tagsText && <div>{tagsText}</div>}
-                {collectionsText && <div>{collectionsText}</div>}
-                {folderText && <div>{folderText}</div>}
-                {deviceText && <div>{deviceText}</div>}
-                {resulutionText && <div>{resulutionText}</div>}
-                {aspectText && <div>{aspectText}</div>}
-                {fullWidth && <>{getSpacer()} {getFilterSizeText()}</>}
+                {dateText && (
+                    <div className="info-section">
+                        <div className="info-section-header">Date:</div>
+                        {dateText}
+                    </div>
+                )}
+                {tagsText && (
+                    <div className="info-section">
+                        <div className="info-section-header">Tags:</div>
+                        {tagsText}
+                    </div>
+                )}
+                {collectionsText && (
+                    <div className="info-section">
+                        <div className="info-section-header">Collections:</div>
+                        {collectionsText}
+                    </div>
+                )}
+                {folderText && (
+                    <div className="info-section">
+                        <div className="info-section-header">Folder:</div>
+                        {folderText}
+                    </div>
+                )}
+                {deviceText && (
+                    <div className="info-section">
+                        <div className="info-section-header">Camera:</div>
+                        {deviceText}
+                    </div>
+                )}
+                {resulutionText && (
+                    <div className="info-section">
+                        <div className="info-section-header">Resolution:</div>
+                        {resulutionText}
+                    </div>
+                )}
+                {aspectText && (
+                    <div className="info-section">
+                        <div className="info-section-header">Aspect:</div>
+                        {aspectText}
+                    </div>
+                )}
+                {fullWidth && (
+                    <>
+                        {getSpacer()} {filterSizeJsx}
+                    </>
+                )}
             </div>
         </div>
     );

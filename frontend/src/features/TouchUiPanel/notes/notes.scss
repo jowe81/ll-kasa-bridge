@@ -2,11 +2,9 @@
     width: 222px;
     height: 100%;
     position: relative;
-    background-color: rgba(156, 57, 161, 0.387);
     font-size: 80%;
     padding-left: 10px;
     padding-top: 6px;
-    color: rgba(160, 106, 160, 0.71);
 
     .notes-date {
         font-style: italic;
@@ -29,4 +27,27 @@
             opacity: 50%;
         }
     }
+}
+
+.notes-purple {
+    background-color: rgba(156, 57, 161, 0.387);
+    color: rgba(160, 106, 160, 0.71);
+}
+
+.notes-green {
+    $color: rgba(0, 140, 0, 0.655);
+    color: $color;
+    background-color: rgba($color, .5)
+}
+
+.notes-blue {
+    $color: rgba(98, 98, 247, 0.706);
+    color: $color;
+    background-color: rgba($color, .4)
+}
+
+.notes-yellow {
+    $color: rgba(162, 141, 66, 0.615);
+    color: $color;
+    background-color: rgba($color, .5)
 }
