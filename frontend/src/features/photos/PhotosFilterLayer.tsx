@@ -65,7 +65,7 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         }
 
         setInputValue(newInputValue);
-        setFilter({ ...filter, tags: splitTags(newInputValue) });
+        setFilter({ ...filter, tags: splitTags(newInputValue), folders: [] });
     }
 
     function addRemoveCollectionFromFilter(collectionName) {
@@ -211,6 +211,7 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
         const newFilter = {
             ...filter,
             [property]: newDate,
+            folders: [],
         };
         setFilter(newFilter);
     }
