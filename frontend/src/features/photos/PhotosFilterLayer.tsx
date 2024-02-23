@@ -3,6 +3,7 @@ import {
     getDefaultCollectionsJsx,
     getCustomCollectionsJsx,
     getLibraryInfo,
+    getLatestOps,
 } from "./photosHelpers.tsx";
 import TouchUIBooleanField from "./TouchUIBooleanField";
 import TouchUIDateSelector from "./TouchUIDateSelector";
@@ -33,9 +34,12 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
     }
 
     const libraryInfo = getLibraryInfo(photosService);
+    const latestOps = getLatestOps(photosService);
+    const defaultFilter = initialState.photosFilterLayer.filter;
 
     // Make sure to update the filter if a remote change comes in.
     useEffect(() => {
+        console.log("Currenet filter", latestOps);
         setFilter({
             ...filter,
             ...uiInfo?.filter,
@@ -94,30 +98,27 @@ function PhotosFilterLayer({ setPhotosServiceFilter, hideChangeFilterLayer, uiIn
             }
         }
 
-        setFilter({ ...filter, collections: newCollections });
+        setFilter({ ...filter, collections: newCollections, folders: [] });
     }
 
     function addRemoveFolderFromFilter(folderInfo: any) {
         let newFolders: string[] = [];
-        let newCollections = [...filter.collections];
         if (filter.folders) {
             if (filter.folders.includes(folderInfo.item)) {
                 newFolders = filter.folders.filter((item) => item != folderInfo.item);
             } else {
                 // Add this folder.
                 newFolders = [...filter.folders, folderInfo.item];
-                // Also, ensure to look in the default collections
-                newCollections = [
-                    ...filter.collections.filter((collectionName) => !["general", "unsorted"].includes(collectionName)),
-                    'general',
-                    'unsorted',
-                ]
             }
         } else {
             newFolders = [folderInfo.item as string];
         }
 
-        setFilter({ ...filter, collections: newCollections, folders: newFolders });
+        if (newFolders.length) {
+            setFilter({ ...defaultFilter, collections:['general', 'unsorted'], folders: newFolders });        
+        } else {
+            setFilter({ ...filter, folders: newFolders });
+        }
     }
 
     const keyboardConfigTags = {

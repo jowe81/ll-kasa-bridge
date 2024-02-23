@@ -96,6 +96,9 @@
   border-left: 1px solid rgb(55, 55, 55); 
   height: 100%;
   margin-left: 5px;
+
+  /* This addresses a bug where sometimes the middle section wouldn't take up quite all the space it should */
+  width: 9999px !important;
 }
 
 .touch-ui-main-column-remaining-space .remaining-main {
