@@ -11,14 +11,14 @@ function Pages({}) {
     }
 
     const pages = [
-        {
-            title: "Jess",
-            content: <Chores dynformsUserId={`jess`} />,
-        },
-        {
-            title: "Johannes",
-            content: <Chores dynformsUserId={`johannes`} />,
-        },
+        // {
+        //     title: "Jess",
+        //     content: <Chores dynformsUserId={`jess`} />,
+        // },
+        // {
+        //     title: "Johannes",
+        //     content: <Chores dynformsUserId={`johannes`} />,
+        // },
         {
             title: "Johannes",
             content: <Medical />,
