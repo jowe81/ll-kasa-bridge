@@ -11,18 +11,18 @@ function Pages({}) {
     }
 
     const pages = [
-        // {
-        //     title: "Jess",
-        //     content: <Chores dynformsUsername={`Jess`} />,
-        // },
-        // { 
-        //     title: "Johannes",
-        //     content: <Chores dynformsUsername={`Johannes`} />,
-        // },
+        {
+            title: "Jess",
+            content: <Chores dynformsUserId={`jess`} />,
+        },
         {
             title: "Johannes",
-            content: <Medical />
-        }
+            content: <Chores dynformsUserId={`johannes`} />,
+        },
+        {
+            title: "Johannes",
+            content: <Medical />,
+        },
     ];
     return (
         <div className="pages-container">

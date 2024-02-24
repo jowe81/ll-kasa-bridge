@@ -43,16 +43,14 @@
 }
 
 .chore-button {
-    width: 70px;
+    width: auto !important;
     height: 40px;
     color:rgba(217, 188, 220, 0.5);
     border-color: rgba(217, 188, 220, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(83, 35, 35, 0.644);
-
-    
+    background-color: rgba(83, 35, 35, 0.644);    
 }
 
 .chore-button-done {

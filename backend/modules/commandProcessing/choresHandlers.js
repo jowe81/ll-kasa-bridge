@@ -19,6 +19,10 @@ async function doChore(deviceWrapper, command) {
         },
         chore,
     }
+
+    log(`Requesting chores table reload`, deviceWrapper, "yellow");
+    deviceWrapper.deviceHandler.runRequestNow(0, {});
+
     return storeUpdateRecord(deviceWrapper, record);
 }
 

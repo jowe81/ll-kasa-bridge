@@ -27,6 +27,10 @@
   overflow-y: scroll;
   overflow-x: hidden;
   max-height: 176px;
+  background-image: url('/icons/birthday.png');
+  background-repeat: no-repeat;
+  background-size: 50%;
+  background-position: bottom;
 }
 
 .birthday-item-container{
@@ -41,6 +45,7 @@
 }
 
 .birthday-item-none { 
+  background-color: rgb(24, 20, 41);
   background-image: url('/icons/birthday.png');
   background-repeat: no-repeat;
   background-position: 58px 10px;  
@@ -50,19 +55,6 @@
   font-size: 18px;
   padding-top: 168px;
   padding-left: 77px;  
-}
-
-.birthday-item-some { 
-  background-image: url('/icons/birthday.png');
-  background-repeat: no-repeat;
-  background-size: 50%;
-  background-position: bottom;
-  margin-left: 8px;
-  margin-bottom: 10px;
-  width: 100%;
-  flex-grow: 1;
-  color: rgba(255, 255, 255, 0.2);
-  font-size: 18px;
 }
 
 .birthday-item-container-today {
@@ -96,6 +88,7 @@
 
 .birthday-item-container-later {
   color:rgb(187, 194, 204);
+  background-color: rgba(24, 20, 41, .5);
   font-size: 90%;
 }
 

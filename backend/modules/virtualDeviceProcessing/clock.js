@@ -154,13 +154,17 @@ class ClockHandler {
           nextSunEvent,
         }
 
-        this.clock._updateState(
-            {
-                powerState: this.clock.getPowerState(),
-                clock: clockData,
-            },
-            true
-        );
+        // Only push if the minute switched over.
+        if (this.clock._previousMinute !== now.getMinutes()) {
+            this.clock._previousMinute = now.getMinutes();
+            this.clock._updateState(
+                {
+                    powerState: this.clock.getPowerState(),
+                    clock: clockData,
+                },
+                true
+            );
+        }
     }
 }
 
