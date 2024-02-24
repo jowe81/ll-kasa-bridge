@@ -65,6 +65,8 @@ const getPhotosService = () => getDeviceByChannel(constants.photos?.serviceChann
 
 const getChoresService = () => getDeviceByChannel(constants.chores?.serviceChannel);
 
+const getMailbox = () => getFirstDeviceOfType(constants.DEVICETYPE_ESP_RELAY, constants.SUBTYPE_MAIL_COMPARTMENT);
+
 const getBirthdaysService = () => getDeviceByChannel(constants.birthdays?.serviceChannel);
 
 const getMedicalService = () => getDeviceByChannel(constants.medical?.serviceChannel);
@@ -147,6 +149,7 @@ function getAlerts() {
 
     services.push(getMedicalService());
     services.push(getChoresService());
+    services.push(getMailbox());
 
     const thermostats = getThermostats();
     if (Array.isArray(thermostats) && thermostats.length) {
@@ -157,7 +160,7 @@ function getAlerts() {
     services = services.filter((item) => item);
 
     const alerts = [];
-    services.forEach((service) => Array.isArray(service.state.alerts) && alerts.push(...service.state.alerts));
+    services.forEach((service) => Array.isArray(service.state?.alerts) && alerts.push(...service.state?.alerts));
 
     return alerts;
 }
@@ -170,6 +173,7 @@ export {
     getDevicesByType,
     getCalendar,
     getClock,
+    getMailbox,
     getMasterSwitch,
     getMasterSwitchDimInfo,
     getMedicalService,

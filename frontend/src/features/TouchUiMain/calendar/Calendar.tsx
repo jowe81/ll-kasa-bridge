@@ -80,7 +80,12 @@ function Calendar() {
 
         if (isSameDay(startDate, endDate)) {
             // Contained within a day - only start date.
-            dateTimeStr = `${startDateStr}, ${startTimeStr} - ${endTimeStr}`;
+            if (isMidnightToMidnight(startDate, endDate)) {
+                // All day event - don't show a time.
+                dateTimeStr = startDateStr;
+            } else {
+                dateTimeStr = `${startDateStr}, ${startTimeStr} - ${endTimeStr}`;
+            }            
         } else {
             // Multiday - start/end date.
             dateTimeStr = `${startDateStr}, ${startTimeStr} - ${endDateStr}, ${endTimeStr}`;
@@ -133,7 +138,13 @@ function Calendar() {
             } else {
                 // It is after this week
                 if (isSameDay(startDate, endDate)) {
-                    dateTimeStr = `${startDateStr}, ${startTimeStr} - ${endTimeStr}`;
+                    // Contained within a day - only start date.
+                    if (isMidnightToMidnight(startDate, endDate)) {
+                        // All day event - don't show a time.
+                        dateTimeStr = startDateStr;
+                    } else {
+                        dateTimeStr = `${startDateStr}, ${startTimeStr} - ${endTimeStr}`;
+                    }
                 } else {
                     if (!isSameTime(startDate, endDate)) {
                         if (isMidnightToMidnight(startDate, endDate)) {

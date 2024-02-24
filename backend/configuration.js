@@ -1687,8 +1687,8 @@ const deviceMap = [
                             minutes: 15,
                         },
                         singleRecord: {
-                            // Have dynforms pick the item
-                            type: "__RANDOMIZED_PREORDERED",
+                            type: "__CURSOR_INDEX",
+                            advance: "daily",
                         },
                     },
                 },
@@ -2133,6 +2133,12 @@ const deviceMap = [
                             },
                             ignoreForButtonState: true,
                         },
+                        {
+                            channel: 35,
+                            stateDate: {
+                                brightness: 100,
+                            }
+                        }
                     ],
                 },
                 {

@@ -143,7 +143,11 @@ class DynformsServiceHandler {
                 switch (info.retrieve.singleRecord.type) {
                     case "__RANDOMIZED_PREORDERED":
                         // Use the dynforms semi-random algorithm
-                        request.settings.singleRecord.semiRandom = true;
+                        request.settings.singleRecord.type = "__RANDOMIZED_PREORDERED";
+                        break;
+
+                    case "__CURSOR_INDEX":
+                        request.settings.singleRecord.type = "__CURSOR_INDEX";
                         break;
 
                     default:
@@ -246,6 +250,11 @@ class DynformsServiceHandler {
         }, 5000);
     }
 
+    getClientId() {
+        // Construct a client ID that is specific to the app and service.
+        return (`${process.env.APP_NAME}.${this.service.id ?? this.service.channel}`)
+    }
+
     pauseResumeRequest(requestIndex) {
         let { pausedRequestIndexes } = this.cache;        
         let newIndexes;
@@ -283,6 +292,7 @@ class DynformsServiceHandler {
             collectionName,
             record,
             ...extraData,
+            clientId: this.getClientId(),
         }
 
         const url = this.service.fullUrlPush;
@@ -336,6 +346,8 @@ class DynformsServiceHandler {
     async _executeRequest(requestInfo, requestIndex) {
         const requestConfig = this.service.settings.requests[requestIndex];
         requestConfig._lastExecuted = new Date();
+        requestInfo.clientId = this.getClientId();
+
         return axios.post(this.service.fullUrlPull, requestInfo);
     }
 
@@ -381,6 +393,7 @@ class DynformsServiceHandler {
             const requestConfig = this.service.settings.requests[requestIndex];
             requestConfig._lastExecuted = now;
             log(`Request ${requestIndex}: ${this.service.fullUrlPull} ${JSON.stringify(requestInfo)}`, this.service, 'yellow');
+            requestInfo.clientId = this.getClientId();
             return axios.post(this.service.fullUrlPull, requestInfo);
         });
 
