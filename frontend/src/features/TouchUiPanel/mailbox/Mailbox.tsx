@@ -1,6 +1,6 @@
 import { socket } from '../../websockets/socket';
 import constants from '../../../constants';
-import { getDeviceByChannel } from '../../../devicesHelpers';
+import { getDeviceByChannel, getMailbox } from '../../../devicesHelpers';
 import './mailbox.css'
 
 function Mailbox() {
@@ -16,7 +16,7 @@ function Mailbox() {
       }
   };
 
-  const mailbox = getDeviceByChannel(constants.touchPanel?.mailboxChannel);
+  const mailbox = getMailbox();
 
   const imageContainerClassName = mailbox?.powerState
       ? "mailbox-image-container"
