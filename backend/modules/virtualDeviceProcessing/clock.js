@@ -1,7 +1,7 @@
 import _ from "lodash";
 import axios from "axios";
 import { makeLiveDeviceObject } from "../TargetDataProcessor.js";
-import { formatTime, formatDateLong, getSunrise, getSunset, getNoon, isDaytime, getTomorrow } from "../../helpers/jDateTimeUtils.js";
+import { formatTime, formatDateLong, getSunrise, getSunset, getNoon, isDaytime, getTomorrow, isDST } from "../../helpers/jDateTimeUtils.js";
 import constants from "../../constants.js";
 import { log, debug } from "../Log.js";
 
@@ -164,6 +164,27 @@ class ClockHandler {
                 },
                 true
             );
+
+            // Update the bedroom clock
+            const hoursPadded = now.getHours().toString().padStart(2, "0");
+            const minutesPadded = now.getMinutes().toString().padStart(2, "0");
+            
+            axios.get(`http://clock.wnet.wn/write?simple=${hoursPadded}.${minutesPadded}`).catch(err => {
+                log(`Unable to write to bedroom wallclock.`, this.clock, 'red');
+            })
+
+            if (now.getMinutes() == 0) {        
+                let offset = isDST() ? 0 : -3600;
+                axios
+                    .get(`http://bclock.wnet.wn/write?timestamp=${Math.floor(now.getTime() / 1000) + offset}`)
+                    .then((data) => {
+                        log(`Updated binary wall clock (DST offset in seconds: ${offset}).`, this.clock, "yellow");
+                    })
+                    .catch((err) => {
+                        log(`Unable to write to bedroom wallclock.`, this.clock, "red");
+                    });
+
+            }
         }
     }
 }

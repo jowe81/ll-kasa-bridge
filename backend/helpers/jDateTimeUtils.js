@@ -480,6 +480,30 @@ function isLeapYear(year) {
   return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
 }
 
+function isDST() {
+    // Get the current date
+    const today = new Date();
+
+    // Get the current year
+    const year = today.getFullYear();
+
+    // Create two dates: one in January (not in DST for northern hemisphere) and one in June (in DST for most northern hemisphere locations)
+    const january = new Date(year, 0, 1); // January 1
+    const june = new Date(year, 5, 1); // June 1
+
+    // Get timezone offsets for January and June (in minutes)
+    const offsetJanuary = january.getTimezoneOffset();
+    const offsetJune = june.getTimezoneOffset();
+
+    // The timezone offset is greater in January (Standard Time) than in June (DST) for locations in the northern hemisphere.
+    // For the southern hemisphere, the logic is reversed, and you might need to adjust the months or logic accordingly.
+
+    // If today's offset is different from January's, it means DST is in effect (assuming northern hemisphere logic).
+    const isDstNow = today.getTimezoneOffset() < offsetJanuary;
+
+    return isDstNow;
+}
+
 
 export {
   formatDate,
@@ -501,6 +525,7 @@ export {
   isDawnOrDusk,
   isDawn,
   isDusk,
+  isDST,
   isAm,
   isPm,
   isLeapYear,
