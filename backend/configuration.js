@@ -802,7 +802,7 @@ const deviceMap = [
         id: "80128096836910A62F80A6B532C1461E1F79D295",
         locationId: "loc-bathroom",
         subType: SUBTYPE_BULB,
-        filters: [{ refId: "naturalLight" }, { refId: "schedule-bathroomLights" }],
+        filters: [{ refId: "naturalLight" }],
     },
     {
         alias: "Bathroom 4",

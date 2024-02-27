@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Medical from '../Medical/Medical';
 import Chores from '../chores/Chores';
 import './pages.scss';
@@ -11,18 +11,18 @@ function Pages({}) {
     }
 
     const pages = [
-        // {
-        //     title: "Jess",
-        //     content: <Chores dynformsUserId={`jess`} />,
-        // },
-        // {
-        //     title: "Johannes",
-        //     content: <Chores dynformsUserId={`johannes`} />,
-        // },
         {
             title: "Johannes",
             content: <Medical />,
         },
+        // {
+        //     title: "Johannes",
+        //     content: <Chores dynformsUserId={`johannes`} />,
+        // },
+        // {
+        //     title: "Jess",
+        //     content: <Chores dynformsUserId={`jess`} />,
+        // },
     ];
     return (
         <div className="pages-container">

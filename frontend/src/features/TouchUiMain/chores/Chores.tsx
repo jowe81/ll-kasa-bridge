@@ -1,7 +1,6 @@
-import React from 'react'
 import { getChoresService, runServiceCommand } from "../../../devicesHelpers";
-import { getDynformsServiceRecords } from '../../../dynformsHelpers';
-import './chores.scss';
+import { isToday } from '../calendar/calendarHelpers';
+import "./chores.scss";
 
 function Chores({ dynformsUserId }) {
     const service = getChoresService();
@@ -10,35 +9,18 @@ function Chores({ dynformsUserId }) {
         return null;
     }
 
-    function getChoresInfo(choresService, dynformsUserId) {
-        const records = getDynformsServiceRecords(choresService.channel, 0, false);
-        const choresInfo = choresService?.state?.settings.custom;
-
-        if (!choresInfo || !dynformsUserId) {
-            return [];
-        }
-
-        const { users, chores } = choresInfo;
-
-        if (!users || !chores) {
-            return [];
-        }
-        return {
-            user: users.find((user) => user.id === dynformsUserId),
-            chores: chores.filter((chore) => chore.user === dynformsUserId).sort((a, b) => a.label > b.label ? 1 : -1),
-        }
-    }
-
     const choresInfo = getChoresInfo(service, dynformsUserId);
     const { user, chores } = choresInfo;
+    const records = getRecords(service, user);
 
     function doChore(chore) {
         runServiceCommand(service, "doChore", { chore, dynformsUsername: user.name });
     }
 
     const choresButtonsJsx = chores.map((chore, index) => {
+        const classDone = choreDoneToday(user, chore, records) ? `chore-button-done` : ``
         return (
-            <div key={index} className="base-button chore-button" onClick={() => doChore(chore)}>
+            <div key={index} className={`base-button chore-button ${classDone}`} onClick={() => doChore(chore)}>
                 {chore.label}
             </div>
         );
@@ -50,6 +32,45 @@ function Chores({ dynformsUserId }) {
             <div className="chores-items-container">{choresButtonsJsx}</div>
         </div>
     );
+}
+
+
+function getChoresInfo(choresService, dynformsUserId) {
+    const choresInfo = choresService?.state?.settings.custom;
+
+    if (!choresInfo || !dynformsUserId) {
+        return [];
+    }
+
+    const { users, chores } = choresInfo;
+
+    if (!users || !chores) {
+        return [];
+    }
+    return {
+        user: users.find((user) => user.id === dynformsUserId),
+        chores: chores
+            .filter((chore) => chore.user === dynformsUserId)
+            .sort((a, b) => (a.label > b.label ? 1 : -1)),
+    };
+}
+
+function getRecords(choresService, user) {
+    let records = [];    
+    if (choresService.state?.requests && choresService.state.requests[0]) {
+        if (choresService.state.requests[0][user.id]) {
+            records = choresService.state.requests[0][user.id].records;
+        }
+    }
+    return records;
+}
+
+function choreDoneToday(user, chore, records) {
+    if (!user || !chore || !records) {
+        return null;
+    }
+    console.log(records)
+    return records.find(record => isToday(new Date(record.created_at)) && record.chore?.id === chore.id && record.__user.name === user.name);
 }
 
 export default Chores

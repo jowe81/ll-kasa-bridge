@@ -20,10 +20,10 @@ async function doChore(deviceWrapper, command) {
         chore,
     }
 
+    log(`Storing chore record`, deviceWrapper, "yellow");
+    await storeUpdateRecord(deviceWrapper, record);
     log(`Requesting chores table reload`, deviceWrapper, "yellow");
-    deviceWrapper.deviceHandler.runRequestNow(0, {});
-
-    return storeUpdateRecord(deviceWrapper, record);
+    await deviceWrapper.deviceHandler.runRequestNow(0, {});    
 }
 
 async function toggleChore(deviceWrapper, command) {
@@ -31,6 +31,31 @@ async function toggleChore(deviceWrapper, command) {
 
 function _processApiResponse(deviceWrapper, displayData, requestIndex) {
     const cache = deviceWrapper.getCache();
+    const records = displayData.data?.records;
+    
+    return getChoresInfoByUser(deviceWrapper, records);
+}
+
+
+function getChoresInfoByUser(deviceWrapper, records) {
+    const users = deviceWrapper.settings?.custom?.users;
+    const chores = deviceWrapper.settings?.custom?.chores;
+
+    if (!users || !chores) {
+        return {};
+    }
+
+    const displayData = {};
+
+    users.forEach((user) => {
+        displayData[user.id] = {
+            chores: chores
+                .filter((chore) => chore.user === user.id)
+                .sort((a, b) => (a.label > b.label ? 1 : -1)),
+            records: records.filter((record) => record.__user?.name === user.name),
+        };
+    });
+
     return displayData;
 }
 

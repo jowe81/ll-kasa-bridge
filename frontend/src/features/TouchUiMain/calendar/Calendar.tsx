@@ -130,6 +130,24 @@ function Calendar() {
                     }
                 }
 
+                if (isSameDay(startDate, endDate)) {
+                    // Contained within a day - only start date.
+                    if (isMidnightToMidnight(startDate, endDate)) {
+                        // All day event - don't show a time.
+                        dateTimeStr = dateLabel;
+                    } else {
+                        dateTimeStr = `${startDateStr}, ${startTimeStr} - ${endTimeStr}`;
+                    }
+                } else {
+                    if (!isSameTime(startDate, endDate)) {
+                        if (isMidnightToMidnight(startDate, endDate)) {
+                            dateTimeStr = `${startDateStr} - ${endDateStr}`;
+                        } else {
+                            dateTimeStr = `${dateLabel}, ${startTimeStr} - ${endDateStr}, ${endTimeStr}`;
+                        }
+                    }
+                }
+
                 calendarItemsJsx.push(
                     <div key={`divider_${index}`} className="calendar-event-divider-container">
                         {dateLabel}
@@ -194,7 +212,7 @@ function Calendar() {
                         <div className="event-calendar-label">{event.calendarLabel}</div>
                     </div>
                     <div className="event-start-end">
-                        {eventIsNow && <div className="event-happening-now-alert">In Progress</div>}
+                        {(eventIsNow && isToday(endDate)) && <div className="event-happening-now-alert">In Progress</div>}
                         {eventStartsSoon && (
                             <div className="event-happening-soon-alert">In {getTimeDifference(startDate, now)}</div>
                         )}

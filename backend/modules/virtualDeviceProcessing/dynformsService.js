@@ -327,20 +327,15 @@ class DynformsServiceHandler {
             }
         }
         
-
-        this._executeRequest(request, requestIndex)
-            .then((data) => {
-                this.cache.data[requestIndex] = data.data;
-            })
-            .catch((err) => {
-                log(`${this.service.alias}: API request failed`, this.service, "red");
-            })
-            .then((data) => {
-                this.processCachedApiResponse(requestIndex);
-            })
-            .catch((err) => {
-                log(`${this.service.alias}: Processing API response failed`, this.service, "red");
-            });
+        let data;
+        try {
+            data = await this._executeRequest(request, requestIndex);
+            this.cache.data[requestIndex] = data.data;
+            this.processCachedApiResponse(requestIndex);
+        } catch (err) {
+            log(`${this.service.alias}: API request failed`, this.service, "red");
+        }
+        return data;
     }
 
     async _executeRequest(requestInfo, requestIndex) {

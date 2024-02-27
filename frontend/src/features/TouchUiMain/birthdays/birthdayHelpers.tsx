@@ -63,8 +63,18 @@ function getDisplayName(record, fullSize) {
     let displayName = record.first_name;
 
     if (fullSize) {
+        if (record.middle_names) {
+            if (record.middle_names.length + record.first_name.length > 12) {
+                displayName += ` ${record.middle_names.substr(0, 1)}.`;    
+            } else {
+                displayName += ` ${record.middle_names}`;
+            }            
+        }
       displayName += ` ${record.last_name}`;
     } else {
+        if (record.middle_names) {
+            displayName += ` ${record.middle_names.substr(0, 1)}.`;   
+        }
       displayName += ` ${record.last_name.substr(0,1)}.`;
     }
 

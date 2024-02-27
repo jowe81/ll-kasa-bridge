@@ -8,7 +8,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   text-align: left;
-  height: 173px;
+  height: 209px;
 }
 
 .chores-items-container {
@@ -16,11 +16,12 @@
   background-color: rgb(42, 31, 42);
   margin: 5px auto;
   padding: 3px;
-  display: flex;
-  align-items: flex-start;
+  display: flex;  
+  align-content: flex-start;
+  justify-content: flex-start;
   flex-flow: row wrap;  
   // overflow-y: scroll;
-  height: 130px;
+  height: 166px;
   color:rgba(209, 190, 212, 0.608);
 
 }

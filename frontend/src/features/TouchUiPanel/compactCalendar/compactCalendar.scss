@@ -122,7 +122,17 @@ $compact-calendar-background-color: rgba(69, 92, 46, 0.4);
     padding: 0px 3px;
 }
 
-
+.header-time-now-today {
+    background-color: rgb(86, 16, 16);
+    text-transform: uppercase;
+    text-align: center;
+    color: rgba(255, 71, 71, 0.567);    
+    border-radius: 3px;
+    float: left;
+    margin-top: 4px;
+    margin-left: 2px;
+    padding: 0px 3px;
+}
 
 .header-time-today {
     background-color: rgba(170, 87, 15, 0.703);
@@ -177,4 +187,5 @@ $compact-calendar-background-color: rgba(69, 92, 46, 0.4);
 
 .calendar-compact-item-summary {
     padding: 0px 2px;
+    font-size: 95%;
 }

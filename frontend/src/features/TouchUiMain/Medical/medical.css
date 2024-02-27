@@ -9,7 +9,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   text-align: left;
-  height: 173px;
+  height: 209px;
 }
 
 .medical-items-container {
@@ -21,7 +21,7 @@
   align-items: flex-start;
   flex-flow: row wrap;  
   overflow-y: scroll;
-  height: 130px;
+  height: 166px;
   color:rgba(209, 190, 212, 0.608);
 
 }

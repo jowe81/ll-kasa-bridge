@@ -3,11 +3,11 @@ import { getRecords, getJsx } from "./birthdayHelpers.tsx";
 
 function Birthdays() {
     const fullSize = true;
-    const records = getRecords();
+    let records = getRecords();
     const birthdaysJsx = records.length ? (
         records.map((record, index) => getJsx(record, index, fullSize))
     ) : (
-        <div className="birthday-item-none"></div>
+        <div className=""></div>
     );
 
 

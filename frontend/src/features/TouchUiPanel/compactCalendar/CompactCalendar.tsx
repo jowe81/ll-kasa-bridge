@@ -5,6 +5,7 @@ import {
     eventIsToday,
     getTimeDifference,
     startsSoon,
+    isToday,
 } from "./../../TouchUiMain/calendar/calendarHelpers";
 
 import "./../../TouchUiMain/calendar/calendar.scss";
@@ -26,11 +27,13 @@ function CompactCalendar() {
     let noEventsNow = eventsNow?.length;
     if (noEventsNow) {
         eventsNowJsx = eventsNow.slice(0, 2).map((event, index) => {
+            const showInProgress = isToday(new Date(event.end));
             return (
                 <div key={index} className="calendar-compact-item-container calendar-compact-item-container-now">
                     <div className="calendar-compact-item-summary">{event.summary}</div>
                     <div className="calendar-compact-item-header">
-                        <div className="header-time-now event-happening-now-alert">IN PROGRESS</div>
+                        {showInProgress && <div className="header-time-now event-happening-now-alert">IN PROGRESS</div>}
+                        {!showInProgress && <div className="header-time-now-today">Starting today</div>}
                         <div className={`header-index-${event.calendarIndex}`}>{event.calendarLabel}</div>
                     </div>
                 </div>
