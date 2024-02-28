@@ -1328,6 +1328,13 @@ const deviceMap = [
                     avg_calc_data_window: 10 * MINUTE,
                 },
             },
+            pushTo: [
+                {
+                    id: "JoWe",
+                    url: "http://drw.spdns.de/wff/temperatur.php",
+                    interval: 3 * MINUTE,
+                },
+            ],
         },
     },
     {
@@ -1360,6 +1367,13 @@ const deviceMap = [
                     avg_calc_data_window: 10 * MINUTE,
                 },
             },
+            pushTo: [
+                {
+                    id: "JoWe",
+                    url: "http://drw.spdns.de/wff/temperatur.php",
+                    interval: 3 * MINUTE,
+                },
+            ],
         },
     },
     {
@@ -1582,6 +1596,11 @@ const deviceMap = [
                 lon: constants.DEFAULT_LON,
             },
             timeFormat: "HH:MM",
+            custom: {
+                binaryClock: {
+                    url: "http://bclock.wnet.wn/",
+                },
+            },
         },
     },
     {
@@ -2454,7 +2473,7 @@ const deviceMap = [
                         {
                             // Kitchen Aleds
                             channel: 44,
-                            stateData: true,
+                            stateData: false, //true,
                         },
                         {
                             groupId: "group-hallwayCeiling",

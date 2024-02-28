@@ -576,6 +576,35 @@ const EspDeviceWrapper = {
                         payload.tempC = latestTempC;
                     }
                 }
+
+                if (latestTempC && Array.isArray(this.settings?.pushTo)) {
+                    if (!this._pushTo) {
+                        this._pushTo = {};
+                    }
+
+                    this.settings.pushTo.forEach(info => {
+                        if (!info.id) {
+                            return;
+                        }
+
+                        if (!this._pushTo[info.id] || (Date.now() - this._pushTo[info.id].getTime() > (info.interval ?? 5 * constants.MINUTE))) {
+                            this._pushTo[info.id] = new Date();
+                            axios
+                                .post(info.url, {
+                                    id: info.id,
+                                    timestamp: Date.now(),
+                                    locationId: this.locationId,
+                                    tempC: latestTempC,
+                                })
+                                .then((data) => {
+                                    log(`Pushed outside temperature to ${info.url}: ${latestTempC}. Response: ${JSON.stringify(data.data)}`, this, "yellow");                                    
+                                })
+                                .catch((err) => {
+                                    log(`Unable to push temperature to ${info.url}: ${err.message}`, this, "bgRed");
+                                });
+                        }
+                    })
+                }
                 break;
         }
 
