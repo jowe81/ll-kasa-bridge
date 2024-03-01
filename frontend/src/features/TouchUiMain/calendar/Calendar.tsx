@@ -93,23 +93,22 @@ function Calendar() {
 
         if (!isSameDay(lastEventStartDate, startDate)) {
             // This event is on a later date than the previous one. See if we want a divider.
-            if (lastEventStartDate === null && !isToday(startDate)) {
-                // Nothing today. Add in divider anyway.
+            if (lastEventStartDate === null && startDate > getEndOfDay()) {
                 calendarItemsJsx.push(
                     <div key={`divider_${-1}`} className="calendar-event-divider-container">
                         Today, {getDateString(now, dateFormatOptions)}
                     </div>
                 );
 
-                const nothingScheduledNote = haveEventsToday
-                    ? `No more scheduled events.`
-                    : `No scheduled events today.`;
+                if (!haveEventsToday) {
+                    const nothingScheduledNote = `No scheduled events today.`;
 
-                calendarItemsJsx.push(
-                    <div key={-1} className="calendar-no-more-events">
-                        {nothingScheduledNote} Cheers! <span className="semi-opaque">&#127866;</span>
-                    </div>
-                );
+                    calendarItemsJsx.push(
+                        <div key={-1} className="calendar-no-more-events">
+                            {nothingScheduledNote} Cheers! <span className="semi-opaque">&#127866;</span>
+                        </div>
+                    );
+                }
             }
             if (isThisWeek(startDate)) {
                 // It is within this week, divide every day.
