@@ -98,9 +98,12 @@ const devicePool = {
         const options = {
             // Number of subsequent polling attempts before 'device-offline' is emitted.
             offlineTolerance: this.globalConfig.defaults.offlineTolerance,
+            // Broadcast address for UDP discovery
+            broadcast: process.env.UDP_DISCOVERY_BROADCAST ?? "255.255.255.255",
         };
 
         log(`Global offline tolerance is ${options.offlineTolerance} attempts.`, null, "white");
+        log(`UDP Discovery broadcast address address is ${options.broadcast}.`, null, "white");
         client.startDiscovery(options).on("device-new", (device) => {
             device.getSysInfo().then((info) => {
                 device.mic_mac = info.mic_mac;
