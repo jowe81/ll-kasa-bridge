@@ -356,15 +356,20 @@ class TimerHandler {
             return;
         }
 
+        const fullPath = localConstants.AUDIO_PATH + file;
+
         if (!player){ 
             player = process.env.AUDIO_PLAYER ?? "afplay";
         }
 
+        let args = [fullPath];
+        if (player === "mpg321") {
+            args = ["-o", process.env.AUDIO_DRIVER ?? "alsa", fullPath];
+        }
+
         log(`Playing audio file ${file} with ${player}.`, this.deviceWrapper, "yellow");
 
-        const fullPath = localConstants.AUDIO_PATH + file;
-
-        const thread = spawn(player, [fullPath]);
+        const thread = spawn(player, args);
 
         thread.on("error", (error) => {
             console.log(`error: ${error.message}`);
