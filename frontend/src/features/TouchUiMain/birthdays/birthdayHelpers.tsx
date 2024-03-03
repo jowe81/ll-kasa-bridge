@@ -55,8 +55,8 @@ function getDifference(record) {
     birthdayDate.setHours(0, 0, 0, 0);    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
-    return (birthdayDate.getTime() - today.getTime()) / constants.DAY;
+    // The rounding is necessary if there's a DST change in the timewindow.
+    return Math.round((birthdayDate.getTime() - today.getTime()) / constants.DAY);
 }
 
 function getDisplayName(record, fullSize) {

@@ -2243,6 +2243,14 @@ const deviceMap = [
                             },
                             ignoreForButtonState: true,
                         },
+                        {
+                            channel: 36,
+                            stateData: {
+                                hue: 0,
+                                saturation: 0,
+                                color_temp: 0,
+                            },
+                        },
                     ],
                 },
                 {
@@ -2473,7 +2481,7 @@ const deviceMap = [
                         {
                             // Kitchen Aleds
                             channel: 44,
-                            stateData: false, //true,
+                            stateData: true,
                         },
                         {
                             groupId: "group-hallwayCeiling",
