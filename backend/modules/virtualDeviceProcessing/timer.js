@@ -353,11 +353,14 @@ class TimerHandler {
     playAudio(file, player = null, messageOnClose) {
         if (!file) {
             log(`Play audio file: no file provided.`, this.deviceWrapper, 'red');
+            return;
         }
 
         if (!player){ 
             player = process.env.AUDIO_PLAYER ?? "afplay";
         }
+
+        log(`Playing audio file ${file} with ${player}.`, this.deviceWrapper, "yellow");
 
         const fullPath = localConstants.AUDIO_PATH + file;
 
