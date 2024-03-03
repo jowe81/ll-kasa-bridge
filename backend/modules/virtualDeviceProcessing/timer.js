@@ -339,7 +339,7 @@ class TimerHandler {
             log(
                 `Timer ${liveTimer.id ?? liveTimer.label}, iteration ${liveTimer.currentTriggerIndex + 1}/${Math.floor(
                     liveTimer.ttl / liveTimer.repeatAlarmEvery
-                )}: Playing ${file} using ${player}.`,
+                )}: Playing ${file}.`,
                 this.deviceWrapper
             );
 
