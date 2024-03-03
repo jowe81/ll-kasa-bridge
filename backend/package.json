@@ -5,7 +5,8 @@
   "description": "JJ-Auto backend",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon -r dotenv/config ./index.js",
+    "start": "node ./jj-auto.js --import-map --import-config",
+    "dev": "nodemon -r dotenv/config ./jj-auto.js --import-map --import-config",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
