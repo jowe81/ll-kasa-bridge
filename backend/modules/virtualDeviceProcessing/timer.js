@@ -343,14 +343,14 @@ class TimerHandler {
                 this.deviceWrapper
             );
 
-            this.playAudio(file, null, `Timer ${liveTimer.id ?? liveTimer.label}: done playing ${file}.`);
+            this.playAudio(file, `Timer ${liveTimer.id ?? liveTimer.label}: done playing ${file}.`);
 
             // Once played, increase this
             liveTimer.lastTriggerIndexPlayed++;
         }
     }
 
-    playAudio(file, player = null, messageOnClose) {
+    playAudio(file, messageOnClose) {
         if (!file) {
             log(`Play audio file: no file provided.`, this.deviceWrapper, 'red');
             return;
@@ -358,16 +358,14 @@ class TimerHandler {
 
         const fullPath = localConstants.AUDIO_PATH + file;
 
-        if (!player){ 
-            player = process.env.AUDIO_PLAYER ?? "afplay";
-        }
+        let playerInfo = (process.env.AUDIO_PLAYER_COMMAND ?? "afplay").split(" ");
 
-        let args = [fullPath];
-        if (player === "mpg321") {
-            args = ["-o", process.env.AUDIO_DRIVER ?? "alsa", fullPath];
-        }
+        const player = playerInfo[0]; // First is the command itself
+        const playerArgs = playerInfo.length > 1 ? playerInfo.slice(1) : [];
+            
+        const args = [...playerArgs, fullPath];
 
-        log(`Playing audio file ${file} with ${player}.`, this.deviceWrapper, "yellow");
+        log(`Playing audio file ${fullPath} with ${player}.`, this.deviceWrapper, "yellow");
 
         const thread = spawn(player, args);
 
