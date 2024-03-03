@@ -306,6 +306,25 @@ const getNextDay = (date = null) => {
 
 const getTomorrow = () => getNextDay();
 
+const getUtcOffset = (targetTimeZone = "America/Vancouver") => {
+    // Create a DateTimeFormat object with the target time zone
+    const dtf = new Intl.DateTimeFormat("en-US", {
+        timeZone: targetTimeZone,
+        timeZoneName: "short",
+    });
+
+    // Get the resolved options
+    const { timeZone, timeZoneName } = dtf.resolvedOptions();
+
+    // Extract the UTC offset from the timeZoneName
+    const utcOffsetString = timeZoneName.split(" ")[1];
+    const utcOffsetMinutes = parseInt(utcOffsetString, 10) * 60;
+
+    console.log(`Current UTC offset for ${timeZone}: ${utcOffsetMinutes} minutes`);
+
+    return utcOffsetMinutes;
+};
+
 /**
  * Is it dark out (are we before sunrise or after sunset)?
  * @returns bool
@@ -521,6 +540,7 @@ export {
   getNoon,
   getNextDay,
   getTomorrow,
+  getUtcOffset,
   isBetweenDuskAndDawn,
   isDawnOrDusk,
   isDawn,

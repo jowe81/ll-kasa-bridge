@@ -331,7 +331,6 @@ class TimerHandler {
      */
     checkAlarm(liveTimer) {
         if (liveTimer.currentTriggerIndex > liveTimer.lastTriggerIndexPlayed) {
-            const player = localConstants.AUDIO_PLAYER_COMMAND ?? "afplay";
             const file =           
                 (liveTimer.audiofileExpired
                     ? liveTimer.audiofileExpired
@@ -344,7 +343,7 @@ class TimerHandler {
                 this.deviceWrapper
             );
 
-            this.playAudio(file, player, `Timer ${liveTimer.id ?? liveTimer.label}: done playing ${file}.`);
+            this.playAudio(file, null, `Timer ${liveTimer.id ?? liveTimer.label}: done playing ${file}.`);
 
             // Once played, increase this
             liveTimer.lastTriggerIndexPlayed++;
@@ -357,7 +356,7 @@ class TimerHandler {
         }
 
         if (!player){ 
-            player = localConstants.AUDIO_PLAYER_COMMAND ?? "afplay";
+            player = process.env.AUDIO_PLAYER ?? "afplay";
         }
 
         const fullPath = localConstants.AUDIO_PATH + file;
