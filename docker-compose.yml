@@ -1,42 +1,25 @@
-version: '3.7'
-name: 'jj-auto'
-
-networks:
-  app:
+version: '3'
 
 services:
-
-  mongodb:
-    image: mongo:5.0
-    restart: always
-#    environment:
-#      MONGO_INITDB_ROOT_USERNAME: ${DB_MONGO_USERNAME}
-#      MONGO_INITDB_ROOT_PASSWORD: ${DB_MONGO_PASSWORD}
-    
-    command: --noauth
-    volumes:
-      - mongo-volume:/data/db
+  main:
+    image: jj-auto-backend
+    networks:
+        mymacvlan:
+            ipv4_address: 192.168.1.10 # Optional: Assign a specific IP to this service
     ports:
-      - "27017:27017"
-    networks:
-      - app
-
-  app:
-    build:
-      context: .
-      dockerfile: node.dockerfile
+      - "9999:9999/udp"
+      - "4000:4000"
+      - "3010:3010"
     volumes:
-      - ./:/usr/src/app
-    depends_on:
-      - mongodb
-    # Path to package.json
-    working_dir: /usr/src/app/ll-kasa-bridge
-    entrypoint: ['bash', './deploy.sh']
-    network_mode: "host"
-#    ports:
-#      - "${NODE_PORT}:3000"
-    networks:
-      - app
+      - ./backend/.env:/usr/src/app/.env
 
-volumes:
-  mongo-volume:
+
+networks:
+  mymacvlan:
+    driver: macvlan
+    driver_opts:
+      parent: en8 # This should be your actual network interface
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.1
