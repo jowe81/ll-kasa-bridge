@@ -82,11 +82,14 @@ function PhotosInfoLayer({ photosService, hideLayer, record, screenMode }) {
     }
 
     function getFolderText() {
-        const folderInfo = libraryInfo.folders?.find((info) => record.dirname === info.item);
+        const folderInfo = libraryInfo?.folders?.find((info) => record.dirname === info.item);
         return folderInfo?.label;
     }
 
     function getFilterSizeText() {
+        if (!latestOps) {
+            return '';
+        }
         if (typeof latestOps.cursorIndex === 'number') {
             return (
                 <div>
