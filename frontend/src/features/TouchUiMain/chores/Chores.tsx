@@ -13,14 +13,14 @@ function Chores({ dynformsUserId }) {
     const { user, chores } = choresInfo;
     const records = getRecords(service, user);
 
-    function doChore(chore) {
-        runServiceCommand(service, "doChore", { chore, dynformsUsername: user.name });
+    function toggleChore(chore) {
+        runServiceCommand(service, "toggleChore", { choreId: chore.id, dynformsUserId: user.id });
     }
 
     const choresButtonsJsx = chores.map((chore, index) => {
         const classDone = choreDoneToday(user, chore, records) ? `chore-button-done` : ``
         return (
-            <div key={index} className={`base-button chore-button ${classDone}`} onClick={() => doChore(chore)}>
+            <div key={index} className={`base-button chore-button ${classDone}`} onClick={() => toggleChore(chore)}>
                 {chore.label}
             </div>
         );
@@ -69,8 +69,8 @@ function choreDoneToday(user, chore, records) {
     if (!user || !chore || !records) {
         return null;
     }
-    console.log(records)
-    return records.find(record => isToday(new Date(record.created_at)) && record.chore?.id === chore.id && record.__user.name === user.name);
+
+    return records.find(record => isToday(new Date(record.created_at)) && record.chore?.id === chore.id && record.__user.id === user.id);
 }
 
 export default Chores

@@ -98,6 +98,21 @@ class DynformsServiceHandler {
 
         return baseUrl + path;
     }
+
+    _constructFullUrlToDeleteByIdEndpoint() {
+        const baseUrl = this._getBaseUrl();
+        if (!baseUrl) {
+            return;
+        }
+
+        let path = this.service.settings.api?.pathToDeleteByIdEndpoint;
+        if (!path) {
+            path = process.env.DYNFORMS_M2M_PATH_DELETE_BY_ID ?? "/db/m2m/deleteById";
+        }
+
+        return baseUrl + path;
+    }
+
     _constructRequests(requestIndexes = null) {
         if (!this.service) {
             return null;
@@ -214,6 +229,7 @@ class DynformsServiceHandler {
 
         this.service.fullUrlPull = this._constructFullUrlToPullEndpoint();
         this.service.fullUrlPush = this._constructFullUrlToPushEndpoint();
+        this.service.fullUrlDeleteById = this._constructFullUrlToDeleteByIdEndpoint();
 
         // Turn on when first starting.
         this.service.setPowerState(true);
@@ -225,7 +241,7 @@ class DynformsServiceHandler {
         log(
             `Initialized ${this.service.subType} "${this.service.alias}" with pull@${
                 this.service.fullUrlPull ? this.service.fullUrlPull : "(not configured)"
-            } and push@${this.service.fullUrlPush ? this.service.fullUrlPush : "(not configured)"}`,
+            }, push@${this.service.fullUrlPush ? this.service.fullUrlPush : "(not configured)"}, and deleteById@${this.service.fullUrlDeleteById ? this.service.fullUrlDeleteById : "(not configured)"}.`,
             this.service
         );
         log(
@@ -252,37 +268,68 @@ class DynformsServiceHandler {
 
     getClientId() {
         // Construct a client ID that is specific to the app and service.
-        return (`${process.env.APP_NAME}.${this.service.id ?? this.service.channel}`)
+        return `${process.env.APP_NAME}.${this.service.id ?? this.service.channel}`;
     }
 
     pauseResumeRequest(requestIndex) {
-        let { pausedRequestIndexes } = this.cache;        
+        let { pausedRequestIndexes } = this.cache;
         let newIndexes;
         let result = null;
 
         if (pausedRequestIndexes.includes(requestIndex)) {
-            newIndexes = pausedRequestIndexes.filter(index => index !== requestIndex);
-            result = 'resume';
+            newIndexes = pausedRequestIndexes.filter((index) => index !== requestIndex);
+            result = "resume";
         } else {
             newIndexes = [...pausedRequestIndexes, requestIndex];
-            result = 'pause';
+            result = "pause";
         }
 
         this.cache.pausedRequestIndexes = newIndexes;
 
         const newState = _.cloneDeep(this.service.state);
         newState.requests.pausedRequestIndexes = newIndexes;
-        this.service._updateState(newState, true);        
+        this.service._updateState(newState, true);
 
         return result;
     }
 
-    async runPushRequest(record, requestIndex, extraData = {}) {
+    async runDeleteByIdRequest(recordId, requestIndex) {
         if ([null, undefined].includes(requestIndex)) {
-            return null;            
+            return null;
         }
 
-        if (!Array.isArray(this.service.settings.requests) || this.service.settings.requests.length < requestIndex + 1) {
+        if (
+            !Array.isArray(this.service.settings.requests) ||
+            this.service.settings.requests.length < requestIndex + 1
+        ) {
+            // Request config not found
+            return null;
+        }
+        const collectionName = this.service.settings.requests[requestIndex].collectionName;
+
+        const request = {
+            collectionName,
+            recordId,
+            clientId: this.getClientId(),
+        };
+
+        const url = this.service.fullUrlDeleteById;
+        log(
+            `Running deleteById request  (${requestIndex}) to ${url} (collection ${collectionName}), removing record ${recordId}.`,
+            this.service
+        );
+        return axios.post(url, request);
+    }
+
+    async runPushRequest(record, requestIndex, extraData = {}) {
+        if ([null, undefined].includes(requestIndex)) {
+            return null;
+        }
+
+        if (
+            !Array.isArray(this.service.settings.requests) ||
+            this.service.settings.requests.length < requestIndex + 1
+        ) {
             // Request config not found
             return null;
         }
@@ -293,10 +340,15 @@ class DynformsServiceHandler {
             record,
             ...extraData,
             clientId: this.getClientId(),
-        }
+        };
 
         const url = this.service.fullUrlPush;
-        log(`Running push request  (${requestIndex}) to ${url} (collection ${collectionName}), ${record?._id ? `updating record ${record._id}.` : `adding record: ${JSON.stringify(record)}`}`, this.service);
+        log(
+            `Running push request  (${requestIndex}) to ${url} (collection ${collectionName}), ${
+                record?._id ? `updating record ${record._id}.` : `adding record: ${JSON.stringify(record)}`
+            }`,
+            this.service
+        );
         return axios.post(url, request);
     }
 
@@ -305,8 +357,8 @@ class DynformsServiceHandler {
             return false;
         }
 
-        if (!(typeof requestIndex === 'number')) {
-            log(`Error: no request index. `, this.service, 'red');
+        if (!(typeof requestIndex === "number")) {
+            log(`Error: no request index. `, this.service, "red");
         }
 
         const requests = this._constructRequests([requestIndex]);
@@ -317,16 +369,16 @@ class DynformsServiceHandler {
         if (mainData) {
             request = {
                 ...mainData,
-            }
+            };
         }
 
         if (extraData) {
             request = {
                 ...request,
                 ...extraData,
-            }
+            };
         }
-        
+
         let data;
         try {
             data = await this._executeRequest(request, requestIndex);
@@ -413,13 +465,17 @@ class DynformsServiceHandler {
      * Update state after a request came back.
      */
     processCachedApiResponse(requestIndex) {
-        let displayData = getDisplayDataFromApiResponse(this.cache.data[requestIndex], this.service.settings, requestIndex);
+        let displayData = getDisplayDataFromApiResponse(
+            this.cache.data[requestIndex],
+            this.service.settings,
+            requestIndex
+        );
 
-        let processApiResponseHandler, getAlertsHandler;        
+        let processApiResponseHandler, getAlertsHandler;
         if (this.service.commandHandlersExtension) {
             // See if a _processApiResponse handler exists for this device.
             processApiResponseHandler = this.service.getCommandHandler("_processApiResponse");
-        
+
             // See if a _getAlerts handler exists for this device.
             getAlertsHandler = this.service.getCommandHandler("_getAlerts");
         }
@@ -445,10 +501,7 @@ class DynformsServiceHandler {
             newState.alerts = getAlertsHandler(this.service, displayData, requestIndex);
         }
 
-        this.service._updateState(
-            newState,
-            true
-        );
+        this.service._updateState(newState, true);
 
         log(`${this.service.alias} received API data from ${this.service.fullUrlPull}`, this.service);
     }

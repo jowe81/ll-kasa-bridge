@@ -1765,7 +1765,7 @@ const deviceMap = [
                 },
                 {
                     collectionName: "photosFileInfo",
-                    push: true,
+                    requestType: "push",
                 },
             ],
             // This is how often the handler will go out and check whether a request should actually be run.
@@ -1966,7 +1966,11 @@ const deviceMap = [
                 },
                 {
                     collectionName: "chores",
-                    push: true,
+                    requestType: "push",
+                },
+                {
+                    collectionName: "chores",
+                    requestType: "deleteById",
                 },
             ],
             // This is how often the handler will go out and check whether a request should actually be run.
@@ -2006,8 +2010,8 @@ const deviceMap = [
                         user: "jess",
                     },
                     {
-                        id: "freeweights",
-                        label: "freeweights",
+                        id: "mission_fit",
+                        label: "mission fit",
                         alertLessThan: 3,
                         weekly: 3,
                         user: "jess",
@@ -2027,8 +2031,8 @@ const deviceMap = [
                         user: "johannes",
                     },
                     {
-                        id: "weights",
-                        label: "weights",
+                        id: "weight_training",
+                        label: "weight training",
                         alertLessThan: 2,
                         weekly: 2,
                         user: "johannes",

@@ -15,14 +15,14 @@ function Pages({}) {
             title: "Johannes",
             content: <Medical />,
         },
-        // {
-        //     title: "Johannes",
-        //     content: <Chores dynformsUserId={`johannes`} />,
-        // },
-        // {
-        //     title: "Jess",
-        //     content: <Chores dynformsUserId={`jess`} />,
-        // },
+        {
+            title: "Johannes",
+            content: <Chores dynformsUserId={`johannes`} />,
+        },
+        {
+            title: "Jess",
+            content: <Chores dynformsUserId={`jess`} />,
+        },
     ];
     return (
         <div className="pages-container">
