@@ -2174,20 +2174,20 @@ const deviceMap = [
                         {
                             groupId: "group-livingroomLights",
                             stateData: {
-                                brightness: 15,
+                                brightness: 5,
                             },
                         },
                         {
                             // Kitchen table
                             channel: 28,
                             stateData: {
-                                brightness: 15,
+                                brightness: 5,
                             },
                         },
                         {
                             groupId: "group-hallwayCeiling",
                             stateData: {
-                                brightness: 15,
+                                brightness: 5,
                             },
                             ignoreForButtonState: true,
                         },
