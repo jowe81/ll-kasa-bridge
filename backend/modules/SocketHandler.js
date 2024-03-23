@@ -126,6 +126,22 @@ const socketHandler = {
         masterSwitchDeviceWrapper._deviceHandlers.execute(buttonId, origin);
       })
 
+      socket.on("auto/command/dismissAlert", ({alert}) => {
+        const logTag = `${address} auto/command/dismissAlert: `;
+        const deviceWrapper = this.devicePool.getDeviceWrapperByChannel(alert.channel);
+        if (!deviceWrapper) {
+            log(`${logTag}Cannot find device wrapper for channel ${alert.channel}.`, "bgRed");
+            return;
+        }
+
+        if (typeof deviceWrapper.dismissAlerts !== 'function') {
+            log(`${logTag}Device wrapper for channel ${alert.channel} as no dismissAlerts method.`, "bgRed");
+            return;            
+        }
+
+        deviceWrapper.dismissAlerts(alert.id); 
+      });
+
       /**
        * Execeute a generic command on a channel. This method should be the way forward.
        */

@@ -136,6 +136,33 @@ const VirtualDeviceWrapper = {
         return this.state.alerts;
     },
 
+    dismissAlerts(alertIds) {
+        if (!Array.isArray(this.state.alerts)) {
+            return;
+        }
+
+        if (!alertIds) {
+            return;
+        }
+
+        if (!Array.isArray(alertIds)) {
+            alertIds = [alertIds];
+        }
+
+        let forceUpdate = false;
+
+        this.state.alerts.forEach((alert, index) => {
+            if (alertIds.includes(alert.id)) {
+                this.state.alerts[index].dismissed = new Date();
+                forceUpdate = true;
+            }
+        });
+
+        if (forceUpdate) {
+            this._updateState({...this.state}, true);
+        }
+    },
+
     // Get a reference to the cache segment for this specific device.
     getCache(data) {
         return this.cache[this.channel];

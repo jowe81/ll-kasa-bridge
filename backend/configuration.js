@@ -1991,9 +1991,12 @@ const deviceMap = [
                     {
                         id: "vitamins",
                         label: "vitamins",
-                        showAlert: true,
-                        weekly: 7,
+                        alertLessThan: 1,
+                        daily: 1,
                         user: "jess",
+                        alertText: "Take your vitamins",
+                        warnAfterHours: 16,
+                        alertAfterHours: 17,
                     },
                     {
                         id: "cardio",
@@ -2019,8 +2022,8 @@ const deviceMap = [
                     {
                         id: "vitamins",
                         label: "vitamins",
-                        alertLessThan: 7,
-                        weekly: 7,
+                        alertLessThan: 1,
+                        daily: 1,
                         user: "johannes",
                     },
                     {

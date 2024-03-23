@@ -6,6 +6,7 @@
 import _ from "lodash";
 import { log } from "../../modules/Log.js";
 import { isToday } from "../../helpers/jDateTimeUtils.js";
+import { createAlert } from "../../helpers/dynformsData.js";
 
 async function doChore(deviceWrapper, dynformsUserId, chore) {
     if (!(dynformsUserId && chore)) {
@@ -102,6 +103,21 @@ function getChoresInfoByUserFromRawRecords(deviceWrapper, records) {
     return displayData;
 }
 
+function getDynformsUsername(deviceWrapper, dynformsUserId) {
+    const users = deviceWrapper.settings?.custom?.users;
+    if (!users) {
+        log(`Error: The configuration seems to be missing dynforms user info (settings.custom.users)`, deviceWrapper, "bgRed");
+        return;
+    }
+
+    const user = users.find(user => user.id === dynformsUserId);
+    if (!user) {
+        return;
+    }
+
+    return user.name;    
+}
+
 function getChoresInfoByUser(deviceWrapper, dynformsUserId) {
     if (!deviceWrapper) {
         return {};
@@ -149,8 +165,50 @@ async function deleteRecord(deviceWrapper, recordId) {
         .catch(err => log(`DeleteById request error. ${err.message}`, deviceWrapper, "bgRed"));
 }
 
+function _getAlerts(deviceWrapper, displayData, requestIndex) {
+    const currentAlerts = deviceWrapper.state.alerts ?? [];
+
+    const alerts = [];
+
+    if (!displayData) {
+        log(`Error: __getAlerts handler did not receive displayData`, deviceWrapper, 'bgRed');
+        return;
+    }
+
+    const dynformsUserIds = Object.keys(displayData);
+    const now = new Date();
+    dynformsUserIds.forEach(dynformsUserId => {
+        const chores = displayData[dynformsUserId].chores;
+        const records = displayData[dynformsUserId].records;
+        const dynformsUsername = getDynformsUsername(deviceWrapper, dynformsUserId);
+
+        chores.forEach(chore => {
+            if (!chore.alertText) {
+                chore.alertText = `${chore.label} is due!`;
+            }
+
+            if (chore.daily === 1 && chore.alertLessThan === 1) {
+                // This is a once a day chore.
+                const warnAfterHours = chore.warnAfterHours ?? 20;
+                const alertAfterHours = chore.alertAfterHours ?? 22;
+
+                if (!choreDoneToday(dynformsUserId, chore, records)) {
+                    if (now.getHours() >= alertAfterHours) {
+                        alerts.push(createAlert(`${dynformsUsername}: ${chore.alertText}`, "alert", deviceWrapper));
+                    } else if (now.getHours() >= warnAfterHours) {
+                        alerts.push(createAlert(`${dynformsUsername}: ${chore.alertText}`, "warn", deviceWrapper));
+                    }                                        
+                }
+            }
+        });
+    })
+
+    return alerts;
+}
+
 const handlers = {
     _processApiResponse, // Not for frontend use!
+    _getAlerts,
     doChore,
     toggleChore,
 };

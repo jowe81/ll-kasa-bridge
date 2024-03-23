@@ -1,9 +1,12 @@
+import { runDismissAlertCommand } from "../../../devicesHelpers";
 import "./alerts.scss";
 
 function Alerts({alerts}) {
     if (!alerts) {
         return;
     }
+
+    alerts = alerts.filter(alert => !alert.dismissed);
 
     const alertsJsx = alerts.sort((a, b) => a.issued_at > b.issued_at ? -1 : 1).map((alert: any, index) => {
         let levelText, badgeClass;
@@ -26,7 +29,7 @@ function Alerts({alerts}) {
         }
         
         return (
-            <div className={`alert-container ${badgeClass}`} key={index}>
+            <div className={`alert-container ${badgeClass}`} key={index} onClick={() => runDismissAlertCommand(alert)}>
                 <div className={`alert-header-container`}>
                     <div>{alert.serviceLabel}</div>
                     <div>

@@ -164,11 +164,15 @@ function createAlert(message, level, deviceWrapper) {
         return existingAlert;
     }
 
+    const now = new Date();
+
     return {
+        id: now.getTime(),
+        channel: deviceWrapper.channel,
         message,
         level,
         serviceLabel,
-        issued_at: new Date(),
+        issued_at: now,
     };
 }
 

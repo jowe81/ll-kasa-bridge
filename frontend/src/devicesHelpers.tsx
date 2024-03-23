@@ -144,6 +144,11 @@ function runServiceCommand(service, commandId, body) {
     runChannelCommand(service?.channel, commandId, body);
 }
 
+function runDismissAlertCommand(alert) {
+    console.log(`Emitting command to dismiss alert ${alert.id} for channel ${alert.channel}`);
+    socket.emit(`auto/command/dismissAlert`, { alert });
+}
+
 function getAlerts() {
     let services: any[] = [];
 
@@ -183,5 +188,6 @@ export {
     getAlerts,
     getThermostats,
     runChannelCommand,
+    runDismissAlertCommand,
     runServiceCommand,
 };
