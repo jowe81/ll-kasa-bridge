@@ -150,7 +150,7 @@ function resolvePlaceholder({key, values}) {
     return null;
 }
 
-function createAlert(message, level, deviceWrapper) {
+function createAlert(message, level, deviceWrapper, noDismiss = false) {
     if (!deviceWrapper) {
         return null;
     }
@@ -172,6 +172,7 @@ function createAlert(message, level, deviceWrapper) {
         message,
         level,
         serviceLabel,
+        dismissable: !noDismiss,
         issued_at: now,
     };
 }

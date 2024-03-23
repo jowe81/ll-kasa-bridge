@@ -1995,8 +1995,9 @@ const deviceMap = [
                         daily: 1,
                         user: "jess",
                         alertText: "Take your vitamins",
-                        warnAfterHours: 16,
-                        alertAfterHours: 17,
+                        alertDismissable: false,
+                        warnAfterHours: 20,
+                        alertAfterHours: 22,
                     },
                     {
                         id: "cardio",

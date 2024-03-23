@@ -194,9 +194,9 @@ function _getAlerts(deviceWrapper, displayData, requestIndex) {
 
                 if (!choreDoneToday(dynformsUserId, chore, records)) {
                     if (now.getHours() >= alertAfterHours) {
-                        alerts.push(createAlert(`${dynformsUsername}: ${chore.alertText}`, "alert", deviceWrapper));
+                        alerts.push(createAlert(`${dynformsUsername}: ${chore.alertText}`, "alert", deviceWrapper, !chore.alertDismissable));
                     } else if (now.getHours() >= warnAfterHours) {
-                        alerts.push(createAlert(`${dynformsUsername}: ${chore.alertText}`, "warn", deviceWrapper));
+                        alerts.push(createAlert(`${dynformsUsername}: ${chore.alertText}`, "warn", deviceWrapper, !chore.alertDismissable));
                     }                                        
                 }
             }

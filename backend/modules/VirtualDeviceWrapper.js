@@ -152,7 +152,7 @@ const VirtualDeviceWrapper = {
         let forceUpdate = false;
 
         this.state.alerts.forEach((alert, index) => {
-            if (alertIds.includes(alert.id)) {
+            if (alertIds.includes(alert.id) && alert.dismissable !== false) {
                 this.state.alerts[index].dismissed = new Date();
                 forceUpdate = true;
             }
