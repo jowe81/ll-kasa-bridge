@@ -1988,6 +1988,7 @@ const deviceMap = [
                     },
                 ],
                 chores: [
+                    // Jess
                     {
                         id: "vitamins",
                         label: "vitamins",
@@ -2007,22 +2008,26 @@ const deviceMap = [
                         user: "jess",
                     },
                     {
-                        id: "machines",
-                        label: "machines",
-                        alertLessThan: 2,
-                        weekly: 2,
-                        user: "jess",
-                    },
-                    {
-                        id: "mission_fit",
-                        label: "mission fit",
+                        id: "workout",
+                        label: "workout",
                         alertLessThan: 3,
                         weekly: 3,
                         user: "jess",
                     },
+                    // Johannes
                     {
-                        id: "vitamins",
-                        label: "vitamins",
+                        id: "pills_am",
+                        label: "am pills",
+                        alertLessThan: 1,
+                        daily: 1,
+                        user: "johannes",
+                        alertText: "morning pills are due!",
+                        warnAfterHours: 9,
+                        alertAfterHours: 10,
+                    },
+                    {
+                        id: "pills_pm",
+                        label: "pm pills",
                         alertLessThan: 1,
                         daily: 1,
                         user: "johannes",
@@ -2030,13 +2035,13 @@ const deviceMap = [
                     {
                         id: "cardio",
                         label: "cardio",
-                        alertLessThan: 4,
-                        weekly: 4,
+                        alertLessThan: 3,
+                        weekly: 3,
                         user: "johannes",
                     },
                     {
-                        id: "weight_training",
-                        label: "weight training",
+                        id: "workout",
+                        label: "workout",
                         alertLessThan: 2,
                         weekly: 2,
                         user: "johannes",
