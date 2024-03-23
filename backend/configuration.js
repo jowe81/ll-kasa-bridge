@@ -2000,20 +2000,20 @@ const deviceMap = [
                         warnAfterHours: 20,
                         alertAfterHours: 22,
                     },
-                    {
-                        id: "cardio",
-                        label: "cardio",
-                        alertLessThan: 4,
-                        weekly: 5,
-                        user: "jess",
-                    },
-                    {
-                        id: "workout",
-                        label: "workout",
-                        alertLessThan: 3,
-                        weekly: 3,
-                        user: "jess",
-                    },
+                    // {
+                    //     id: "cardio",
+                    //     label: "cardio",
+                    //     alertLessThan: 4,
+                    //     weekly: 5,
+                    //     user: "jess",
+                    // },
+                    // {
+                    //     id: "workout",
+                    //     label: "workout",
+                    //     alertLessThan: 3,
+                    //     weekly: 3,
+                    //     user: "jess",
+                    // },
                     // Johannes
                     {
                         id: "pills_am",
