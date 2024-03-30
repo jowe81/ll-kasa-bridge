@@ -75,7 +75,7 @@ constants.DEVICETYPES_WITH_POWERSTATE = [
 constants.DEVICETYPES_CUSTOM_DISPLAY = [constants.SUBTYPE_TIMER];
 
 constants.services = {
-    JJ_AUTO_BACKEND_HOST: "http://johannes-mb.wnet.wn",
+    JJ_AUTO_BACKEND_HOST: "http://jj-auto.wnet.wn",
     JJ_AUTO_BACKEND_PORT: 4000,
     PHOTOS_BACKEND_HOST: "http://jj-photos.wnet.wn",
     PHOTOS_BACKEND_PORT: 3020,
