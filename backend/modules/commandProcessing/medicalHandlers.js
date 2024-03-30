@@ -3,7 +3,6 @@
  */
 import _ from "lodash";
 import { log } from "../../modules/Log.js";
-import { createAlert } from "../../helpers/dynformsData.js";
 
 function _getAlerts(deviceWrapper, displayData, requestIndex) {
     const currentAlerts = deviceWrapper.state.alerts ?? [];
@@ -11,21 +10,21 @@ function _getAlerts(deviceWrapper, displayData, requestIndex) {
     const alerts = [];
     const latestRecord = getLatestRecord(displayData?.data?.records);
     if (!latestRecord) {
-        alerts.push(createAlert("Medical Data unavailable.", "critical", deviceWrapper));
+        alerts.push(deviceWrapper.devicePool.createAlert("Medical Data unavailable.", "critical", deviceWrapper));
     }
 
     const { warnAfter, alertAfter } = deviceWrapper.settings.ui;
 
     const createdAt = new Date(latestRecord.created_at);
     if (isNaN(createdAt.getTime())) {
-        alerts.push(createAlert("Last record appears corrupt.", "critical", deviceWrapper));
+        alerts.push(deviceWrapper.devicePool.createAlert("Last record appears corrupt.", "critical", deviceWrapper));
     } else {
         const tsNow = new Date().getTime();
         const tsLastSample = createdAt.getTime();
         if (tsNow - tsLastSample > alertAfter) {
-            alerts.push(createAlert("Blood pressure sample overdue!", "alert", deviceWrapper));
+            alerts.push(deviceWrapper.devicePool.createAlert("Blood pressure sample overdue!", "alert", deviceWrapper));
         } else if (tsNow - tsLastSample > warnAfter) {
-            alerts.push(createAlert("Blood pressure sample is due!", "warn", deviceWrapper));
+            alerts.push(deviceWrapper.devicePool.createAlert("Blood pressure sample is due!", "warn", deviceWrapper));
         }
     }
 

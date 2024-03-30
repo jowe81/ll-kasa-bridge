@@ -113,6 +113,20 @@ class DynformsServiceHandler {
         return baseUrl + path;
     }
 
+    _constructFullUrlToMacroEndpoint() {
+        const baseUrl = this._getBaseUrl();
+        if (!baseUrl) {
+            return;
+        }
+
+        let path = this.service.settings.api?.pathToMacroEndpoint;
+        if (!path) {
+            path = process.env.DYNFORMS_M2M_PATH_DELETE_BY_ID ?? "/db/m2m/macro";
+        }
+
+        return baseUrl + path;
+    }
+
     _constructRequests(requestIndexes = null) {
         if (!this.service) {
             return null;
@@ -128,51 +142,60 @@ class DynformsServiceHandler {
         const requests = [];
 
         requestInfo.forEach((info, requestIndex) => {
+            if (info.requestType === "push") {
+                // Its a push request - ignored here altogether.
+                return;
+            }
+
             if (
                 !(requestIndexes === null || (Array.isArray(requestIndexes) && requestIndexes.includes(requestIndex)))
             ) {
                 return;
             }
 
-            if (!info.retrieve || info.push) {
-                // Its a push request - ignored here.
-                return;
-            }
-
             const request = {
                 connectionName: info.connectionName ?? localConstants.connectionName,
                 collectionName: info.collectionName,
+                requestType: info.requestType,
                 sessionId: null,
                 settings: info.settings ?? {},
                 filter: info.query?.filter ?? {},
-                orderBy: info.retrieve.orderBy ?? {},
+                orderBy: info.retrieve?.orderBy ?? {},
             };
 
-            if (info.retrieve?.filters) {
-                request.filter = this.resolveFilters(info.retrieve?.filters) ?? {};
-            }
+            switch (info.requestType) {
+                case "macro":
+                    break;
 
-            if (info.retrieve?.singleRecord) {
-                request.settings.singleRecord = info.retrieve.singleRecord;
+                case "pull":
+                default:
+                    if (info.retrieve?.filters) {
+                        request.filter = this.resolveFilters(info.retrieve?.filters) ?? {};
+                    }
 
-                switch (info.retrieve.singleRecord.type) {
-                    case "__RANDOMIZED_PREORDERED":
-                        // Use the dynforms semi-random algorithm
-                        request.settings.singleRecord.type = "__RANDOMIZED_PREORDERED";
-                        break;
+                    if (info.retrieve?.singleRecord) {
+                        request.settings.singleRecord = info.retrieve.singleRecord;
 
-                    case "__CURSOR_INDEX":
-                        request.settings.singleRecord.type = "__CURSOR_INDEX";
-                        break;
+                        switch (info.retrieve.singleRecord.type) {
+                            case "__RANDOMIZED_PREORDERED":
+                                // Use the dynforms semi-random algorithm
+                                request.settings.singleRecord.type = "__RANDOMIZED_PREORDERED";
+                                break;
 
-                    default:
-                        log(
-                            `Error: cannot construct request. Unkown single-record request type ${info.retrieve.singleRecord.type},`,
-                            this.service,
-                            "red"
-                        );
-                        return;
-                }
+                            case "__CURSOR_INDEX":
+                                request.settings.singleRecord.type = "__CURSOR_INDEX";
+                                break;
+
+                            default:
+                                log(
+                                    `Error: cannot construct request. Unkown single-record request type ${info.retrieve.singleRecord.type},`,
+                                    this.service,
+                                    "red"
+                                );
+                                return;
+                        }
+                    }
+                    break;
             }
 
             requests.push(request);
@@ -227,9 +250,15 @@ class DynformsServiceHandler {
         this.cache.data = {};
         this.cache.pausedRequestIndexes = [];
 
-        this.service.fullUrlPull = this._constructFullUrlToPullEndpoint();
         this.service.fullUrlPush = this._constructFullUrlToPushEndpoint();
         this.service.fullUrlDeleteById = this._constructFullUrlToDeleteByIdEndpoint();
+
+        this.service.fullUrls = {
+            pull: this._constructFullUrlToPullEndpoint(),
+            push: this.service.fullUrlPush,
+            deleteById: this.service.fullUrlDeleteById,
+            macro: this._constructFullUrlToMacroEndpoint(),
+        };
 
         // Turn on when first starting.
         this.service.setPowerState(true);
@@ -240,8 +269,10 @@ class DynformsServiceHandler {
 
         log(
             `Initialized ${this.service.subType} "${this.service.alias}" with pull@${
-                this.service.fullUrlPull ? this.service.fullUrlPull : "(not configured)"
-            }, push@${this.service.fullUrlPush ? this.service.fullUrlPush : "(not configured)"}, and deleteById@${this.service.fullUrlDeleteById ? this.service.fullUrlDeleteById : "(not configured)"}.`,
+                this.service.fullUrls.pull ? this.service.fullUrls.pull : "(not configured)"
+            }, push@${this.service.fullUrls.push ? this.service.fullUrls.push : "(not configured)"}, and deleteById@${
+                this.service.fullUrls.deleteById ? this.service.fullUrls.deleteById : "(not configured)"
+            }.`,
             this.service
         );
         log(
@@ -293,7 +324,7 @@ class DynformsServiceHandler {
         return result;
     }
 
-    async runDeleteByIdRequest(recordId, requestIndex) {
+    getRequestConfig(requestIndex) {
         if ([null, undefined].includes(requestIndex)) {
             return null;
         }
@@ -305,7 +336,17 @@ class DynformsServiceHandler {
             // Request config not found
             return null;
         }
-        const collectionName = this.service.settings.requests[requestIndex].collectionName;
+
+        return this.service.settings.requests[requestIndex];
+    }
+
+    async runDeleteByIdRequest(recordId, requestIndex) {
+        const requestConfig = this.getRequestConfig(requestIndex);
+        if (!requestConfig) {
+            return null;
+        }
+
+        const collectionName = requestConfig.collectionName;
 
         const request = {
             collectionName,
@@ -395,7 +436,8 @@ class DynformsServiceHandler {
         requestConfig._lastExecuted = new Date();
         requestInfo.clientId = this.getClientId();
 
-        return axios.post(this.service.fullUrlPull, requestInfo);
+        const url = this.service.fullUrls[requestInfo.requestType ?? "pull"];
+        return axios.post(url, requestInfo);
     }
 
     async dynformsServiceIntervalHandler() {
@@ -423,7 +465,11 @@ class DynformsServiceHandler {
         });
 
         if (pausedRequestsCount) {
-            log(`${this.service.alias} has ${pausedRequestsCount} requests that are due to run but currently paused.`, this.service, 'yellow');
+            log(
+                `${this.service.alias} has ${pausedRequestsCount} requests that are due to run but currently paused.`,
+                this.service,
+                "yellow"
+            );
         }
 
         if (!requestsReadyToRun.length) {
@@ -437,11 +483,18 @@ class DynformsServiceHandler {
         const now = new Date();
 
         const promises = requestsReadyToRun.map((requestInfo, requestIndex) => {
+            const url = this.service.fullUrls[requestInfo.requestType ?? "pull"];
             const requestConfig = this.service.settings.requests[requestIndex];
             requestConfig._lastExecuted = now;
-            log(`Request ${requestIndex}: ${this.service.fullUrlPull} ${JSON.stringify(requestInfo)}`, this.service, 'yellow');
+            log(
+                `Request ${requestIndex}: ${url} ${JSON.stringify(requestInfo)}`,
+                this.service,
+                "yellow"
+            );
+            
             requestInfo.clientId = this.getClientId();
-            return axios.post(this.service.fullUrlPull, requestInfo);
+
+            return axios.post(url, requestInfo);
         });
 
         if (promises.length) {
@@ -490,7 +543,6 @@ class DynformsServiceHandler {
             api: displayData,
             requests: {
                 ...this.service.state.requests,
-                test: true,
                 [requestIndex]: displayData,
                 lastReturnedRequestIndex: requestIndex,
             },
@@ -498,12 +550,15 @@ class DynformsServiceHandler {
         };
 
         if (getAlertsHandler) {
-            newState.alerts = getAlertsHandler(this.service, displayData, requestIndex);
+            const alerts = getAlertsHandler(this.service, displayData, requestIndex);
+            if (alerts !== null) {
+                newState.alerts = alerts;
+            }            
         }
 
         this.service._updateState(newState, true);
 
-        log(`${this.service.alias} received API data from ${this.service.fullUrlPull}`, this.service);
+        log(`${this.service.alias} received API data from request #${requestIndex}`, this.service);
     }
 }
 

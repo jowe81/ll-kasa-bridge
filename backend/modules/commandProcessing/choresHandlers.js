@@ -6,7 +6,6 @@
 import _ from "lodash";
 import { log } from "../../modules/Log.js";
 import { isToday } from "../../helpers/jDateTimeUtils.js";
-import { createAlert } from "../../helpers/dynformsData.js";
 
 async function doChore(deviceWrapper, dynformsUserId, chore) {
     if (!(dynformsUserId && chore)) {
@@ -40,7 +39,7 @@ async function removeChore(deviceWrapper, choreRecord) {
     } else if (deleteResult.data.deletedCount !== 1) {
         log(`Unable to remove chore record ${choreRecord._id} - dynforms did not acknowledge the deletion (record may not exist anymore).`, deviceWrapper, "red");
     }
-    log(`Requesting chores table reload`, deviceWrapper, "yellow");
+    // Reload chores table data
     await deviceWrapper.deviceHandler.runRequestNow(0, {});
 
     return deleteResult;
@@ -53,15 +52,17 @@ async function toggleChore(deviceWrapper, command) {
         return null;
     }
 
-    const choresInfo = getChoresInfoByUser(deviceWrapper, dynformsUserId);    
-    const chore = choresInfo?.chores?.find(chore => chore.id === choreId);
+    const choresInfo = getChoresInfoByUser(deviceWrapper, dynformsUserId);
+    const chore = choresInfo?.chores?.find((chore) => chore.id === choreId);
 
     const choreRecord = choreDoneToday(dynformsUserId, chore, choresInfo.records);
-    if (choreRecord) {        
+    if (choreRecord) {
         const result = await removeChore(deviceWrapper, choreRecord);
-    } else {        
+    } else {
         await doChore(deviceWrapper, dynformsUserId, chore);
     }
+    // Reload stats
+    await deviceWrapper.deviceHandler.runRequestNow(3, {});
 }
 
 function choreDoneToday(dynformsUserId, chore, records) {
@@ -76,9 +77,17 @@ function choreDoneToday(dynformsUserId, chore, records) {
 
 function _processApiResponse(deviceWrapper, displayData, requestIndex) {
     const cache = deviceWrapper.getCache();
-    const records = displayData.data?.records;
-    
-    return getChoresInfoByUserFromRawRecords(deviceWrapper, records);
+
+    switch (requestIndex) {
+        case 0:
+        case 1:
+            const records = displayData.data?.records;
+            return getChoresInfoByUserFromRawRecords(deviceWrapper, records);
+
+        case 3:
+            return displayData;
+
+    }    
 }
 
 function getChoresInfoByUserFromRawRecords(deviceWrapper, records) {
@@ -166,42 +175,50 @@ async function deleteRecord(deviceWrapper, recordId) {
 }
 
 function _getAlerts(deviceWrapper, displayData, requestIndex) {
-    const currentAlerts = deviceWrapper.state.alerts ?? [];
-
-    const alerts = [];
-
-    if (!displayData) {
-        log(`Error: __getAlerts handler did not receive displayData`, deviceWrapper, 'bgRed');
-        return;
+    if (requestIndex === 3) {
+        // This request doesn't return chore info, do not attempt to calculate alerts.
+        return null;
     }
 
-    const dynformsUserIds = Object.keys(displayData);
-    const now = new Date();
-    dynformsUserIds.forEach(dynformsUserId => {
-        const chores = displayData[dynformsUserId].chores;
-        const records = displayData[dynformsUserId].records;
-        const dynformsUsername = getDynformsUsername(deviceWrapper, dynformsUserId);
+    const alerts = [];
+    try {
 
-        chores.forEach(chore => {
-            if (!chore.alertText) {
-                chore.alertText = `${chore.label} is due!`;
-            }
+        if (!displayData) {
+            log(`Error: __getAlerts handler did not receive displayData`, deviceWrapper, 'bgRed');
+            return;
+        }
 
-            if (chore.daily === 1 && chore.alertLessThan === 1) {
-                // This is a once a day chore.
-                const warnAfterHours = chore.warnAfterHours ?? 20;
-                const alertAfterHours = chore.alertAfterHours ?? 22;
+        const dynformsUserIds = Object.keys(displayData);
+        const now = new Date();
+        dynformsUserIds.forEach(dynformsUserId => {
+            const chores = displayData[dynformsUserId].chores;
+            const records = displayData[dynformsUserId].records;
+            const dynformsUsername = getDynformsUsername(deviceWrapper, dynformsUserId);
 
-                if (!choreDoneToday(dynformsUserId, chore, records)) {
-                    if (now.getHours() >= alertAfterHours) {
-                        alerts.push(createAlert(`${dynformsUsername}: ${chore.alertText}`, "alert", deviceWrapper, !chore.alertDismissable));
-                    } else if (now.getHours() >= warnAfterHours) {
-                        alerts.push(createAlert(`${dynformsUsername}: ${chore.alertText}`, "warn", deviceWrapper, !chore.alertDismissable));
-                    }                                        
+            chores.forEach(chore => {
+                if (!chore.alertText) {
+                    chore.alertText = `${chore.label} is due!`;
                 }
-            }
-        });
-    })
+
+                if (chore.daily === 1 && chore.alertLessThan === 1) {
+                    // This is a once a day chore.
+                    const warnAfterHours = chore.warnAfterHours ?? 20;
+                    const alertAfterHours = chore.alertAfterHours ?? 22;
+
+                    if (!choreDoneToday(dynformsUserId, chore, records)) {
+                        if (now.getHours() >= alertAfterHours) {
+                            alerts.push(deviceWrapper.devicePool.createAlert(`${dynformsUsername}: ${chore.alertText}`, "alert", deviceWrapper, !chore.alertDismissable, chore.alertAudio));
+                        } else if (now.getHours() >= warnAfterHours) {
+                            alerts.push(deviceWrapper.devicePool.createAlert(`${dynformsUsername}: ${chore.alertText}`, "warn", deviceWrapper, !chore.alertDismissable, chore.alertAudio));
+                        }                                        
+                    }
+                }
+            });
+        })
+
+    } catch (err) {
+        console.log(err);
+    }
 
     return alerts;
 }

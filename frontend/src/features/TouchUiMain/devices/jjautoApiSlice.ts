@@ -4,7 +4,7 @@ export const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
         //baseUrl: "http://johannes-mb.wnet.wn:3000/auto",
-        baseUrl: "http://jj-auto.wnet.wn:3000/auto",
+        baseUrl: "http://johannes-mb.wnet.wn:3000/auto",
     }),
     endpoints(builder) {
         return {

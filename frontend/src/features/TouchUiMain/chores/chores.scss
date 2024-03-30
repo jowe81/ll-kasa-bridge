@@ -20,12 +20,62 @@
   align-content: flex-start;
   justify-content: flex-start;
   flex-flow: row wrap;  
-  // overflow-y: scroll;
   height: 166px;
   color:rgba(209, 190, 212, 0.608);
-
 }
- 
+
+.chores-selected-chore-container {
+  width: 280px;  
+  background-color: rgb(42, 31, 42);
+  margin: 5px auto;
+  display: flex;  
+  align-content: flex-start;
+  justify-content: flex-start;
+  flex-flow: row wrap;  
+  height: 166px;
+  color:rgba(209, 190, 212, 0.608);
+}
+
+.chores-selected-top-container {
+    display:flex;
+    width: 100%;
+    height: 50px;
+    justify-content: space-between;
+
+    .chores-selected-back-button {
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding:2px 2px;
+        background-color: rgb(53, 46, 52);
+        width: 25%;
+        text-align: center;
+    }
+
+    .chores-selected-button:last-child {
+        border-left: 1px solid rgba(87, 71, 86, 0.785);
+    }
+
+    .chores-selected-info-container {
+        width: 75%;
+        padding: 2px;
+        padding-left: 5px;
+
+        .chores-selected-description {
+            font-size: 80%;
+        }
+
+        .chores-selected-label-big {
+            height: 100%;
+            display: grid;
+            place-items: center;
+            text-align: center;
+        }
+    }
+
+    border-bottom: 1px solid rgba(87, 71, 86, 0.785);
+}
+
 /* Handle */
 .chores-items-container::-webkit-scrollbar-thumb {
   background: #5f4e6289;
@@ -46,6 +96,7 @@
 .chore-button {
     width: auto !important;
     height: 40px;
+    min-width: 81px;
     color:rgba(217, 188, 220, 0.5);
     border-color: rgba(217, 188, 220, 0.5);
     display: flex;

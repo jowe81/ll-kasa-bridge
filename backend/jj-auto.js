@@ -21,6 +21,11 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 
+process.on("uncaughtException", (err) => {
+    console.error("An uncaught exception occurred:", err);
+    log("An uncaught exception occurred.", "bgRed");
+});
+
 const app = express();
 app.use(cors());
 app.use(express.urlencoded());

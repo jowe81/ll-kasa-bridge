@@ -5,7 +5,6 @@ import { log, debug } from "..//Log.js";
 import { findByField, findById } from "../../helpers/jUtils.js";
 import { formatTime } from "../../helpers/jDateTimeUtils.js";
 import { makeLiveDeviceObject } from "../TargetDataProcessor.js";
-import { spawn } from "child_process";
 
 const localConstants = constants.DEVICETYPE_DEFAULTS[constants.DEVICETYPE_VIRTUAL][constants.SUBTYPE_TIMER];
 
@@ -149,7 +148,7 @@ class TimerHandler {
         this.state.liveTimers.push(timer);
 
         if (timer.audiofileScheduled !== false) {
-            this.playAudio(timer.audiofileScheduled ?? localConstants.AUDIO_FILE_SCHEDULED_TIMER_DEFAULT);
+            this.devicePool.playAudio(timer.audiofileScheduled ?? localConstants.AUDIO_FILE_SCHEDULED_TIMER_DEFAULT);
         }
     }
 
@@ -343,41 +342,11 @@ class TimerHandler {
                 this.deviceWrapper
             );
 
-            this.playAudio(file, `Timer ${liveTimer.id ?? liveTimer.label}: done playing ${file}.`);
+            this.devicePool.playAudio(file, `Timer ${liveTimer.id ?? liveTimer.label}: done playing ${file}.`);
 
             // Once played, increase this
             liveTimer.lastTriggerIndexPlayed++;
         }
-    }
-
-    playAudio(file, messageOnClose) {
-        if (!file) {
-            log(`Play audio file: no file provided.`, this.deviceWrapper, 'red');
-            return;
-        }
-
-        const fullPath = localConstants.AUDIO_PATH + file;
-
-        let playerInfo = (process.env.AUDIO_PLAYER_COMMAND ?? "afplay").split(" ");
-
-        const player = playerInfo[0]; // First is the command itself
-        const playerArgs = playerInfo.length > 1 ? playerInfo.slice(1) : [];
-            
-        const args = [...playerArgs, fullPath];
-
-        log(`Playing audio file ${fullPath} with ${player}.`, this.deviceWrapper, "yellow");
-
-        const thread = spawn(player, args);
-
-        thread.on("error", (error) => {
-            console.log(`error: ${error.message}`);
-        });
-
-        thread.on("close", (code) => {
-            if (messageOnClose) {
-                log(messageOnClose, this.deviceWrapper);
-            }            
-        });
     }
 }
 

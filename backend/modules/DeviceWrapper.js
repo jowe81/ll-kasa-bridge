@@ -435,7 +435,7 @@ const cmdFailPrefix = '[FAIL]';
   },
 
   getAlerts() {
-    if (!Array.isArray(this.state.alerts)) {
+    if (!Array.isArray(this.state?.alerts)) {
         return []
     };
 

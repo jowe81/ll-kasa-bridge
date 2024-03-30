@@ -13,7 +13,7 @@ function requestShouldRun(requestConfig, lastExecuted) {
 
   const timeInfo = requestConfig.retrieve?.time;  
 
-  switch (timeInfo.frequency) {
+  switch (timeInfo?.frequency) {
 
     case 'minutes':
       if (!timeInfo.minutes) {
@@ -150,32 +150,6 @@ function resolvePlaceholder({key, values}) {
     return null;
 }
 
-function createAlert(message, level, deviceWrapper, noDismiss = false) {
-    if (!deviceWrapper) {
-        return null;
-    }
-
-    const serviceLabel = deviceWrapper.displayLabel;
-    const currentAlerts = deviceWrapper.getAlerts();
-    const existingAlert = currentAlerts?.find(alert => alert.message === message && alert.level === level && alert.serviceLabel === serviceLabel);
-
-    if (existingAlert) {
-        existingAlert.reissued_at = new Date();
-        return existingAlert;
-    }
-
-    const now = new Date();
-
-    return {
-        id: now.getTime(),
-        channel: deviceWrapper.channel,
-        message,
-        level,
-        serviceLabel,
-        dismissable: !noDismiss,
-        issued_at: now,
-    };
-}
 
 const dynformsDbFilters = {
     applyCurrentDateFilter,

@@ -2,7 +2,6 @@ import _ from "lodash";
 import { makeLiveDeviceObject } from '../TargetDataProcessor.js';
 import constants from "../../constants.js";
 import { log, debug } from '../Log.js';
-import { createAlert } from "../../helpers/dynformsData.js";
 
 const localConstants = constants.DEVICETYPE_DEFAULTS[constants.DEVICETYPE_VIRTUAL][constants.SUBTYPE_THERMOSTAT];
 
@@ -240,7 +239,7 @@ class ThermostatHandler {
         }  
       } else {
         if (location.isHeating()) {
-            alerts.push(createAlert(`${location.name}: Uncontrolled heater!`, "warn", this.thermostat));
+            alerts.push(this.devicePool.createAlert(`${location.name}: Uncontrolled heater!`, "warn", this.thermostat));
             log(`${location.name}: Uncontrolled heater!`, this.thermostat, 'bgRed');
         }
       }

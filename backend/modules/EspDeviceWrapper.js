@@ -5,7 +5,6 @@ import { log, debug } from './Log.js';
 import { globalConfig } from '../configuration.js';
 import { resolveDeviceDependencies } from './DependencyResolver.js';
 import { makeLiveDeviceObject } from './TargetDataProcessor.js';
-import { createAlert } from '../helpers/dynformsData.js';
 
 
 const espConstants = {
@@ -219,9 +218,9 @@ const EspDeviceWrapper = {
                                     const threshold = parseInt(payload.photo_circuit_threshold);
                                     const value = parseInt(payload.photo_circuit_raw2);
                                     if (value > threshold) {                                        
-                                        this.setAlerts([createAlert("Mailbox likely has a delivery.", "alert", this)]);
+                                        this.setAlerts([this.devicePool.createAlert("Mailbox likely has a delivery.", "alert", this)]);
                                     } else {
-                                        this.setAlerts([createAlert("Mailbox is locked but likely empty.", "warn", this)]);
+                                        this.setAlerts([this.devicePool.createAlert("Mailbox is locked but likely empty.", "warn", this)]);
                                     }
                                 } else {
                                     this.setAlerts([]);

@@ -100,6 +100,13 @@ const globalConfig = {
              */
             paddingFromSunEvent: 2 * HOUR,
         },
+
+        backendAlertHandler: {
+            // How often should the service check for active alerts to play audio for?
+            checkInterval: 15 * SECOND,
+            defaultPlayInterval: 5 * MINUTE,
+            defaultAudiofile: 'smooth_bells.mp3', 
+        }
     },
 
     /**
@@ -1649,6 +1656,7 @@ const deviceMap = [
                 {
                     connectionName: null, // not implemented // Database name. Will fall back to default constant if absent.
                     collectionName: "address_book",
+                    requestType: "pull",
                     retrieve: {
                         time: {
                             frequency: "daily",
@@ -1699,6 +1707,7 @@ const deviceMap = [
                 {
                     connectionName: null, // not implemented
                     collectionName: "scriptures",
+                    requestType: "pull",
                     retrieve: {
                         time: {
                             frequency: "daily",
@@ -1753,6 +1762,7 @@ const deviceMap = [
                 {
                     connectionName: null, // not implemented
                     collectionName: "photosFileInfo",
+                    requestType: "pull",
                     retrieve: {
                         time: {
                             frequency: "minutes",
@@ -1898,6 +1908,7 @@ const deviceMap = [
                 {
                     connectionName: "dynforms",
                     collectionName: "johannes_medical",
+                    requestType: "pull",
                     retrieve: {
                         time: {
                             frequency: "minutes",
@@ -1946,6 +1957,7 @@ const deviceMap = [
                 {
                     connectionName: null, // not implemented
                     collectionName: "chores",
+                    requestType: "pull",
                     retrieve: {
                         time: {
                             frequency: "minutes",
@@ -1972,6 +1984,39 @@ const deviceMap = [
                     collectionName: "chores",
                     requestType: "deleteById",
                 },
+                {
+                    collectionName: "chores",
+                    requestType: "macro",
+                    settings: {
+                        macroId: "__aggregation",
+                        aggregation: [
+                            {
+                                $match: {
+                                    created_at: {
+                                        $gte: "__DATE_DAYS_AGO-90",
+                                    },
+                                },
+                            },
+                            {
+                                $group: {
+                                    _id: {
+                                        id: "$chore.id",
+                                        user: "$__user.id",
+                                        week: { $week: "$created_at" }, // Extract the week number from the created_at field
+                                        year: { $year: "$created_at" }, // Extract the year for accuracy
+                                    },
+                                    count: { $sum: 1 }, // Count the documents in each group
+                                },
+                            },
+                            {
+                                $sort: {
+                                    "_id.year": 1, // Sort by year in ascending order
+                                    "_id.week": 1, // Sort by week in ascending order
+                                },
+                            },
+                        ],
+                    },
+                },
             ],
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 30 * SECOND,
@@ -1990,30 +2035,43 @@ const deviceMap = [
                 chores: [
                     // Jess
                     {
-                        id: "vitamins",
-                        label: "vitamins",
+                        id: "pills_am",
+                        label: "am pills",
                         alertLessThan: 1,
                         daily: 1,
                         user: "jess",
-                        alertText: "Take your vitamins",
-                        alertDismissable: false,
-                        warnAfterHours: 20,
-                        alertAfterHours: 22,
+                        alertText: "Morning pills are due!",
+                        warnAfterHours: 8,
+                        alertAfterHours: 10,
+                        alertAudio: true,
                     },
-                    // {
-                    //     id: "cardio",
-                    //     label: "cardio",
-                    //     alertLessThan: 4,
-                    //     weekly: 5,
-                    //     user: "jess",
-                    // },
-                    // {
-                    //     id: "workout",
-                    //     label: "workout",
-                    //     alertLessThan: 3,
-                    //     weekly: 3,
-                    //     user: "jess",
-                    // },
+                    {
+                        id: "pills_pm",
+                        label: "pm pills",
+                        alertLessThan: 1,
+                        daily: 1,
+                        user: "jess",
+                        alertText: "Evening pills are due!",
+                        warnAfterHours: 19,
+                        alertAfterHours: 21,
+                        alertAudio: true,
+                    },
+                    {
+                        id: "cardio",
+                        label: "cardio",
+                        description: "hike or bike (1h+), or run (30m+)",
+                        alertLessThan: 3,
+                        weekly: 3,
+                        user: "jess",
+                    },
+                    {
+                        id: "workout",
+                        label: "workout",
+                        description: "weightlifting (machines or free)",
+                        alertLessThan: 3,
+                        weekly: 3,
+                        user: "jess",
+                    },
                     // Johannes
                     {
                         id: "pills_am",
@@ -2021,9 +2079,10 @@ const deviceMap = [
                         alertLessThan: 1,
                         daily: 1,
                         user: "johannes",
-                        alertText: "morning pills are due!",
-                        warnAfterHours: 9,
+                        alertText: "Morning pills are due!",
+                        warnAfterHours: 8,
                         alertAfterHours: 10,
+                        alertAudio: true,
                     },
                     {
                         id: "pills_pm",
@@ -2031,10 +2090,15 @@ const deviceMap = [
                         alertLessThan: 1,
                         daily: 1,
                         user: "johannes",
+                        alertText: "Evening pills are due!",
+                        warnAfterHours: 19,
+                        alertAfterHours: 21,
+                        alertAudio: true,
                     },
                     {
                         id: "cardio",
                         label: "cardio",
+                        description: "hike or bike (1h+), or run (30m+)",
                         alertLessThan: 3,
                         weekly: 3,
                         user: "johannes",
@@ -2042,6 +2106,7 @@ const deviceMap = [
                     {
                         id: "workout",
                         label: "workout",
+                        description: "weightlifting (machines or free)",
                         alertLessThan: 2,
                         weekly: 2,
                         user: "johannes",
@@ -2071,6 +2136,7 @@ const deviceMap = [
                 {
                     connectionName: null, // not implemented
                     collectionName: "notes_scanned",
+                    requestType: "pull",
                     retrieve: {
                         time: {
                             frequency: "minutes",

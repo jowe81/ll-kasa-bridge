@@ -6,6 +6,7 @@ import DeviceWrapper from "./DeviceWrapper.js";
 import EspDeviceWrapper from "./EspDeviceWrapper.js";
 import VirtualDeviceWrapper from "./VirtualDeviceWrapper.js";
 import Location from "./Location.js";
+import { spawn } from "child_process";
 
 import { getPreset } from "./Presets.js";
 import { log } from "./Log.js";
@@ -81,13 +82,21 @@ const devicePool = {
     },
 
     startPeriodicServices() {
+        // Filters
         const settings = this.globalConfig?.defaults?.periodicFilters;
         const interval = settings?.checkInterval ?? constants.MINUTE;
         log(`Starting periodic services at check interval (ms): ${interval}`, null, "white");
 
         setInterval(() => {
-            this._runPeriodicFilters();
+            this._runPeriodicFilters();            
         }, interval);
+
+        // Alerts
+        const alertsSettings = this.globalConfig?.defaults?.backendAlertHandler;
+        const alertsInterval = alertsSettings?.checkInterval ?? constants.MINUTE;
+        log(`Starting backend alert handler at check interval (ms): ${alertsInterval}`, null, "white");
+
+        setInterval(() => this._handleBackendAlerts(), alertsInterval);
     },
 
     startDiscovery() {
@@ -883,6 +892,106 @@ const devicePool = {
 
         return filtersToRun;
     },
+
+    _handleBackendAlerts() {
+        const allCurrentAlerts = [];
+
+        this.devices.forEach((deviceWrapper) => {
+            const deviceAlerts = deviceWrapper.getAlerts();
+
+            if (Array.isArray(deviceAlerts)) {
+                allCurrentAlerts.push(...deviceAlerts);
+            }            
+        });
+
+        const now = new Date();
+        const audiofilesToPlay = [];
+        
+        allCurrentAlerts.forEach(alert => {
+            if (alert.audiofile && alert.playInterval && ['warn','alert'].includes(alert.level)) {
+                // This alert should play audio.
+                if (!alert.lastPlayed || (alert.lastPlayed?.getTime() + alert.playInterval < now.getTime())) {
+                    // It is due to play.
+                    if (!audiofilesToPlay.includes(alert.audiofile)) {
+                        audiofilesToPlay.push(alert.audiofile);
+                    }
+                    alert.lastPlayed = now;
+                }        
+            }
+        })
+
+        audiofilesToPlay.forEach((audiofile) => {
+            this.playAudio(audiofile);
+        });
+    },
+
+    createAlert(message, level, deviceWrapper, noDismiss = false, alertAudio = false, audiofile = null, playInterval = null) {
+        if (!deviceWrapper) {
+            return null;
+        }
+        const alertsSettings = this.globalConfig?.defaults?.backendAlertHandler;
+
+        const serviceLabel = deviceWrapper.displayLabel;
+        const currentAlerts = deviceWrapper.getAlerts();
+        const existingAlert = currentAlerts?.find(alert => alert.message === message && alert.level === level && alert.serviceLabel === serviceLabel);
+
+        if (existingAlert) {
+            existingAlert.reissued_at = new Date();
+            return existingAlert;
+        }
+
+        const now = new Date();
+
+        const alert = {
+            id: now.getTime(),
+            channel: deviceWrapper.channel,
+            message,
+            level,
+            serviceLabel,
+            audiofile,
+            playInterval,
+            dismissable: !noDismiss,
+            issued_at: now,
+        };
+
+        if (alertAudio) {
+            alert.audiofile = audiofile ? audiofile : alertsSettings.defaultAudiofile ?? 'alert_error.mp3';
+            alert.playInterval = playInterval ? playInterval : alertsSettings.defaultPlayInterval ?? 5 * MINUTE;
+        }
+
+        return alert;
+    },
+
+    playAudio(file, messageOnClose) {
+        if (!file) {
+            log(`Play audio file: no file provided.`, this.deviceWrapper, 'red');
+            return;
+        }
+
+        const fullPath = './media-files/' + file;
+
+        let playerInfo = (process.env.AUDIO_PLAYER_COMMAND ?? "afplay").split(" ");
+
+        const player = playerInfo[0]; // First is the command itself
+        const playerArgs = playerInfo.length > 1 ? playerInfo.slice(1) : [];
+            
+        const args = [...playerArgs, fullPath];
+
+        log(`Playing audio file ${fullPath} with ${player}.`, this.deviceWrapper, "yellow");
+
+        const thread = spawn(player, args);
+
+        thread.on("error", (error) => {
+            console.log(`error: ${error.message}`);
+        });
+
+        thread.on("close", (code) => {
+            if (messageOnClose) {
+                log(messageOnClose, this.deviceWrapper);
+            }            
+        });
+    }
+
 };
 
 export { devicePool, constants };
