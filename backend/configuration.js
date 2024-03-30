@@ -105,7 +105,7 @@ const globalConfig = {
             // How often should the service check for active alerts to play audio for?
             checkInterval: 15 * SECOND,
             defaultPlayInterval: 5 * MINUTE,
-            defaultAudiofile: 'smooth_bells.mp3', 
+            defaultAudiofile: 'smooth_bells_quiet.mp3', 
         }
     },
 
@@ -1931,7 +1931,7 @@ const deviceMap = [
             // This is how often the handler will go out and check whether a request should actually be run.
             checkInterval: 2 * MINUTE,
             ui: {
-                warnAfter: 3 * HOUR,
+                warnAfter: 4 * HOUR,
                 alertAfter: 5 * HOUR,
             },
         },
