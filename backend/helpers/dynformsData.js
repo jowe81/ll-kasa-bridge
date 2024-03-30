@@ -156,4 +156,4 @@ const dynformsDbFilters = {
     applyStaticFilter,
 };
 
-export { createAlert, dynformsDbFilters, getDisplayDataFromApiResponse, requestShouldRun };
+export { dynformsDbFilters, getDisplayDataFromApiResponse, requestShouldRun };
