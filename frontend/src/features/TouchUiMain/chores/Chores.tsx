@@ -27,8 +27,8 @@ function Chores({ dynformsUserId }) {
 
     function handleChoreButtonClick(event, chore) {
         const rect = event.target.getBoundingClientRect();
-        const center = rect.left + rect.width / 2;
-        if (event.clientX < center) {
+        const rightQuarter = rect.left + rect.width / 4 * 3;
+        if (event.clientX < rightQuarter) {
             // Tap on left side of button
             toggleChore(chore);
         } else {
