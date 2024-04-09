@@ -4,6 +4,9 @@ import { makeLiveDeviceObject } from "../TargetDataProcessor.js";
 import { formatTime, formatDateLong, getSunrise, getSunset, getNoon, isDaytime, getTomorrow, isDST } from "../../helpers/jDateTimeUtils.js";
 import constants from "../../constants.js";
 import { log, debug } from "../Log.js";
+import os from 'os';
+import fs from "fs";
+import diskusage from "diskusage";
 
 const localConstants =
     constants.DEVICETYPE_DEFAULTS[constants.DEVICETYPE_VIRTUAL][
@@ -156,11 +159,14 @@ class ClockHandler {
 
         // Only push if the minute switched over.
         if (this.clock._previousMinute !== now.getMinutes()) {            
+            const systemInfo = await getSystemInfoData();
+
             this.clock._previousMinute = now.getMinutes();
             this.clock._updateState(
                 {
                     powerState: this.clock.getPowerState(),
                     clock: clockData,
+                    system: systemInfo,
                 },
                 true
             );
@@ -200,6 +206,71 @@ class ClockHandler {
             }
         }
     }
+}
+
+async function getSystemInfoData() {
+    const uptimeInSeconds = os.uptime();
+    const uptimeInDays = Math.floor(uptimeInSeconds / (3600 * 24));
+    const uptimeInHours = Math.floor((uptimeInSeconds % (3600 * 24)) / 3600);
+    const uptimeInMinutes = Math.floor((uptimeInSeconds % 3600) / 60);
+
+    const devicePaths = process.env.DISKINFO_DEVICES.split(',');
+    const diskInfo = await getDiskInfos(devicePaths);
+    
+    const data = {
+        uptime: `${uptimeInDays} days, ${uptimeInHours}:${uptimeInMinutes > 9 ? '' : '0'}${uptimeInMinutes}`,
+        loadAvg: os.loadavg().map(n => n.toFixed(2)).join(', '),
+        freeMem: (os.freemem() / 1024 / 1024).toFixed(0) + 'M',
+        totalMem: (os.totalmem() / 1024 / 1024).toFixed(0) + 'M',
+        platform: os.platform(),
+        release: os.release(),
+        disks: diskInfo,
+    }
+
+    return data;
+}
+
+async function getDiskInfos(devicePaths) {
+    const promises = devicePaths.map(devicePath => getDiskInfo(devicePath));
+    const infos = await Promise.all(promises);
+    const diskInfos = {};
+    infos.forEach((info, index) => diskInfos[devicePaths[index]] = info);
+    
+    Object.keys(diskInfos).forEach(devicePath => {
+        const info = diskInfos[devicePath]
+        if (info) {
+            let n = info.total;
+            let unitIndex = 0;
+            while (n > 1) {
+                n = n / 1024;
+                unitIndex++;
+            }
+
+            const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+            const unit = units[unitIndex];
+
+            Object.keys(info).forEach(key => {
+                info['f_' + key] = (info[key] / Math.pow(10, unitIndex * 3)).toFixed(2) + ` ${unit}`;
+            })
+
+            info.avPercent = Math.round((info.available / info.total) * 100);
+            info.freePercent = Math.round((info.free / info.total) * 100);
+        }
+    })
+
+    return diskInfos;
+}
+
+async function getDiskInfo(devicePath) {
+    return new Promise((resolve, reject) => {
+        diskusage.check(devicePath, (err, info) => {
+            if (err) {
+                log(`Unable to get disk info for ${mountPoint}: ${err.message}`, this, "bgRed");
+                return;
+            }
+            resolve(info);
+        });
+    });
 }
 
 function clockHandler(devicePool, clock, cache) {

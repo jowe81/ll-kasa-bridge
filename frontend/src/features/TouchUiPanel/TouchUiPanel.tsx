@@ -11,6 +11,7 @@ import Notes from "./notes/Notes.tsx";
 import MasterSwitches from "./masterSwitches/MasterSwitches.tsx";
 import DevicePresetButtons from "./devicePresetButtons/devicePresetButtons.tsx";
 import Mailbox from "./mailbox/Mailbox.tsx";
+import SystemInfo from "./SystemInfo/SystemInfo.tsx";
 
 import { getDeviceByChannel, getAlerts } from "../../devicesHelpers.tsx";
 
@@ -35,7 +36,8 @@ function TouchUiPanel(props: any) {
             {showBirthdays && <CompactBirthdays birthdayRangeToDisplay={birthdayRangeToDisplay} />}
 
             {controlsMode && <Notes />}
-            {controlsMode && <Alerts alerts={alerts}/>}
+            {controlsMode && alerts.length > 0 && <Alerts alerts={alerts} />}
+            {controlsMode && !alerts.length && <SystemInfo />}
             {panelMode && alerts.length > 0 && <Alerts alerts={alerts} />}
             {panelMode && alerts.length === 0 && <Notes />}
             <Temperature thermometersStartIndex={2} />
