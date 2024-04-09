@@ -10,9 +10,9 @@ function SystemInfo() {
         (device) => device.subType === constants.SUBTYPE_CLOCK && device.channel === constants.clock?.serviceChannel
     );
     const systemInfo = clock?.state?.system;
-    
+    console.log(systemInfo);
     const disks = systemInfo?.disks ?? {};
-    console.log(disks);
+    
     const diskInfoJsx = Object.keys(disks).map((devicePath, index) => {
         return <tr key={index}><td>{devicePath}</td><td>{disks[devicePath].f_total}, {disks[devicePath].freePercent}%, {disks[devicePath].avPercent}%</td></tr>
     });
@@ -27,18 +27,18 @@ function SystemInfo() {
                         <tbody>
                             <tr>
                                 <td>Uptime:</td>
-                                <td>{systemInfo.uptime}</td>
+                                <td>{systemInfo?.uptime}</td>
                             </tr>
                             <tr>
                                 <td>Memory:</td>
                                 <td>
-                                    {systemInfo.freeMem} / {systemInfo.totalMem}
+                                    {systemInfo?.freeMem} / {systemInfo?.totalMem}
                                 </td>
                             </tr>
                             <tr>
                                 <td>Load:</td>
                                 <td>
-                                    {systemInfo.loadAvg}
+                                    {systemInfo?.loadAvg}
                                 </td>
                             </tr>
                             {diskInfoJsx}
