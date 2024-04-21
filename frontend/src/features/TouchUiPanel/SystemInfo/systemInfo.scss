@@ -14,12 +14,29 @@
     padding-left: 4px;
 }
 
+.system-info-items-container {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 100px;
+    margin-top: 0px;
+}
+
+/* Handle */
+.system-info-items-container::-webkit-scrollbar-thumb {
+  background: #5f4e6289;
+}
+
+/* Handle on hover */
+.system-info-items-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(114, 84, 113, 0.735);
+}
+
 .system-info-label {
-    color: #999;
-    max-height: 25px;  
-    font-size: 16px;
-    width: 100%;
-    border-bottom: 1px solid #333;
+  padding-top:5px;
+  padding-bottom:0px;
+  margin-bottom: 2px;    
+  border-bottom: 1px solid #333;
+  color: #999;
 }
 
 .system-info-table {
@@ -29,4 +46,8 @@
     tr {
         height: 20px;
     }
+}
+
+.system-info-table-leftcol {
+    width: 90px;    
 }

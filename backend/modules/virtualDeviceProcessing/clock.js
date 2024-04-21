@@ -5,8 +5,10 @@ import { formatTime, formatDateLong, getSunrise, getSunset, getNoon, isDaytime, 
 import constants from "../../constants.js";
 import { log, debug } from "../Log.js";
 import os from 'os';
-import fs from "fs";
+import dns from "dns";
 import diskusage from "diskusage";
+import { exec } from "child_process";
+
 
 const localConstants =
     constants.DEVICETYPE_DEFAULTS[constants.DEVICETYPE_VIRTUAL][
@@ -216,7 +218,8 @@ async function getSystemInfoData() {
 
     const devicePaths = process.env.DISKINFO_DEVICES.split(',');
     const diskInfo = await getDiskInfos(devicePaths);
-    
+    const ipv4AddressesByInterface = await getIpAddresses();
+    const publicHostnameStatus = await checkPublicHostname(ipv4AddressesByInterface);
     const data = {
         uptime: `${uptimeInDays} days, ${uptimeInHours}:${uptimeInMinutes > 9 ? '' : '0'}${uptimeInMinutes}`,
         loadAvg: os.loadavg().map(n => n.toFixed(2)).join(', '),
@@ -225,6 +228,8 @@ async function getSystemInfoData() {
         platform: os.platform(),
         release: os.release(),
         disks: diskInfo,
+        ipAddresses: ipv4AddressesByInterface,
+        publicHostnameStatus,
     }
 
     return data;
@@ -239,22 +244,20 @@ async function getDiskInfos(devicePaths) {
     Object.keys(diskInfos).forEach(devicePath => {
         const info = diskInfos[devicePath]
         if (info) {
-            let n = info.total;
-            let unitIndex = 0;
+            let n = parseInt(info.size);
+            let unitIndex = -1;
             while (n > 1) {
                 n = n / 1024;
                 unitIndex++;
             }
-
             const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-            const unit = units[unitIndex];
+            const unit = units[unitIndex + 1];
 
-            Object.keys(info).forEach(key => {
+            ['size', 'used', 'free'].forEach(key => {
                 info['f_' + key] = (info[key] / Math.pow(10, unitIndex * 3)).toFixed(2) + ` ${unit}`;
             })
 
-            info.avPercent = Math.round((info.available / info.total) * 100);
-            info.freePercent = Math.round((info.free / info.total) * 100);
+            info.freePercent = Math.round((info.free / info.size) * 100);
         }
     })
 
@@ -263,14 +266,115 @@ async function getDiskInfos(devicePaths) {
 
 async function getDiskInfo(devicePath) {
     return new Promise((resolve, reject) => {
-        diskusage.check(devicePath, (err, info) => {
-            if (err) {
-                log(`Unable to get disk info for ${mountPoint}: ${err.message}`, this, "bgRed");
+
+        exec(`df -k "${devicePath}"`, (error, stdout, stderr) => {
+            if (error) {
+                console.log(error);
+                log(`Failed to execute df. Error: ${error}`);
                 return;
             }
+
+            const lines = stdout.split('\n');
+            let colsRaw = lines[1].split(/\s+/);
+            let colsCount;
+            let osDevicePath, size, used, free, usedPercent, iUsed, iFree, iUsedPercent, mountPoint;
+
+            const platform = os.platform();
+            if (platform === 'linux') {
+                colsCount = 6;
+                [osDevicePath, size, used, free, usedPercent] = lines[1].split(/\s+/);
+                // Mount point may have spaces - hence the acrobatics here.
+                mountPoint = colsRaw.splice(5).join(' ');
+            } else if (platform === 'darwin') {
+                //OSX - has 3 more columns (that we don't care about).
+                colsCount = 9;
+                [osDevicePath, size, used, free, usedPercent, iUsed, iFree, iUsedPercent] = lines[1].split(/\s+/);
+                mountPoint = colsRaw.splice(8).join(" ");
+            }
+            
+            const info = {
+                devicePath,
+                osDevicePath,
+                size: parseInt(size),
+                used: parseInt(used),
+                free: parseInt(free),
+                mountPoint,
+            };
+
             resolve(info);
         });
     });
+}
+
+async function getIpAddresses() {
+    return new Promise((resolve) => {
+        const networkInterfaces = os.networkInterfaces();
+
+        // Initialize an empty object to store results
+        const ipv4AddressesByInterface = {};
+        const interfacesToDisplay = process.env.NETWORKINFO_INTERFACES ? process.env.NETWORKINFO_INTERFACES.split(",") : [];
+
+        // Iterate over network interfaces
+        Object.entries(networkInterfaces).forEach(([interfaceName, interfaces]) => {
+            // Filter interfaces with IPv4 addresses
+            const ipv4Interfaces = interfaces.filter(
+                (networkInterface) =>
+                    interfacesToDisplay.includes(interfaceName) &&
+                    networkInterface.family === "IPv4" &&
+                    !networkInterface.internal
+            );
+
+            // If there are IPv4 addresses, add them to the result object
+            if (ipv4Interfaces.length > 0) {
+                ipv4AddressesByInterface[interfaceName] = ipv4Interfaces.map(
+                    (networkInterface) => networkInterface.address
+                );
+            }
+                
+            resolve(ipv4AddressesByInterface);
+        });          
+    })
+}
+
+async function checkPublicHostname(ipv4AddressesByInterface) {
+    const hostname = process.env.NETWORKINFO_PUBLIC_HOSTNAME;
+    if (hostname && ipv4AddressesByInterface && Object.keys(ipv4AddressesByInterface).length) {        
+        try {
+            const addresses = await dns.promises.resolve(hostname);
+            const matchingAddresses = {};
+            const interfaces = Object.keys(ipv4AddressesByInterface);
+
+            interfaces.forEach(networkInterface => {                
+                const addressesForThisInterface = ipv4AddressesByInterface[networkInterface];
+                const intersection = addressesForThisInterface.filter(address => addresses.includes(address));                
+                if (intersection.length) {
+                    matchingAddresses[networkInterface] = intersection;
+                }            
+            })
+            
+            if (!Object.keys(matchingAddresses).length) {
+                return {
+                    ok: false,
+                    message: `OFFLINE!`,
+                };
+            }
+
+            return {
+                ok: true,
+                message: `OK (${Object.keys(matchingAddresses).join(", ")})`,
+            };
+        } catch (err) {
+            log(`Unable to resolve ${hostname}:  ${err.message}`, this, "red");
+            return {
+                ok: false,
+                message: `ERROR!`,
+            }
+        }
+    }
+    return {
+        ok: null,
+        message: `Config Error`,
+    };
 }
 
 function clockHandler(devicePool, clock, cache) {

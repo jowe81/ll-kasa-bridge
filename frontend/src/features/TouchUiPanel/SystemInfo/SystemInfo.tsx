@@ -10,11 +10,28 @@ function SystemInfo() {
         (device) => device.subType === constants.SUBTYPE_CLOCK && device.channel === constants.clock?.serviceChannel
     );
     const systemInfo = clock?.state?.system;
-    console.log(systemInfo);
     const disks = systemInfo?.disks ?? {};
-    
+    console.log(disks);
     const diskInfoJsx = Object.keys(disks).map((devicePath, index) => {
-        return <tr key={index}><td>{devicePath}</td><td>{disks[devicePath].f_total}, {disks[devicePath].freePercent}%, {disks[devicePath].avPercent}%</td></tr>
+        const devicePathEscaped = <span>{devicePath.length > 10 ? '...' + devicePath.substr(-10) : devicePath}</span>
+        return (
+            <tr key={index}>
+                <td>{devicePathEscaped}</td>
+                <td>
+                    {disks[devicePath].f_free} free
+                </td>
+            </tr>
+        );
+    });
+
+    const ipAddresses = systemInfo?.ipAddresses ?? {};
+    const ipAddressesInfoJsx = Object.keys(ipAddresses).map((interfaceName, index) => {
+        return (
+            <tr key={index}>
+                <td>IP ({interfaceName}):</td>
+                <td>{ipAddresses[interfaceName].join(', ')}</td>
+            </tr>
+        );
     });
 
     return (
@@ -22,26 +39,27 @@ function SystemInfo() {
             <div className={``}>
                 <div className={`system-info-label`}>System Info</div>
                 <div className="system-info-items-container">
-                    <table className='system-info-table'>
+                    <table className="system-info-table">
                         <thead></thead>
                         <tbody>
                             <tr>
-                                <td>Uptime:</td>
+                                <td className="system-info-table-leftcol">Uptime:</td>
                                 <td>{systemInfo?.uptime}</td>
                             </tr>
                             <tr>
                                 <td>Memory:</td>
-                                <td>
-                                    {systemInfo?.freeMem} / {systemInfo?.totalMem}
-                                </td>
+                                <td>{systemInfo?.freeMem} free</td>
+                            </tr>
+                            <tr>
+                                <td>Hostname:</td>
+                                <td>{systemInfo?.publicHostnameStatus?.message}</td>
                             </tr>
                             <tr>
                                 <td>Load:</td>
-                                <td>
-                                    {systemInfo?.loadAvg}
-                                </td>
+                                <td>{systemInfo?.loadAvg}</td>
                             </tr>
                             {diskInfoJsx}
+                            {ipAddressesInfoJsx}
                         </tbody>
                     </table>
                 </div>
