@@ -25,7 +25,7 @@ function TouchUiPanel(props: any) {
     const mailbox = getDeviceByChannel(constants.touchPanel?.mailboxChannel);
     const showMailbox = mailbox?.powerState;
 
-    const alerts = getAlerts();
+    const alerts = getAlerts().filter(alert => !alert.dismissed);
 
     return (
         <>
