@@ -3,6 +3,8 @@ $color-text-orange: rgb(255, 157, 0);
 $color-text-red: red;
 $color-text-gray: gray;
 $color-bg-red: rgba($color-text-red, 0.273);
+$color-text-green: rgb(0, 197, 0);
+$color-bg-green: rgb(0, 74, 0);
 
 $color-touch-layer: rgba(255, 255, 255, 0.753);
 $color-bg-touch-layer: gray;
@@ -252,6 +254,11 @@ $touch-item-selected-background-color: rgba(0, 94, 0, 0.9);
     @extend .text-neutral;    
 }
 
+
+.badge-green {
+    color: $color-text-green;
+    background-color: $color-bg-green;
+}
 
 /* Orange */
 
