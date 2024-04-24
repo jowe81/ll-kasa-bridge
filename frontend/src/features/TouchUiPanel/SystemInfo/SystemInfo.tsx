@@ -35,8 +35,8 @@ function SystemInfo() {
     });
 
     return (
-        <div className="touch-ui-panel-item system-info-container">
-            <div className={``}>
+        <div className="touch-ui-panel-item">
+            <div className="system-info-container">
                 <div className={`system-info-label`}>System Info</div>
                 <div className="system-info-items-container">
                     <table className="system-info-table">
@@ -51,8 +51,10 @@ function SystemInfo() {
                                 <td>{systemInfo?.freeMem} free</td>
                             </tr>
                             <tr>
-                                <td>Hostname:</td>
-                                <td>{systemInfo?.publicHostnameStatus?.message}</td>
+                                <td>DDNS Status:</td>
+                                <td>
+                                    <span className={systemInfo?.publicHostnameStatus?.ok ? "badge-green" : "badge-red"}>{systemInfo?.publicHostnameStatus?.message}</span>
+                                </td>
                             </tr>
                             <tr>
                                 <td>Load:</td>

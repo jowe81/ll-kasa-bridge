@@ -161,7 +161,7 @@ class ClockHandler {
 
         // Only push if the minute switched over.
         if (this.clock._previousMinute !== now.getMinutes()) {            
-            const systemInfo = await getSystemInfoData();
+            const systemInfo = await this.getSystemInfoData(true);
 
             this.clock._previousMinute = now.getMinutes();
             this.clock._updateState(
@@ -169,6 +169,7 @@ class ClockHandler {
                     powerState: this.clock.getPowerState(),
                     clock: clockData,
                     system: systemInfo,
+                    alerts: this.clock.state?.alerts,                    
                 },
                 true
             );
@@ -208,31 +209,58 @@ class ClockHandler {
             }
         }
     }
-}
 
-async function getSystemInfoData() {
-    const uptimeInSeconds = os.uptime();
-    const uptimeInDays = Math.floor(uptimeInSeconds / (3600 * 24));
-    const uptimeInHours = Math.floor((uptimeInSeconds % (3600 * 24)) / 3600);
-    const uptimeInMinutes = Math.floor((uptimeInSeconds % 3600) / 60);
+    async getSystemInfoData(generateNeededAlerts = true) {
+        const uptimeInSeconds = os.uptime();
+        const uptimeInDays = Math.floor(uptimeInSeconds / (3600 * 24));
+        const uptimeInHours = Math.floor((uptimeInSeconds % (3600 * 24)) / 3600);
+        const uptimeInMinutes = Math.floor((uptimeInSeconds % 3600) / 60);
 
-    const devicePaths = process.env.DISKINFO_DEVICES.split(',');
-    const diskInfo = await getDiskInfos(devicePaths);
-    const ipv4AddressesByInterface = await getIpAddresses();
-    const publicHostnameStatus = await checkPublicHostname(ipv4AddressesByInterface);
-    const data = {
-        uptime: `${uptimeInDays} days, ${uptimeInHours}:${uptimeInMinutes > 9 ? '' : '0'}${uptimeInMinutes}`,
-        loadAvg: os.loadavg().map(n => n.toFixed(2)).join(', '),
-        freeMem: (os.freemem() / 1024 / 1024).toFixed(0) + 'M',
-        totalMem: (os.totalmem() / 1024 / 1024).toFixed(0) + 'M',
-        platform: os.platform(),
-        release: os.release(),
-        disks: diskInfo,
-        ipAddresses: ipv4AddressesByInterface,
-        publicHostnameStatus,
+        const devicePaths = process.env.DISKINFO_DEVICES.split(',');
+        const diskInfo = await getDiskInfos(devicePaths);
+        const ipv4AddressesByInterface = await getIpAddresses();
+        const publicHostnameStatus = await checkPublicHostname(ipv4AddressesByInterface);
+        const data = {
+            uptime: `${uptimeInDays} days, ${uptimeInHours}:${uptimeInMinutes > 9 ? '' : '0'}${uptimeInMinutes}`,
+            loadAvg: os.loadavg().map(n => n.toFixed(2)).join(', '),
+            freeMem: (os.freemem() / 1024 / 1024).toFixed(0) + 'M',
+            totalMem: (os.totalmem() / 1024 / 1024).toFixed(0) + 'M',
+            platform: os.platform(),
+            release: os.release(),
+            disks: diskInfo,
+            ipAddresses: ipv4AddressesByInterface,
+            publicHostnameStatus,
+        }
+
+        if (generateNeededAlerts) {
+            if (!publicHostnameStatus.ok) {
+                log(`DDNS is offline (${process.env.NETWORKINFO_PUBLIC_HOSTNAME})`, this.clock, "bgRed");
+                this.clock.setAlerts([
+                    this.devicePool.createAlert(
+                        `${process.env.NETWORKINFO_PUBLIC_HOSTNAME} is offline!`, 
+                        "alert", 
+                        this.clock, 
+                        false, 
+                        false, 
+                        null, 
+                        null, 
+                        constants.HOUR * 24 // Reactivate this alert after a day if it gets dismissed.
+                    )
+                ]);
+            }
+        }
+
+        return data;
     }
 
-    return data;
+    getAlerts() {
+        if (!Array.isArray(this.state?.alerts)) {
+            return []
+        };
+
+        return this.state.alerts
+    }
+
 }
 
 async function getDiskInfos(devicePaths) {
