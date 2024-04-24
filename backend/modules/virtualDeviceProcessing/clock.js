@@ -282,7 +282,7 @@ async function getDiskInfos(devicePaths) {
             const unit = units[unitIndex + 1];
 
             ['size', 'used', 'free'].forEach(key => {
-                info['f_' + key] = (info[key] / Math.pow(10, unitIndex * 3)).toFixed(2) + ` ${unit}`;
+                info['f_' + key] = (info[key] / Math.pow(1024, unitIndex)).toFixed(2) + ` ${unit}`;
             })
 
             info.freePercent = Math.round((info.free / info.size) * 100);
