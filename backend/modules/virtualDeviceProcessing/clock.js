@@ -8,7 +8,8 @@ import os from 'os';
 import dns from "dns";
 import diskusage from "diskusage";
 import { exec } from "child_process";
-
+import { promisify } from "util";
+const execPromise = promisify(exec);
 
 const localConstants =
     constants.DEVICETYPE_DEFAULTS[constants.DEVICETYPE_VIRTUAL][
@@ -218,6 +219,8 @@ class ClockHandler {
 
         const devicePaths = process.env.DISKINFO_DEVICES.split(',');
         const diskInfo = await getDiskInfos(devicePaths);
+        const raidDevices = process.env.RAIDINFO_DEVICES ? process.env.RAIDINFO_DEVICES.split(",") : [];
+        const raidStatus = await getRaidStatus(raidDevices);
         const ipv4AddressesByInterface = await getIpAddresses();
         const publicHostnameStatus = await checkPublicHostname(ipv4AddressesByInterface);
         const data = {
@@ -230,12 +233,14 @@ class ClockHandler {
             disks: diskInfo,
             ipAddresses: ipv4AddressesByInterface,
             publicHostnameStatus,
+            raidStatus,
         }
 
         if (generateNeededAlerts) {
+            const alerts = [];
             if (!publicHostnameStatus.ok) {
                 log(`DDNS is offline (${process.env.NETWORKINFO_PUBLIC_HOSTNAME})`, this.clock, "bgRed");
-                this.clock.setAlerts([
+                alerts.push(
                     this.devicePool.createAlert(
                         `${process.env.NETWORKINFO_PUBLIC_HOSTNAME} is offline!`, 
                         "alert", 
@@ -246,8 +251,44 @@ class ClockHandler {
                         null, 
                         constants.HOUR * 24 // Reactivate this alert after a day if it gets dismissed.
                     )
-                ]);
+                );
             }
+        
+            const raidStatusIssues = raidStatus.filter((info) => !info.diskStatusOk);            
+            raidStatusIssues.forEach(info => {
+                log(`RAID Issue with ${info.device}: ${JSON.stringify(info)}`, this.clock, "bgRed");
+                alerts.push(
+                    this.devicePool.createAlert(
+                        `RAID Issue with ${info.device}: [${info.diskStatus}]`,
+                        "alert",
+                        this.clock,
+                        false,
+                        false,
+                        null,
+                        null,
+                        constants.HOUR * 24 // Reactivate this alert after a day if it gets dismissed.
+                    )
+                )                
+            });
+
+            const raidDisksSyncing = raidStatus.filter((info) => info.syncing);
+            raidDisksSyncing.forEach(info => {
+                log(`RAID Issue with ${info.device}: ${JSON.stringify(info)}`, this.clock, "bgRed");
+                alerts.push(
+                    this.devicePool.createAlert(
+                        `RAID Sync on ${info.device}: ${info.syncPercent ? `${info.syncPercent}%` : `progress N/A`}`,
+                        "warn",
+                        this.clock,
+                        false,
+                        false,
+                        null,
+                        null,
+                        constants.HOUR * 24 // Reactivate this alert after a day if it gets dismissed.
+                    )
+                );                
+            })
+
+            this.clock.setAlerts(alerts);
         }
 
         return data;
@@ -261,6 +302,87 @@ class ClockHandler {
         return this.state.alerts
     }
 
+}
+
+async function getRaidStatus(devices) {
+    if (!devices) {
+        devices = [];
+    }
+
+    const promises = devices.map(device => {
+        return execPromise(`cat /proc/mdstat | grep -A2 ${device}`);
+    });
+
+    const results = await Promise.all(promises);
+
+    // const results = [
+    //     {
+    //         stdout:
+    //             "md0 : active raid6 sdd[5] sde[4] sdf[0] sdc[3]\n" +
+    //             "      31251494912 blocks super 1.2 level 6, 512k chunk, algorithm 2 [4/4] [UUUU]\n" +
+    //             "      bitmap: 0/117 pages [0KB], 65536KB chunk\n",
+    //         stderr: "",
+    //     },
+    //     {
+    //         stdout:
+    //             "md1 : active raid1 sda[2] sdb[0]\n" +
+    //             "      1000072512 blocks super 1.2 [2/2] [UU]\n" +
+    //             "      [==>..................]  resync = 12.5% (244259584/1953513472) finish=143.1min speed=63245K/sec\n",
+    //         stderr: "",
+    //     },
+    // ];
+
+    const statusInfos = devices.map((device, index) => {
+        const stdout = results[index].stdout;
+
+        const lines = stdout.split(/\n/);
+        const line0parts = lines[0].split(':').map(section => section.trim());        
+        const line0partsR = line0parts[1].split(' ').map(word => word.trim());
+                
+        const returnedDeviceName = line0parts[0];
+
+        const level = line0partsR[1];
+
+        let syncing = false;
+        let syncPercent = null;
+        if (stdout.includes('resync')) {
+            syncing = true;
+
+            // Grab the percentage from the third line
+            const match = lines[2].match(/(\d+(?:\.\d+)?)%/);
+
+            if (match) {                
+                syncPercent = match[1];
+            }            
+        }
+
+        let diskStatus;
+        const match = lines[1].match(/\[([FRAU_]*)\]/);
+
+        if (match) {
+            diskStatus = match[1];            
+        } 
+
+        let diskStatusOk = !/[^U]/.test(diskStatus);
+
+        const statusInfo = {
+            device: returnedDeviceName,
+            active: line0partsR[0].toLowerCase() === 'active',
+            level,
+            diskStatus,
+            diskStatusOk,
+            syncing: stdout.includes('resync'),            
+        };
+
+        if (syncPercent) {
+            statusInfo.syncPercent = syncPercent;
+        }
+
+        return statusInfo;
+
+    });
+    
+    return statusInfos;
 }
 
 async function getDiskInfos(devicePaths) {

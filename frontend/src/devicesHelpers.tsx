@@ -155,6 +155,7 @@ function getAlerts() {
     services.push(getMedicalService());
     services.push(getChoresService());
     services.push(getMailbox());
+    services.push(getClock());
 
     const thermostats = getThermostats();
     if (Array.isArray(thermostats) && thermostats.length) {

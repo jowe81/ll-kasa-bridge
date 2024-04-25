@@ -925,7 +925,7 @@ const devicePool = {
         });
     },
 
-    createAlert(message, level, deviceWrapper, noDismiss = false, alertAudio = false, audiofile = null, playInterval = null) {
+    createAlert(message, level, deviceWrapper, noDismiss = false, alertAudio = false, audiofile = null, playInterval = null, reactivateAfterMs = 0) {
         if (!deviceWrapper) {
             return null;
         }
@@ -937,6 +937,15 @@ const devicePool = {
 
         if (existingAlert) {
             existingAlert.reissued_at = new Date();
+
+            if (existingAlert.dismissed) {
+                const dismissedDate = new Date(existingAlert.dismissed);
+                const now = new Date()
+                if (reactivateAfterMs && (now.getTime() - dismissedDate.getTime() > reactivateAfterMs)) {
+                    log(`Reactivating alert`, deviceWrapper, 'bgGreen');
+                    delete existingAlert.dismissed;
+                }
+            }
             return existingAlert;
         }
 

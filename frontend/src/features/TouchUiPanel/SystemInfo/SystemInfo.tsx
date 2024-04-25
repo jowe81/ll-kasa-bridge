@@ -10,8 +10,31 @@ function SystemInfo() {
         (device) => device.subType === constants.SUBTYPE_CLOCK && device.channel === constants.clock?.serviceChannel
     );
     const systemInfo = clock?.state?.system;
+
+    const raidStatus = systemInfo.raidStatus;
+    const raidStatusJsx = raidStatus.map((info, index) => {
+        return (
+            <tr key={index}>
+                <td>Raid {info.device}</td>
+                <td>
+                    {info.diskStatusOk && !info.syncing && (
+                        <>
+                            <span className="badge-green">OK</span> [{info.diskStatus}]
+                        </>
+                    )}
+                    {!info.diskStatusOk && <span className="badge-red">[{info.diskStatus}]</span>}
+                    {info.syncPercent && (
+                        <>
+                            [{info.diskStatus}] <span className="badge-orange"> {info.syncPercent}%</span>
+                        </>
+                    )}
+                </td>
+            </tr>
+        );
+    });
+
+
     const disks = systemInfo?.disks ?? {};
-    console.log(disks);
     const diskInfoJsx = Object.keys(disks).map((devicePath, index) => {
         const devicePathEscaped = <span>{devicePath.length > 10 ? '...' + devicePath.substr(-10) : devicePath}</span>
         return (
@@ -60,6 +83,7 @@ function SystemInfo() {
                                 <td>Load:</td>
                                 <td>{systemInfo?.loadAvg}</td>
                             </tr>
+                            {raidStatusJsx}
                             {diskInfoJsx}
                             {ipAddressesInfoJsx}
                         </tbody>
