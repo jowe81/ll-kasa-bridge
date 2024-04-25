@@ -70,21 +70,25 @@ function SystemInfo() {
                                 <td>{systemInfo?.uptime}</td>
                             </tr>
                             <tr>
-                                <td>Memory:</td>
-                                <td>{systemInfo?.freeMem} free</td>
-                            </tr>
-                            <tr>
                                 <td>DDNS Status:</td>
                                 <td>
-                                    <span className={systemInfo?.publicHostnameStatus?.ok ? "badge-green" : "badge-red"}>{systemInfo?.publicHostnameStatus?.message}</span>
+                                    <span
+                                        className={systemInfo?.publicHostnameStatus?.ok ? "badge-green" : "badge-red"}
+                                    >
+                                        {systemInfo?.publicHostnameStatus?.message}
+                                    </span>
                                 </td>
+                            </tr>
+                            {raidStatusJsx}
+                            {diskInfoJsx}
+                            <tr>
+                                <td>Memory:</td>
+                                <td>{systemInfo?.freeMem} free</td>
                             </tr>
                             <tr>
                                 <td>Load:</td>
                                 <td>{systemInfo?.loadAvg}</td>
                             </tr>
-                            {raidStatusJsx}
-                            {diskInfoJsx}
                             {ipAddressesInfoJsx}
                         </tbody>
                     </table>
