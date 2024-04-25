@@ -511,7 +511,7 @@ async function checkPublicHostname(ipv4AddressesByInterface) {
 
             return {
                 ok: true,
-                message: `OK (${Object.keys(matchingAddresses).join(", ")})`,
+                message: `${Object.keys(matchingAddresses).join(", ")}`,
             };
         } catch (err) {
             log(`Unable to resolve ${hostname}:  ${err.message}`, this, "red");

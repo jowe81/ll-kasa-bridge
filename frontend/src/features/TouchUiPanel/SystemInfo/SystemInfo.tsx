@@ -74,8 +74,7 @@ function SystemInfo() {
                                 <td>
                                     {systemInfo?.publicHostnameStatus?.ok && (
                                         <>
-                                            <span className="badge-green">OK</span>{" "}
-                                            {systemInfo?.publicHostnameStatus?.message}
+                                            <span className="badge-green">OK</span> ({systemInfo?.publicHostnameStatus?.message})
                                         </>
                                     )}
                                     {!systemInfo?.publicHostnameStatus?.ok && (
