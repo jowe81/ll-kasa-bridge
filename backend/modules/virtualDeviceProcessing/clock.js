@@ -283,7 +283,6 @@ class ClockHandler {
                         false,
                         null,
                         null,
-                        constants.HOUR * 24 // Reactivate this alert after a day if it gets dismissed.
                     )
                 );                
             })
