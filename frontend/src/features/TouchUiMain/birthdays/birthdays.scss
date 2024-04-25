@@ -15,22 +15,34 @@
 }
 
 .birthdays-items-container{
-  width: 280px;
-  background-color: rgb(24, 20, 41);
-  margin: 5px auto;
-  padding: 3px;
-  padding-right: 7px;
-  display: flex;
-  flex-flow: column;
-  justify-items: flex-start;
-  flex-grow: 1;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  max-height: 140px;
-  background-image: url('/icons/birthday.png');
-  background-repeat: no-repeat;
-  background-size: 50%;
-  background-position: bottom;
+    width: 280px;
+    background-color: rgb(24, 20, 41);
+    margin: 5px auto;
+    padding: 3px;
+    padding-right: 7px;
+    display: flex;
+    flex-flow: column;
+    justify-items: flex-start;
+    flex-grow: 1;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    max-height: 140px;
+    background-image: url('/icons/birthday.png');
+    background-repeat: no-repeat;
+    background-size: 50%;
+    background-position: bottom;
+}
+
+.birthdays-items-container::-webkit-scrollbar-track {
+  background-color: rgba(186, 179, 205, 0.08);
+}
+ 
+.birthdays-items-container::-webkit-scrollbar-thumb {
+  background: #333341;  
+}
+
+.birthdays-items-container::-webkit-scrollbar-thumb:hover {
+  background: rgb(99, 99, 114);
 }
 
 .birthday-item-container{
