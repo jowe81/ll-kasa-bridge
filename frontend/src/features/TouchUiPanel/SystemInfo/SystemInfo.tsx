@@ -72,11 +72,15 @@ function SystemInfo() {
                             <tr>
                                 <td>DDNS Status:</td>
                                 <td>
-                                    <span
-                                        className={systemInfo?.publicHostnameStatus?.ok ? "badge-green" : "badge-red"}
-                                    >
-                                        {systemInfo?.publicHostnameStatus?.message}
-                                    </span>
+                                    {systemInfo?.publicHostnameStatus?.ok && (
+                                        <>
+                                            <span className="badge-green">OK</span>{" "}
+                                            {systemInfo?.publicHostnameStatus?.message}
+                                        </>
+                                    )}
+                                    {!systemInfo?.publicHostnameStatus?.ok && (
+                                        <span className="badge-red">{systemInfo?.publicHostnameStatus?.message}</span>
+                                    )}
                                 </td>
                             </tr>
                             {raidStatusJsx}
