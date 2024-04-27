@@ -1,10 +1,10 @@
 import React from 'react'
 import constants from '../../../constants.ts';
-import "./systemInfo.scss";
+import "./serverStatus.scss";
 import { useAppSelector } from "../../../app/hooks.ts";
 import { VirtualDevice } from "../../TouchUiMain/devices/dataSlice.ts";
 
-function SystemInfo() {
+function ServerStatus() {
     const devices: VirtualDevice[] = useAppSelector((state) => state.data.devices);
     const clock = devices.find(
         (device) => device.subType === constants.SUBTYPE_CLOCK && device.channel === constants.clock?.serviceChannel
@@ -60,7 +60,7 @@ function SystemInfo() {
     return (
         <div className="touch-ui-panel-item">
             <div className="system-info-container">
-                <div className={`system-info-label`}>System Info</div>
+                <div className={`system-info-label`}>Server Status</div>
                 <div className="system-info-items-container">
                     <table className="system-info-table">
                         <thead></thead>
@@ -101,4 +101,4 @@ function SystemInfo() {
     );
 }
 
-export default SystemInfo
+export default ServerStatus
