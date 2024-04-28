@@ -19,21 +19,28 @@ function Notes() {
 
     const message = record.message;
 
-    if (message === '__NONE__') {
-        return;
-    }
-    
     return (
         <div className="touch-ui-panel-item">
             <div className={`notes-container ${colorClassName}`}>
-                POST-IT
-                <span className="notes-date">
-                    (from {record.__user?.name}, {createdAt.toLocaleDateString(undefined, { month: "short", day: "numeric" })})
-                </span>
-                {url && <div className="notes-image-container">
-                    <img src={url} />
-                </div>}
-                {!url && <div className={`notes-message`} style={getMessageDivStyle(message)}>{message}</div>}
+                {message !== "__NONE__" && (
+                    <>
+                        POST-IT
+                        <span className="notes-date">
+                            (from {record.__user?.name},{" "}
+                            {createdAt.toLocaleDateString(undefined, { month: "short", day: "numeric" })})
+                        </span>
+                        {url && (
+                            <div className="notes-image-container">
+                                <img src={url} />
+                            </div>
+                        )}
+                        {!url && (
+                            <div className={`notes-message`} style={getMessageDivStyle(message)}>
+                                {message}
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
         </div>
     );
