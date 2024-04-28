@@ -18,6 +18,11 @@ function Notes() {
     const url = record.urlpath ? `http://jj-photos.wnet.wn:3021/db/imageFile?path=${record.urlpath}` : null;
 
     const message = record.message;
+
+    if (message === '__NONE__') {
+        return;
+    }
+    
     return (
         <div className="touch-ui-panel-item">
             <div className={`notes-container ${colorClassName}`}>
