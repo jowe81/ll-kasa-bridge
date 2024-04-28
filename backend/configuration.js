@@ -1987,6 +1987,12 @@ const deviceMap = [
                 {
                     collectionName: "chores",
                     requestType: "macro",
+                    retrieve: {
+                        time: {
+                            frequency: "minutes",
+                            minutes: 5,
+                        },
+                    },
                     settings: {
                         macroId: "__aggregation",
                         aggregation: [
@@ -2044,6 +2050,8 @@ const deviceMap = [
                         warnAfterHours: 8,
                         alertAfterHours: 10,
                         alertAudio: true,
+                        alertInterval: 10 * MINUTE,
+                        alertDismissable: true,
                     },
                     {
                         id: "pills_pm",
@@ -2055,6 +2063,8 @@ const deviceMap = [
                         warnAfterHours: 19,
                         alertAfterHours: 21,
                         alertAudio: true,
+                        alertInterval: 10 * MINUTE,
+                        alertDismissable: true,
                     },
                     {
                         id: "cardio",
@@ -2072,6 +2082,13 @@ const deviceMap = [
                         weekly: 3,
                         user: "jess",
                     },
+                    {
+                        id: "chinups",
+                        label: "chinups",
+                        description: "",
+                        daily: 1,
+                        user: "jess",
+                    },
                     // Johannes
                     {
                         id: "pills_am",
@@ -2083,6 +2100,7 @@ const deviceMap = [
                         warnAfterHours: 8,
                         alertAfterHours: 10,
                         alertAudio: true,
+                        alertDismissable: true,
                     },
                     {
                         id: "pills_pm",
@@ -2094,6 +2112,7 @@ const deviceMap = [
                         warnAfterHours: 19,
                         alertAfterHours: 21,
                         alertAudio: true,
+                        alertDismissable: true,
                     },
                     {
                         id: "cardio",
