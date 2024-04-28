@@ -18,11 +18,12 @@ function Notes() {
     const url = record.urlpath ? `http://jj-photos.wnet.wn:3021/db/imageFile?path=${record.urlpath}` : null;
 
     const message = record.message;
+    const displayNote = message !== '__NONE__';
 
     return (
         <div className="touch-ui-panel-item">
-            <div className={`notes-container ${colorClassName}`}>
-                {message !== "__NONE__" && (
+            <div className={`notes-container ${displayNote ? colorClassName : ''}`}>
+                {displayNote && (
                     <>
                         POST-IT
                         <span className="notes-date">
