@@ -952,7 +952,7 @@ const devicePool = {
         const now = new Date();
 
         const alert = {
-            id: now.getTime(),
+            id: now.getTime() + '_' + Math.floor(Math.random() * 10000),
             channel: deviceWrapper.channel,
             message,
             level,
