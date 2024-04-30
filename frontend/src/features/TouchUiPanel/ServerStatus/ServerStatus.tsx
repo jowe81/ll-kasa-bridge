@@ -11,8 +11,8 @@ function ServerStatus() {
     );
     const systemInfo = clock?.state?.system;
 
-    const raidStatus = systemInfo.raidStatus;
-    const raidStatusJsx = raidStatus.map((info, index) => {
+    const raidStatus = systemInfo?.raidStatus;
+    const raidStatusJsx = raidStatus?.map((info, index) => {
         return (
             <tr key={index}>
                 <td>Raid {info.device}</td>

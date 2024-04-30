@@ -105,7 +105,7 @@ function getChoresInfoByUserFromRawRecords(deviceWrapper, records) {
             chores: chores
                 .filter((chore) => chore.user === user.id)
                 .sort((a, b) => (a.label > b.label ? 1 : -1)),
-            records: records.filter((record) => record.__user?.id === user.id),
+            records: records?.filter((record) => record.__user?.id === user.id) ?? [],
         };
     });
 
@@ -207,9 +207,9 @@ function _getAlerts(deviceWrapper, displayData, requestIndex) {
 
                     if (!choreDoneToday(dynformsUserId, chore, records)) {
                         if (now.getHours() >= alertAfterHours) {
-                            alerts.push(deviceWrapper.devicePool.createAlert(`${dynformsUsername}: ${chore.alertText}`, "alert", deviceWrapper, !chore.alertDismissable, chore.alertAudio));
+                            alerts.push(deviceWrapper.devicePool.createAlert(`${dynformsUsername}: ${chore.alertText}`, "alert", deviceWrapper, !chore.alertDismissable, chore.alertAudio, chore.audiofile, chore.alertInterval));
                         } else if (now.getHours() >= warnAfterHours) {
-                            alerts.push(deviceWrapper.devicePool.createAlert(`${dynformsUsername}: ${chore.alertText}`, "warn", deviceWrapper, !chore.alertDismissable, chore.alertAudio));
+                            alerts.push(deviceWrapper.devicePool.createAlert(`${dynformsUsername}: ${chore.alertText}`, "warn", deviceWrapper, !chore.alertDismissable, chore.alertAudio, chore.audiofile, chore.alertInterval));
                         }                                        
                     }
                 }

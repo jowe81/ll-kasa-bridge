@@ -161,10 +161,11 @@ class ClockHandler {
         }
 
         // Only push if the minute switched over.
-        if (this.clock._previousMinute !== now.getMinutes()) {            
-            const systemInfo = await this.getSystemInfoData(true);
-
+        if (this.clock._previousMinute !== now.getMinutes()) {    
             this.clock._previousMinute = now.getMinutes();
+
+            const systemInfo = await this.getSystemInfoData(true);
+                
             this.clock._updateState(
                 {
                     powerState: this.clock.getPowerState(),
@@ -178,7 +179,7 @@ class ClockHandler {
             // Update the wall clocks
             let brightnessClock = null;
             let brightnessBclock = null;
-            if (now.getHours() === 22) {
+            if (now.getHours() === 21) {
                 brightnessBclock = 100;
                 brightnessClock = 8;
             }

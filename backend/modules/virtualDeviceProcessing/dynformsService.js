@@ -142,11 +142,6 @@ class DynformsServiceHandler {
         const requests = [];
 
         requestInfo.forEach((info, requestIndex) => {
-            if (info.requestType === "push") {
-                // Its a push request - ignored here altogether.
-                return;
-            }
-
             if (
                 !(requestIndexes === null || (Array.isArray(requestIndexes) && requestIndexes.includes(requestIndex)))
             ) {
@@ -161,6 +156,7 @@ class DynformsServiceHandler {
                 settings: info.settings ?? {},
                 filter: info.query?.filter ?? {},
                 orderBy: info.retrieve?.orderBy ?? {},
+                requestIndex, // This is the original index
             };
 
             switch (info.requestType) {
@@ -482,7 +478,8 @@ class DynformsServiceHandler {
         // Add the current timestamp to each of the requests that are about to be executed.
         const now = new Date();
 
-        const promises = requestsReadyToRun.map((requestInfo, requestIndex) => {
+        const promisesInfo = requestsReadyToRun.map((requestInfo) => {
+            const requestIndex = requestInfo.requestIndex;
             const url = this.service.fullUrls[requestInfo.requestType ?? "pull"];
             const requestConfig = this.service.settings.requests[requestIndex];
             requestConfig._lastExecuted = now;
@@ -494,14 +491,21 @@ class DynformsServiceHandler {
             
             requestInfo.clientId = this.getClientId();
 
-            return axios.post(url, requestInfo);
+            return {
+                requestIndex,
+                promise: axios.post(url, requestInfo),
+            }
         });
+
+        const promises = promisesInfo.map(info => info.promise);
+        const requestIndexes = promisesInfo.map(info => info.requestIndex);
 
         if (promises.length) {
             Promise.all(promises)
                 .then((allResponseData) => {
                     // Cache the responses.
-                    allResponseData.forEach((data, requestIndex) => {
+                    allResponseData.forEach((data, responseIndex) => {
+                        const requestIndex = requestIndexes[responseIndex];
                         this.cache.data[requestIndex] = data.data;
                         this.processCachedApiResponse(requestIndex);
                     });

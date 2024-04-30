@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { getChoresService, runServiceCommand } from "../../../devicesHelpers";
 import { isToday } from '../calendar/calendarHelpers';
-
+import Graph from "./Graph";
 import "./chores.scss";
 
 function Chores({ dynformsUserId }) {
@@ -50,6 +50,9 @@ function Chores({ dynformsUserId }) {
         );
     });
 
+    const usersGraphData = prepareStatsForGraph(service, [user]);
+    const dataset = usersGraphData ? usersGraphData[user.id][selectedChore?.id] : null;
+
     return (
         <div className="chores-container">
             <div className="chores-header">{user.name} Chores</div>
@@ -65,7 +68,9 @@ function Chores({ dynformsUserId }) {
                             back
                         </div>
                     </div>
-                    <div className="chores-selected-main-container"></div>
+                    <div className="chores-selected-main-container">
+                        <Graph dataset={dataset} />
+                    </div>
                 </div>
             )}
         </div>
@@ -74,7 +79,7 @@ function Chores({ dynformsUserId }) {
 
 
 function getChoresInfo(choresService, dynformsUserId) {
-    const choresInfo = choresService?.state?.settings.custom;
+    const choresInfo = choresService?.state?.settings?.custom;
 
     if (!choresInfo || !dynformsUserId) {
         return [];
@@ -109,6 +114,52 @@ function choreDoneToday(user, chore, records) {
     }
 
     return records.find(record => isToday(new Date(record.created_at)) && record.chore?.id === chore.id && record.__user.id === user.id);
+}
+
+function prepareStatsForGraph(service, users) {
+    const data = service.state?.requests ? service.state.requests[3] : null;
+    if (!data) {
+        return null;
+    }
+
+    const aggregationRecords = data.data;
+
+    if (!Array.isArray(aggregationRecords) && aggregationRecords.length) {
+        return null;
+    }
+
+    const usersGraphData = {};
+    Object.keys(users).forEach(userKey => {
+        const user = users[userKey];
+        const records = aggregationRecords
+            .filter(record => record._id.user === user.id)
+            .sort((a, b) => {
+                // Order chronologically
+                if (a._id.year !== b._id.year) {
+                    return a._id.year > b._id.year ? 1 : -1;
+                }
+                return a._id.week > b._id.week ? 1 : -1;
+            });
+
+        const graphData = {};
+        records.forEach(record => {
+            const chore = record._id.id;
+            if (!graphData[chore]) {
+                graphData[chore] = [];
+            }
+
+            graphData[chore].push({
+                label: record._id.week,
+                x: record._id.week,
+                y: record.count,
+                order: `${record._id.year}-${record._id.week}`,
+            });
+        });
+
+        usersGraphData[user.id] = graphData;
+    })
+
+    return usersGraphData;
 }
 
 export default Chores
