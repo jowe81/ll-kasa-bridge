@@ -22,7 +22,7 @@ function Notes() {
 
     return (
         <div className="touch-ui-panel-item">
-            <div className={`notes-container ${displayNote ? colorClassName : ''}`}>
+            <div className={`notes-container ${displayNote ? colorClassName : "notes-none"}`}>
                 {displayNote && (
                     <>
                         POST-IT
@@ -38,6 +38,21 @@ function Notes() {
                         {!url && (
                             <div className={`notes-message`} style={getMessageDivStyle(message)}>
                                 {message}
+                            </div>
+                        )}
+                    </>
+                )}
+                {!displayNote && (
+                    <>
+                        POST-IT
+                        <span className="notes-date"></span>
+                        {url && (
+                            <div className="notes-image-container">
+                                <img src={url} />
+                            </div>
+                        )}
+                        {!url && (
+                            <div className={`notes-message`} style={getMessageDivStyle(message)}>                                
                             </div>
                         )}
                     </>

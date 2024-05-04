@@ -98,3 +98,9 @@
     color: $color;
     background-color: rgba($color, .5)
 }
+
+.notes-none {
+    $color: rgba(130, 130, 130, 0.615);
+    color: $color;
+    background-color: rgba($color, .3)
+}
