@@ -1,6 +1,6 @@
 import React, {useRef, useEffect} from "react";
 
-const Graph = ({ dataset }) => {
+const Graph = ({ dataset, limitYRange }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     // dataset = [
@@ -29,7 +29,7 @@ const Graph = ({ dataset }) => {
         context.clearRect(0, 0, canvas?.width, canvas.height);
         
         let minX = getLowestValue(dataset, 'x');
-        let minY = 0;//getLowestValue(dataset, 'y');
+        let minY = limitYRange ? getLowestValue(dataset, 'y') : 0;
         let maxX = getHighestValue(dataset, 'x');
         let maxY = getHighestValue(dataset, 'y');
 
@@ -74,7 +74,7 @@ function drawLabels(context, canvasWidth, canvasHeight, minX, maxX, minY, maxY, 
     let current = minY + padY;
     while(current <= maxY - padY) {        
         const point = dataPointToCanvasCoordinates({x: 0, y: current}, canvasWidth, canvasHeight, minX, maxX, minY, maxY);
-        context.fillText(current, 5, point.y + 3);
+        context.fillText(current.toFixed(), 5, point.y + 3);
         current += stepY;
     }
 

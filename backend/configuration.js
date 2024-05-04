@@ -1999,7 +1999,7 @@ const deviceMap = [
                             {
                                 $match: {
                                     created_at: {
-                                        $gte: "__DATE_DAYS_AGO-90",
+                                        $gte: "__DATE_CURRENT_YEAR_START",
                                     },
                                 },
                             },
@@ -2020,6 +2020,58 @@ const deviceMap = [
                                     "_id.week": 1, // Sort by week in ascending order
                                 },
                             },
+                        ],
+                    },
+                },
+                {
+                    collectionName: "weight_tracking",
+                    requestType: "macro",
+                    retrieve: {
+                        time: {
+                            frequency: "minutes",
+                            minutes: 5,
+                        },
+                    },
+                    settings: {
+                        macroId: "__aggregation",
+                        aggregation: [
+                            {
+                                $match: {
+                                    created_at: {
+                                        $gte: "__DATE_CURRENT_YEAR_START",
+                                    },
+                                    "__user.name": "Johannes",
+                                },
+                            },
+                            { $project: { year: { $year: "$created_at" }, week: { $week: "$created_at" }, lbs: 1 } },
+                            { $group: { _id: { year: "$year", week: "$week" }, lbs: { $avg: "$lbs" } } },
+                            { $sort: { "_id.year": 1, "_id.week": 1 } },
+                        ],
+                    },
+                },
+                {
+                    collectionName: "weight_tracking",
+                    requestType: "macro",
+                    retrieve: {
+                        time: {
+                            frequency: "minutes",
+                            minutes: 5,
+                        },
+                    },
+                    settings: {
+                        macroId: "__aggregation",
+                        aggregation: [
+                            {
+                                $match: {
+                                    created_at: {
+                                        $gte: "__DATE_CURRENT_YEAR_START",
+                                    },
+                                    "__user.name": "Jess",
+                                },
+                            },
+                            { $project: { year: { $year: "$created_at" }, week: { $week: "$created_at" }, lbs: 1 } },
+                            { $group: { _id: { year: "$year", week: "$week" }, lbs: { $avg: "$lbs" } } },
+                            { $sort: { "_id.year": 1, "_id.week": 1 } },
                         ],
                     },
                 },

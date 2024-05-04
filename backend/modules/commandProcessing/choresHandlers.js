@@ -75,18 +75,24 @@ function choreDoneToday(dynformsUserId, chore, records) {
     );
 }
 
-function _processApiResponse(deviceWrapper, displayData, requestIndex) {
+function _processApiResponse(deviceWrapper, displayData, requestIndex) {    
     const cache = deviceWrapper.getCache();
-
+    let records;
+    
     switch (requestIndex) {
         case 0:
         case 1:
-            const records = displayData.data?.records;
+            records = displayData.data?.records;
             return getChoresInfoByUserFromRawRecords(deviceWrapper, records);
 
         case 3:
             return displayData;
 
+        case 4:
+        case 5:
+            console.log(displayData);
+            records = displayData.data;            
+            return records;
     }    
 }
 
