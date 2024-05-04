@@ -22,6 +22,11 @@ function Chores({ dynformsUserId }) {
     }
 
     function toggleChore(chore) {
+        if (chore.id.substring(0, 2) === "__") {
+            // The __weight chore is readonly.
+            return;
+        }
+
         runServiceCommand(service, "toggleChore", { choreId: chore.id, dynformsUserId: user.id });
     }
 
