@@ -115,7 +115,7 @@ function getChoresInfo(choresService, dynformsUserId) {
     chores.push({
         "id": "__weight",
         "label": "weight tracking",
-        "description": "weight tracking",
+        "description": "body weight over time",
         "user": dynformsUserId,
     });
 
