@@ -90,7 +90,6 @@ function _processApiResponse(deviceWrapper, displayData, requestIndex) {
 
         case 4:
         case 5:
-            console.log(displayData);
             records = displayData.data;            
             return records;
     }    
@@ -181,7 +180,7 @@ async function deleteRecord(deviceWrapper, recordId) {
 }
 
 function _getAlerts(deviceWrapper, displayData, requestIndex) {
-    if (requestIndex === 3) {
+    if (requestIndex !== 0) {
         // This request doesn't return chore info, do not attempt to calculate alerts.
         return null;
     }

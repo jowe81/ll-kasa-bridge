@@ -43,14 +43,17 @@ function Chores({ dynformsUserId }) {
     };
 
     const choresButtonsJsx = chores.map((chore, index) => {
-        const classDone = choreDoneToday(user, chore, records) ? `chore-button-done` : ``
+        const choreRecord = choreDoneToday(user, chore, records);
+        const classDone = choreRecord ? `chore-button-done` : ``;
+
         return (
             <div
                 key={index}
                 className={`base-button chore-button ${classDone} ${chore.id === "__weight" ? "chore-readonly" : ""}`}
                 onClick={(event) => handleChoreButtonClick(event, chore)}
             >
-                {chore.label}
+                <div className={choreRecord ? "chore-label-lifted" : "chore-label"}>{chore.label}</div>
+                <div className="chore-time">{choreRecord ? new Date(choreRecord.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : ''}</div>
             </div>
         );
     });
