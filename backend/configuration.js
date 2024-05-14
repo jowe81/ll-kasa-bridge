@@ -2141,6 +2141,12 @@ const deviceMap = [
                         daily: 1,
                         user: "jess",
                     },
+                    {
+                        id: "volunteer",
+                        label: "volunteer",
+                        description: "any volunteer role",
+                        user: "jess",
+                    },
                     // Johannes
                     {
                         id: "pills_am",
@@ -2180,6 +2186,18 @@ const deviceMap = [
                         description: "weightlifting (machines or free)",
                         alertLessThan: 2,
                         weekly: 2,
+                        user: "johannes",
+                    },
+                    {
+                        id: "piano_practice",
+                        label: "piano",
+                        description: "15+ minutes of practice",
+                        user: "johannes",
+                    },
+                    {
+                        id: "volunteer",
+                        label: "volunteer",
+                        description: "any volunteer role",
                         user: "johannes",
                     },
                 ],
