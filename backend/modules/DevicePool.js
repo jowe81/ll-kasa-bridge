@@ -908,7 +908,7 @@ const devicePool = {
         const audiofilesToPlay = [];
         
         allCurrentAlerts.forEach(alert => {
-            if (alert.audiofile && alert.playInterval && ['alert'].includes(alert.level)) {
+            if (alert.audiofile && alert.playInterval && ['alert'].includes(alert.level) && !alert.dismissed) {
                 // This alert should play audio.
                 if (!alert.lastPlayed || (alert.lastPlayed?.getTime() + alert.playInterval < now.getTime())) {
                     // It is due to play.
