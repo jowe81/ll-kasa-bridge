@@ -1342,6 +1342,19 @@ const deviceMap = [
                     interval: 3 * MINUTE,
                 },
             ],
+            pushToDynforms: true,
+            dynformsSettings: {
+                interval: 60 * MINUTE,
+                api: {
+                    baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
+                    path: null, // will use .env DYNFORMS_PATH or default instead
+                    queryParams: {},
+                },
+                request: {
+                    collectionName: "weatherHistory",
+                    requestType: "push",
+                },
+            },
         },
     },
     {

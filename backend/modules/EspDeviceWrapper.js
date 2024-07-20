@@ -5,7 +5,7 @@ import { log, debug } from './Log.js';
 import { globalConfig } from '../configuration.js';
 import { resolveDeviceDependencies } from './DependencyResolver.js';
 import { makeLiveDeviceObject } from './TargetDataProcessor.js';
-
+import { isToday } from "../helpers/jDateTimeUtils.js";
 
 const espConstants = {
 
@@ -170,7 +170,7 @@ const EspDeviceWrapper = {
                             // Not the initial update, and may or may not have an actual change.
 
                             // This needs to be done regardless of whether the data changed from the last poll.
-                            this.__trendData = this.processThermometerTrendData(this.__trendData, this.state.tempC);
+                            this.__trendData = this.processThermometerTrendData(this.__trendData, this.state[jsonPathKey]);
 
                             // Inject the trends/trend field into the update payload (makes the addition of trend transparent).
                             payload.trends = {};
@@ -193,6 +193,78 @@ const EspDeviceWrapper = {
                             if (this.state?.diff?.toFixed(2) !== this.__trendData?.diff?.toFixed(2)) {
                                 // Set changeInfo.changed to trigger a socket push.
                                 changeInfo.changed = true;
+                            }
+
+                            // Handle dayly min/max.
+                            const temperaturePayload = payload[jsonPathKey];
+                            const now = new Date();
+                            const daylyInitialData = {
+                                date: now,
+                                min: {
+                                    tempC: temperaturePayload,
+                                    updated: now,
+                                },
+                                max: {
+                                    tempC: temperaturePayload,
+                                    updated: now,
+                                },
+                            };
+                            const dateChanged = this.state.dayly && !isToday(this.state.dayly.date);
+
+                            if (!this.state.dayly) {
+                                // Initialize (first run)
+                                payload.dayly = daylyInitialData;
+                            } else {
+                                // Check if the date changed
+                                if (dateChanged) {
+                                    log(`Resetting dayly min/max temperature.`, this);
+                                    // New day - reinit.
+                                    payload.dayly = daylyInitialData;
+                                } else {
+                                    // Copy over the existing dayly field
+                                    payload.dayly = { ...this.state.dayly };
+
+                                    // Adjust data if needed.
+                                    if (payload.dayly.min.tempC > temperaturePayload) {
+                                        payload.dayly.min.tempC = temperaturePayload;
+                                        payload.dayly.min.updated = now;
+                                    }
+                                    if (payload.dayly.max.tempC < temperaturePayload) {
+                                        payload.dayly.max.tempC = temperaturePayload;
+                                        payload.dayly.max.updated = now;
+                                    }
+                                }
+                            }
+                            if (this.settings.pushToDynforms) {
+                                if (!this._pushTo) {
+                                    this._pushTo = {};
+                                }                                
+
+                                if (!this._pushTo.dynforms || (Date.now() - this._pushTo.dynforms.getTime() > (this.settings.dynformsSettings?.interval ?? 5 * constants.MINUTE))){
+                                    this._pushTo.dynforms = new Date();                                
+                                    const record = {
+                                        sensorName: this.alias,
+                                        sonsorId: this.id,
+                                        tempC: temperaturePayload,
+                                    };
+
+                                    this.runPushRequest(record).then((response) => {
+                                        const record = response.data?.data?.records?.length ? response.data.data.records[0] : null;
+
+                                        if (dateChanged && this._lastDynformsRecord) {
+                                            // Update yesterday's last record with the dayly stats.
+                                            this._lastDynformsRecord.dayly = {
+                                                min: payload.dayly.min,
+                                                max: payload.dayly.max,
+                                            }
+                                            log(`Updating yesterday's last dynforms record with dayly data: ${JSON.stringify(payload.dayly)}`, this);
+                                            this.runPushRequest(this._lastDynformsRecord);
+                                        }
+
+                                        // Keep a copy which we'll update in case the next sample is on a new day.
+                                        this._lastDynformsRecord = record;
+                                    });
+                                }                                                    
                             }
                             break;
 
@@ -502,6 +574,69 @@ const EspDeviceWrapper = {
         }
     },
 
+    // Send data to dynforms.
+    async runPushRequest(record, extraData = {}) {
+        const dynformsSettings = this.settings.dynformsSettings;
+        if (!dynformsSettings) {
+            return null;
+        }
+
+        const collectionName = dynformsSettings.request?.collectionName;
+        if (!collectionName) {
+            return null;
+        }
+
+        const request = {
+            collectionName,
+            record,
+            ...extraData,
+            clientId: this.getClientId(),
+        };
+
+        const url = this._constructFullUrlToPushEndpoint();
+        log(
+            `Running push request to ${url} (collection ${collectionName}), ${
+                record?._id ? `updating record ${record._id}.` : `adding record: ${JSON.stringify(record)}`
+            }`,
+            this
+        );
+        return axios.post(url, request);
+    },
+
+    getClientId() {
+        // Construct a client ID that is specific to the app and service.
+        return `${process.env.APP_NAME}.${this.id ?? this.channel}`;
+    },
+
+    _getBaseUrl() {
+        let { protocol, baseUrl } = this.settings.dynformsSettings.api;
+
+        if (!protocol) {
+            protocol = "http";
+        }
+
+        if (!baseUrl) {
+            baseUrl = `${protocol}://${process.env.DYNFORMS_HOST}:${process.env.DYNFORMS_PORT}`;
+        }
+
+        return baseUrl;
+    },
+
+    _constructFullUrlToPushEndpoint() {
+        const baseUrl = this._getBaseUrl();
+        if (!baseUrl) {
+            return;
+        }
+
+        let path = this.settings.dynformsSettings?.api?.pathToPushEndpoint;
+        if (!path) {
+            path = process.env.DYNFORMS_M2M_PATH_PUSH ?? "/db/m2m/push";
+        }
+
+        return baseUrl + path;
+    },
+
+
     _emitDeviceStateUpdate(changeInfo) {
         this.socketHandler.emitDeviceStateUpdate(this.getLiveDeviceStateUpdate(), changeInfo);
     },
@@ -596,7 +731,7 @@ const EspDeviceWrapper = {
                                     tempC: latestTempC,
                                 })
                                 .then((data) => {
-                                    log(`Pushed outside temperature to ${info.url}: ${latestTempC}. Response: ${JSON.stringify(data.data)}`, this, "yellow");                                    
+                                    log(`Pushed temperature to ${info.url}: ${latestTempC}. Response: ${JSON.stringify(data.data)}`, this, "yellow");                                    
                                 })
                                 .catch((err) => {
                                     log(`Unable to push temperature to ${info.url}: ${err.message}`, this, "bgRed");

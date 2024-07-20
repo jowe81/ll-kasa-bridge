@@ -136,8 +136,14 @@ function Temperature(props: any) {
                         {iconsJsx}
                     </div>
                 </div>
-                <div className="thermometer-temp" style={styleTemp}>
-                    {displayData.tempC}
+                <div className="thermometer-temp-container">
+                    <div className="thermometer-temp" style={styleTemp}>
+                        {displayData.tempC}
+                    </div>
+                </div>
+                <div className="thermometer-min-max">
+                    Lo <span style={styleTemp}>{displayData.daylyMin}</span> Hi{" "}
+                    <span style={styleTemp}>{displayData.daylyMax}</span>
                 </div>
             </div>
         );
@@ -155,6 +161,8 @@ function getDisplayData(thermometer: any, useTrend = "long") {
 
     const data = {
         tempC: "N/A",
+        daylyMin: "N/A",
+        daylyMax: "N/A",
         modifier: "",
         trend: "",
         trendDirection: "",
@@ -170,6 +178,8 @@ function getDisplayData(thermometer: any, useTrend = "long") {
     const { state } = thermometer;
 
     data.tempC = state.tempC?.toFixed(1);
+    data.daylyMin = state.dayly.min.tempC.toFixed(1);
+    data.daylyMax = state.dayly.max.tempC.toFixed(1);
 
     let diff: null | number = null;
 
