@@ -244,7 +244,7 @@ const EspDeviceWrapper = {
                                     this._pushTo.dynforms = new Date();                                
                                     const record = {
                                         sensorName: this.alias,
-                                        sonsorId: this.id,
+                                        sensorId: this.id,
                                         tempC: temperaturePayload,
                                     };
 
