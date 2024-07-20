@@ -70,6 +70,7 @@ width: 50%;
     top: -18px;
     width: 100%;
     color: gray;
+    padding-right: 3px;
 }
 .thermometer-grey-out {
   filter: saturate(0%);
