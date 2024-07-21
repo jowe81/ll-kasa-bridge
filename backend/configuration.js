@@ -1342,9 +1342,9 @@ const deviceMap = [
                     interval: 3 * MINUTE,
                 },
             ],
+            sampleCollectInterval: 1 * HOUR,
             pushToDynforms: true,
             dynformsSettings: {
-                interval: 60 * MINUTE,
                 api: {
                     baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
                     path: null, // will use .env DYNFORMS_PATH or default instead
@@ -1394,6 +1394,19 @@ const deviceMap = [
                     interval: 3 * MINUTE,
                 },
             ],
+            sampleCollectInterval: 1 * HOUR,
+            pushToDynforms: true,
+            dynformsSettings: {
+                api: {
+                    baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
+                    path: null, // will use .env DYNFORMS_PATH or default instead
+                    queryParams: {},
+                },
+                request: {
+                    collectionName: "weatherHistory",
+                    requestType: "push",
+                },
+            },
         },
     },
     {
@@ -1426,6 +1439,19 @@ const deviceMap = [
                     avg_calc_data_window: 10 * MINUTE,
                 },
             },
+            sampleCollectInterval: 1 * HOUR,
+            pushToDynforms: true,
+            dynformsSettings: {
+                api: {
+                    baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
+                    path: null, // will use .env DYNFORMS_PATH or default instead
+                    queryParams: {},
+                },
+                request: {
+                    collectionName: "weatherHistory",
+                    requestType: "push",
+                },
+            },
         },
     },
     {
@@ -1456,6 +1482,19 @@ const deviceMap = [
                     label: "long",
                     avg_calc_history_length: 60 * MINUTE,
                     avg_calc_data_window: 10 * MINUTE,
+                },
+            },
+            sampleCollectInterval: 1 * HOUR,
+            pushToDynforms: true,
+            dynformsSettings: {
+                api: {
+                    baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
+                    path: null, // will use .env DYNFORMS_PATH or default instead
+                    queryParams: {},
+                },
+                request: {
+                    collectionName: "weatherHistory",
+                    requestType: "push",
                 },
             },
         },

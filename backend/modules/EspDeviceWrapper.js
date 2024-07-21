@@ -157,7 +157,17 @@ const EspDeviceWrapper = {
                             payload = data.data[jsonPath].find(
                                 (item) => item[payloadFieldKey] === jsonPathId[payloadFieldKey]
                             );
+
+                            if (payload[jsonPathKey] === undefined) {
+                                // No data.
+                                log(`No data returned from device.`, this);
+                                return;
+                            }
+
                             changeInfo = this.analyzeStateChange(payload);
+
+                            const latestDataPoint = this.getLatestDataPoint();
+                            payload[jsonPathKey] = this.mitigateOutlier(payload[jsonPathKey], latestDataPoint?.tempC);
 
                             if (typeof changeInfo === "undefined") {
                                 // This is the initial state update.
@@ -170,7 +180,10 @@ const EspDeviceWrapper = {
                             // Not the initial update, and may or may not have an actual change.
 
                             // This needs to be done regardless of whether the data changed from the last poll.
-                            this.__trendData = this.processThermometerTrendData(this.__trendData, this.state[jsonPathKey]);
+                            this.__trendData = this.processThermometerTrendData(
+                                this.__trendData,
+                                this.state[jsonPathKey]
+                            );
 
                             // Inject the trends/trend field into the update payload (makes the addition of trend transparent).
                             payload.trends = {};
@@ -194,19 +207,20 @@ const EspDeviceWrapper = {
                                 // Set changeInfo.changed to trigger a socket push.
                                 changeInfo.changed = true;
                             }
+                                                    
+                            const temperaturePayload = payload[jsonPathKey];
 
                             // Handle dayly min/max.
-                            const temperaturePayload = payload[jsonPathKey];
                             const now = new Date();
                             const daylyInitialData = {
                                 date: now,
                                 min: {
                                     tempC: temperaturePayload,
-                                    updated: now,
+                                    updatedAt: now,
                                 },
                                 max: {
                                     tempC: temperaturePayload,
-                                    updated: now,
+                                    updatedAt: now,
                                 },
                             };
                             const dateChanged = this.state.dayly && !isToday(this.state.dayly.date);
@@ -227,44 +241,64 @@ const EspDeviceWrapper = {
                                     // Adjust data if needed.
                                     if (payload.dayly.min.tempC > temperaturePayload) {
                                         payload.dayly.min.tempC = temperaturePayload;
-                                        payload.dayly.min.updated = now;
+                                        payload.dayly.min.updatedAt = `__DATE-${now.getTime()}`;
                                     }
                                     if (payload.dayly.max.tempC < temperaturePayload) {
                                         payload.dayly.max.tempC = temperaturePayload;
-                                        payload.dayly.max.updated = now;
+                                        payload.dayly.max.updatedAt = `__DATE-${now.getTime()}`;
                                     }
                                 }
                             }
+
                             if (this.settings.pushToDynforms) {
-                                if (!this._pushTo) {
-                                    this._pushTo = {};
-                                }                                
+                                const measurement = {
+                                    tempC: temperaturePayload,
+                                    measuredAt: `__DATE-${now.getTime()}`,
+                                };
 
-                                if (!this._pushTo.dynforms || (Date.now() - this._pushTo.dynforms.getTime() > (this.settings.dynformsSettings?.interval ?? 5 * constants.MINUTE))){
-                                    this._pushTo.dynforms = new Date();                                
-                                    const record = {
-                                        sensorName: this.alias,
+                                if (!this._todaysData) {
+                                    this._todaysData = {
+                                        initialized: `__DATE-${now.getTime()}`,
                                         sensorId: this.id,
-                                        tempC: temperaturePayload,
+                                        sensorName: this.alias,
+                                        sensorUrl: this.url,
+                                        sensorLocationId: this.locationId,
+                                        measurements: [],
                                     };
+                                }
 
-                                    this.runPushRequest(record).then((response) => {
-                                        const record = response.data?.data?.records?.length ? response.data.data.records[0] : null;
+                                // Collect a sample at the configured interval.
+                                if (
+                                    !this._lastSampleCollect ||
+                                    Date.now() - this._lastSampleCollect.getTime() >
+                                        (this.settings.sampleCollectInterval ?? 5 * constants.MINUTE)
+                                ) {
+                                    this._lastSampleCollect = now;
+                                    this._todaysData.measurements.push(measurement);
+                                }
 
-                                        if (dateChanged && this._lastDynformsRecord) {
-                                            // Update yesterday's last record with the dayly stats.
-                                            this._lastDynformsRecord.dayly = {
-                                                min: payload.dayly.min,
-                                                max: payload.dayly.max,
-                                            }
-                                            log(`Updating yesterday's last dynforms record with dayly data: ${JSON.stringify(payload.dayly)}`, this);
-                                            this.runPushRequest(this._lastDynformsRecord);
-                                        }
+                                if (dateChanged) {
+                                    log(
+                                        `Sending yesterday's data to dynforms (${this._todaysData.measurements} samples)`,
+                                        this
+                                    );
+                                    // Add in min/max for the day. (state.dayly is from previous day at this point and has the min/max.)
+                                    const yesterdaysDayly = { ...this.state.dayly };
+                                    this._todaysData.min = yesterdaysDayly.min.tempC;
+                                    this._todaysData.minMeasuredAt = yesterdaysDayly.min.updatedAt;
+                                    this._todaysData.max = yesterdaysDayly.max.tempC;
+                                    this._todaysData.maxMeasuredAt = yesterdaysDayly.max.updatedAt;
 
-                                        // Keep a copy which we'll update in case the next sample is on a new day.
-                                        this._lastDynformsRecord = record;
-                                    });
-                                }                                                    
+                                    // Add in mean from the available samples.
+                                    const measurementsRaw = this._todaysData.measurements.map(
+                                        (measurement) => measurement.tempC
+                                    );
+                                    const sum = measurementsRaw.reduce((acc, curr) => acc + curr, 0);
+                                    this._todaysData.mean = parseFloat((sum / measurementsRaw.length).toFixed(2));
+
+                                    // Send data and clear _todaysData.
+                                    this.runPushRequest(this._todaysData).then(() => delete this._todaysData);
+                                }
                             }
                             break;
 
@@ -286,13 +320,25 @@ const EspDeviceWrapper = {
                         case constants.SUBTYPE_MAIL_COMPARTMENT:
                             // All we care about here is the door_locked field
                             if (payload.door_locked) {
-                                if (payload.door_locked === 'true') {
+                                if (payload.door_locked === "true") {
                                     const threshold = parseInt(payload.photo_circuit_threshold);
                                     const value = parseInt(payload.photo_circuit_raw2);
-                                    if (value > threshold) {                                        
-                                        this.setAlerts([this.devicePool.createAlert("Mailbox likely has a delivery.", "alert", this)]);
+                                    if (value > threshold) {
+                                        this.setAlerts([
+                                            this.devicePool.createAlert(
+                                                "Mailbox likely has a delivery.",
+                                                "alert",
+                                                this
+                                            ),
+                                        ]);
                                     } else {
-                                        this.setAlerts([this.devicePool.createAlert("Mailbox is locked but likely empty.", "warn", this)]);
+                                        this.setAlerts([
+                                            this.devicePool.createAlert(
+                                                "Mailbox is locked but likely empty.",
+                                                "warn",
+                                                this
+                                            ),
+                                        ]);
                                     }
                                 } else {
                                     this.setAlerts([]);
@@ -601,6 +647,24 @@ const EspDeviceWrapper = {
             this
         );
         return axios.post(url, request);
+    },
+
+    mitigateOutlier(tempC, previousTempC) {
+        if (!previousTempC) {
+            return tempC;
+        }
+
+        // If it's a bad type, return previous
+        if (typeof tempC !== 'number' || isNaN(tempC)) {
+            return previousTempC;
+        }
+
+        if (Math.abs(previousTempC - tempC) >= espConstants.thermo.OUTLIER_THRESHOULD) {
+            // Reading differs too much from previous.
+            return previousTempC;
+        } else {
+            return tempC;
+        }
     },
 
     getClientId() {
