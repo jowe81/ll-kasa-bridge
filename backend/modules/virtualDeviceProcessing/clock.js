@@ -336,6 +336,8 @@ async function getRaidStatus(devices) {
         const stdout = results[index].stdout;
 
         const lines = stdout.split(/\n/);
+        // It's not catching 'resync' on the server for some reason - log to analyse.
+        console.log(lines)
         const line0parts = lines[0].split(':').map(section => section.trim());        
         const line0partsR = line0parts[1].split(' ').map(word => word.trim());
                 
@@ -386,30 +388,35 @@ async function getRaidStatus(devices) {
 }
 
 async function getDiskInfos(devicePaths) {
-    const promises = devicePaths.map(devicePath => getDiskInfo(devicePath));
-    const infos = await Promise.all(promises);
     const diskInfos = {};
-    infos.forEach((info, index) => diskInfos[devicePaths[index]] = info);
-    
-    Object.keys(diskInfos).forEach(devicePath => {
-        const info = diskInfos[devicePath]
-        if (info) {
-            let n = parseInt(info.size);
-            let unitIndex = -1;
-            while (n > 1) {
-                n = n / 1024;
-                unitIndex++;
+    const promises = devicePaths.map(devicePath => getDiskInfo(devicePath));
+
+    try {
+        const infos = await Promise.all(promises);
+        infos.forEach((info, index) => (diskInfos[devicePaths[index]] = info));
+
+        Object.keys(diskInfos).forEach((devicePath) => {
+            const info = diskInfos[devicePath];
+            if (info) {
+                let n = parseInt(info.size);
+                let unitIndex = -1;
+                while (n > 1) {
+                    n = n / 1024;
+                    unitIndex++;
+                }
+                const units = ["B", "KB", "MB", "GB", "TB", "PB"];
+                const unit = units[unitIndex + 1];
+
+                ["size", "used", "free"].forEach((key) => {
+                    info["f_" + key] = (info[key] / Math.pow(1024, unitIndex)).toFixed(2) + ` ${unit}`;
+                });
+
+                info.freePercent = Math.round((info.free / info.size) * 100);
             }
-            const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-            const unit = units[unitIndex + 1];
-
-            ['size', 'used', 'free'].forEach(key => {
-                info['f_' + key] = (info[key] / Math.pow(1024, unitIndex)).toFixed(2) + ` ${unit}`;
-            })
-
-            info.freePercent = Math.round((info.free / info.size) * 100);
-        }
-    })
+        });
+    } catch (err) {
+        log(`getDiskInfos: ${err}`, this, 'red')
+    }
 
     return diskInfos;
 }
@@ -419,9 +426,8 @@ async function getDiskInfo(devicePath) {
 
         exec(`df -k "${devicePath}"`, (error, stdout, stderr) => {
             if (error) {
-                console.log(error);
-                log(`Failed to execute df. Error: ${error}`);
-                return;
+                const errMsg = `Failed to execute df. Error: ${error.message}`;
+                return reject(errMsg);
             }
 
             const lines = stdout.split('\n');
