@@ -158,16 +158,18 @@ const EspDeviceWrapper = {
                                 (item) => item[payloadFieldKey] === jsonPathId[payloadFieldKey]
                             );
 
-                            if (payload[jsonPathKey] === undefined) {
+                            const latestDataPoint = this.getLatestDataPoint();
+                            let temperaturePayload = payload[jsonPathKey] !== undefined ? 
+                                this.mitigateOutlier(payload[jsonPathKey], latestDataPoint?.tempC) : 
+                                undefined;
+
+                            if (temperaturePayload === undefined) {
                                 // No data.
                                 log(`No data returned from device.`, this);
                                 return;
                             }
 
                             changeInfo = this.analyzeStateChange(payload);
-
-                            const latestDataPoint = this.getLatestDataPoint();
-                            payload[jsonPathKey] = this.mitigateOutlier(payload[jsonPathKey], latestDataPoint?.tempC);
 
                             if (typeof changeInfo === "undefined") {
                                 // This is the initial state update.
@@ -180,10 +182,7 @@ const EspDeviceWrapper = {
                             // Not the initial update, and may or may not have an actual change.
 
                             // This needs to be done regardless of whether the data changed from the last poll.
-                            this.__trendData = this.processThermometerTrendData(
-                                this.__trendData,
-                                this.state[jsonPathKey]
-                            );
+                            this.__trendData = this.processThermometerTrendData(this.__trendData, temperaturePayload);
 
                             // Inject the trends/trend field into the update payload (makes the addition of trend transparent).
                             payload.trends = {};
@@ -208,8 +207,6 @@ const EspDeviceWrapper = {
                                 changeInfo.changed = true;
                             }
                                                     
-                            const temperaturePayload = payload[jsonPathKey];
-
                             // Handle dayly min/max.
                             const now = new Date();
                             const daylyInitialData = {
@@ -288,7 +285,9 @@ const EspDeviceWrapper = {
                                     this._todaysData.minMeasuredAt = yesterdaysDayly.min.updatedAt;
                                     this._todaysData.max = yesterdaysDayly.max.tempC;
                                     this._todaysData.maxMeasuredAt = yesterdaysDayly.max.updatedAt;
-
+                                    if (process.env.NODE_ENV === "development") {
+                                        this._todaysData.env = "development";
+                                    }
                                     // Add in mean from the available samples.
                                     const measurementsRaw = this._todaysData.measurements.map(
                                         (measurement) => measurement.tempC
@@ -651,7 +650,12 @@ const EspDeviceWrapper = {
 
     mitigateOutlier(tempC, previousTempC) {
         if (!previousTempC) {
-            return tempC;
+            // If the first measurement isn't a reasonable reading, return 0 degrees.
+            if (tempC > 50 || tempC < -50) {
+                return 0;
+            } else {
+                return tempC;
+            }            
         }
 
         // If it's a bad type, return previous
