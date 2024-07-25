@@ -75,6 +75,12 @@ function Temperature(props: any) {
         const styleTemp = {
             color: tempToColor(displayData.tempC),
         };
+        const styleMax = {
+            color: tempToColor(displayData.daylyMax),
+        };
+        const styleMin = {
+            color: tempToColor(displayData.daylyMin),
+        };
 
         const styleTrend = {
             color: displayData.trendColor,
@@ -142,8 +148,8 @@ function Temperature(props: any) {
                     </div>
                 </div>
                 <div className="thermometer-min-max">
-                    Lo <span style={styleTemp}>{displayData.daylyMin}</span> Hi{" "}
-                    <span style={styleTemp}>{displayData.daylyMax}</span>
+                    Lo <span style={styleMin}>{displayData.daylyMin}</span> Hi{" "}
+                    <span style={styleMax}>{displayData.daylyMax}</span>
                 </div>
             </div>
         );
