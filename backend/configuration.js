@@ -1342,7 +1342,7 @@ const deviceMap = [
                     interval: 3 * MINUTE,
                 },
             ],
-            sampleCollectInterval: 1 * HOUR,
+            sampleCollectInterval: 15 * MINUTE,
             pushToDynforms: true,
             dynformsSettings: {
                 api: {

@@ -213,11 +213,11 @@ const EspDeviceWrapper = {
                                 date: now,
                                 min: {
                                     tempC: temperaturePayload,
-                                    updatedAt: now,
+                                    updatedAt: now.getTime(),
                                 },
                                 max: {
                                     tempC: temperaturePayload,
-                                    updatedAt: now,
+                                    updatedAt: now.getTime(),
                                 },
                             };
                             const dateChanged = this.state.dayly && !isToday(this.state.dayly.date);
@@ -238,15 +238,15 @@ const EspDeviceWrapper = {
                                     // Adjust data if needed.
                                     if (payload.dayly.min.tempC > temperaturePayload) {
                                         payload.dayly.min.tempC = temperaturePayload;
-                                        payload.dayly.min.updatedAt = `__DATE-${now.getTime()}`;
+                                        payload.dayly.min.updatedAt = now.getTime();
                                     }
                                     if (payload.dayly.max.tempC < temperaturePayload) {
                                         payload.dayly.max.tempC = temperaturePayload;
-                                        payload.dayly.max.updatedAt = `__DATE-${now.getTime()}`;
+                                        payload.dayly.max.updatedAt = now.getTime();
                                     }
                                 }
                             }
-
+                            console.log(payload.dayly)
                             if (this.settings.pushToDynforms) {
                                 const measurement = {
                                     tempC: temperaturePayload,
@@ -282,9 +282,9 @@ const EspDeviceWrapper = {
                                     // Add in min/max for the day. (state.dayly is from previous day at this point and has the min/max.)
                                     const yesterdaysDayly = { ...this.state.dayly };
                                     this._todaysData.min = yesterdaysDayly.min.tempC;
-                                    this._todaysData.minMeasuredAt = yesterdaysDayly.min.updatedAt;
+                                    this._todaysData.minMeasuredAt = `__DATE-${yesterdaysDayly.min.updatedAt.getTime()}`;
                                     this._todaysData.max = yesterdaysDayly.max.tempC;
-                                    this._todaysData.maxMeasuredAt = yesterdaysDayly.max.updatedAt;
+                                    this._todaysData.maxMeasuredAt = `__DATE-${yesterdaysDayly.max.updatedAt.getTime()}`;
                                     if (process.env.NODE_ENV === "development") {
                                         this._todaysData.env = "development";
                                     }

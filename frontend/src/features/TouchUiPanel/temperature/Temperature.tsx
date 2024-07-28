@@ -2,7 +2,7 @@ import "./temperature.css";
 import { Device } from "../../TouchUiMain/devices/dataSlice.ts";
 import constants from "../../../constants.ts";
 import { toggleChannel } from "../../websockets/socket.tsx";
-
+import { formatTime } from "../../TouchUiMain/calendar/calendarHelpers.tsx";
 import { useAppSelector } from "../../../app/hooks.ts";
 
 function Temperature(props: any) {
@@ -148,8 +148,8 @@ function Temperature(props: any) {
                     </div>
                 </div>
                 <div className="thermometer-min-max">
-                    Lo <span style={styleMin}>{displayData.daylyMin}</span> Hi{" "}
-                    <span style={styleMax}>{displayData.daylyMax}</span>
+                    <div className="thermometer-min-max-box"><span className="thermometer-min-max-time">{displayData.daylyMinMeasuredAt}</span> Lo <span style={styleMin}>{displayData.daylyMin}</span>{" "}</div>                    
+                    <div className="thermometer-min-max-box"><span className="thermometer-min-max-time">{displayData.daylyMaxMeasuredAt}</span> Hi <span style={styleMax}>{displayData.daylyMax}</span></div>
                 </div>
             </div>
         );
@@ -186,6 +186,8 @@ function getDisplayData(thermometer: any, useTrend = "long") {
     data.tempC = state.tempC?.toFixed(1);
     data.daylyMin = state.dayly.min.tempC.toFixed(1);
     data.daylyMax = state.dayly.max.tempC.toFixed(1);
+    data.daylyMinMeasuredAt = formatTime("HH:MM", new Date(state.dayly.min.updatedAt));
+    data.daylyMaxMeasuredAt = formatTime("HH:MM", new Date(state.dayly.max.updatedAt));
 
     let diff: null | number = null;
 
