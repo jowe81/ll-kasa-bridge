@@ -246,7 +246,7 @@ const EspDeviceWrapper = {
                                     }
                                 }
                             }
-                            console.log(payload.dayly)
+
                             if (this.settings.pushToDynforms) {
                                 const measurement = {
                                     tempC: temperaturePayload,
