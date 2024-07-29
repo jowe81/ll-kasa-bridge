@@ -282,9 +282,9 @@ const EspDeviceWrapper = {
                                     // Add in min/max for the day. (state.dayly is from previous day at this point and has the min/max.)
                                     const yesterdaysDayly = { ...this.state.dayly };
                                     this._todaysData.min = yesterdaysDayly.min.tempC;
-                                    this._todaysData.minMeasuredAt = `__DATE-${yesterdaysDayly.min.updatedAt.getTime()}`;
+                                    this._todaysData.minMeasuredAt = `__DATE-${yesterdaysDayly.min.updatedAt}`;
                                     this._todaysData.max = yesterdaysDayly.max.tempC;
-                                    this._todaysData.maxMeasuredAt = `__DATE-${yesterdaysDayly.max.updatedAt.getTime()}`;
+                                    this._todaysData.maxMeasuredAt = `__DATE-${yesterdaysDayly.max.updatedAt}`;
                                     if (process.env.NODE_ENV === "development") {
                                         this._todaysData.env = "development";
                                     }
