@@ -86,6 +86,10 @@ constants.chores = {
     serviceChannel: 507,
 };
 
+constants.countdown = {
+    serviceChannel: 509,
+}
+
 constants.photos = {
     //url: `http://johannes-mb.wnet.wn:3020/db/randomUrl`,
     url: `${constants.services.PHOTOS_BACKEND_HOST}:${constants.services.PHOTOS_BACKEND_PORT}`,

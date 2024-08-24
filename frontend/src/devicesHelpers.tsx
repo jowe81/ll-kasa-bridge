@@ -59,6 +59,8 @@ function getFirstDeviceOfType(type: string, subType: string | null) {
 
 const getClock = () => getFirstDeviceOfType(constants.DEVICETYPE_VIRTUAL, constants.SUBTYPE_CLOCK);
 
+const getCountdownsService = () => getDeviceByChannel(constants.countdown?.serviceChannel);
+
 const getNotesService = () => getDeviceByChannel(constants.notes?.serviceChannel);
 
 const getPhotosService = () => getDeviceByChannel(constants.photos?.serviceChannel);
@@ -179,6 +181,7 @@ export {
     getDevicesByType,
     getCalendar,
     getClock,
+    getCountdownsService,
     getMailbox,
     getMasterSwitch,
     getMasterSwitchDimInfo,

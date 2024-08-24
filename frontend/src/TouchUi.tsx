@@ -7,6 +7,7 @@ import Calendar from "./features/TouchUiMain/calendar/Calendar.tsx";
 import ScreenKeyboard from "./features/ScreenKeyboard/ScreenKeyboard.tsx";
 import TouchUiPanel from "./features/TouchUiPanel/TouchUiPanel";
 import Scripture from "./features/TouchUiPanel/scripture/Scripture.tsx";
+import Countdowns from "./features/TouchUiMain/countdowns/Countdowns.tsx";
 import Pages from "./features/TouchUiMain/personal/Pages.tsx";
 import './touch.css';
 import { useState } from "react";
@@ -118,6 +119,7 @@ function TouchUi() {
                         </div>
                         <div className="remaining-panel">
                             <Scripture renderForMainViewingArea={false} />
+                            <Countdowns />
                         </div>
                     </div>
                     <div className="touch-ui-main-column touch-ui-right-column">

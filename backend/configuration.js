@@ -2294,7 +2294,44 @@ const deviceMap = [
             ui: {},
         },
     },
-
+    {
+        alias: "Countdown Service",
+        channel: 509,
+        id: "countdown-service",
+        display: true,
+        displayLabel: "Countdown",
+        displayType: null,
+        locationId: "__internal",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_DYNFORMS_SERVICE,
+        commandHandlersExtension: null,
+        settings: {
+            api: {
+                baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
+                path: null, // will use .env DYNFORMS_PATH or default instead
+                queryParams: {},
+            },
+            requests: [
+                {
+                    connectionName: null, // not implemented
+                    collectionName: "countdowns",
+                    requestType: "pull",
+                    retrieve: {
+                        time: {
+                            frequency: "minutes",
+                            minutes: 60,
+                        },
+                        orderBy: {
+                            created_at: -1,
+                        },
+                    },
+                },
+            ],
+            // This is how often the handler will go out and check whether a request should actually be run.
+            checkInterval: 30 * SECOND,
+            ui: {},
+        },
+    },
     {
         alias: "Master Switch Service",
         channel: 999,

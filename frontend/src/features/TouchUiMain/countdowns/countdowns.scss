@@ -1,0 +1,56 @@
+.countdowns-container {
+    width: 222px;
+    height: 132px;
+    font-size: 80%;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 3px;
+    margin-right: 5px;
+    margin-top: 5px;
+    margin-bottom: 105px;
+    border-radius: 5px;
+    border: 3px solid rgba(180, 124, 40, 0.939);
+
+    .countdowns-header {
+        text-align: center;
+    }
+    .countdowns-elapse-date {
+        font-style: italic;
+        text-align: center;
+        position: relative;
+        top: -4px;
+    }
+
+    .countdowns-countdown {
+        padding-top: 4px;
+        font-size: 24px;
+        text-align: center;  
+        font-family: monospace;      
+    }
+
+    .countdowns-message {
+        line-height: 1.2;
+        position: relative;
+        top: -3px;
+        text-align: center;
+    }
+}
+
+/* To support other colors, can add more colors like this, and add them to the return of Countdowns.tsx/mapRecordToColorClass() */
+.countdowns-gray {
+    $color:rgb(240, 240, 218);
+    background-color: rgb(77, 77, 69);
+    color: $color;
+
+    .countdowns-header {
+        color: rgba($color, .3);
+        border-bottom: 1px solid rgba($color, .1);
+    }
+
+    .countdowns-elapse-date {
+        color: rgba($color, .3);
+    }
+    .countdowns-message {
+        color: rgba($color, .5);
+    }    
+}

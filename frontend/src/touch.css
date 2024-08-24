@@ -108,7 +108,8 @@
 }
 
 .touch-ui-main-column-remaining-space .remaining-panel {
-    border-top: 1px solid rgb(55, 55, 55);         
+    border-top: 1px solid rgb(55, 55, 55);   
+    display: flex;      
 }
 
 .touch-ui-sub-panel-header {

@@ -16,7 +16,7 @@ const MasterSwitchButton = ({ button, powerState }) => {
     }
 
     const metaClass = `master-switch-button-meta-${button.buttonId}`;
-    console.log()
+
     let powerStateString = 'none';
     if (powerState === true) {
         powerStateString = 'on';
