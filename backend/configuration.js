@@ -692,6 +692,10 @@ const globalConfig = {
             id: "loc-outside",
             name: "Outside",
         },
+        {
+            id: "loc-garage",
+            name: "Garage",
+        }
     ],
 };
 
@@ -1358,12 +1362,12 @@ const deviceMap = [
         },
     },
     {
-        alias: "Living Room",
+        alias: "Garage",
         channel: 202,
         id: "esp8266-01-1",
         url: "http://192.168.1.23/read",
         display: true,
-        locationId: "loc-livingRoom",
+        locationId: "loc-garage",
         type: constants.DEVICETYPE_ESP_THERMOMETER,
         subType: constants.SUBTYPE_THERMOMETER,
         settings: {
