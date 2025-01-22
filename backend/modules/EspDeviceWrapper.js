@@ -788,16 +788,17 @@ const EspDeviceWrapper = {
                         if (!info.id) {
                             return;
                         }
-
                         if (!this._pushTo[info.id] || (Date.now() - this._pushTo[info.id].getTime() > (info.interval ?? 5 * constants.MINUTE))) {
                             this._pushTo[info.id] = new Date();
+                            const payload = {
+                                id: info.id,
+                                timestamp: Date.now(),
+                                locationId: this.locationId,
+                                tempC: latestTempC,
+                            };
+
                             axios
-                                .post(info.url, {
-                                    id: info.id,
-                                    timestamp: Date.now(),
-                                    locationId: this.locationId,
-                                    tempC: latestTempC,
-                                })
+                                .post(info.url, payload)
                                 .then((data) => {
                                     log(`Pushed temperature to ${info.url}: ${latestTempC}. Response: ${JSON.stringify(data.data)}`, this, "yellow");                                    
                                 })

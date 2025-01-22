@@ -46,6 +46,14 @@ const globalConfig = {
     },
 
     /**
+     * Other devies that play audio in addition to the server.
+     */
+    remoteAudioPlayers: [
+        {
+            url: "http://192.168.1.135:3999/play",
+        },
+    ],
+    /**
      * Classes are used to convenienently select devices that belong together.
      * When assigning classes to a device or group, referencing the class name of a child class
      * results in all its parents being assigned to the device automatically.
@@ -61,7 +69,7 @@ const globalConfig = {
                 },
                 "class-hallwayLights": {},
                 "class-kitchenLights": {
-                    "class-kitchenCounterLights": {},
+                    //"class-kitchenCounterLights": {},
                 },
                 "class-livingroomLights": {
                     "class-jessDeskLights": {},
@@ -105,68 +113,14 @@ const globalConfig = {
             // How often should the service check for active alerts to play audio for?
             checkInterval: 15 * SECOND,
             defaultPlayInterval: 5 * MINUTE,
-            defaultAudiofile: 'smooth_bells_quiet.mp3', 
-        }
+            defaultAudiofile: "smooth_bells_quiet.mp3",
+        },
     },
 
     /**
      * Global filter definitions
      */
     filters: [
-        {
-            id: "externalFlags",
-            globalLabel: "Action based on flags in LifeLog",
-            pluginName: "externalFlags",
-            settings: {
-                /**
-                 * Specify an URL that will respond with JSON data (boolean flags).
-                 */
-                url: "http://lifelog.wnet.wn/ajax.php?action=getFlags",
-
-                /**
-                 * The path to the flags properties in the JSON response. Defaults to 'flags'.
-                 */
-                //jsonPath: 'flags'
-            },
-            periodicallyActive: true,
-        },
-        {
-            id: "nighttimeGlim",
-            pluginName: "externalFlags",
-            settings: {
-                /**
-                 * Specify an URL that will respond with JSON data (boolean flags).
-                 */
-                url: "http://lifelog.wnet.wn/ajax.php?action=getFlags",
-
-                flag: "sleep_wake",
-
-                /**
-                 * The path to the flags properties in the JSON response. Defaults to 'flags'.
-                 */
-                //jsonPath: 'flags'
-            },
-            stateData: {
-                on_off: {
-                    value: 0,
-                    altValue: 1,
-                },
-                brightness: {
-                    value: 0,
-                    altValue: 2,
-                },
-                hue: {
-                    value: 240,
-                    altValue: 240,
-                },
-                saturation: {
-                    value: 0,
-                    altValue: 100,
-                },
-            },
-
-            periodicallyActive: true,
-        },
         {
             id: "naturalLight",
             globalLabel: "Automatic color temperature control",
@@ -425,7 +379,7 @@ const globalConfig = {
             ],
         },
         {
-            id: "schedule-christmasTree",
+            id: "schedule-kitchenCounterLights",
             pluginName: "schedule",
             periodicallyActive: true,
             schedule: [
@@ -434,8 +388,8 @@ const globalConfig = {
                  */
                 {
                     trigger: {
-                        hours: 8,
-                        minutes: 30,
+                        hours: 7,
+                        minutes: 0,
                     },
                     stateData: {
                         on_off: 1,
@@ -443,8 +397,8 @@ const globalConfig = {
                 },
                 {
                     trigger: {
-                        hours: 6,
-                        minutes: 16,
+                        hours: 7,
+                        minutes: 2,
                     },
                     stateData: {
                         // None. Now it can be manually switched.
@@ -453,7 +407,7 @@ const globalConfig = {
                 {
                     trigger: {
                         hours: 22,
-                        minutes: 30,
+                        minutes: 0,
                     },
                     stateData: {
                         on_off: 0,
@@ -461,8 +415,8 @@ const globalConfig = {
                 },
                 {
                     trigger: {
-                        hours: 23,
-                        minutes: 31,
+                        hours: 22,
+                        minutes: 2,
                     },
                     stateData: {
                         // None. Now it can be manually switched.
@@ -471,57 +425,98 @@ const globalConfig = {
             ],
         },
         {
-            id: "schedule-bathroomLights",
+            id: "schedule-hallwaysNightlights",
             pluginName: "schedule",
             periodicallyActive: true,
             schedule: [
+                /**
+                 * The pair of items below turns the lamp on 45 minutes before sunset by overwriting
+                 * the on_off and brightness properties for the stateData passed in
+                 * (possibly the output from another filter).
+                 *
+                 * A minute later, the override is disabled and the stateData will just pass through,
+                 * (it may be empty or come from naturalLight and/or sunEvents).
+                 */
+
+                /*
+                 * This schedule item gets triggered by sunset, with an offset.
+                 * It runs a filter instead of defining data here.
+                 */
+                {
+                    trigger: {
+                        event: "sunset",
+                        offset: -45 * MINUTE,
+                    },
+                    stateData: {
+                        on_off: 1,
+                        brightness: 5,
+                        color_temp: 2700,
+                    },
+                },
+                /**
+                 * This item rescinds the previous one a minute later
+                 */
+                {
+                    trigger: {
+                        event: "sunset",
+                        offset: -44 * MINUTE,
+                    },
+                    stateData: {},
+                },
+
                 /**
                  * This is a plain schedule item - specify a time and stateData.
                  */
                 {
                     trigger: {
-                        hours: 22,
-                        minutes: 0,
-                    },
-                    stateData: {
-                        brightness: 10,
-                    },
-                },
-                {
-                    trigger: {
                         hours: 23,
-                        minutes: 30,
+                        minutes: 0,
                     },
                     stateData: {
                         brightness: 1,
                     },
                 },
+
+                /**
+                 * This item, with an empty stateData object, will
+                 * clear whatever adjustments the preceding item made,
+                 * letting the input stateData pass through.
+                 */
                 {
                     trigger: {
-                        hours: 6,
-                        minutes: 0,
+                        hours: 5,
+                    },
+                    stateData: {},
+                },
+
+                /**
+                 * The following pair of items turns the lamp off at sunrise by overwriting
+                 * the on_off property for the stateData passed in (possibly output from another filter)
+                 * A minute later, the override is disabled and the output from the previous filter
+                 * can pass through.
+                 */
+
+                /**
+                 * This schedule item gets triggered by sunrise, with an offset.
+                 * It runs a filter instead of defining data here.
+                 */
+                {
+                    trigger: {
+                        event: "sunrise",
                     },
                     stateData: {
-                        brightness: 10,
+                        on_off: 0,
                     },
                 },
+                /**
+                 * This item rescinds the previous one a minute later
+                 */
                 {
                     trigger: {
-                        hours: 7,
-                        minutes: 0,
+                        event: "sunrise",
+                        offset: 1 * MINUTE,
                     },
-                    stateData: {
-                        brightness: 40,
-                    },
-                },
-                {
-                    trigger: {
-                        hours: 8,
-                        minutes: 30,
-                    },
-                    stateData: {
-                        brightness: 90,
-                    },
+                    stateData: {},
                 },
             ],
         },
@@ -530,135 +525,7 @@ const globalConfig = {
     /**
      * Device Group Definitions
      */
-    groups: [
-        {
-            id: "group-bedShelfLights",
-            name: "Bed Shelf Lights",
-            channels: [38],
-            class: "class-bedroomLights",
-            display: false,
-            displayLabel: "Bed",
-            displayType: constants.SUBTYPE_LIGHT,
-            filters: [{ refId: "naturalLight" }],
-            linkedDevices: [
-                {
-                    channel: 101,
-                    // Sync the switch to the powerstate of this device or just toggle it?
-                    sync: true,
-                    // Only has effect if sync === true: should the device be inversely synced
-                    inverse: false,
-                    // Sync/toggle when this device is set to the on position
-                    onPosition: true,
-                    // Sync/toggle when this device is set to the off position
-                    offPosition: true,
-                    // NOT YET IMPLEMENTED: Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
-                    onlyWhenSameStateAs: [],
-                },
-                // When this light goes off, take channel 2 with.
-                {
-                    channel: 2,
-                    sync: true,
-                    onPosition: false,
-                    offPosition: true,
-                },
-            ],
-        },
-        {
-            id: "group-jessDeskLights",
-            name: "Jess Desk Lights",
-            channels: [32, 33, 36, 40],
-            class: "class-jessDeskLights",
-            displayLabel: "Desk",
-            display: false,
-            displayType: constants.SUBTYPE_LIGHT,
-            linkedDevices: [
-                {
-                    channel: 34,
-                    // Sync the switch to the powerstate of this device or just toggle it?
-                    sync: true,
-                    // Only has effect if sync === true: should the device be inversely synced
-                    inverse: false,
-                    // Sync/toggle when this device is set to the on position
-                    onPosition: true,
-                    // Sync/toggle when this device is set to the off position
-                    offPosition: true,
-                    // NOT YET IMPLEMENTED: Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
-                    onlyWhenSameStateAs: [],
-                },
-            ],
-        },
-        {
-            id: "group-bedroomDeskLights",
-            name: "Bedroom Desk Lights",
-            channels: [2, 3, 16, 37],
-            class: "class-johannesDeskLights",
-            displayLabel: "Desk",
-            displayType: constants.SUBTYPE_LIGHT,
-            linkedDevices: [
-                {
-                    channel: 14,
-                    // Sync the switch to the powerstate of this device or just toggle it?
-                    sync: true,
-                    // Only has effect if sync === true: should the device be inversely synced
-                    inverse: false,
-                    // Sync/toggle when this device is set to the on position
-                    onPosition: true,
-                    // Sync/toggle when this device is set to the off position
-                    offPosition: true,
-                    // NOT YET IMPLEMENTED: Sync/toggle only if the listed devices (channel numbers) share the same powerstate as this device
-                    onlyWhenSameStateAs: [],
-                },
-            ],
-        },
-        {
-            id: "group-bedroomCeilingLights",
-            name: "Bedroom Ceiling Lights",
-            channels: [6, 7],
-            class: "class-bedroomLights",
-            displayType: constants.SUBTYPE_LIGHT,
-            displayLabel: "Ceiling",
-        },
-        {
-            id: "group-kitchenCounterLights",
-            name: "Kitchen Counter Lights",
-            channels: [42, 43],
-            class: "class-kitchenCounterLights",
-            displayLabel: "Counter",
-            displayType: constants.SUBTYPE_LIGHT,
-        },
-        {
-            id: "group-kitchenLights",
-            name: "Kitchen Table Lights",
-            channels: [28],
-            class: "class-kitchenLights",
-            displayLabel: "Table",
-            displayType: constants.SUBTYPE_LIGHT,
-        },
-        {
-            id: "group-hallwayCeiling",
-            name: "Hallway Lights",
-            channels: [8, 9],
-            class: "class-kitchenLights",
-            displayLabel: "Hallway",
-            displayType: constants.SUBTYPE_LIGHT,
-        },
-        {
-            id: "group-bathroomLights",
-            name: "Bathroom Lights",
-            displayType: constants.SUBTYPE_LIGHT,
-            displayLabel: "Lights",
-            channels: [10, 11, 12, 13],
-            class: "class-bathroomLights",
-        },
-        {
-            id: "group-livingroomLights",
-            name: "Living Room Lights",
-            displayLabel: "Living",
-            displayType: constants.SUBTYPE_LIGHT,
-            channels: [29, 30, 31],
-            class: "class-livingroomLights",
-        },
-    ],
+    groups: [],
 
     /**
      * Locations
@@ -689,384 +556,36 @@ const globalConfig = {
             name: "Bedroom",
         },
         {
+            id: "loc-recroom",
+            name: "Rec Room",
+        },
+        {
             id: "loc-outside",
             name: "Outside",
         },
         {
+            id: "loc-office-johannes",
+            name: "Office",
+        },
+        {
             id: "loc-garage",
             name: "Garage",
-        }
+        },
     ],
 };
 
 const deviceMap = [
-    //Bedroom
-    {
-        alias: "Bedroom IKEA lamp",
-        channel: 2,
-        class: "class-johannesDeskLights",
-        displayLabel: "IKEA Lamp",
-        id: "8012E7EA0A70974D997DE95E898FBA261F980E1A",
-        locationId: "loc-bedroom",
-        subType: SUBTYPE_BULB,
-        filters: [
-            { refId: "naturalLight" },
-            {
-                refId: "externalFlags",
-                stateData: {
-                    on_off: {
-                        value: 0,
-                        altValue: 1,
-                    },
-                },
-                settings: {
-                    flag: "busy_available",
-                },
-            },
-        ],
-    },
-    {
-        alias: "Bedroom Desk Strip top",
-        channel: 3,
-        id: "80121CF5373D56F7C62278B4C0FE88A01F53DD26",
-        locationId: "loc-bedroom",
-        subType: SUBTYPE_LED_STRIP,
-        filters: [{ refId: "naturalLight" }],
-    },
-    {
-        alias: "Bedroom Heater",
-        channel: 4,
-        id: "80065A4E60A835C49695A74DA7FAE76520436E9C01",
-        displayType: SUBTYPE_AIR_HEAT,
-        displayLabel: "Heater",
-        locationId: "loc-bedroom",
-        subType: SUBTYPE_PLUG,
-        hvacType: SUBTYPE_AIR_HEAT,
-    },
-    {
-        alias: "Bedroom Fan",
-        channel: 5,
-        id: "80065A4E60A835C49695A74DA7FAE76520436E9C02",
-        locationId: "loc-bedroom",
-        displayType: SUBTYPE_AIR_FAN,
-        displayLabel: "Fan",
-        subType: SUBTYPE_PLUG,
-    },
-    {
-        alias: "Bedroom Ceiling 1",
-        channel: 6,
-        class: "class-bedroomLights",
-        id: "8012C3A3B58B58E8081EDBCF694C8CBC1F790A02",
-        locationId: "loc-bedroom",
-        subType: SUBTYPE_BULB,
-        filters: [{ refId: "naturalLight" }],
-    },
-    {
-        alias: "Bedroom Ceiling 2",
-        channel: 7,
-        class: "class-bedroomLights",
-        id: "8012511ABF75C811DB47A833DD2EDAED1F791417",
-        locationId: "loc-bedroom",
-        subType: SUBTYPE_BULB,
-        filters: [{ refId: "naturalLight" }],
-    },
-
-    //Hallway
-    {
-        alias: "Hallway Ceiling 1", //Hallway ceiling 2?
-        channel: 8,
-        class: "class-hallwayLights",
-        id: "80121D6F58ADDCAC185363C01347F5EA1F752B55",
-        locationId: "loc-kitchen",
-        subType: SUBTYPE_BULB,
-    },
-    {
-        alias: "Hallway Ceiling 2",
-        channel: 9,
-        class: "class-hallwayLights",
-        id: "8012DA57516B98CCFFE6467D8F4F01691F73C975",
-        locationId: "loc-kitchen",
-        subType: SUBTYPE_BULB,
-    },
-
-    //Bathroom
-    //***** ***pp pp***
-    {
-        alias: "Bathroom 1",
-        channel: 10,
-        id: "8012D32B889FD9CE23C825CEB1C2EFD41F73D8E2",
-        locationId: "loc-bathroom",
-        subType: SUBTYPE_BULB,
-        filters: [{ refId: "naturalLight" }],
-    },
-    {
-        alias: "Bathroom 2",
-        channel: 11,
-        id: "8012F65B8543DA7FFFC8A3F756D1EBE61F742CDF",
-        locationId: "loc-bathroom",
-        subType: SUBTYPE_BULB,
-        filters: [{ refId: "naturalLight" }],
-    },
-    {
-        alias: "Bathroom 3",
-        channel: 12,
-        id: "80128096836910A62F80A6B532C1461E1F79D295",
-        locationId: "loc-bathroom",
-        subType: SUBTYPE_BULB,
-        filters: [{ refId: "naturalLight" }],
-    },
-    {
-        alias: "Bathroom 4",
-        channel: 13,
-        id: "8012EE37548E3F0F48405DECC13D0B801F779B2B",
-        locationId: "loc-bathroom",
-        subType: SUBTYPE_BULB,
-        filters: [{ refId: "naturalLight" }],
-    },
-    {
-        alias: "Bedroom Desk Switch",
-        channel: 14,
-        id: "8006E7EB4A66E3687708A7ABF93FB237200DCDA4",
-        locationId: "loc-bedroom",
-        display: false,
-        subType: SUBTYPE_SWITCH,
-        targets: {
-            on: [
-                { channel: 5, stateData: true }, // Turn fan on
-                { channel: 4, stateData: false }, // Turn heater off
-                { channel: 39, stateData: true }, // Turn audio amp on both ways
-                {
-                    channel: 2,
-                    stateData: {
-                        on_off: 1,
-                        brightness: 95,
-                    },
-                },
-                {
-                    channel: 3,
-                    stateData: {
-                        on_off: 1,
-                        brightness: 95,
-                    },
-                },
-                {
-                    channel: 16,
-                    stateData: {
-                        on_off: 1,
-                        brightness: 20,
-                        hue: 240,
-                        saturation: 100,
-                    },
-                },
-                {
-                    channel: 37,
-                    stateData: {
-                        on_off: 1,
-                        brightness: 20,
-                        hue: 240,
-                        saturation: 100,
-                    },
-                },
-            ],
-            off: [
-                { channel: 8, stateData: false },
-                {
-                    channel: 9,
-                    stateData: {
-                        on_off: 1,
-                        brightness: 100,
-                        hue: 120,
-                        saturation: 100,
-                    },
-                },
-
-                { channel: 5, stateData: false }, // Turn fan off
-                { channel: 4, stateData: true }, // Turn heater on
-                { channel: 39, stateData: true }, // Turn audio amp on both ways
-                {
-                    channel: 2,
-                    stateData: {
-                        on_off: 1,
-                        brightness: 95,
-                    },
-                },
-                {
-                    channel: 3,
-                    stateData: {
-                        on_off: 1,
-                        brightness: 95,
-                    },
-                },
-                {
-                    channel: 16,
-                    stateData: {
-                        on_off: 1,
-                        brightness: 20,
-                        hue: 277,
-                        saturation: 100,
-                    },
-                },
-                {
-                    channel: 37,
-                    stateData: {
-                        on_off: 1,
-                        brightness: 20,
-                        hue: 277,
-                        saturation: 100,
-                    },
-                },
-            ],
-        },
-    },
-    {
-        alias: "Bathroom Heater",
-        channel: 15,
-        id: "80061465B741F3D278857FD2F8E09CD020C3200A",
-        locationId: "loc-bathroom",
-        subType: SUBTYPE_PLUG,
-        displayLabel: "Heater",
-        displayType: SUBTYPE_AIR_HEAT,
-        hvacType: SUBTYPE_AIR_HEAT,
-    },
-    {
-        alias: "Bedroom Desk Strip bottom",
-        channel: 16,
-        id: "8012ACE65E9CFF19DBAB8CAF5A2BBD942014A9B1",
-        locationId: "loc-bedroom",
-        subType: SUBTYPE_LED_STRIP,
-    },
-
-    //Living Room
-    //***** ***** ***** ***** ***** **ppp p****
-    {
-        alias: "Kitchen Ikea 1",
-        channel: 28,
-        id: "801217E95EAD46CF3A6E6C5F9D70E22020F2079F",
-        locationId: "loc-kitchen",
-        subType: SUBTYPE_BULB,
-        filters: [
-            // {
-            //     refId: "naturalLight",
-            //     periodicallyActive: true,
-            //     applyPartially: 0.125,
-            // },
-        ],
-    },
-    {
-        alias: "Living Room Ikea 1",
-        channel: 29,
-        id: "801264A4EC3F66CAC02D4FF78712E6D11F992564",
-        locationId: "loc-livingRoom",
-        subType: SUBTYPE_BULB,
-        // filters: [
-        //     {
-        //         refId: "naturalLight",
-        //         periodicallyActive: true,
-        //         applyPartially: 0.3,
-        //     },
-        // ],
-    },
-    {
-        alias: "Living Room Ikea 2",
-        channel: 30,
-        id: "801261D1846E3508D7801279357BB1A820F2B6D1",
-        locationId: "loc-livingRoom",
-        subType: SUBTYPE_BULB,
-        // filters: [
-        //     {
-        //         refId: "naturalLight",
-        //         periodicallyActive: true,
-        //         applyPartially: 0.5,
-        //     },
-        // ],
-    },
-    {
-        alias: "Living Room Ikea 3",
-        channel: 31,
-        id: "80124378042EF9B324B75F639D993F9F20F23759",
-        locationId: "loc-livingRoom",
-        subType: SUBTYPE_BULB,
-        // filters: [{ refId: "naturalLight" }],
-    },
-    {
-        alias: "Living Room Ikea 4",
-        channel: 32,
-        id: "8012D9195E6D17B426B7F74DE432D6A21F9BD8BE",
-        locationId: "loc-livingRoom",
-        subType: SUBTYPE_BULB,
-        filters: [{ refId: "naturalLight" }],
-    },
-    {
-        alias: "Tree",
-        channel: 45,
-        id: "80069F21DB5B0BBF07AEC07F6485B19320C3751C",
-        locationId: "loc-livingRoom",
-        displayType: SUBTYPE_CHRISTMAS_TREE,
-        subType: SUBTYPE_PLUG,
-        filters: [{ refId: "schedule-christmasTree" }],
-    },
-    {
-        alias: "Jess' Desk Lamp",
-        channel: 33,
-        id: "8012D2D5067A0F9AE37075A3FA816E341F9D35A9",
-        locationId: "loc-livingRoom",
-        subType: SUBTYPE_BULB,
-        filters: [{ refId: "naturalLight" }],
-    },
-    {
-        alias: "Switch in Jess' desk",
-        channel: 34,
-        id: "800686BE89C5D37A63B4E70AB37689212066F343",
-        displayLabel: "Jess Desk",
-        displayType: constants.SUBTYPE_LIGHT,
-        locationId: "loc-livingRoom",
-        subType: SUBTYPE_SWITCH,
-        targets: {
-            on: [
-                // {
-                //     channel: 31,
-                //     stateData: {
-                //         on_off: 1,
-                //     },
-                //     delay: 2000,
-                // },
-                {
-                    channel: 32,
-                    stateData: {
-                        on_off: 1,
-                    },
-                    delay: 2000,
-                },
-                {
-                    channel: 33,
-                    stateData: {
-                        on_off: 1,
-                    },
-                    delay: 1000,
-                },
-                { channel: 36, stateData: true },
-                {
-                    channel: 40,
-                    stateData: {
-                        brightness: 95,
-                        on_off: 1,
-                    },
-                },
-            ],
-            off: [
-                // { channel: 31, stateData: false },
-                { channel: 32, stateData: false },
-                { channel: 33, stateData: false },
-                { channel: 36, stateData: false },
-                { channel: 40, stateData: false },
-            ],
-        },
-    },
+    /**
+     * Tp Link Kasa devices
+     */
+    /**
+     * Outside / Garage
+     */
     {
         alias: "Front Door Lamp",
-        channel: 35,
+        channel: 1,
         class: "class-outdoorLights",
-        id: "801277C3769ADD0BA769504AAB6B233E1F77F11C",
+        id: "8012E7EA0A70974D997DE95E898FBA261F980E1A",
         displayLabel: "Entrance",
         locationId: "loc-outside",
         subType: SUBTYPE_BULB,
@@ -1084,24 +603,69 @@ const deviceMap = [
             { refId: "schedule-outdoorLights" },
         ],
     },
+    /**
+     * Kitchen
+     * 8012511ABF75C811DB47A833DD2EDAED1F791417
+     */
     {
-        alias: "Jess Storage Shelves",
-        channel: 36,
-        id: "80120A8622D026338547E3D7E88D70931F9E81A8",
-        locationId: "loc-livingRoom",
-        subType: SUBTYPE_LED_STRIP,
+        alias: "Counter",
+        channel: 9,
+        id: "80068105FEB3EACD7AC20A6D1702871720C3A77A",
+        displayLabel: "Counter",
+        displayType: SUBTYPE_LIGHT,
+        locationId: "loc-kitchen",
+        subType: SUBTYPE_SWITCH,
+        filters: [{ refId: "schedule-kitchenCounterLights" }],
     },
     {
-        alias: "Bedroom Desk Strip Shelving",
-        channel: 37,
-        id: "80125B9CDD55CE105CC76F0CA2F6C8CC1F5426D8",
+        alias: "Night Light",
+        channel: 8,
+        id: "8012511ABF75C811DB47A833DD2EDAED1F791417",
+        displayLabel: "Nightlight",
+        displayType: SUBTYPE_LIGHT,
+        locationId: "loc-kitchen",
+        subType: SUBTYPE_BULB,
+    },
+    /**
+     * Bedroom
+     */
+    {
+        alias: "Jess Bed Switch",
+        channel: 10,
+        id: "8006000F366B7DD70835CBF38A51040620662083",
+        displayLabel: "Bed Shelf",
+        displayType: SUBTYPE_LIGHT,
         locationId: "loc-bedroom",
-        subType: SUBTYPE_LED_STRIP,
+        subType: SUBTYPE_SWITCH,
+        targets: {
+            on: [
+                // Bed Strip
+                {
+                    channel: 11,
+                    stateData: {
+                        brightness: 80,
+                        on_off: 1,
+                        saturation: 0,
+                    },
+                },
+            ],
+            off: [
+                {
+                    channel: 11,
+                    stateData: {
+                        on_off: 0,
+                        transition: 20000,
+                    },
+                },
+                // Ceiling
+                { channel: 12, stateData: false },
+            ],
+        },
     },
     {
         alias: "Bed Shelf Strip",
-        channel: 38,
-        id: "8012D0E9DD82CBC61A864D093BF05E911F53B1E8",
+        channel: 11,
+        id: "80120CD616EF7A3088B8A38BB8E191171F54389E",
         locationId: "loc-bedroom",
         subType: SUBTYPE_LED_STRIP,
         filters: [
@@ -1195,9 +759,10 @@ const deviceMap = [
                 },
             },
         ],
+        linkedDevices: [{ channel: 10, sync: true, onPosition: true, offPosition: true }],
         //   linkedDevices: [
         //     {
-        //       channel: 101,
+        //       channel: 10,
         //       // Sync the switch to the powerstate of this device or just toggle it?
         //       sync: true,
         //       // Only has effect if sync === true: should the device be inversely synced
@@ -1214,101 +779,47 @@ const deviceMap = [
         //   ],
     },
     {
-        alias: "Jess Bed Switch",
-        channel: 101,
-        id: "8006000F366B7DD70835CBF38A51040620662083",
-        displayLabel: "Bed Shelf",
-        displayType: SUBTYPE_LIGHT,
+        alias: "Bedroom Ceiling 1",
+        channel: 12,
+        id: "801264A4EC3F66CAC02D4FF78712E6D11F992564",
         locationId: "loc-bedroom",
-        subType: SUBTYPE_SWITCH,
-        targets: {
-            on: [
-                {
-                    channel: 38,
-                    stateData: {
-                        brightness: 80,
-                        on_off: 1,
-                        saturation: 0,
-                    },
-                },
-            ],
-            off: [
-                {
-                    channel: 38,
-                    stateData: {
-                        on_off: 0,
-                        transition: 20000,
-                    },
-                },
-                // Ceiling
-                { channel: 6, stateData: false },
-                { channel: 7, stateData: false },
-            ],
-        },
-    },
-    {
-        alias: "Bedroom Audio Amp",
-        channel: 39,
-        id: "80065A4E60A835C49695A74DA7FAE76520436E9C00",
-        locationId: "loc-bedroom",
-        displayType: SUBTYPE_ENTERTAINMENT,
-        displayLabel: "Amp",
-        subType: SUBTYPE_PLUG,
-    },
-    {
-        alias: "Jess Desk Strip",
-        channel: 40,
-        id: "8012984E9F504FC4AEC384A012A6BEE01F54FA11",
-        locationId: "loc-livingRoom",
-        subType: SUBTYPE_LED_STRIP,
+        subType: SUBTYPE_BULB,
         filters: [
             {
-                refId: "nighttimeGlim",
-            },
-            {
                 refId: "naturalLight",
-                settings: {
-                    /**
-                     * This is a filter specific setting.
-                     * naturalLight taps into externalFlags to execute conditionally.
-                     */
-                    restrictions: [
-                        {
-                            type: "externalFlags",
-                            url: "http://lifelog.wnet.wn/ajax.php?action=getFlags",
-                            flagName: "sleep_wake",
-                            flagState: true, // Block the filter when flag is set to true
-                        },
-                    ],
-                },
-                stateData: {
-                    color_temp: 0,
-                },
+                periodicallyActive: true,
+                applyPartially: 0.3,
             },
         ],
     },
+    /**
+     * Rec Room
+     */
     {
-        alias: "Kitchen Counter Main",
-        channel: 42,
-        id: "8006DE7EE2F73CBEA4629F293A1684A52042804800",
-        locationId: "loc-kitchen",
-        subType: SUBTYPE_PLUG,
+        alias: "Rec Room",
+        channel: 20,
+        id: "8012D32B889FD9CE23C825CEB1C2EFD41F73D8E2",
+        locationId: "loc-recroom",
+        subType: SUBTYPE_BULB,
     },
     {
-        alias: "Kitchen Counter Sink",
-        channel: 43,
-        id: "8006DE7EE2F73CBEA4629F293A1684A52042804801",
-        locationId: "loc-kitchen",
-        subType: SUBTYPE_PLUG,
+        alias: "Rec Room Strip 1",
+        channel: 21,
+        id: "80125D66D3B56B9365A992BA16C9D3E0201EEDC1",
+        locationId: "loc-recroom",
+        subType: SUBTYPE_LED_STRIP,
     },
     {
-        alias: "Kitchen Cabinets Aleds",
-        channel: 44,
-        id: "8006DE7EE2F73CBEA4629F293A1684A52042804802",
-        display: false,
-        locationId: "loc-kitchen",
-        subType: SUBTYPE_PLUG,
+        alias: "Hallway",
+        channel: 30,
+        id: "80124378042EF9B324B75F639D993F9F20F23759",
+        locationId: "loc-recroom",
+        subType: SUBTYPE_BULB,
+        filters: [{ refId: "schedule-hallwaysNightlights" }],
     },
+    /**
+     * ESP and Other devices
+     */
     {
         alias: "Outside",
         channel: 201,
@@ -1342,7 +853,7 @@ const deviceMap = [
             pushTo: [
                 {
                     id: "JoWe",
-                    url: "http://drw.spdns.de/wff/temperatur.php",
+                    url: "https://drw.spdns.de/wff/temperatur.php",
                     interval: 3 * MINUTE,
                 },
             ],
@@ -1414,12 +925,12 @@ const deviceMap = [
         },
     },
     {
-        alias: "Bedroom",
+        alias: "Office",
         channel: 203,
         id: "esp8266-02-0",
         url: "http://192.168.1.22/read",
         display: true,
-        locationId: "loc-bedroom",
+        locationId: "loc-office-johannes",
         type: constants.DEVICETYPE_ESP_THERMOMETER,
         subType: constants.SUBTYPE_THERMOMETER,
         settings: {
@@ -1458,121 +969,51 @@ const deviceMap = [
             },
         },
     },
-    {
-        alias: "Bathroom",
-        channel: 204,
-        id: "esp8266-02-1",
-        url: "http://192.168.1.22/read",
-        display: true,
-        locationId: "loc-bathroom",
-        type: constants.DEVICETYPE_ESP_THERMOMETER,
-        subType: constants.SUBTYPE_THERMOMETER,
-        settings: {
-            jsonPath: "ds18b20",
-            jsonPathId: { local_id: 1 },
-            jsonPathKey: "temperature",
-            trends: {
-                short: {
-                    label: "short",
-                    avg_calc_history_length: 5 * MINUTE,
-                    avg_calc_data_window: 1 * MINUTE,
-                },
-                mid: {
-                    label: "mid",
-                    avg_calc_history_length: 20 * MINUTE,
-                    avg_calc_data_window: 5 * MINUTE,
-                },
-                long: {
-                    label: "long",
-                    avg_calc_history_length: 60 * MINUTE,
-                    avg_calc_data_window: 10 * MINUTE,
-                },
-            },
-            sampleCollectInterval: 1 * HOUR,
-            pushToDynforms: true,
-            dynformsSettings: {
-                api: {
-                    baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
-                    path: null, // will use .env DYNFORMS_PATH or default instead
-                    queryParams: {},
-                },
-                request: {
-                    collectionName: "weatherHistory",
-                    requestType: "push",
-                },
-            },
-        },
-    },
-    {
-        alias: "Mailbox Lights",
-        channel: 205,
-        id: "esp32-01-0",
-        url: "http://192.168.1.25/read",
-        display: true,
-        displayLabel: "Mailbox",
-        locationId: "loc-outside",
-        type: constants.DEVICETYPE_ESP_RELAY,
-        subType: constants.SUBTYPE_BULB,
-        settings: {
-            jsonPath: null, // Top level
-            jsonPathKey: "lights_on",
-            engageUrl: "http://192.168.1.25/write?lights=on",
-            disengageUrl: "http://192.168.1.25/write?lights=off",
-        },
-    },
-    {
-        alias: "Mailbox Lock",
-        channel: 206,
-        id: "esp32-01-1",
-        url: "http://192.168.1.25/read",
-        display: true,
-        displayLabel: "Mailbox",
-        displayType: constants.SUBTYPE_MAIL_COMPARTMENT,
-        locationId: "loc-outside",
-        type: constants.DEVICETYPE_ESP_RELAY,
-        subType: constants.SUBTYPE_MAIL_COMPARTMENT,
-        settings: {
-            jsonPath: null, // Top level
-            jsonPathKey: "door_locked",
-            engageUrl: "http://192.168.1.25/write?door=lock",
-            disengageUrl: "http://192.168.1.25/write?door=unlock",
-        },
-    },
-    {
-        alias: "Bathroom Thermostat",
-        channel: 207,
-        id: "thermostat-bathroom",
-        display: true,
-        displayLabel: "Thermostat",
-        displayType: constants.SUBTYPE_THERMOSTAT,
-        locationId: "loc-bathroom",
-        type: constants.DEVICETYPE_VIRTUAL,
-        subType: constants.SUBTYPE_THERMOSTAT,
-        settings: {
-            hysteresis: 1, // Hysteresis in degrees Celsius
-            checkInterval: 1 * MINUTE,
-            target: 25, // Will initialize to default if not set
-            heat: true, // Should the room be heated?
-            cool: false, // Should the room be cooled?
-        },
-    },
-    {
-        alias: "Bedroom Thermostat",
-        channel: 208,
-        id: "thermostat-bedroom",
-        display: true,
-        displayLabel: "Thermostat",
-        displayType: constants.SUBTYPE_THERMOSTAT,
-        locationId: "loc-bedroom",
-        type: constants.DEVICETYPE_VIRTUAL,
-        subType: constants.SUBTYPE_THERMOSTAT,
-        settings: {
-            hysteresis: 0.5, // Hysteresis in degrees Celsius
-            checkInterval: 30 * SECOND,
-            heat: true, // Should the room be heated?
-            cool: false, // Should the room be cooled?
-        },
-    },
+    // {
+    //     alias: "Bathroom",
+    //     channel: 204,
+    //     id: "esp8266-02-1",
+    //     url: "http://192.168.1.22/read",
+    //     display: true,
+    //     locationId: "loc-bathroom",
+    //     type: constants.DEVICETYPE_ESP_THERMOMETER,
+    //     subType: constants.SUBTYPE_THERMOMETER,
+    //     settings: {
+    //         jsonPath: "ds18b20",
+    //         jsonPathId: { local_id: 1 },
+    //         jsonPathKey: "temperature",
+    //         trends: {
+    //             short: {
+    //                 label: "short",
+    //                 avg_calc_history_length: 5 * MINUTE,
+    //                 avg_calc_data_window: 1 * MINUTE,
+    //             },
+    //             mid: {
+    //                 label: "mid",
+    //                 avg_calc_history_length: 20 * MINUTE,
+    //                 avg_calc_data_window: 5 * MINUTE,
+    //             },
+    //             long: {
+    //                 label: "long",
+    //                 avg_calc_history_length: 60 * MINUTE,
+    //                 avg_calc_data_window: 10 * MINUTE,
+    //             },
+    //         },
+    //         sampleCollectInterval: 1 * HOUR,
+    //         pushToDynforms: true,
+    //         dynformsSettings: {
+    //             api: {
+    //                 baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
+    //                 path: null, // will use .env DYNFORMS_PATH or default instead
+    //                 queryParams: {},
+    //             },
+    //             request: {
+    //                 collectionName: "weatherHistory",
+    //                 requestType: "push",
+    //             },
+    //         },
+    //     },
+    // },
     {
         alias: "Kitchen Timer",
         channel: 209,
@@ -1585,6 +1026,13 @@ const deviceMap = [
         subType: constants.SUBTYPE_TIMER,
         settings: {
             timers: [
+                {
+                    id: "30s",
+                    length: 30 * SECOND,
+                    subLabel: "Fcy Cfe",
+                    ttl: 0,
+                    audiofileExpired: "fancy-coffee.mp3",
+                },
                 {
                     id: "1m",
                     length: 1 * MINUTE,
@@ -2157,7 +1605,7 @@ const deviceMap = [
                         alertText: "Morning pills are due!",
                         warnAfterHours: 8,
                         alertAfterHours: 10,
-                        alertAudio: true,
+                        alertAudio: false,
                         alertInterval: 10 * MINUTE,
                         alertDismissable: true,
                     },
@@ -2170,7 +1618,7 @@ const deviceMap = [
                         alertText: "Evening pills are due!",
                         warnAfterHours: 19,
                         alertAfterHours: 21,
-                        alertAudio: true,
+                        alertAudio: false,
                         alertInterval: 10 * MINUTE,
                         alertDismissable: true,
                     },
@@ -2213,7 +1661,7 @@ const deviceMap = [
                         alertText: "Morning pills are due!",
                         warnAfterHours: 8,
                         alertAfterHours: 10,
-                        alertAudio: true,
+                        alertAudio: false,
                         alertDismissable: true,
                     },
                     {
@@ -2225,7 +1673,7 @@ const deviceMap = [
                         alertText: "Evening pills are due!",
                         warnAfterHours: 19,
                         alertAfterHours: 21,
-                        alertAudio: true,
+                        alertAudio: false,
                         alertDismissable: true,
                     },
                     {
@@ -2359,70 +1807,19 @@ const deviceMap = [
                     },
                     uiOpacityPercent: 40,
                     forceDim: false, // Default. This means it dims only as long as dimOnButton button is 'active'.
-                    dimOnButton: "master-off",
+                    //dimOnButton: "master-off",
                 },
             },
             buttons: [
                 // *********** Presets *************
                 {
                     type: "preset",
-                    alias: "Movie",
-                    switch: [
-                        {
-                            groupId: "group-livingroomLights",
-                            stateData: {
-                                on_off: 1,
-                                brightness: 1,
-                            },
-                        },
-                        {
-                            groupId: "group-kitchenCounterLights",
-                            stateData: false,
-                        },
-                        {
-                            groupId: "group-hallwayCeiling",
-                            stateData: false,
-                            ignoreForButtonState: true,
-                        },
-                        {
-                            // Kitchen table
-                            channel: 28,
-                            stateData: false,
-                        },
-                        {
-                            // Kitchen Aleds
-                            channel: 44,
-                            stateData: true,
-                        },
-                    ],
-                },
-                {
-                    type: "preset",
                     alias: "Full",
                     switch: [
                         {
-                            groupId: "group-livingroomLights",
+                            // Rec room
+                            channel: 20,
                             stateData: {
-                                brightness: 100,
-                            },
-                        },
-                        {
-                            // Kitchen table
-                            channel: 28,
-                            stateData: {
-                                brightness: 100,
-                            },
-                        },
-                        {
-                            groupId: "group-hallwayCeiling",
-                            stateData: {
-                                brightness: 100,
-                            },
-                            ignoreForButtonState: true,
-                        },
-                        {
-                            channel: 35,
-                            stateDate: {
                                 brightness: 100,
                             },
                         },
@@ -2433,24 +1830,24 @@ const deviceMap = [
                     alias: "Low",
                     switch: [
                         {
-                            groupId: "group-livingroomLights",
+                            // Rec room
+                            channel: 20,
                             stateData: {
                                 brightness: 5,
                             },
                         },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Min",
+                    switch: [
                         {
-                            // Kitchen table
-                            channel: 28,
+                            // Rec room
+                            channel: 20,
                             stateData: {
-                                brightness: 5,
+                                brightness: 1,
                             },
-                        },
-                        {
-                            groupId: "group-hallwayCeiling",
-                            stateData: {
-                                brightness: 5,
-                            },
-                            ignoreForButtonState: true,
                         },
                     ],
                 },
@@ -2459,57 +1856,10 @@ const deviceMap = [
                     alias: "Warm",
                     switch: [
                         {
-                            groupId: "group-livingroomLights",
+                            // Rec room
+                            channel: 20,
                             stateData: {
                                 color_temp: 2700,
-                            },
-                        },
-                        {
-                            // Kitchen table
-                            channel: 28,
-                            stateData: {
-                                color_temp: 2700,
-                            },
-                        },
-                        {
-                            groupId: "group-hallwayCeiling",
-                            stateData: {
-                                color_temp: 2700,
-                            },
-                            ignoreForButtonState: true,
-                        },
-                    ],
-                },
-                {
-                    type: "preset",
-                    alias: "Daylight",
-                    switch: [
-                        {
-                            groupId: "group-livingroomLights",
-                            stateData: {
-                                color_temp: 6000,
-                            },
-                        },
-                        {
-                            // Kitchen table
-                            channel: 28,
-                            stateData: {
-                                color_temp: 6000,
-                            },
-                        },
-                        {
-                            groupId: "group-hallwayCeiling",
-                            stateData: {
-                                color_temp: 6000,
-                            },
-                            ignoreForButtonState: true,
-                        },
-                        {
-                            channel: 36,
-                            stateData: {
-                                hue: 0,
-                                saturation: 0,
-                                color_temp: 0,
                             },
                         },
                     ],
@@ -2519,94 +1869,14 @@ const deviceMap = [
                     alias: "Red",
                     switch: [
                         {
-                            groupId: "group-jessDeskLights",
-                            stateData: false,
-                        },
-                        {
-                            groupId: "group-livingroomLights",
+                            // Rec room
+                            channel: 20,
                             stateData: {
                                 on_off: 1,
                                 hue: 0,
                                 saturation: 100,
                                 color_temp: 0,
                             },
-                        },
-                        {
-                            // Kitchen table
-                            channel: 28,
-                            stateData: {
-                                on_off: 1,
-                                hue: 0,
-                                saturation: 100,
-                                color_temp: 0,
-                            },
-                        },
-                        {
-                            groupId: "group-kitchenCounterLights",
-                            stateData: false,
-                        },
-                        {
-                            // Kitchen Aleds
-                            channel: 44,
-                            stateData: true,
-                        },
-                        {
-                            groupId: "group-hallwayCeiling",
-                            stateData: {
-                                on_off: 1,
-                                hue: 0,
-                                saturation: 100,
-                                color_temp: 0,
-                            },
-                            ignoreForButtonState: true,
-                        },
-                    ],
-                },
-                {
-                    type: "preset",
-                    alias: "Green",
-                    switch: [
-                        {
-                            groupId: "group-jessDeskLights",
-                            stateData: false,
-                        },
-                        {
-                            groupId: "group-livingroomLights",
-                            stateData: {
-                                on_off: 1,
-                                hue: 120,
-                                saturation: 100,
-                                color_temp: 0,
-                            },
-                        },
-                        {
-                            // Kitchen table
-                            channel: 28,
-                            stateData: {
-                                on_off: 1,
-                                hue: 120,
-                                saturation: 100,
-                                color_temp: 0,
-                            },
-                        },
-                        {
-                            groupId: "group-kitchenCounterLights",
-                            stateData: false,
-                        },
-                        {
-                            // Kitchen Aleds
-                            channel: 44,
-                            stateData: false,
-                        },
-                        {
-                            groupId: "group-hallwayCeiling",
-                            stateData: {
-                                on_off: 1,
-                                hue: 120,
-                                saturation: 100,
-                                color_temp: 0,
-                            },
-                            ignoreForButtonState: true,
                         },
                     ],
                 },
@@ -2615,11 +1885,8 @@ const deviceMap = [
                     alias: "Blue",
                     switch: [
                         {
-                            groupId: "group-jessDeskLights",
-                            stateData: false,
-                        },
-                        {
-                            groupId: "group-livingroomLights",
+                            // Rec room
+                            channel: 20,
                             stateData: {
                                 on_off: 1,
                                 hue: 240,
@@ -2627,64 +1894,8 @@ const deviceMap = [
                                 color_temp: 0,
                             },
                         },
-                        {
-                            // Kitchen table
-                            channel: 28,
-                            stateData: {
-                                on_off: 1,
-                                hue: 240,
-                                saturation: 100,
-                                color_temp: 0,
-                            },
-                        },
-                        {
-                            groupId: "group-kitchenCounterLights",
-                            stateData: false,
-                        },
-                        {
-                            // Kitchen Aleds
-                            channel: 44,
-                            stateData: false,
-                        },
-                        {
-                            groupId: "group-hallwayCeiling",
-                            stateData: {
-                                on_off: 1,
-                                hue: 240,
-                                saturation: 100,
-                                color_temp: 0,
-                            },
-                            ignoreForButtonState: true,
-                        },
                     ],
                 },
-                {
-                    type: "preset",
-                    alias: "Bedroom Full",
-                    switch: [
-                        {
-                            groupId: "group-bedroomCeilingLights",
-                            stateData: {
-                                on_off: 1,
-                                brightness: 100,
-                            },
-                        },
-                    ],
-                },
-                {
-                    type: "preset",
-                    alias: "Bedroom Low",
-                    switch: [
-                        {
-                            groupId: "group-bedroomCeilingLights",
-                            stateData: {
-                                on_off: 1,
-                                brightness: 15,
-                            },
-                        },
-                    ],
-                },
-
                 // *********** Master *************
                 {
                     type: "master",
@@ -2692,26 +1903,18 @@ const deviceMap = [
                     buttonId: "master-on",
                     switch: [
                         {
-                            groupId: "group-livingroomLights",
-                            stateData: true,
-                        },
-                        {
-                            groupId: "group-kitchenCounterLights",
-                            stateData: true,
-                        },
-                        {
-                            // Kitchen table
-                            channel: 28,
+                            // Bed strip
+                            channel: 11,
                             stateData: {
                                 on_off: 1,
-                                brightness: 100,
                             },
                         },
                         {
-                            // Kitchen Aleds
-                            channel: 44,
-                            stateData: false,
-                            ignoreForButtonState: true,
+                            // Rec room
+                            channel: 20,
+                            stateData: {
+                                on_off: 1,
+                            },
                         },
                     ],
                 },
@@ -2721,97 +1924,24 @@ const deviceMap = [
                     buttonId: "master-off",
                     switch: [
                         {
-                            groupId: "group-jessDeskLights",
-                            stateData: false,
-                        },
-                        {
-                            groupId: "group-livingroomLights",
-                            stateData: false,
-                        },
-                        {
-                            groupId: "group-kitchenCounterLights",
-                            stateData: false,
-                        },
-                        {
-                            // Kitchen table
-                            channel: 28,
+                            // Bed strip
+                            channel: 11,
                             stateData: {
                                 on_off: 0,
                             },
                         },
                         {
-                            // Kitchen Aleds
-                            channel: 44,
-                            stateData: true,
-                        },
-                        {
-                            groupId: "group-hallwayCeiling",
-                            stateData: false,
-                        },
-                        // {
-                        //     groupId: "group-bathroomLights",
-                        //     stateData: false,
-                        //     ignoreForButtonState: true,
-                        // },
-                        {
-                            groupId: "group-bedroomCeilingLights",
-                            stateData: false,
-                            ignoreForButtonState: true,
-                        },
-                        {
-                            groupId: "group-bedroomDeskLights",
-                            stateData: false,
-                        },
-                        {
-                            // Thermostat Bathroom
-                            channel: 207,
-                            stateData: false,
-                            ignoreForButtonState: true,
-                        },
-                        {
-                            // Heater Bathroom
-                            channel: 15,
-                            stateData: false,
-                            ignoreForButtonState: true,
-                        },
-                        {
-                            // Thermostat Bedroom
-                            channel: 208,
-                            stateData: false,
-                            ignoreForButtonState: true,
-                        },
-                        {
-                            // Heater Bedroom
-                            channel: 4,
-                            stateData: false,
-                            ignoreForButtonState: true,
-                        },
-                        {
-                            // Fan Bedroom
-                            channel: 5,
-                            stateData: true,
-                            ignoreForButtonState: true,
-                        },
-                        {
-                            // Amp Bedroom
-                            channel: 39,
-                            stateData: false,
-                            ignoreForButtonState: true,
+                            // Rec room
+                            channel: 20,
+                            stateData: {
+                                on_off: 0,
+                            },
                         },
                     ],
                 },
             ],
         },
     },
-
-    //Kitchen and living room all: ***** ***** ***** *p*p* pp*p* ppppp **
-    //Full on: **1** ***** ****1 11*1* 11*1* 11111 111
-    //Blackout: 000** 00000 00**0 00000 00000 00000 000
-    //Desk work: **p** ***** ****p p
-    //Bedroom ceil: ***** pp***
-    //Bedroom all: *pp** pp*** ***** p**** ***** ***** ***** *pp**
-    //Bathroom: ***** ****pp pp***
-    //Jess' desk: ***** ***** ***** ***** ***** ***** *ppp**
 ];
 
 const presets = [

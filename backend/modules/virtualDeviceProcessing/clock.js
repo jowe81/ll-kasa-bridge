@@ -309,6 +309,9 @@ async function getRaidStatus(devices) {
         devices = [];
     }
 
+    const excludeDevices = [1];
+    devices = devices.filter((device, index) => !excludeDevices.includes(index));
+
     const promises = devices.map(device => {
         return execPromise(`cat /proc/mdstat | grep -A2 ${device}`);
     });
@@ -331,6 +334,21 @@ async function getRaidStatus(devices) {
     //         stderr: "",
     //     },
     // ];
+
+    // 2|jj-auto  | 2024/10/06 13:29:00 Ch  1 (Front Door Lamp): Polling error. Device probably went offline.: connect EHOSTUNREACH 192.168.1.70:9999
+    // 2|jj-auto  | [
+    // 2|jj-auto  |   'md0 : active raid6 sde[4] sdf[0] sdd[5] sdc[3]',
+    // 2|jj-auto  |   '      31251494912 blocks super 1.2 level 6, 512k chunk, algorithm 2 [4/4] [UUUU]',
+    // 2|jj-auto  |   '      [=>...................]  check =  8.0% (1251127040/15625747456) finish=1161.7min speed=206215K/sec',
+    // 2|jj-auto  |   ''
+    // 2|jj-auto  | ]
+    // 2|jj-auto  | [
+    // 2|jj-auto  |   'md1 : active raid1 sdb[0] sda[2]',
+    // 2|jj-auto  |   '      1000072512 blocks super 1.2 [2/2] [UU]',
+    // 2|jj-auto  |   '      bitmap: 1/8 pages [4KB], 65536KB chunk',
+    // 2|jj-auto  |   ''
+    // 2|jj-auto  | ]
+    // 2|jj-auto  | 2024/10/06 13:29:00 Ch 500: Unable to write to bedroom wallclock.    
 
     const statusInfos = devices.map((device, index) => {
         const stdout = results[index].stdout;

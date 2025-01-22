@@ -25,6 +25,7 @@ import { commandMatchesCurrentState, commandObjectToBoolean } from "./TargetData
 
 import { globalConfig } from "../configuration.js";
 import { socketHandler } from "./SocketHandler.js";
+import axios from "axios";
 
 /**
  * The DevicePool encapsulates all automation device functionality.
@@ -999,6 +1000,17 @@ const devicePool = {
                 log(messageOnClose, this.deviceWrapper);
             }            
         });
+
+        // Remote players
+        const players = this.globalConfig.remoteAudioPlayers ?? [];
+        players.forEach(player => {
+            axios
+                .post(player.url, {file: file})
+                .then(data => log(`Remote audio ${data.data?.success ? `played successfully` : `did not play`}.`))
+                .catch(err => {
+                    log(`Remote audio player ${player.url} is offline.`, "red");
+                })
+        })
     }
 
 };
