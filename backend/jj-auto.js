@@ -9,6 +9,7 @@ import { initRouter } from './routers/kasaRouter.js';
 import devicesRouter from './routers/devices.js';
 import remoteRouter from './routers/remoteRouter.js';
 import getDevicePoolRouter from './routers/devicePool.js';
+import externalRouter from './routers/externalRouter.js';
 import { socketHandler } from './modules/SocketHandler.js';
 import { log } from './helpers/jUtils.js';
 
@@ -81,6 +82,9 @@ mongoConnect().then(db => {
 
       const remote = remoteRouter(express, devicePool, utils.processRemoteRequest);
       app.use('/auto/remote', remote);
+
+      const external = externalRouter(express, devicePool, utils.getTemperatureForExternalRequest);
+      app.use('/external', external);
 
       socketHandler.initialize(io, devicePool);
       socketHandler.startSocketServer();

@@ -429,19 +429,6 @@ const globalConfig = {
             pluginName: "schedule",
             periodicallyActive: true,
             schedule: [
-                /**
-                 * The pair of items below turns the lamp on 45 minutes before sunset by overwriting
-                 * the on_off and brightness properties for the stateData passed in
-                 * (possibly the output from another filter).
-                 *
-                 * A minute later, the override is disabled and the stateData will just pass through,
-                 * (it may be empty or come from naturalLight and/or sunEvents).
-                 */
-
-                /*
-                 * This schedule item gets triggered by sunset, with an offset.
-                 * It runs a filter instead of defining data here.
-                 */
                 {
                     trigger: {
                         event: "sunset",
@@ -453,9 +440,6 @@ const globalConfig = {
                         color_temp: 2700,
                     },
                 },
-                /**
-                 * This item rescinds the previous one a minute later
-                 */
                 {
                     trigger: {
                         event: "sunset",
@@ -463,10 +447,6 @@ const globalConfig = {
                     },
                     stateData: {},
                 },
-
-                /**
-                 * This is a plain schedule item - specify a time and stateData.
-                 */
                 {
                     trigger: {
                         hours: 23,
@@ -476,45 +456,63 @@ const globalConfig = {
                         brightness: 1,
                     },
                 },
-
-                /**
-                 * This item, with an empty stateData object, will
-                 * clear whatever adjustments the preceding item made,
-                 * letting the input stateData pass through.
-                 */
                 {
                     trigger: {
-                        hours: 5,
+                        hours: 6,
                     },
-                    stateData: {},
+                    stateData: {
+                        brightness: 5,
+                    },
                 },
-
-                /**
-                 * The following pair of items turns the lamp off at sunrise by overwriting
-                 * the on_off property for the stateData passed in (possibly output from another filter)
-                 * A minute later, the override is disabled and the output from the previous filter
-                 * can pass through.
-                 */
-
-                /**
-                 * This schedule item gets triggered by sunrise, with an offset.
-                 * It runs a filter instead of defining data here.
-                 */
                 {
                     trigger: {
                         event: "sunrise",
+                        offset: 30 * MINUTE,
                     },
                     stateData: {
                         on_off: 0,
                     },
                 },
-                /**
-                 * This item rescinds the previous one a minute later
-                 */
                 {
                     trigger: {
                         event: "sunrise",
-                        offset: 1 * MINUTE,
+                        offset: 31 * MINUTE,
+                    },
+                    stateData: {
+                    },
+                },
+            ],
+        },
+        {
+            id: "schedule-recRoomMorning",
+            pluginName: "schedule",
+            periodicallyActive: true,
+            schedule: [
+                {
+                    trigger: {
+                        hours: 6,
+                    },
+                    stateData: {
+                        brightness: 90,
+                        color_temp: 4700,
+                        on_off: 1,
+                    },
+                },
+                {
+                    trigger: {
+                        event: "sunrise",
+                        offset: 30 * MINUTE,
+                    },
+                    stateData: {
+                        brightness: 50,
+                        color_temp: 2700,
+                        on_off: 0,
+                    },
+                },
+                {
+                    trigger: {
+                        event: "sunrise",
+                        offset: 31 * MINUTE,
                     },
                     stateData: {},
                 },
@@ -801,13 +799,70 @@ const deviceMap = [
         id: "8012D32B889FD9CE23C825CEB1C2EFD41F73D8E2",
         locationId: "loc-recroom",
         subType: SUBTYPE_BULB,
+        //filters: [{ refId: "schedule-recRoomMorning" }],
     },
     {
-        alias: "Rec Room Strip 1",
+        alias: "Under Bar",
         channel: 21,
         id: "80125D66D3B56B9365A992BA16C9D3E0201EEDC1",
         locationId: "loc-recroom",
         subType: SUBTYPE_LED_STRIP,
+    },
+    {
+        alias: "J&Js Bar",
+        channel: 22,
+        id: "8006DE7EE2F73CBEA4629F293A1684A52042804800",
+        locationId: "loc-recroom",
+        subType: SUBTYPE_BULB,
+    },
+    {
+        alias: "Counter",
+        channel: 23,
+        id: "8006DE7EE2F73CBEA4629F293A1684A52042804801",
+        locationId: "loc-recroom",
+        subType: SUBTYPE_BULB,
+    },
+    {
+        alias: "Ceil Strip",
+        channel: 24,
+        id: "8006DE7EE2F73CBEA4629F293A1684A52042804802",
+        locationId: "loc-recroom",
+        subType: SUBTYPE_BULB,
+    },
+    {
+        alias: "Fireplace",
+        channel: 25,
+        id: "8012410A7B3C6C369B10E0D889820C51201E08CC",
+        locationId: "loc-recroom",
+        subType: SUBTYPE_LED_STRIP,
+    },
+    {
+        alias: "Stove Fan",
+        channel: 26,
+        id: "80061465B741F3D278857FD2F8E09CD020C3200A",
+        locationId: "loc-recroom",
+        subType: SUBTYPE_LED_STRIP,
+    },
+    {
+        alias: "Above bar",
+        channel: 27,
+        id: "801224EDFE01CB1C1940AB267D059AFE201D2D46",
+        locationId: "loc-recroom",
+        subType: SUBTYPE_LED_STRIP,
+    },
+    {
+        alias: "Budweiser",
+        channel: 28,
+        id: "80065A4E60A835C49695A74DA7FAE76520436E9C01",
+        locationId: "loc-recroom",
+        subType: SUBTYPE_BULB,
+    },
+    {
+        alias: "Bar Top",
+        channel: 29,
+        id: "8006FDF98E41AFB5E2E33F27779742F7203AF7AC",
+        locationId: "loc-recroom",
+        subType: SUBTYPE_SWITCH,
     },
     {
         alias: "Hallway",
@@ -1823,6 +1878,27 @@ const deviceMap = [
                                 brightness: 100,
                             },
                         },
+                        {
+                            // Under bar
+                            channel: 21,
+                            stateData: {
+                                brightness: 55,
+                            },
+                        },
+                        {
+                            // Above bar
+                            channel: 27,
+                            stateData: {
+                                brightness: 70,
+                            },
+                        },
+                        {
+                            // Fireplace
+                            channel: 25,
+                            stateData: {
+                                brightness: 18,
+                            },
+                        },
                     ],
                 },
                 {
@@ -1834,6 +1910,27 @@ const deviceMap = [
                             channel: 20,
                             stateData: {
                                 brightness: 5,
+                            },
+                        },
+                        {
+                            // Under bar
+                            channel: 21,
+                            stateData: {
+                                brightness: 35,
+                            },
+                        },
+                        {
+                            // Above bar
+                            channel: 27,
+                            stateData: {
+                                brightness: 35,
+                            },
+                        },
+                        {
+                            // Fireplace
+                            channel: 25,
+                            stateData: {
+                                brightness: 9,
                             },
                         },
                     ],
@@ -1849,6 +1946,64 @@ const deviceMap = [
                                 brightness: 1,
                             },
                         },
+                        {
+                            // Under bar
+                            channel: 21,
+                            stateData: {
+                                brightness: 12,
+                            },
+                        },
+                        {
+                            // Above bar
+                            channel: 27,
+                            stateData: {
+                                brightness: 12,
+                            },
+                        },
+                        {
+                            // Fireplace
+                            channel: 25,
+                            stateData: {
+                                brightness: 4,
+                            },
+                        },
+                    ],
+                },
+                {
+                    type: "preset",
+                    alias: "Daylight",
+                    switch: [
+                        {
+                            // Rec room
+                            channel: 20,
+                            stateData: {
+                                color_temp: 4700,
+                            },
+                        },
+                        {
+                            // Under bar
+                            channel: 21,
+                            stateData: {
+                                hue: 220,
+                                saturation: 0,
+                            },
+                        },
+                        {
+                            // Above bar
+                            channel: 27,
+                            stateData: {
+                                hue: 220,
+                                saturation: 0,
+                            },
+                        },
+                        {
+                            // Fireplace
+                            channel: 25,
+                            stateData: {
+                                hue: 220,
+                                saturation: 0,
+                            },
+                        },
                     ],
                 },
                 {
@@ -1860,6 +2015,30 @@ const deviceMap = [
                             channel: 20,
                             stateData: {
                                 color_temp: 2700,
+                            },
+                        },
+                        {
+                            // Under bar
+                            channel: 21,
+                            stateData: {
+                                hue: 0,
+                                saturation: 100,
+                            },
+                        },
+                        {
+                            // Above bar
+                            channel: 27,
+                            stateData: {
+                                hue: 0,
+                                saturation: 100,
+                            },
+                        },
+                        {
+                            // Fireplace
+                            channel: 25,
+                            stateData: {
+                                hue: 50,
+                                saturation: 30,
                             },
                         },
                     ],

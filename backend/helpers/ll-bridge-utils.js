@@ -66,6 +66,35 @@ const processRequest = (req, res, routeCommand, devicePool) => {
   }
 }
 
+const getTemperatureForExternalRequest = async (deviceIds, devicePool) => {
+    return new Promise((resolve, reject) => {
+        if (!Array.isArray(deviceIds)) {
+            return reject('No device Ids specified');
+        }
+
+        const promises = [];
+        deviceIds.forEach((deviceId) => promises.push(devicePool.getDeviceWrapperById(deviceId)));
+
+        Promise.all(promises).then((deviceWrappers) => {
+            const data = [];
+
+            deviceWrappers.forEach(device => {
+                if (!device) {
+                    return;
+                }
+                
+                data.push({
+                    deviceId: device.id,
+                    locationId: device.locationId,
+                    alias: device.alias,
+                    data: device.getLatestDataPoint()
+                })
+            })
+            resolve(data);
+        });
+    });
+}
+
 /**
  * Handle a button on a physical remote being pushed.
  */
@@ -251,4 +280,5 @@ export default {
     buildCommandObjectFromQuery,
     processRequest,
     processRemoteRequest,
+    getTemperatureForExternalRequest,
 };
