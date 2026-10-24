@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import constants from '../constants.js';
+import { log } from './Log.js';
 
 const resolveDeviceDependencies = (deviceWrapper) => {
   const { globalConfig } = deviceWrapper.devicePool;

@@ -29,7 +29,7 @@ process.on("uncaughtException", (err) => {
 
 const app = express();
 app.use(cors());
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 
 const server = http.createServer(app);
 const io = new Server({
