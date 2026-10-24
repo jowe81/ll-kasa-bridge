@@ -379,52 +379,6 @@ const globalConfig = {
             ],
         },
         {
-            id: "schedule-kitchenCounterLights",
-            pluginName: "schedule",
-            periodicallyActive: true,
-            schedule: [
-                /**
-                 * This is a plain schedule item - specify a time and stateData.
-                 */
-                {
-                    trigger: {
-                        hours: 7,
-                        minutes: 0,
-                    },
-                    stateData: {
-                        on_off: 1,
-                    },
-                },
-                {
-                    trigger: {
-                        hours: 7,
-                        minutes: 2,
-                    },
-                    stateData: {
-                        // None. Now it can be manually switched.
-                    },
-                },
-                {
-                    trigger: {
-                        hours: 22,
-                        minutes: 0,
-                    },
-                    stateData: {
-                        on_off: 0,
-                    },
-                },
-                {
-                    trigger: {
-                        hours: 22,
-                        minutes: 2,
-                    },
-                    stateData: {
-                        // None. Now it can be manually switched.
-                    },
-                },
-            ],
-        },
-        {
             id: "schedule-hallwaysNightlights",
             pluginName: "schedule",
             periodicallyActive: true,
@@ -905,15 +859,9 @@ const deviceMap = [
                     avg_calc_data_window: 10 * MINUTE,
                 },
             },
-            pushTo: [
-                {
-                    id: "JoWe",
-                    url: "https://drw.spdns.de/wff/temperatur.php",
-                    interval: 3 * MINUTE,
-                },
-            ],
+            pushTo: [],
             sampleCollectInterval: 15 * MINUTE,
-            pushToDynforms: true,
+            pushToDynforms: false,
             dynformsSettings: {
                 api: {
                     baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
@@ -957,15 +905,9 @@ const deviceMap = [
                     avg_calc_data_window: 10 * MINUTE,
                 },
             },
-            pushTo: [
-                {
-                    id: "JoWe",
-                    url: "http://drw.spdns.de/wff/temperatur.php",
-                    interval: 3 * MINUTE,
-                },
-            ],
+            pushTo: [],
             sampleCollectInterval: 1 * HOUR,
-            pushToDynforms: true,
+            pushToDynforms: false,
             dynformsSettings: {
                 api: {
                     baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
@@ -979,96 +921,6 @@ const deviceMap = [
             },
         },
     },
-    {
-        alias: "Office",
-        channel: 203,
-        id: "esp8266-02-0",
-        url: "http://192.168.1.22/read",
-        display: true,
-        locationId: "loc-office-johannes",
-        type: constants.DEVICETYPE_ESP_THERMOMETER,
-        subType: constants.SUBTYPE_THERMOMETER,
-        settings: {
-            jsonPath: "ds18b20",
-            jsonPathId: { local_id: 0 },
-            jsonPathKey: "temperature",
-            trends: {
-                short: {
-                    label: "short",
-                    avg_calc_history_length: 15 * MINUTE,
-                    avg_calc_data_window: 1 * MINUTE,
-                },
-                mid: {
-                    label: "mid",
-                    avg_calc_history_length: 45 * MINUTE,
-                    avg_calc_data_window: 5 * MINUTE,
-                },
-                long: {
-                    label: "long",
-                    avg_calc_history_length: 90 * MINUTE,
-                    avg_calc_data_window: 10 * MINUTE,
-                },
-            },
-            sampleCollectInterval: 1 * HOUR,
-            pushToDynforms: true,
-            dynformsSettings: {
-                api: {
-                    baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
-                    path: null, // will use .env DYNFORMS_PATH or default instead
-                    queryParams: {},
-                },
-                request: {
-                    collectionName: "weatherHistory",
-                    requestType: "push",
-                },
-            },
-        },
-    },
-    // {
-    //     alias: "Bathroom",
-    //     channel: 204,
-    //     id: "esp8266-02-1",
-    //     url: "http://192.168.1.22/read",
-    //     display: true,
-    //     locationId: "loc-bathroom",
-    //     type: constants.DEVICETYPE_ESP_THERMOMETER,
-    //     subType: constants.SUBTYPE_THERMOMETER,
-    //     settings: {
-    //         jsonPath: "ds18b20",
-    //         jsonPathId: { local_id: 1 },
-    //         jsonPathKey: "temperature",
-    //         trends: {
-    //             short: {
-    //                 label: "short",
-    //                 avg_calc_history_length: 5 * MINUTE,
-    //                 avg_calc_data_window: 1 * MINUTE,
-    //             },
-    //             mid: {
-    //                 label: "mid",
-    //                 avg_calc_history_length: 20 * MINUTE,
-    //                 avg_calc_data_window: 5 * MINUTE,
-    //             },
-    //             long: {
-    //                 label: "long",
-    //                 avg_calc_history_length: 60 * MINUTE,
-    //                 avg_calc_data_window: 10 * MINUTE,
-    //             },
-    //         },
-    //         sampleCollectInterval: 1 * HOUR,
-    //         pushToDynforms: true,
-    //         dynformsSettings: {
-    //             api: {
-    //                 baseUrl: null, // will use .env DYNFORMS_HOST, DYNFORMS_PORT instead
-    //                 path: null, // will use .env DYNFORMS_PATH or default instead
-    //                 queryParams: {},
-    //             },
-    //             request: {
-    //                 collectionName: "weatherHistory",
-    //                 requestType: "push",
-    //             },
-    //         },
-    //     },
-    // },
     {
         alias: "Kitchen Timer",
         channel: 209,
@@ -1125,16 +977,6 @@ const deviceMap = [
                     id: "20m",
                     length: 20 * MINUTE,
                     ttl: 3 * MINUTE,
-                },
-                {
-                    id: "pomodoro",
-                    topLabel: "25m",
-                    subLabel: "P'doro",
-                    displayButton: true,
-                    length: 25 * MINUTE,
-                    ttl: 0,
-                    audiofileScheduled: false,
-                    audiofileExpired: "timer-pomodoro.mp3",
                 },
                 {
                     id: "60m",
