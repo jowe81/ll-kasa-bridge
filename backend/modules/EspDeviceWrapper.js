@@ -152,11 +152,16 @@ const EspDeviceWrapper = {
 
                     switch (this.subType) {
                         case constants.SUBTYPE_THERMOMETER:
-                            // Multiple thermometers can be on an ESP device; look for the right temperature.
-                            const payloadFieldKey = Object.keys(jsonPathId)[0];
-                            payload = data.data[jsonPath].find(
-                                (item) => item[payloadFieldKey] === jsonPathId[payloadFieldKey]
-                            );
+                            if (jsonPath) {
+                                // Multiple thermometers can be on an ESP device; look for the right temperature.
+                                const payloadFieldKey = Object.keys(jsonPathId)[0];
+                                payload = data.data[jsonPath].find(
+                                    (item) => item[payloadFieldKey] === jsonPathId[payloadFieldKey]
+                                );
+                            } else {
+                                // Reading is a top-level field, e.g. { tempC: 6 }.
+                                payload = { ...data.data };
+                            }
 
                             const latestDataPoint = this.getLatestDataPoint();
                             let temperaturePayload = payload[jsonPathKey] !== undefined ? 
@@ -373,7 +378,7 @@ const EspDeviceWrapper = {
 
                     switch (this.subType) {
                         case constants.SUBTYPE_THERMOMETER:
-                            if (!Array.isArray(data.data[jsonPath])) {
+                            if (jsonPath && !Array.isArray(data.data[jsonPath])) {
                                 throw new Error(
                                     `Bad data from device, expected array at jsonPath ${jsonPath} and got ${typeof data[
                                         jsonPath

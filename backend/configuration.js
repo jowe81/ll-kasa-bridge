@@ -833,14 +833,13 @@ const deviceMap = [
         alias: "Outside",
         channel: 201,
         id: "esp8266-01-0",
-        url: "http://192.168.1.23/read",
+        url: "http://192.168.1.200:8101/automation_api/logical-device/iot.woodshed_01.tempOutside/data",
         display: true,
         locationId: "loc-outside",
         type: constants.DEVICETYPE_ESP_THERMOMETER,
         subType: constants.SUBTYPE_THERMOMETER,
         settings: {
-            jsonPath: "temperature_sensors",
-            jsonPathId: { local_id: 0 },
+            // Response is a flat object, e.g. { tempC: 6 }. No jsonPath.
             jsonPathKey: "tempC",
             trends: {
                 short: {
