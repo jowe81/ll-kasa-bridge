@@ -4,7 +4,9 @@ import { log } from "../helpers/jUtils.js";
 
 const promises = [];
 
-const filterFiles = getFileNames('./filters', import.meta.url);
+const filterFiles = getFileNames("./filters", import.meta.url).filter(
+    (fileName) => fileName.endsWith(".js") && !fileName.startsWith("._")
+);
 
 let cachedFilterPlugins = {};
 

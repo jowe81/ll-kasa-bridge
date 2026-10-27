@@ -520,8 +520,8 @@ const globalConfig = {
             name: "Office",
         },
         {
-            id: "loc-garage",
-            name: "Garage",
+            id: "loc-house",
+            name: "House",
         },
     ],
 };
@@ -875,17 +875,16 @@ const deviceMap = [
         },
     },
     {
-        alias: "Garage",
+        alias: "House",
         channel: 202,
         id: "esp8266-01-1",
-        url: "http://192.168.1.23/read",
+        url: "http://192.168.1.200:8101/automation_api/logical-device/iot.aggregates.spatialAverageInsideRolling/data",
         display: true,
-        locationId: "loc-garage",
+        locationId: "loc-house",
         type: constants.DEVICETYPE_ESP_THERMOMETER,
         subType: constants.SUBTYPE_THERMOMETER,
         settings: {
-            jsonPath: "temperature_sensors",
-            jsonPathId: { local_id: 1 },
+            // Response is a flat object, e.g. { tempC: 21.3, samples: 5, windowMs: 300000 }.
             jsonPathKey: "tempC",
             trends: {
                 short: {
@@ -918,6 +917,23 @@ const deviceMap = [
                     requestType: "push",
                 },
             },
+        },
+    },
+    {
+        alias: "Woodstove",
+        channel: 210,
+        id: "woodstove-recroom",
+        display: false,
+        locationId: "loc-recroom",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_WOODSTOVE,
+        settings: {
+            url: "http://192.168.1.200:8101/automation_api/logical-device/iot.recroom_01.woodstove/data",
+            stateKey: "woodstoveState",
+            alertState: "refuel",
+            audioFile: "smooth_bells_quiet.mp3",
+            checkInterval: 1 * MINUTE,
+            repeatAfter: 30 * MINUTE,
         },
     },
     {

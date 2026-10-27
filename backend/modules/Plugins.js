@@ -3,7 +3,9 @@ import { getFileNames } from "../helpers/jUtils.js";
 import { log } from "../helpers/jUtils.js";
 
 
-const deviceHandlerFiles = getFileNames('./virtualDeviceProcessing', import.meta.url);
+const isHandlerModule = (fileName) => fileName.endsWith(".js") && !fileName.startsWith("._");
+
+const deviceHandlerFiles = getFileNames("./virtualDeviceProcessing", import.meta.url).filter(isHandlerModule);
 
 let cachedDeviceHandlerPlugins = {};
 
@@ -48,7 +50,7 @@ const loadDeviceHandlerPlugins = async () => {
 
 
 
-const commandHandlerFiles = getFileNames('./commandProcessing', import.meta.url);
+const commandHandlerFiles = getFileNames("./commandProcessing", import.meta.url).filter(isHandlerModule);
 
 let cachedCommandHandlerPlugins = {};
 
