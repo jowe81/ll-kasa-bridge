@@ -937,6 +937,19 @@ const deviceMap = [
         },
     },
     {
+        alias: "Furnace",
+        channel: 211,
+        id: "furnace-closet",
+        display: false,
+        locationId: "loc-recroom",
+        type: constants.DEVICETYPE_VIRTUAL,
+        subType: constants.SUBTYPE_FURNACE,
+        settings: {
+            url: "http://192.168.1.200:8101/automation_api/logical-device/iot.furnace_closet_01.furnace/data",
+            checkInterval: 15 * SECOND,
+        },
+    },
+    {
         alias: "Kitchen Timer",
         channel: 209,
         id: "timer-kitchen",

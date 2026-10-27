@@ -58,6 +58,7 @@ const constants = {
     SUBTYPE_THERMOSTAT: "thermostat",
     SUBTYPE_TIMER: "timer",
     SUBTYPE_WOODSTOVE: "woodstove",
+    SUBTYPE_FURNACE: "furnace",
     SUBTYPE_WEATHER_SERVICE: "weatherService",
     SUBTYPE_DYNFORMS_SERVICE: "dynformsService",
     SUBTYPE_DAV_SERVICE: "davService",
@@ -93,6 +94,7 @@ constants.SUBTYPES = [
     constants.SUBTYPE_THERMOSTAT,
     constants.SUBTYPE_TIMER,
     constants.SUBTYPE_WOODSTOVE,
+    constants.SUBTYPE_FURNACE,
     constants.SUBTYPE_WEATHER_SERVICE,
     constants.SUBTYPE_DYNFORMS_SERVICE,
     constants.SUBTYPE_DAV_SERVICE,
@@ -145,6 +147,10 @@ constants.DEVICETYPE_DEFAULTS = {
             ALERT_STATE: "refuel",
             AUDIO_FILE: "smooth_bells_quiet.mp3",
             REPEAT_AFTER: 30 * MINUTE,
+        },
+
+        [constants.SUBTYPE_FURNACE]: {
+            CHECKING_INTERVAL_DEFAULT: 15 * SECOND,
         },
 
         [constants.SUBTYPE_TIMER]: {

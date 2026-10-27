@@ -3,6 +3,7 @@ import constants from "../../constants.ts";
 import Forecast from "./forecast/Forecast";
 import Clock from "./clock/Clock";
 import Temperature from "./temperature/Temperature";
+import HeatingStatus from "./temperature/HeatingStatus";
 import CompactTimer from "./compactTimer/CompactTimer";
 import CompactBirthdays from "./compactBirthdays/CompactBirthdays";
 import CompactCalendar from "./compactCalendar/CompactCalendar.tsx";
@@ -40,7 +41,7 @@ function TouchUiPanel(props: any) {
             {controlsMode && !alerts.length && <ServerStatus />}
             {panelMode && alerts.length > 0 && <Alerts alerts={alerts} />}
             {panelMode && alerts.length === 0 && <Notes />}
-            <Temperature thermometersStartIndex={2} />
+            <HeatingStatus />
 
             {showMailbox && <Mailbox />}
             {!showMailbox && <Temperature thermometersStartIndex={0} />}

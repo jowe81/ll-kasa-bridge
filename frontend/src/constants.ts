@@ -98,7 +98,9 @@ constants.photos = {
 };
 
 constants.touchPanel = {
-    thermometerChannels: [201, 202, 203, 204],
+    thermometerChannels: [201, 202],
+    woodstoveChannel: 210,
+    furnaceChannel: 211,
     forecastChannels: [501],
     mailboxChannel: 206,
 };
