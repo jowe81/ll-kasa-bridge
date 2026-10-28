@@ -2,16 +2,18 @@ import { useState, useEffect } from 'react';
 import { Device } from './dataSlice.ts';
 import constants from '../../../constants.ts';
 
+const setPowerStateTimeout = constants.SECOND * 5;
+
 const TouchButtonDevice = ({device, onClick}) => {
 
-  const [isPending, setIsPending] = useState(false);
-  const [powerState, setPowerState] = useState(null);
+  const [isPending, setIsPending] = useState<boolean | number>(false);
+  const [powerState, setPowerState] = useState<boolean | null>(null);
 
   const powerStateClass = getPowerStateClass(device);
   const bgIconClass = getBgIconClass(device)
 
   const handleClick = (e) => {
-    setIsPending(true);    
+    setIsPending(Date.now());
     onClick(e);
   }
 
@@ -20,8 +22,16 @@ const TouchButtonDevice = ({device, onClick}) => {
 
     if ((typeof powerState === 'boolean') && (powerState !== device.powerState)) {
       setIsPending(false);
-    }  
-  }, [device])
+    }
+
+    const handle = setInterval(() => {
+      if (typeof isPending === 'number' && Date.now() > isPending + setPowerStateTimeout) {
+        setIsPending(false);
+      }
+    }, 1000);
+
+    return () => clearInterval(handle);
+  }, [device.powerState, isPending])
 
   //console.log(`Rendering device ${device.alias}`, device.powerState);
 
@@ -46,7 +56,7 @@ const TouchButtonDevice = ({device, onClick}) => {
 
   return (
     <div 
-      className={`device-button ${bgIconClass} powerstate-toggle-button powerstate-toggle-button-small ${!isPending && powerStateClass }`}
+      className={`device-button ${bgIconClass} powerstate-toggle-button powerstate-toggle-button-small ${isPending ? 'device-pending' : powerStateClass}`}
       data-device-channel={device.channel} 
       onClick={handleClick}
     >

@@ -556,9 +556,9 @@ const EspDeviceWrapper = {
             isOnline: this.isOnline,            
         };
 
-        switch (this.type) {
-            case constants.DEVICETYPE_ESP_RELAY:
-                data.powerState = this.getPowerState();                
+        const powerState = this.getPowerState();
+        if (typeof powerState === 'boolean') {
+            data.powerState = powerState;
         }
 
         return data;
@@ -577,6 +577,22 @@ const EspDeviceWrapper = {
     },
 
     getPowerState() {
+        if (typeof this.state === 'boolean') {
+            return this.state;
+        }
+
+        if (this.state === 'true' || this.state === 'false') {
+            return this.state === 'true';
+        }
+
+        if (this.state?.on_off === 0 || this.state?.on_off === 1) {
+            return this.state.on_off === 1;
+        }
+
+        if (typeof this.state?.lights_on === 'boolean') {
+            return this.state.lights_on;
+        }
+
         switch (this.type) {
             case constants.DEVICETYPE_ESP_RELAY: // Includes mailbox lights, mailbox lock
                 return !!this.state;
@@ -818,10 +834,9 @@ const EspDeviceWrapper = {
 
         this.state = _.cloneDeep(payload);
 
-        switch (this.type) {
-            case constants.DEVICETYPE_ESP_RELAY:
-                this.powerState = this.getPowerState();
-                break;
+        const powerState = this.getPowerState();
+        if (typeof powerState === 'boolean') {
+            this.powerState = powerState;
         }
     },
 };

@@ -123,22 +123,30 @@ const dataSlice = createSlice({
         // Update device state for a single device
         deviceStateUpdated(data: Data, action:PayloadAction<DeviceStateUpdate>) {
           const { devices } = data;
-          const { channel, state } = action.payload.data;
+          const payload = action.payload?.data;
+          if (!payload) {
+            return;
+          }
 
+          const { channel, state } = payload;
           const deviceKey = getDeviceKeyByChannel(data.devices, channel);
         
           if (deviceKey !== null) {
-            switch (devices[deviceKey].type) {
-              case constants.SUBTYPE_THERMOMETER:
-                break;
-
-              default:
-                devices[deviceKey].powerState = action.payload.data.powerState;
-
+            // A missing powerState used to be written through as undefined and
+            // turned the switch gray (power-not-available) permanently.
+            if (devices[deviceKey].type !== constants.SUBTYPE_THERMOMETER && typeof payload.powerState === 'boolean') {
+              devices[deviceKey].powerState = payload.powerState;
+            } else if (devices[deviceKey].type !== constants.SUBTYPE_THERMOMETER && typeof state === 'boolean') {
+              devices[deviceKey].powerState = state;
             }
 
-            devices[deviceKey].state = state;
-            devices[deviceKey].isOnline = action.payload.data.isOnline;
+            if (state !== undefined) {
+              devices[deviceKey].state = state;
+            }
+
+            if (typeof payload.isOnline === 'boolean') {
+              devices[deviceKey].isOnline = payload.isOnline;
+            }
           }
         },
 
@@ -168,9 +176,14 @@ const addDevice = (devices: Device[], addedDevice: Device) => {
 
 const getDeviceKeyByChannel = ((devices: Device[], channel: number): number | null => {
   let deviceKey: number | null = null;
+  const wanted = Number(channel);
+
+  if (!Number.isFinite(wanted)) {
+    return null;
+  }
 
   Object.keys(devices).every((device, key) => {
-    if (devices[key].channel !== channel) {
+    if (Number(devices[key].channel) !== wanted) {
       return true;
     }
 

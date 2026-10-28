@@ -102,13 +102,32 @@ const cmdFailPrefix = '[FAIL]';
     //If no callback function is present create a dummy.
     const deviceEventCallback = this.deviceEventCallback ? this.deviceEventCallback : () => {};
 
+    const reportStateAfterHandlerError = (label, listener) => (newState) => {
+      try {
+        listener(newState);
+      } catch (err) {
+        log(`${label} handler failed: ${err.message}`, this, 'red');
+        try {
+          this._updateState(newState);
+        } catch (updateErr) {
+          log(`${label} state update failed: ${updateErr.message}`, this, 'red');
+        }
+
+        if (typeof this.getPowerState() !== 'boolean' && typeof newState === 'boolean') {
+          this.powerState = newState;
+        }
+
+        this._emitDeviceStateUpdate({ changed: true, on_off: true });
+      }
+    };
+
     switch (this.device.type) {
       case constants.DEVICETYPE_KASA_SMARTPLUGSWITCH:
-        this.device.on('power-update', onOffListener);
+        this.device.on('power-update', reportStateAfterHandlerError('power-update', onOffListener));
         break;
   
       case constants.DEVICETYPE_KASA_SMARTBULB:
-        this.device.on('lightstate-update', lightStateListener);
+        this.device.on('lightstate-update', reportStateAfterHandlerError('lightstate-update', lightStateListener));
         break;
     }
   
@@ -148,6 +167,13 @@ const cmdFailPrefix = '[FAIL]';
 
     if (changeInfo.changed) {
 
+      // Plug relay updates are booleans. Treat any boolean transition as on/off,
+      // including devices whose sysinfo type is not exactly IOT.SMARTPLUGSWITCH.
+      if (typeof this.state === 'boolean' || typeof newState === 'boolean') {
+        changeInfo.on_off = this.state !== newState;
+        return changeInfo;
+      }
+
       // If this is a power-state change then there's nothing to analyse; newState is boolean
       if (this.type === constants.DEVICETYPE_KASA_SMARTPLUGSWITCH) {
         changeInfo.on_off = true;
@@ -156,35 +182,35 @@ const cmdFailPrefix = '[FAIL]';
 
       let backendChange;
 
-      changeInfo.on_off = this.state.on_off !== newState.on_off;
-      changeInfo.transition = this.state.transition !== newState.transition;
+      changeInfo.on_off = this.state?.on_off !== newState?.on_off;
+      changeInfo.transition = this.state?.transition !== newState?.transition;
 
       if (changeInfo.on_off) {
-        if (newState.on_off === 1) {
+        if (newState?.on_off === 1) {
           // Was turned on
           backendChange = newState.dft_on_state ? true : false;
 
           if (backendChange) {
-            changeInfo.settings = !_.isEqual(this.state.dft_on_state.groups, newState.dft_on_state.groups);
+            changeInfo.settings = !_.isEqual(this.state?.dft_on_state?.groups, newState?.dft_on_state?.groups);
           } else {
-            changeInfo.settings = !_.isEqual(this.state.dft_on_state.groups, newState.groups);
+            changeInfo.settings = !_.isEqual(this.state?.dft_on_state?.groups, newState?.groups);
           }
         } else {
           // Was turned off
-          backendChange = newState.mode && newState.groups;
+          backendChange = newState?.mode && newState?.groups;
 
           if (backendChange) {            
-            changeInfo.settings = !_.isEqual(this.state.groups, newState.groups);
+            changeInfo.settings = !_.isEqual(this.state?.groups, newState?.groups);
           } else {
-            changeInfo.settings = !_.isEqual(this.state.groups, newState.dft_on_state.groups);
+            changeInfo.settings = !_.isEqual(this.state?.groups, newState?.dft_on_state?.groups);
           }
         }
       } else {
         // Was not an on_off change
-        if (this.state.on_off === 1) {
-          changeInfo.settings = !_.isEqual(this.state.groups, newState.groups);
+        if (this.state?.on_off === 1) {
+          changeInfo.settings = !_.isEqual(this.state?.groups, newState?.groups);
         } else {
-          changeInfo.settings = !_.isEqual(this.state.dft_on_state.groups, newState.dft_on_state.groups);
+          changeInfo.settings = !_.isEqual(this.state?.dft_on_state?.groups, newState?.dft_on_state?.groups);
         }
         
       }
@@ -482,24 +508,37 @@ const cmdFailPrefix = '[FAIL]';
 
   // Return power state as a boolean, regardless of the type of device
   getPowerState() {
-    let powerState = undefined;
+    const { state } = this;
 
-    switch (this.type) {
-      case constants.DEVICETYPE_KASA_SMARTBULB:
-        if ([0, 1].includes(this.state?.on_off)) {
-          powerState = this.state.on_off === 1 ? true : false;
-        }
-        break;
-
-      case constants.DEVICETYPE_KASA_SMARTPLUGSWITCH:
-        if (typeof this.state === 'boolean') {
-          powerState = this.state;
-        }
-        break;
-
+    if (typeof state === 'boolean') {
+      return state;
     }
 
-    return powerState;
+    if (state === 0 || state === 1) {
+      return state === 1;
+    }
+
+    if (!state || typeof state !== 'object') {
+      return undefined;
+    }
+
+    if (state.on_off === 0 || state.on_off === 1) {
+      return state.on_off === 1;
+    }
+
+    if (typeof state.on_off === 'boolean') {
+      return state.on_off;
+    }
+
+    if (typeof state.powerState === 'boolean') {
+      return state.powerState;
+    }
+
+    if (state.relay_state === 0 || state.relay_state === 1) {
+      return state.relay_state === 1;
+    }
+
+    return undefined;
   },
 
   /**
@@ -827,7 +866,17 @@ const cmdFailPrefix = '[FAIL]';
         return;
       }
       
-      log(`${cmdPrefix} [${originText}] setPowerState ${state ? 'on' : 'off'}`, this, 'cyan');  
+      log(`${cmdPrefix} [${originText}] setPowerState ${state ? 'on' : 'off'}`, this, 'cyan');
+
+      // The device event is what normally pushes state to the UI. If that event
+      // never produced a matching boolean, publish the state the device just confirmed.
+      if (this.getPowerState() !== !!state) {
+        this.powerState = !!state;
+        if (typeof this.state === 'boolean') {
+          this.state = !!state;
+        }
+        this._emitDeviceStateUpdate({ changed: true, on_off: true });
+      }
     } catch(err) {
       log(`${cmdPrefix} [${originText}]${cmdFailPrefix} setPowerState error; caching command: power-${state ? 'on' : 'off'}`, this, null, err);
       this.cacheCommand(state, triggerSwitchPosition);
